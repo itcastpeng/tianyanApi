@@ -5,7 +5,7 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.company import AddForm, UpdateForm, SelectForm
+from api.forms.article import AddForm, UpdateForm, SelectForm
 import json
 
 
@@ -19,16 +19,16 @@ def article(request):
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
-            order = request.GET.get('order', '-create_date')
+            order = request.GET.get('order', '-create_datetime')
             field_dict = {
                 'id': '',
-                'name': '__contains',
-                'create_date': '',
-                'oper_user__username': '__contains',
+                'title': '__contains',
+                'classify_id': '__in',
+                'create_datetime': '',
             }
             q = conditionCom(request, field_dict)
             print('q -->', q)
-            objs = models.company.objects.filter(q).order_by(order)
+            objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
             count = objs.count()
 
             if length != 0:
@@ -49,9 +49,11 @@ def article(request):
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'name': obj.name,
-                    'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
-                    'oper_user__username': oper_user_username,
+                    'title': obj.title,
+                    'content': obj.content,
+                    'classify_id': obj.classify_id,
+                    'classify_name': obj.classify.name,
+                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
             #  查询成功 返回200 状态码
             response.code = 200

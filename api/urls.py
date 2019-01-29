@@ -1,21 +1,21 @@
 
 from django.conf.urls import url
 
-from api.views_dir import user, wechat, classify
+from api.views_dir import user, wechat, classify, article
 
 urlpatterns = [
 
     # 分类管理
-    url(r'^classify/(?P<oper_type>\w+)/(?P<o_id>\d+)', classify.classify_oper),
+    # url(r'^classify/(?P<oper_type>\w+)/(?P<o_id>\d+)', classify.classify_oper),
     url(r'^classify', classify.classify),
 
     # # 公司管理
     # url(r'^company/(?P<oper_type>\w+)/(?P<o_id>\d+)', company.company_oper),
     # url(r'^company', company.company),
 
-    # # 文章管理
-    # url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)', article.article_oper),
-    # url(r'^article', article.article),
+    # 文章管理
+    url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)', article.article_oper),
+    url(r'^article', article.article),
 
     # 用户管理
     url(r'^user', user.user),
