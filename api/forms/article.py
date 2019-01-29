@@ -7,64 +7,58 @@ import time
 
 # 添加
 class AddForm(forms.Form):
-    oper_user_id = forms.IntegerField(
+    create_user_id = forms.IntegerField(
         required=True,
         error_messages={
-            'required': '操作人不能为空'
+            'required': '创建人不能为空'
         }
     )
 
-    username = forms.CharField(
+    title = forms.CharField(
         required=True,
         error_messages={
-            'required': "用户名不能为空"
+            'required': "标题不能为空"
         }
     )
-    password = forms.CharField(
+    content = forms.CharField(
         required=True,
         error_messages={
-            'required': "密码不能为空"
-        }
-    )
-
-    role_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "角色名称不能为空"
+            'required': "内容不能为空"
         }
     )
 
-    company_id = forms.IntegerField(
+    classify_id = forms.IntegerField(
         required=True,
         error_messages={
-            'required': "公司ID不能为空"
+            'required': "分类id不能为空"
         }
     )
 
-    token = forms.IntegerField(
-        required=False
-    )
+    # 查询文章标题是否存在
+    def clean_title(self):
+        create_user_id = self.data['create_user_id']
+        title = self.data['title']
 
-    # 查询名称是否存在
-    def clean_name(self):
-        username = self.data['username']
-        company_id = self.data['company_id']
-        objs = models.userprofile.objects.filter(
-            username=username,
-            company_id=company_id,
+        objs = models.Article.objects.filter(
+            create_user_id=create_user_id,
+            title=title,
         )
         if objs:
-            self.add_error('username', '用户名已存在')
+            self.add_error('title', '标题已存在')
         else:
-            return username
+            return title
 
-    def clean_password(self):
-        password = self.data['password']
-        return account.str_encrypt(password)
+    # 查询分类Id是否存在
+    def clean_classify_id(self):
+        classify_id = self.data['classify_id']
 
-    def clean_token(self):
-        password = self.data['password']
-        return account.get_token(password + str(int(time.time()) * 1000))
+        objs = models.Classify.objects.filter(
+            id=classify_id,
+        )
+        if not objs:
+            self.add_error('classify_id', '分类Id不存在')
+        else:
+            return classify_id
 
 
 # 更新
@@ -72,49 +66,72 @@ class UpdateForm(forms.Form):
     o_id = forms.IntegerField(
         required=True,
         error_messages={
-            'required': '角色id不能为空'
+            'required': '文章id不能为空'
         }
     )
 
-    username = forms.CharField(
+    title = forms.CharField(
         required=True,
         error_messages={
-            'required': "用户名不能为空"
+            'required': "标题不能为空"
         }
     )
-
-    role_id = forms.IntegerField(
+    content = forms.CharField(
         required=True,
         error_messages={
-            'required': "角色名称不能为空"
+            'required': "内容不能为空"
         }
     )
 
-    company_id = forms.IntegerField(
+    classify_id = forms.IntegerField(
         required=True,
         error_messages={
-            'required': "公司ID不能为空"
+            'required': "分类id不能为空"
         }
     )
 
-    # 判断名称是否存在
-    def clean_username(self):
+    # 查询文章标题是否存在
+    def clean_o_id(self):
+        create_user_id = self.data['create_user_id']
         o_id = self.data['o_id']
-        username = self.data['username']
-        company_id = self.data['company_id']
-        objs = models.userprofile.objects.filter(
-            username=username,
-            company_id=company_id
-        ).exclude(
-            id=o_id
+
+        objs = models.Article.objects.filter(
+            create_user_id=create_user_id,
+            id=o_id,
+        )
+        if not objs:
+            self.add_error('o_id', '文章不存在')
+        else:
+            return o_id
+
+    # 查询文章标题是否存在
+    def clean_title(self):
+        create_user_id = self.data['create_user_id']
+        title = self.data['title']
+
+        objs = models.Article.objects.filter(
+            create_user_id=create_user_id,
+            title=title,
         )
         if objs:
-            self.add_error('username', '用户名已存在')
+            self.add_error('title', '标题已存在')
         else:
-            return username
+            return title
+
+    # 查询分类Id是否存在
+    def clean_classify_id(self):
+        classify_id = self.data['classify_id']
+
+        objs = models.Classify.objects.filter(
+            id=classify_id,
+        )
+        if not objs:
+            self.add_error('classify_id', '分类Id不存在')
+        else:
+            return classify_id
 
 
-# 判断是否是数字
+# 查询
 class SelectForm(forms.Form):
     current_page = forms.IntegerField(
         required=False,

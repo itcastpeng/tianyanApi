@@ -24,6 +24,7 @@ def article(request):
                 'id': '',
                 'title': '__contains',
                 'classify_id': '__in',
+                'create_user_id': '__in',
                 'create_datetime': '',
             }
             q = conditionCom(request, field_dict)
@@ -87,9 +88,10 @@ def article_oper(request, oper_type, o_id):
     if request.method == "POST":
         if oper_type == "add":
             form_data = {
-                'user_id': o_id,
-                'oper_user_id': request.GET.get('user_id'),
-                'name': request.POST.get('name'),
+                'create_user_id': request.GET.get('user_id'),
+                'title': request.POST.get('title'),
+                'content': request.POST.get('content'),
+                'classify_id': request.POST.get('classify_id'),
             }
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
@@ -98,7 +100,7 @@ def article_oper(request, oper_type, o_id):
                 # print(forms_obj.cleaned_data)
                 #  添加数据库
                 # print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
-                obj = models.company.objects.create(**forms_obj.cleaned_data)
+                obj = models.Article.objects.create(**forms_obj.cleaned_data)
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'testCase': obj.id}
@@ -109,21 +111,24 @@ def article_oper(request, oper_type, o_id):
                 # print(forms_obj.errors.as_json())
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        elif oper_type == "delete":
-            # 删除 ID
-            objs = models.company.objects.filter(id=o_id)
-            if objs:
-                objs.delete()
-                response.code = 200
-                response.msg = "删除成功"
-            else:
-                response.code = 302
-                response.msg = '删除ID不存在'
+        # elif oper_type == "delete":
+        #     # 删除 ID
+        #     objs = models.company.objects.filter(id=o_id)
+        #     if objs:
+        #         objs.delete()
+        #         response.code = 200
+        #         response.msg = "删除成功"
+        #     else:
+        #         response.code = 302
+        #         response.msg = '删除ID不存在'
         elif oper_type == "update":
             # 获取需要修改的信息
             form_data = {
                 'o_id': o_id,
-                'name': request.POST.get('name'),
+                'create_user_id': request.GET.get('user_id'),
+                'title': request.POST.get('title'),
+                'content': request.POST.get('content'),
+                'classify_id': request.POST.get('classify_id'),
             }
 
             forms_obj = UpdateForm(form_data)
@@ -131,22 +136,19 @@ def article_oper(request, oper_type, o_id):
                 print("验证通过")
                 print(forms_obj.cleaned_data)
                 o_id = forms_obj.cleaned_data['o_id']
-                name = forms_obj.cleaned_data['name']
-                #  查询数据库  用户id
-                objs = models.company.objects.filter(
-                    id=o_id
-                )
-                #  更新 数据
-                if objs:
-                    objs.update(
-                        name=name
-                    )
+                title = forms_obj.cleaned_data['title']
+                content = forms_obj.cleaned_data['content']
+                classify_id = forms_obj.cleaned_data['classify_id']
 
-                    response.code = 200
-                    response.msg = "修改成功"
-                else:
-                    response.code = 303
-                    response.msg = json.loads(forms_obj.errors.as_json())
+                #  查询更新 数据
+                models.Article.objects.filter(id=o_id).update(
+                    title=title,
+                    content=content,
+                    classify_id=classify_id,
+                )
+
+                response.code = 200
+                response.msg = "修改成功"
 
             else:
                 print("验证不通过")

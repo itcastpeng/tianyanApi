@@ -81,4 +81,5 @@ class Article(models.Model):
     content = models.TextField(verbose_name="文章内容")
     classify = models.ForeignKey('Classify', verbose_name='所属分类')
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户')
 
