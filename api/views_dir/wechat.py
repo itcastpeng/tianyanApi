@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from api import models
 import base64
 import time
+import datetime
 import json
 import xml.dom.minidom
 
@@ -102,11 +103,13 @@ def wechat(request):
                 else:
                     encodestr = base64.b64encode(ret_obj['nickname'].encode('utf-8'))
                     encode_username = str(encodestr, encoding='utf-8')
+                    overdue_date = datetime.datetime.now() + datetime.timedelta(days=30)
 
                     user_data['inviter_id'] = inviter_user_id
                     user_data['set_avator'] = ret_obj['headimgurl']
                     user_data['name'] = encode_username
                     user_data['openid'] = ret_obj['openid']
+                    user_data['overdue_date'] = overdue_date
                     print("user_data --->", user_data)
                     models.Userprofile.objects.create(**user_data)
 
