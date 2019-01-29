@@ -110,6 +110,7 @@ def wechat(request):
                     user_data['name'] = encode_username
                     user_data['openid'] = ret_obj['openid']
                     user_data['overdue_date'] = overdue_date
+                    user_data['token'] = get_token()
                     print("user_data --->", user_data)
                     models.Userprofile.objects.create(**user_data)
 
