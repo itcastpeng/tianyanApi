@@ -61,36 +61,53 @@ def wechat(request):
                 if event == "subscribe":
                     event_key = event_key.split("qrscene_")[-1]
                 event_key = json.loads(event_key)
-                timestamp = event_key["timestamp"]
+                inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
                 print('event_key -->', event_key)
 
-                # # 保证1个微信只能够关联1个账号
+                # 保证1个微信只能够关联1个账号
                 user_objs = models.Userprofile.objects.filter(openid=openid)
-                if user_objs:
-                    obj = user_objs[0]
-                    # print(obj.username)
-                    obj.timestamp = timestamp
-                    obj.save()
-                else:
-                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                    print('ret_obj -->', ret_obj)
+                ret_obj = weichat_api_obj.get_user_info(openid=openid)
 
+                print('ret_obj -->', ret_obj)
+                """
+                    {
+                        'subscribe_scene': 'ADD_SCENE_QR_CODE', 
+                            'city': '丰台', 
+                        'openid': 'oX0xv1pJPEv1nnhswmSxr0VyolLE', 
+                        'qr_scene': 0, 
+                        'tagid_list': [], 
+                        'nickname': '张聪', 
+                        'subscribe_time': 1527689396, 
+                            'country': '中国', 
+                        'groupid': 0, 
+                        'subscribe': 1, 
+                        'qr_scene_str': '{"timestamp": "1527689369548"}', 
+                        'headimgurl': 'http://thirdwx.qlogo.cn/mmopen/oFswpUmYn53kTv5QdmmONicVJqp3okrhHospu6icoLF7Slc5XyZWR96STN9RiakoBQn1uoFJIWEicJgJ1QjR5iaGOgWNQ5BSVqFe5/132', 
+                            'province': '北京', 
+                            'sex': 1, 
+                        'language': 'zh_CN', 
+                        'remark': ''
+                    }
+                """
+
+                user_data = {
+                    "sex": ret_obj['sex'],
+                    "country": ret_obj['country'],
+                    "province": ret_obj['province'],
+                    "city": ret_obj['city'],
+                }
+
+                if user_objs:
+                    user_objs.update(**user_data)
+                else:
                     encodestr = base64.b64encode(ret_obj['nickname'].encode('utf-8'))
                     encode_username = str(encodestr, encoding='utf-8')
-                    print('encode_username -->', encode_username)
-                    # models.Userprofile.objects.create(
-                    #     openid=openid,
-                    #     token=get_token(timestamp),
-                    #     timestamp=timestamp,
-                    #     sex=ret_obj['sex'],
-                    #     country=ret_obj['country'],
-                    #     province=ret_obj['province'],
-                    #     city=ret_obj['city'],
-                    #     subscribe_time=ret_obj['subscribe_time'],
-                    #     set_avator=ret_obj['headimgurl'],
-                    #     username=encode_username,
-                    #     # username=ret_obj['nickname'],
-                    # )
+
+                    user_data['inviter_user_id'] = inviter_user_id
+                    user_data['set_avator'] = ret_obj['headimgurl']
+                    user_data['name'] = encode_username
+                    user_data['openid'] = ret_obj['openid']
+                    models.Userprofile.objects.create(**user_data)
 
             # 取消关注
             elif event == "unsubscribe":
@@ -137,14 +154,14 @@ def wechat(request):
 def weichat_generate_qrcode(request):
     weichat_api_obj = WeChatApi()
     response = ResponseObj()
-    timestamp = str(int(time.time() * 1000))
-    qc_code_url = weichat_api_obj.generate_qrcode({'timestamp': timestamp})
+    inviter_user_id = request.GET.get('inviter_user_id')
+    qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': inviter_user_id})
     print(qc_code_url)
 
     response.code = 200
     response.data = {
         'qc_code_url': qc_code_url,
-        'timestamp': timestamp
+        'timestamp': inviter_user_id
     }
 
     return JsonResponse(response.__dict__)

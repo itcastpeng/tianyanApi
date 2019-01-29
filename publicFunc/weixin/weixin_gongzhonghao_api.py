@@ -289,6 +289,6 @@ class WeChatApi(object):
 
 if __name__ == '__main__':
 
-    obj = WeChatPublicSendMsg("wechat_data.json")
+    obj = WeChatApi("wechat_data.json")
 
 
