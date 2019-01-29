@@ -79,8 +79,11 @@ def is_token(table_obj):
 
 
 if __name__ == '__main__':
-    print(get_token(randon_str()))
-
+    # print(get_token(randon_str()))
+    timestamp = str(int(time.time() * 1000))
+    token = "892836aad41572b8d8fdd58c04103472"
+    user_id = 1
+    print(timestamp, str_encrypt(timestamp + token))
 
 
 

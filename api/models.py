@@ -62,16 +62,17 @@ class Userprofile(models.Model):
     )
 
 
-
 # 团队表
 class Team(models.Model):
     name = models.CharField(verbose_name="团队名称", max_length=128)
     create_user = models.ForeignKey('Userprofile', verbose_name="创建人", related_name="team_create_user")
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 
 # 分类表
 class Classify(models.Model):
     name = models.CharField(verbose_name="分类名称", max_length=128)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 
 # 文章管理
@@ -79,4 +80,5 @@ class Article(models.Model):
     title = models.CharField(verbose_name="文章标题", max_length=256)
     content = models.TextField(verbose_name="文章内容")
     classify = models.ForeignKey('Classify', verbose_name='所属分类')
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
