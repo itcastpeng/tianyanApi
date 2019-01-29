@@ -53,6 +53,11 @@ def classify(request):
                 'ret_data': ret_data,
                 'data_count': count,
             }
+            response.note = {
+                'id': "分类id",
+                'name': '分类名称',
+                'create_datetime': '创建时间',
+            }
         else:
             response.code = 402
             response.msg = "请求异常"

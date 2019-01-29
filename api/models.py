@@ -17,7 +17,7 @@ class Userprofile(models.Model):
     city = models.CharField(verbose_name="城市", max_length=128, null=True, blank=True)
 
     phone_number = models.CharField(verbose_name="手机号", max_length=11, null=True, blank=True)
-    signature = models.TextField(verbose_name="签名", null=True, blank=True)
+    signature = models.TextField(verbose_name="个性签名", null=True, blank=True)
     show_product = models.BooleanField(verbose_name="文章底部是否显示产品", default=True)
 
     token = models.CharField(verbose_name="token值", max_length=128)

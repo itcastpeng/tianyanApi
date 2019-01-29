@@ -64,6 +64,18 @@ def user(request):
                 'ret_data': ret_data,
                 'data_count': count,
             }
+            response.note = {
+                'id': "用户id",
+                'name': "姓名",
+                'phone_number': "手机号",
+                'signature': "个性签名",
+                'show_product': "文章底部是否显示产品",
+                'register_date': "注册时间",
+                'overdue_date': "过期时间",
+                'set_avator': "头像",
+                'qr_code': "微信二维码",
+                'vip_type': "会员类型",
+            }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
             response.code = 402
