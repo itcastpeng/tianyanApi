@@ -62,6 +62,16 @@ def article(request):
                 'ret_data': ret_data,
                 'data_count': count,
             }
+
+            response.note = {
+                'id': "文章id",
+                'title': "文章标题",
+                'content': "文章内容",
+                'classify_id': "所属分类id",
+                'classify_name': "所属分类名称",
+                'create_datetime': "创建时间",
+            }
+
         else:
             response.code = 402
             response.msg = "请求异常"
