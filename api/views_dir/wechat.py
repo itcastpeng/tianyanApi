@@ -98,7 +98,7 @@ def wechat(request):
                 }
 
                 if user_objs:
-                    user_objs.update(user_data)
+                    user_objs.update(**user_data)
                 else:
                     encodestr = base64.b64encode(ret_obj['nickname'].encode('utf-8'))
                     encode_username = str(encodestr, encoding='utf-8')
@@ -107,8 +107,8 @@ def wechat(request):
                     user_data['set_avator'] = ret_obj['headimgurl']
                     user_data['name'] = encode_username
                     user_data['openid'] = ret_obj['openid']
-                    print(**user_data)
-                    models.Userprofile.objects.create(user_data)
+                    print("user_data --->", user_data)
+                    models.Userprofile.objects.create(**user_data)
 
             # 取消关注
             elif event == "unsubscribe":
