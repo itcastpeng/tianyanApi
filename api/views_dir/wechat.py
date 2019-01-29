@@ -103,7 +103,7 @@ def wechat(request):
                     encodestr = base64.b64encode(ret_obj['nickname'].encode('utf-8'))
                     encode_username = str(encodestr, encoding='utf-8')
 
-                    user_data['inviter'] = inviter_user_id
+                    user_data['inviter_id'] = inviter_user_id
                     user_data['set_avator'] = ret_obj['headimgurl']
                     user_data['name'] = encode_username
                     user_data['openid'] = ret_obj['openid']
