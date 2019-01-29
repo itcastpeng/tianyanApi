@@ -17,8 +17,10 @@ import xml.dom.minidom
 from publicFunc.account import get_token
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.Response import ResponseObj
+from publicFunc import account
 
 
+# 微信服务器调用的接口
 def wechat(request):
     weichat_api_obj = WeChatApi()
 
@@ -156,17 +158,17 @@ def wechat(request):
 
 
 # 获取用于登录的微信二维码
+@account.is_token(models.Userprofile)
 def weichat_generate_qrcode(request):
     weichat_api_obj = WeChatApi()
     response = ResponseObj()
-    inviter_user_id = request.GET.get('inviter_user_id')
-    qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': inviter_user_id})
+    user_id = request.GET.get('user_id')
+    qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
     print(qc_code_url)
 
     response.code = 200
     response.data = {
         'qc_code_url': qc_code_url,
-        'timestamp': inviter_user_id
     }
 
     return JsonResponse(response.__dict__)
