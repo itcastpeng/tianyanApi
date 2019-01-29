@@ -107,6 +107,7 @@ def wechat(request):
                     user_data['set_avator'] = ret_obj['headimgurl']
                     user_data['name'] = encode_username
                     user_data['openid'] = ret_obj['openid']
+                    print(**user_data)
                     models.Userprofile.objects.create(user_data)
 
             # 取消关注
