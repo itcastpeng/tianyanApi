@@ -91,3 +91,18 @@ class Article(models.Model):
     create_user = models.ForeignKey('Userprofile', verbose_name='创建用户',  related_name="article_create_user")
     source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
 
+
+# 海报管理
+class Posters(models.Model):
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="posters_create_user")
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    posters_url = models.CharField(verbose_name='海报链接', max_length=256, null=True, blank=True)
+    posters_choices = (
+        (1, '正能量'),
+        (2, '邀请函')
+    )
+    posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
+
+
+
+
