@@ -41,12 +41,6 @@ def article(request):
             ret_data = []
 
             for obj in objs:
-                #  如果有oper_user字段 等于本身名字
-                if obj.oper_user:
-                    oper_user_username = obj.oper_user.username
-                else:
-                    oper_user_username = ''
-                # print('oper_user_username -->', oper_user_username)
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
