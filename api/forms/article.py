@@ -199,5 +199,5 @@ class SelectForm(forms.Form):
         if classify_type not in ["1", "2"]:
             self.add_error('classify_id', '分类类型传参异常')
         else:
-            return classify_type
+            return int(classify_type)
 
