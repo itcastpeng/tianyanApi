@@ -195,6 +195,9 @@ class SelectForm(forms.Form):
 
     def clean_classify_type(self):
         classify_type = self.data.get('classify_type')
-        print('classify_type -->', classify_type, type(classify_type))
-        return classify_type
+        # print('classify_type -->', classify_type, type(classify_type))
+        if classify_type not in ["1", "2"]:
+            self.add_error('classify_id', '分类类型传参异常')
+        else:
+            return classify_type
 
