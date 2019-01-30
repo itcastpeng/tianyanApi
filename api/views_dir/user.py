@@ -3,15 +3,13 @@ from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from publicFunc.condition_com import conditionCom
-from api.forms.user import AddForm, UpdateForm, SelectForm
+from api.forms.user import SelectForm
 import json
-from django.db.models import Q
+# from django.db.models import Q
 
 
 # cerf  token验证 用户展示模块
-@csrf_exempt
 @account.is_token(models.Userprofile)
 def user(request):
     response = Response.ResponseObj()
@@ -81,4 +79,33 @@ def user(request):
             response.code = 402
             response.msg = "请求异常"
             response.data = json.loads(forms_obj.errors.as_json())
+    return JsonResponse(response.__dict__)
+
+
+# 增删改
+# token验证
+@account.is_token(models.Userprofile)
+def user_oper(request, oper_type, o_id):
+    response = Response.ResponseObj()
+    user_id = request.GET.get('user_id')
+
+    if request.method == "POST":
+        # 设置推荐分类
+        if oper_type == "update_recommend_classify":
+            classify_id = request.POST.getlist('classify_id[]')
+            if classify_id:
+                recommend_classify_list = [int(i) for i in classify_id]
+                print("recommend_classify_list -->", recommend_classify_list)
+                user_obj = models.Userprofile.objects.get(id=user_id)
+                user_obj.recommend_classify = recommend_classify_list
+                response.code = 200
+                response.msg = "设置成功"
+            else:
+                response.code = 301
+                response.msg = "分类id传参异常"
+
+    else:
+        response.code = 402
+        response.msg = "请求异常"
+
     return JsonResponse(response.__dict__)
