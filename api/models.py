@@ -73,13 +73,21 @@ class Team(models.Model):
 class Classify(models.Model):
     name = models.CharField(verbose_name="分类名称", max_length=128)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    create_user = models.ForeignKey(
+        'Userprofile',
+        verbose_name='创建用户',
+        related_name="classify_create_user",
+        null=True,
+        blank=True
+    )   # 该字段为空，表示为默认(推荐)分类，不为空表示品牌分类
 
 
 # 文章管理
 class Article(models.Model):
     title = models.CharField(verbose_name="文章标题", max_length=256)
     content = models.TextField(verbose_name="文章内容")
-    classify = models.ForeignKey('Classify', verbose_name='所属分类')
+    classify = models.ForeignKey('Classify', verbose_name='所属分类', null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户')
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户',  related_name="article_create_user")
+    source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
 
