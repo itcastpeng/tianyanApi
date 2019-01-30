@@ -102,7 +102,7 @@ class UpdateForm(forms.Form):
         create_user_id = self.data['create_user_id']
         title = self.data['title']
         o_id = self.data['o_id']        # 文章id
-
+        print('o_id -->', o_id)
         objs = models.Article.objects.filter(
             create_user_id=create_user_id,
             title=title,
