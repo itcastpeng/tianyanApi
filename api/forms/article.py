@@ -171,6 +171,14 @@ class SelectForm(forms.Form):
         }
     )
 
+    classify_type = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "分类类型不能为空",
+            'invalid': "分类类型只能为整数"
+        }
+    )
+
     def clean_current_page(self):
         if 'current_page' not in self.data:
             current_page = 1
@@ -184,3 +192,9 @@ class SelectForm(forms.Form):
         else:
             length = int(self.data['length'])
         return length
+
+    def clean_classify_type(self):
+        classify_type = self.data.get('classify_type')
+        print('classify_type -->', classify_type, type(classify_type))
+        return classify_type
+

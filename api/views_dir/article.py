@@ -13,6 +13,7 @@ import json
 @account.is_token(models.Userprofile)
 def article(request):
     response = Response.ResponseObj()
+    user_id = request.GET.get('user_id')
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
@@ -29,6 +30,15 @@ def article(request):
                 'source_link': '',
             }
             q = conditionCom(request, field_dict)
+            classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
+            user_obj = models.Userprofile.objects.get(id=user_id)
+            if classify_type == 1:  # 推荐分类
+                classify_objs = user_obj.recommend_classify.all()
+                classify_id_list = [obj.id for obj in classify_objs]
+                print("classify_id_list -->", classify_id_list)
+            elif classify_type == 2:    # 品牌分类
+                pass
+
             print('q -->', q)
             objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
             count = objs.count()
@@ -84,10 +94,12 @@ def article(request):
 @account.is_token(models.Userprofile)
 def article_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
+    user_id = request.GET.get('user_id')
+
     if request.method == "POST":
         if oper_type == "add":
             form_data = {
-                'create_user_id': request.GET.get('user_id'),
+                'create_user_id': user_id,
                 'title': request.POST.get('title'),
                 'content': request.POST.get('content'),
                 'classify_id': request.POST.get('classify_id'),
@@ -126,7 +138,7 @@ def article_oper(request, oper_type, o_id):
             # 获取需要修改的信息
             form_data = {
                 'o_id': o_id,   # 文章id
-                'create_user_id': request.GET.get('user_id'),
+                'create_user_id': user_id,
                 'title': request.POST.get('title'),
                 'content': request.POST.get('content'),
             }
@@ -160,7 +172,7 @@ def article_oper(request, oper_type, o_id):
         elif oper_type == "update_classify":
             form_data = {
                 'o_id': o_id,  # 文章id
-                'create_user_id': request.GET.get('user_id'),
+                'create_user_id': user_id,
                 'classify_id': request.POST.get('classify_id'),
             }
 
