@@ -5,7 +5,7 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.article import AddForm, UpdateForm, SelectForm
+from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
 import json
 
 
@@ -26,6 +26,7 @@ def article(request):
                 'classify_id': '__in',
                 'create_user_id': '__in',
                 'create_datetime': '',
+                'source_link': '',
             }
             q = conditionCom(request, field_dict)
             print('q -->', q)
@@ -115,14 +116,15 @@ def article_oper(request, oper_type, o_id):
         #     else:
         #         response.code = 302
         #         response.msg = '删除ID不存在'
+        
+        # 修改文章
         elif oper_type == "update":
             # 获取需要修改的信息
             form_data = {
-                'o_id': o_id,
+                'o_id': o_id,   # 文章id
                 'create_user_id': request.GET.get('user_id'),
                 'title': request.POST.get('title'),
                 'content': request.POST.get('content'),
-                'classify_id': request.POST.get('classify_id'),
             }
 
             forms_obj = UpdateForm(form_data)
@@ -132,13 +134,11 @@ def article_oper(request, oper_type, o_id):
                 o_id = forms_obj.cleaned_data['o_id']
                 title = forms_obj.cleaned_data['title']
                 content = forms_obj.cleaned_data['content']
-                classify_id = forms_obj.cleaned_data['classify_id']
 
                 #  查询更新 数据
                 models.Article.objects.filter(id=o_id).update(
                     title=title,
                     content=content,
-                    classify_id=classify_id,
                 )
 
                 response.code = 200
@@ -152,6 +152,35 @@ def article_oper(request, oper_type, o_id):
                 #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
+        # 修改文章所属分类
+        elif oper_type == "update_classify":
+            form_data = {
+                'o_id': o_id,  # 文章id
+                'create_user_id': request.GET.get('user_id'),
+                'classify_id': request.POST.get('classify_id'),
+            }
+
+            forms_obj = UpdateClassifyForm(form_data)
+            if forms_obj.is_valid():
+                print("验证通过")
+                print(forms_obj.cleaned_data)
+                o_id = forms_obj.cleaned_data['o_id']
+                classify_id = forms_obj.cleaned_data['classify_id']
+
+                #  查询更新 数据
+                models.Article.objects.filter(id=o_id).update(
+                    classify_id=classify_id,
+                )
+                response.code = 200
+                response.msg = "修改成功"
+
+            else:
+                print("验证不通过")
+                # print(forms_obj.errors)
+                response.code = 301
+                # print(forms_obj.errors.as_json())
+                #  字符串转换 json 字符串
+                response.msg = json.loads(forms_obj.errors.as_json())
     else:
         response.code = 402
         response.msg = "请求异常"

@@ -83,13 +83,6 @@ class UpdateForm(forms.Form):
         }
     )
 
-    classify_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "分类id不能为空"
-        }
-    )
-
     # 查询文章标题是否存在
     def clean_o_id(self):
         create_user_id = self.data['create_user_id']
@@ -117,6 +110,35 @@ class UpdateForm(forms.Form):
             self.add_error('title', '标题已存在')
         else:
             return title
+
+class UpdateClassifyForm(forms.Form):
+    o_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': '文章id不能为空'
+        }
+    )
+
+    classify_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "分类id不能为空"
+        }
+    )
+
+    # 查询文章标题是否存在
+    def clean_o_id(self):
+        create_user_id = self.data['create_user_id']
+        o_id = self.data['o_id']
+
+        objs = models.Article.objects.filter(
+            create_user_id=create_user_id,
+            id=o_id,
+        )
+        if not objs:
+            self.add_error('o_id', '文章不存在')
+        else:
+            return o_id
 
     # 查询分类Id是否存在
     def clean_classify_id(self):
