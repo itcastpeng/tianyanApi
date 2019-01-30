@@ -90,6 +90,8 @@ class Article(models.Model):
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     create_user = models.ForeignKey('Userprofile', verbose_name='创建用户',  related_name="article_create_user")
     source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
+    look_num = models.ImageField(verbose_name="查看次数", default=0)
+    like_num = models.ImageField(verbose_name="点赞(喜欢)次数", default=0)
 
 
 # 海报管理
