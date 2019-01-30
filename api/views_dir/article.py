@@ -98,7 +98,7 @@ def article_oper(request, oper_type, o_id):
                 obj = models.Article.objects.create(**forms_obj.cleaned_data)
                 response.code = 200
                 response.msg = "添加成功"
-                response.data = {'testCase': obj.id}
+                response.data = {'id': obj.id}
             else:
                 print("验证不通过")
                 # print(forms_obj.errors)
