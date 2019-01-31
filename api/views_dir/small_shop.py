@@ -60,12 +60,21 @@ def small_shop(request):
                     'goods_picture': obj.goods_picture,                     # 商品图片
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
+
+            goods_status_list = []
+            for i in models.Goods.goods_status_choices:
+                goods_status_list.append({
+                    'id':i[0],
+                    'name':i[1]
+                })
+
             #  查询成功 返回200 状态码
             response.code = 200
             response.msg = '查询成功'
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
+                'goods_status_list': goods_status_list,
             }
             response.note = {
                 'id': "文章id",
@@ -99,7 +108,15 @@ def small_shop_oper(request, oper_type, o_id):
 
         # 修改微店 静态横图
         if oper_type == "static_image":
-            pass
+            static_image = request.POST.get('static_image')
+            objs = models.Userprofile.objects.filter(id=user_id)
+            if objs:
+                objs.update(static_image=static_image)
+                response.code = 200
+                response.msg = '修改成功'
+            else:
+                response.code = 301
+                response.msg = '非法用户'
 
         # 添加商品分类
         elif oper_type == "add_classify":
