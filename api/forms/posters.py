@@ -59,6 +59,14 @@ class UpdateForm(forms.Form):
         }
     )
 
+    def clean_o_id(self):
+        o_id = self.data.get('o_id')
+        objs = models.Posters.objects.filter(id=o_id)
+        if objs:
+            return o_id, objs
+        else:
+            self.add_error('o_id', '修改ID不存在')
+
 
 # 查询
 class SelectForm(forms.Form):
@@ -76,14 +84,6 @@ class SelectForm(forms.Form):
         }
     )
 
-    classify_type = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "分类类型不能为空",
-            'invalid': "分类类型只能为整数"
-        }
-    )
-
     def clean_current_page(self):
         if 'current_page' not in self.data:
             current_page = 1
@@ -97,12 +97,4 @@ class SelectForm(forms.Form):
         else:
             length = int(self.data['length'])
         return length
-
-    def clean_classify_type(self):
-        classify_type = self.data.get('classify_type')
-        # print('classify_type -->', classify_type, type(classify_type))
-        if classify_type not in ["1", "2"]:
-            self.add_error('classify_id', '分类类型传参异常')
-        else:
-            return int(classify_type)
 

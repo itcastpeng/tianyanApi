@@ -17,28 +17,19 @@ def posters(request):
         if forms_obj.is_valid():
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
-            print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
+
             order = request.GET.get('order', '-create_datetime')
             field_dict = {
                 'id': '',
-                'title': '__contains',
-                'classify_id': '__in',
-                'create_user_id': '__in',
+                'posters_url': '__contains',
+                'posters_status': '',
                 'create_datetime': '',
-                'source_link': '',
+                'create_user_id': '',
+                'create_user__name': '__contains',
             }
             q = conditionCom(request, field_dict)
-            classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
-            user_obj = models.Userprofile.objects.get(id=user_id)
-            if classify_type == 1:  # 推荐分类
-                classify_objs = user_obj.recommend_classify.all()
-                classify_id_list = [obj.id for obj in classify_objs]
-                print("classify_id_list -->", classify_id_list)
-            elif classify_type == 2:    # 品牌分类
-                pass
-
             print('q -->', q)
-            objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
+            objs = models.Posters.objects.filter(q).order_by(order)
             count = objs.count()
 
             if length != 0:
@@ -53,13 +44,19 @@ def posters(request):
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'title': obj.title,
-                    'content': obj.content,
-                    'look_num': obj.look_num,
-                    'like_num': obj.like_num,
-                    'classify_id': obj.classify_id,
-                    'classify_name': obj.classify.name,
+                    'posters_url': obj.posters_url,
+                    'posters_status_id': obj.posters_status,
+                    'posters_status': obj.get_posters_status_display(),
+                    'create_user_id': obj.create_user_id,
+                    'create_user__name': obj.create_user.name,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                })
+
+            posters_choices = []
+            for i in models.Posters.posters_choices:
+                posters_choices.append({
+                    'id':i[0],
+                    'name':i[1]
                 })
             #  查询成功 返回200 状态码
             response.code = 200
@@ -67,17 +64,17 @@ def posters(request):
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
+                'posters_choices': posters_choices,
             }
 
             response.note = {
-                'id': "文章id",
-                'title': "文章标题",
-                'content': "文章内容",
-                'look_num': "查看次数",
-                'like_num': "点赞(喜欢)次数",
-                'classify_id': "所属分类id",
-                'classify_name': "所属分类名称",
+                'id': "海报ID",
+                'posters_url': "海报链接",
+                'posters_status_id': "海报类型ID",
+                'posters_status': "海报类型名称",
                 'create_datetime': "创建时间",
+                'create_user_id': "创建人ID",
+                'create_user__name': "创建人名字",
             }
 
         else:
@@ -95,15 +92,15 @@ def posters_oper(request, oper_type, o_id):
     user_id = request.GET.get('user_id')
 
     if request.method == "POST":
+        form_data = {
+            'o_id':o_id,
+            'create_user_id': user_id,
+            'posters_url': request.POST.get('posters_url'),
+            'posters_status': request.POST.get('posters_status', 1),
+        }
 
         # 添加海报
         if oper_type == "add":
-            form_data = {
-                'create_user_id': user_id,
-                'posters_url': request.POST.get('posters_url'),
-                'posters_status': request.POST.get('posters_status', 1),
-            }
-            #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
                 print("验证通过")
@@ -118,43 +115,26 @@ def posters_oper(request, oper_type, o_id):
         
         # 修改海报
         elif oper_type == "update":
-            # 获取需要修改的信息
-            form_data = {
-                'o_id': o_id,   # 文章id
-                'create_user_id': user_id,
-                'title': request.POST.get('title'),
-                'content': request.POST.get('content'),
-            }
-
             forms_obj = UpdateForm(form_data)
             if forms_obj.is_valid():
                 print("验证通过")
-                print(forms_obj.cleaned_data)
-                o_id = forms_obj.cleaned_data['o_id']
-                title = forms_obj.cleaned_data['title']
-                content = forms_obj.cleaned_data['content']
+                o_id, objs = forms_obj.cleaned_data['o_id']
+                posters_url = forms_obj.cleaned_data['posters_url']
+                posters_status = forms_obj.cleaned_data['posters_status']
 
-                #  查询更新 数据
-                models.Article.objects.filter(id=o_id).update(
-                    title=title,
-                    content=content,
-                )
-
+                objs.update(posters_url=posters_url, posters_status=posters_status)
                 response.code = 200
                 response.msg = "修改成功"
 
             else:
                 print("验证不通过")
-                # print(forms_obj.errors)
                 response.code = 301
-                # print(forms_obj.errors.as_json())
-                #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # 删除海报
         elif oper_type == "delete":
             # 删除 ID
-            objs = models.company.objects.filter(id=o_id)
+            objs = models.Posters.objects.filter(id=o_id)
             if objs:
                 objs.delete()
                 response.code = 200
@@ -163,35 +143,6 @@ def posters_oper(request, oper_type, o_id):
                 response.code = 302
                 response.msg = '删除ID不存在'
 
-        # 修改文章所属分类
-        elif oper_type == "update_classify":
-            form_data = {
-                'o_id': o_id,  # 文章id
-                'create_user_id': user_id,
-                'classify_id': request.POST.get('classify_id'),
-            }
-
-            forms_obj = UpdateClassifyForm(form_data)
-            if forms_obj.is_valid():
-                print("验证通过")
-                print(forms_obj.cleaned_data)
-                o_id = forms_obj.cleaned_data['o_id']
-                classify_id = forms_obj.cleaned_data['classify_id']
-
-                #  查询更新 数据
-                models.Article.objects.filter(id=o_id).update(
-                    classify_id=classify_id,
-                )
-                response.code = 200
-                response.msg = "修改成功"
-
-            else:
-                print("验证不通过")
-                # print(forms_obj.errors)
-                response.code = 301
-                # print(forms_obj.errors.as_json())
-                #  字符串转换 json 字符串
-                response.msg = json.loads(forms_obj.errors.as_json())
     else:
         response.code = 402
         response.msg = "请求异常"
