@@ -45,6 +45,27 @@ def get_token(pwd=None):
     return token
 
 
+# 客户 验证token
+def customer_is_token(table_obj, data):
+    response = Response.ResponseObj()
+    rand_str = data.get('rand_str')
+    timestamp = data.get('timestamp', '')
+    user_id = data.get('user_id')
+
+    objs = table_obj.objects.filter(id=user_id)
+    if objs:
+        obj = objs[0]
+        # print('str_encrypt(timestamp + obj.token) -->', str_encrypt(timestamp + obj.token))
+        if str_encrypt(timestamp + obj.token) == rand_str:
+            flag = True
+        else:
+            flag = False
+    else:
+        flag = False
+
+    return flag
+
+
 # 装饰器 判断token 是否正确
 def is_token(table_obj):
     def is_token_decorator(func):
