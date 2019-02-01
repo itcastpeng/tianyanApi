@@ -33,7 +33,7 @@ def brand(request):
             q = conditionCom(request, field_dict)
 
             print('q -->', q)
-            objs = models.Classify.objects.filter(q).order_by(order)
+            objs = models.Classify.objects.filter(create_user__isnull=True).filter(q).order_by(order)
             count = objs.count()
 
             if length != 0:
