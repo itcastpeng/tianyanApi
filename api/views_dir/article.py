@@ -41,8 +41,8 @@ def article(request):
 
             elif classify_type == 2:    # 品牌分类
                 pass
-            if classify_id_list:
-                q.add('classify__in', classify_id_list)
+            if len(classify_id_list) > 0:
+                q.add('classify_id__in', classify_id_list)
 
             print('q -->', q)
             objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
