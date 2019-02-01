@@ -8,6 +8,8 @@ from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
 import json
 
+from django.db.models import Q
+
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -42,7 +44,7 @@ def article(request):
             elif classify_type == 2:    # 品牌分类
                 pass
             if len(classify_id_list) > 0:
-                q.add('classify_id__in', classify_id_list)
+                q.add(Q(**{'classify_id__in': classify_id_list}), Q.AND)
 
             print('q -->', q)
             objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
