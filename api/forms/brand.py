@@ -14,51 +14,12 @@ class AddForm(forms.Form):
         }
     )
 
-    title = forms.CharField(
+    name = forms.CharField(
         required=True,
         error_messages={
-            'required': "标题不能为空"
+            'required': "品牌名称不能为空"
         }
     )
-    content = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "内容不能为空"
-        }
-    )
-
-    classify_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "分类id不能为空"
-        }
-    )
-
-    # 查询文章标题是否存在
-    def clean_title(self):
-        create_user_id = self.data['create_user_id']
-        title = self.data['title']
-
-        objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
-            title=title,
-        )
-        if objs:
-            self.add_error('title', '标题已存在')
-        else:
-            return title
-
-    # 查询分类Id是否存在
-    def clean_classify_id(self):
-        classify_id = self.data['classify_id']
-
-        objs = models.Classify.objects.filter(
-            id=classify_id,
-        )
-        if not objs:
-            self.add_error('classify_id', '分类Id不存在')
-        else:
-            return classify_id
 
 
 # 更新

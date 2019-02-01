@@ -83,21 +83,32 @@ def brand_oper(request, oper_type, o_id):
         if oper_type == "add":
             form_data = {
                 'create_user_id': user_id,
-                'title': request.POST.get('title'),
-                'content': request.POST.get('content'),
-                'classify_id': request.POST.get('classify_id'),
+                'name': request.POST.get('name'),
             }
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-                # print(forms_obj.cleaned_data)
-                #  添加数据库
-                # print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
-                obj = models.Article.objects.create(**forms_obj.cleaned_data)
+                name = forms_obj.cleaned_data.get('name')
+
+                # 判断需要添加的品牌名称是否存在，如果不存在则添加
+                classify_objs = models.Classify.objects.filter(
+                    create_user__isnull=False,
+                    name=name
+                )
+
+                if classify_objs:   # 品牌分类已经存在
+                    classify_id = classify_objs[0].id
+
+                else:   # 品牌分类不存在
+                    obj = models.Classify.objects.create(name=name, create_user_id=user_id)
+                    print(obj.id)
+                    classify_id = obj.id
+
+                models.Userprofile.objects.get(id=user_id).brand_classify.add(classify_id)
+
                 response.code = 200
                 response.msg = "添加成功"
-                response.data = {'id': obj.id}
+                response.data = {'id': classify_id}
             else:
                 print("验证不通过")
                 # print(forms_obj.errors)
