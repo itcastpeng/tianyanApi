@@ -53,13 +53,6 @@ class UpdateForm(forms.Form):
 
 # 查询
 class SelectForm(forms.Form):
-    team_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'invalid': "页码数据类型错误",
-            'required': "团队id不能为空"
-        }
-    )
 
     current_page = forms.IntegerField(
         required=False,
@@ -92,6 +85,14 @@ class SelectForm(forms.Form):
 
 # 查看团队人员列表
 class SelectUserList(forms.Form):
+    team_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "页码数据类型错误",
+            'required': "团队id不能为空"
+        }
+    )
+
     current_page = forms.IntegerField(
         required=False,
         error_messages={

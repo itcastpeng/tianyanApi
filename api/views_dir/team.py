@@ -9,6 +9,7 @@ from api.forms.team import AddForm, UpdateForm, SelectForm
 import json
 
 from django.db.models import Q
+from publicFunc import base64_encryption
 
 
 # token验证 用户展示模块
@@ -176,7 +177,7 @@ def team_oper(request, oper_type, o_id):
                     #  将查询出来的数据 加入列表
                     ret_data.append({
                         'id': obj.id,
-                        'name': obj.name,
+                        'name': base64_encryption.b64decode(obj.name),
                         'set_avator': obj.set_avator,
                         'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                     })
