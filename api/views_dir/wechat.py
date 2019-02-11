@@ -18,6 +18,7 @@ from publicFunc.account import get_token
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.Response import ResponseObj
 from publicFunc import account
+from publicFunc import base64_encryption
 
 
 # 微信服务器调用的接口
@@ -103,8 +104,9 @@ def wechat(request):
                 if user_objs:
                     user_objs.update(**user_data)
                 else:
-                    encodestr = base64.b64encode(ret_obj['nickname'].encode('utf-8'))
-                    encode_username = str(encodestr, encoding='utf-8')
+                    encode_username = base64_encryption.b64encode(ret_obj['nickname'])
+                    # encodestr = base64.b64encode(ret_obj['nickname'].encode('utf8'))
+                    # encode_username = str(encodestr, encoding='utf8')
                     overdue_date = datetime.datetime.now() + datetime.timedelta(days=30)
 
                     user_data['inviter_id'] = inviter_user_id

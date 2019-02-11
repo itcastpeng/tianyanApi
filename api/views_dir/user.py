@@ -9,6 +9,7 @@ import json
 # from django.db.models import Q
 import re
 import datetime
+from publicFunc import base64_encryption
 
 
 # cerf  token验证 用户展示模块
@@ -121,6 +122,7 @@ def user_oper(request, oper_type, o_id):
         elif oper_type == "update_name":
             name = request.POST.get('name')
             if name:
+                name = base64_encryption.b64encode(name)
                 models.Userprofile.objects.filter(id=user_id).update(name=name)
                 response.code = 200
                 response.msg = "修改成功"
