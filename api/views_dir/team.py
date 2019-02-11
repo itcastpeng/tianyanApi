@@ -5,7 +5,7 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.team import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
+from api.forms.team import AddForm, UpdateForm, SelectForm
 import json
 
 from django.db.models import Q
@@ -23,29 +23,16 @@ def team(request):
             length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
             order = request.GET.get('order', '-create_datetime')
-            field_dict = {
-                'id': '',
-                'name': '__contains',
-                'create_datetime': '',
-            }
-            q = conditionCom(request, field_dict)
-            classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
+            # field_dict = {
+            #     'id': '',
+            #     'name': '__contains',
+            #     'create_datetime': '',
+            # }
+            # q = conditionCom(request, field_dict)
+            # classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
             user_obj = models.Userprofile.objects.get(id=user_id)
-
-            classify_objs = None
-            if classify_type == 1:  # 推荐分类
-                classify_objs = user_obj.recommend_classify.all()
-            elif classify_type == 2:    # 品牌分类
-                classify_objs = user_obj.brand_classify.all()
-
-            if classify_objs:
-                classify_id_list = [obj.id for obj in classify_objs]
-                print("classify_id_list -->", classify_id_list)
-                if len(classify_id_list) > 0:
-                    q.add(Q(**{'classify_id__in': classify_id_list}), Q.AND)
-
-            print('q -->', q)
-            objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
+            objs = user_obj.team.all().order_by(order)
+            # objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
             count = objs.count()
 
             if length != 0:
@@ -60,12 +47,7 @@ def team(request):
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'title': obj.title,
-                    'content': obj.content,
-                    'look_num': obj.look_num,
-                    'like_num': obj.like_num,
-                    'classify_id': obj.classify_id,
-                    'classify_name': obj.classify.name,
+                    'name': obj.name,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
             #  查询成功 返回200 状态码
@@ -74,17 +56,11 @@ def team(request):
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
-                'is_customer':forms_obj.cleaned_data['id'] # 判断是否为客户查看 (该字段有值 为客户查看详情 调用接口返回时长)
             }
 
             response.note = {
                 'id': "文章id",
-                'title': "文章标题",
-                'content': "文章内容",
-                'look_num': "查看次数",
-                'like_num': "点赞(喜欢)次数",
-                'classify_id': "所属分类id",
-                'classify_name': "所属分类名称",
+                'name': "团队名称",
                 'create_datetime': "创建时间",
             }
         else:
