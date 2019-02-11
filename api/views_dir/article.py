@@ -12,7 +12,7 @@ from django.db.models import Q
 
 
 # token验证 用户展示模块
-# @account.is_token(models.Userprofile)
+@account.is_token(models.Userprofile)
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')

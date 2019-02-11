@@ -10,6 +10,7 @@ import json
 import re
 import datetime
 
+
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def user(request):
