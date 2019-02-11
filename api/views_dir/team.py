@@ -148,10 +148,10 @@ def team_oper(request, oper_type, o_id):
             }
             forms_obj = SelectForm(form_data)
             if forms_obj.is_valid():
+                print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
                 current_page = forms_obj.cleaned_data['current_page']
                 length = forms_obj.cleaned_data['length']
                 team_id = forms_obj.cleaned_data['team_id']
-                print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
                 order = request.GET.get('order', 'create_datetime')
                 # field_dict = {
                 #     'id': '',
