@@ -60,7 +60,31 @@ class Userprofile(models.Model):
         blank=True,
         default=None
     )
+    static_image = models.CharField(verbose_name='静态横图', max_length=256, null=True, blank=True)
 
+# 客户表(用户的客户)
+class Customer(models.Model):
+    name = models.CharField(verbose_name="姓名", max_length=128)
+
+    sex_choices = (
+        (1, "男"),
+        (2, "女"),
+    )
+    sex = models.SmallIntegerField(verbose_name="性别", choices=sex_choices)
+    country = models.CharField(verbose_name="国家", max_length=128, null=True, blank=True)
+    province = models.CharField(verbose_name="省份", max_length=128, null=True, blank=True)
+    city = models.CharField(verbose_name="城市", max_length=128, null=True, blank=True)
+
+    phone_number = models.CharField(verbose_name="手机号", max_length=11, null=True, blank=True)
+    token = models.CharField(verbose_name="token值", max_length=128)
+
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    set_avator = models.CharField(
+        verbose_name='头像',
+        default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg',
+        max_length=128
+    )
+    openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
 
 # 团队表
 class Team(models.Model):
@@ -104,6 +128,32 @@ class Posters(models.Model):
         (2, '邀请函')
     )
     posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
+
+# --------------------微店----------------------
+# 商品分类
+class GoodsClassify(models.Model):
+    oper_user = models.ForeignKey(to='Userprofile', verbose_name='归属人')
+    goods_classify = models.CharField(verbose_name='分类名称', max_length=128)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+# 商品
+class Goods(models.Model):
+    goods_classify = models.ForeignKey(to='GoodsClassify', verbose_name='归属分类')
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    goods_name = models.CharField(verbose_name='商品名称', max_length=128)
+    price = models.CharField(verbose_name='价格', max_length=16)
+    inventory = models.IntegerField(verbose_name='库存', default=1)
+    freight = models.IntegerField(verbose_name='运费', default=0)
+    goods_describe = models.CharField(verbose_name='商品描述', max_length=128)
+    point_origin = models.CharField(verbose_name='发货地', max_length=256)
+    goods_status_choices = (
+        (1, '上架'),
+        (2, '下架')
+    )
+    goods_status = models.SmallIntegerField(verbose_name='商品状态', choices=goods_status_choices, default=2)
+    goods_picture = models.TextField(verbose_name='商品图片')
+
+
 
 
 

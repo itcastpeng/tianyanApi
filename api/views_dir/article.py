@@ -12,7 +12,7 @@ from django.db.models import Q
 
 
 # token验证 用户展示模块
-@account.is_token(models.Userprofile)
+# @account.is_token(models.Userprofile)
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
@@ -77,6 +77,7 @@ def article(request):
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
+                'is_customer':forms_obj.cleaned_data['id'] # 判断是否为客户查看 (该字段有值 为客户查看详情 调用接口返回时长)
             }
 
             response.note = {
@@ -89,12 +90,13 @@ def article(request):
                 'classify_name': "所属分类名称",
                 'create_datetime': "创建时间",
             }
-
         else:
-            response.code = 402
-            response.msg = "请求异常"
+            response.code = 301
             response.data = json.loads(forms_obj.errors.as_json())
-            print(forms_obj.errors)
+
+    else:
+        response.code = 402
+        response.msg = "请求异常"
     return JsonResponse(response.__dict__)
 
 
@@ -104,7 +106,6 @@ def article(request):
 def article_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
-
     if request.method == "POST":
         if oper_type == "add":
             form_data = {
