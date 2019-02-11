@@ -2,7 +2,7 @@
 from django.conf.urls import url
 
 
-from api.views_dir import user, wechat, classify, article, posters, customer, small_shop
+from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand
 
 
 urlpatterns = [

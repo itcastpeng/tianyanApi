@@ -103,6 +103,10 @@ def user_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = "分类id传参异常"
+        # 修改头像
+        elif oper_type == "update_head_portrait":
+            pass
+
 
     else:
         response.code = 402
