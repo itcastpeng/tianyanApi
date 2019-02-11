@@ -143,8 +143,8 @@ def team_oper(request, oper_type, o_id):
         if oper_type == "select_user_list":
             form_data = {
                 'team_id': o_id,
-                'current_page': request.GET.get('current_page'),
-                'length': request.GET.get('length'),
+                'current_page': request.GET.get('current_page', 1),
+                'length': request.GET.get('length', 10),
             }
             forms_obj = SelectForm(form_data)
             if forms_obj.is_valid():
