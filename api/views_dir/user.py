@@ -129,8 +129,8 @@ def user_oper(request, oper_type, o_id):
         # 修改手机号
         elif oper_type == "update_phone_number":
             phone_number = request.POST.get('phone_number')
-            ret = re.match(r"^1\d{10}$", phone_number)      # 验证是否以1开头，并且是11位的数字
-            if phone_number and ret:
+            flag = re.match(r"^1\d{10}$", phone_number)      # 验证是否以1开头，并且是11位的数字
+            if phone_number and flag:
                 models.Userprofile.objects.filter(id=user_id).update(phone_number=phone_number)
                 response.code = 200
                 response.msg = "修改成功"
@@ -162,7 +162,7 @@ def user_oper(request, oper_type, o_id):
         # 修改文章底部是否显示产品
         elif oper_type == "update_show_product":
             show_product = request.POST.get('show_product')
-            flag = isinstance(show_product, int)
+            flag = re.match(r"^[01]$", show_product)
 
             if show_product and flag:
                 models.Userprofile.objects.filter(id=user_id).update(show_product=int(show_product))
