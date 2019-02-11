@@ -49,6 +49,7 @@ def team(request):
                     'id': obj.id,
                     'name': obj.name,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    'count': obj.userprofile_team.count()
                 })
             #  查询成功 返回200 状态码
             response.code = 200
