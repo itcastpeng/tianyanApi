@@ -63,6 +63,7 @@ def team(request):
                 'id': "文章id",
                 'name': "团队名称",
                 'create_datetime': "创建时间",
+                'count': "团队总人数",
             }
         else:
             response.code = 301
