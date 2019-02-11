@@ -5,7 +5,7 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.brand import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
+from api.forms.brand import AddForm, SelectForm
 import json
 
 
