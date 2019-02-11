@@ -62,6 +62,7 @@ class Userprofile(models.Model):
     )
     static_image = models.CharField(verbose_name='静态横图', max_length=256, null=True, blank=True)
 
+
 # 客户表(用户的客户)
 class Customer(models.Model):
     name = models.CharField(verbose_name="姓名", max_length=128)
@@ -85,6 +86,7 @@ class Customer(models.Model):
         max_length=128
     )
     openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
+
 
 # 团队表
 class Team(models.Model):
@@ -129,12 +131,14 @@ class Posters(models.Model):
     )
     posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
 
+
 # --------------------微店----------------------
 # 商品分类
 class GoodsClassify(models.Model):
     oper_user = models.ForeignKey(to='Userprofile', verbose_name='归属人')
     goods_classify = models.CharField(verbose_name='分类名称', max_length=128)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
 
 # 商品
 class Goods(models.Model):
