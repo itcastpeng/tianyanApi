@@ -22,7 +22,7 @@ def team(request):
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
-            order = request.GET.get('order', '-create_datetime')
+            order = request.GET.get('order', 'create_datetime')
             # field_dict = {
             #     'id': '',
             #     'name': '__contains',
