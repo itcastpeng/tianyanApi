@@ -8,7 +8,7 @@ from api.forms.user import SelectForm
 import json
 # from django.db.models import Q
 import re
-
+import datetime
 
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -104,6 +104,7 @@ def user_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = "分类id传参异常"
+
         # 修改头像
         elif oper_type == "update_head_portrait":
             img_path = request.POST.get('img_path')
@@ -137,6 +138,7 @@ def user_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = "手机号传参异常"
+
         # 修改微信二维码
         elif oper_type == "update_qr_code":
             qr_code = request.POST.get('qr_code')
@@ -172,11 +174,38 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = "是否显示产品传参异常"
 
-
-
-
     else:
-        response.code = 402
-        response.msg = "请求异常"
+        if oper_type == "member_info":
+            obj = models.Userprofile.objects.get(id=user_id)
+
+            # vip 类型
+            vip_type = obj.get_vip_type_display()
+
+            # 时间对象 - 年月日时分秒
+            now_datetime_obj = datetime.datetime.now()
+
+            # 时间对象 - 年月日
+            now_date_obj = datetime.date(now_datetime_obj.year, now_datetime_obj.month, now_datetime_obj.day)
+
+            # 计算剩余天数
+            remaining_days = (obj.overdue_date - now_date_obj).days
+
+            # 如果已经过期，则剩余过期时间为0，vip类型为vip已过期
+            if remaining_days <= 0:
+                remaining_days = 0
+                vip_type = "vip已过期"
+
+            response.code = 200
+            response.data = {
+                'vip_type': vip_type,
+                'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
+                'remaining_days': remaining_days
+            }
+
+            response.note = {
+                'vip_type': "vip类型",
+                'overdue_date': "有效期至",
+                'remaining_days': "剩余天数"
+            }
 
     return JsonResponse(response.__dict__)
