@@ -302,58 +302,6 @@ class UpdateGoodForm(forms.Form):
         else:
             return goods_name
 
-# 商品删除
-class DeleteGoodForm(forms.Form):
-    o_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': '文章id不能为空'
-        }
-    )
-
-    title = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "标题不能为空"
-        }
-    )
-    content = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "内容不能为空"
-        }
-    )
-
-    # 查询文章标题是否存在
-    def clean_o_id(self):
-        create_user_id = self.data['create_user_id']
-        o_id = self.data['o_id']        # 文章id
-
-        objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
-            id=o_id,
-        )
-        if not objs:
-            self.add_error('o_id', '文章不存在')
-        else:
-            return o_id
-
-    # 查询文章标题是否存在
-    def clean_title(self):
-        create_user_id = self.data['create_user_id']
-        title = self.data['title']
-        o_id = self.data['o_id']        # 文章id
-        print('o_id -->', o_id)
-        objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
-            title=title,
-        ).exclude(id=o_id)
-        if objs:
-            self.add_error('title', '标题已存在')
-        else:
-            return title
-
-
 
 # 查询
 class SelectForm(forms.Form):

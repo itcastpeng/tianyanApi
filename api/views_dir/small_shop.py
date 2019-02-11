@@ -5,7 +5,7 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.small_shop import AddForm, UpdateForm, SelectForm, AddGoodForm, UpdateGoodForm, DeleteGoodForm
+from api.forms.small_shop import AddForm, UpdateForm, SelectForm, AddGoodForm, UpdateGoodForm
 import json
 
 
@@ -92,6 +92,7 @@ def small_shop(request):
         else:
             response.code = 301
             response.data = json.loads(forms_obj.errors.as_json())
+
     else:
         response.code = 402
         response.msg = "请求异常"
