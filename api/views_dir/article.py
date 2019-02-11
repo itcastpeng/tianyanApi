@@ -8,6 +8,8 @@ from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
 import json
 
+from django.db.models import Q
+
 
 # token验证 用户展示模块
 # @account.is_token(models.Userprofile)
@@ -32,12 +34,18 @@ def article(request):
             q = conditionCom(request, field_dict)
             classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
             user_obj = models.Userprofile.objects.get(id=user_id)
+
+            classify_objs = None
             if classify_type == 1:  # 推荐分类
                 classify_objs = user_obj.recommend_classify.all()
+            elif classify_type == 2:    # 品牌分类
+                classify_objs = user_obj.brand_classify.all()
+
+            if classify_objs:
                 classify_id_list = [obj.id for obj in classify_objs]
                 print("classify_id_list -->", classify_id_list)
-            elif classify_type == 2:    # 品牌分类
-                pass
+                if len(classify_id_list) > 0:
+                    q.add(Q(**{'classify_id__in': classify_id_list}), Q.AND)
 
             print('q -->', q)
             objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
@@ -85,6 +93,7 @@ def article(request):
         else:
             response.code = 301
             response.data = json.loads(forms_obj.errors.as_json())
+
     else:
         response.code = 402
         response.msg = "请求异常"

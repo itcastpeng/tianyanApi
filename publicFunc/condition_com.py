@@ -1,9 +1,9 @@
 # 构造搜索条件 q
 from django.db.models import Q
-from api import models
-import datetime
-from publicFunc import Response
-import os,json
+# from api import models
+# import datetime
+# from publicFunc import Response
+# import os,json
 
 
 def conditionCom(request, field_dict):
