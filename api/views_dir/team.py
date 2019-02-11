@@ -146,7 +146,7 @@ def team_oper(request, oper_type, o_id):
                 'current_page': request.GET.get('current_page', 1),
                 'length': request.GET.get('length', 10),
             }
-            forms_obj = SelectForm(form_data)
+            forms_obj = SelectUserList(form_data)
             if forms_obj.is_valid():
                 print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
                 current_page = forms_obj.cleaned_data['current_page']
