@@ -179,30 +179,6 @@ class SelectForm(forms.Form):
         }
     )
 
-    id = forms.IntegerField(
-        required=False,
-        error_messages={
-            'required': "查询ID类型错误",
-        }
-    )
-    user_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "非法用户",
-        }
-    )
-    timestamp = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "非法用户",
-        }
-    )
-    rand_str = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "非法用户",
-        }
-    )
     def clean_current_page(self):
         if 'current_page' not in self.data:
             current_page = 1
@@ -225,14 +201,3 @@ class SelectForm(forms.Form):
         else:
             return int(classify_type)
 
-    def clean_id(self): # 判断是否为客户查看
-        id = self.data.get('id')
-        user_id = self.data.get('user_id')
-        data = {
-            'user_id':user_id,
-            'rand_str':self.data.get('rand_str'),
-            'timestamp':self.data.get('timestamp')
-        }
-        flag = account.customer_is_token(models.Customer, data)
-        if flag:
-            print('=-==============')

@@ -2,7 +2,7 @@
 from django.conf.urls import url
 
 
-from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand
+from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team
 
 
 urlpatterns = [
@@ -23,11 +23,15 @@ urlpatterns = [
     url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)', user.user_oper),
     url(r'^user', user.user),
 
+    # 团队管理
+    url(r'^team/(?P<oper_type>\w+)/(?P<o_id>\d+)', team.team_oper),
+    url(r'^team', team.team),
+
     # 海报管理
     url(r'^posters/(?P<oper_type>\w+)/(?P<o_id>\d+)', posters.posters_oper),
     url(r'^posters', posters.posters),
 
-    # 用户管理
+    # 客户管理  用户的用户称为客户
     url(r'^customer', customer.customer),
 
     # 微店管理
