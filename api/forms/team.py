@@ -102,6 +102,54 @@ class DeleteMemberForm(forms.Form):
             return delete_user_id
 
 
+# 设置普通成员成为管理员
+class SetManagementForm(forms.Form):
+    o_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': '团队id不能为空'
+        }
+    )
+
+    set_user_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "成员id不能为空"
+        }
+    )
+
+    # 查询当前用户是否在该团队中存在且具有管理权限
+    def clean_o_id(self):
+        user_id = self.data['user_id']
+        o_id = self.data['o_id']        # 团队id
+        objs = models.UserprofileTeam.objects.filter(
+            type=2,
+            team_id=o_id,
+            user_id=user_id
+        )
+
+        if not objs:
+            self.add_error('o_id', '权限不足')
+        else:
+            return o_id
+
+    # 查询被移除的成员是否在该团队中存在
+    def clean_set_user_id(self):
+        set_user_id = self.data['set_user_id']
+        o_id = self.data['o_id']  # 团队id
+
+        objs = models.UserprofileTeam.objects.filter(
+            type=1,
+            team_id=o_id,
+            user_id=set_user_id
+        )
+
+        if not objs:
+            self.add_error('o_id', '成员不存在')
+        else:
+            return set_user_id
+
+
 # 查询
 class SelectForm(forms.Form):
 

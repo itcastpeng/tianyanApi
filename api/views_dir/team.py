@@ -5,7 +5,8 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.team import AddForm, UpdateForm, SelectForm, SelectUserListForm, DeleteMemberForm
+from api.forms.team import AddForm, UpdateForm, SelectForm, \
+    SelectUserListForm, DeleteMemberForm, SetManagementForm
 import json
 
 from django.db.models import Q
@@ -169,6 +170,31 @@ def team_oper(request, oper_type, o_id):
                 print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
+
+        # 设置普通成员成为管理员
+        elif oper_type == "set_management":
+            set_user_id = request.POST.get('set_user_id')  # 要升级的成员id
+            form_data = {
+                'o_id': o_id,  # 团队id
+                'user_id': user_id,
+                'set_user_id': set_user_id,
+            }
+
+            forms_obj = SetManagementForm(form_data)
+            if forms_obj.is_valid():
+                team_id = forms_obj.cleaned_data['o_id']
+                set_user_id = forms_obj.cleaned_data['set_user_id']
+
+                # 修改成员类型为管理员
+                models.UserprofileTeam.objects.filter(
+                    team_id=team_id,
+                    type=1,
+                    user_id=set_user_id
+                ).update(type=2)
+
+                response.code = 200
+                response.msg = "修改成功"
+
     else:
         # 查看团队人员列表
         if oper_type == "select_user_list":
@@ -211,6 +237,8 @@ def team_oper(request, oper_type, o_id):
                     print('base64_encryption.b64encode(obj.user.name) -->', base64_encryption.b64encode(obj.user.name))
                     ret_data.append({
                         'id': obj.id,
+                        'user_type_name': obj.get_type_display(),
+                        'user_type': obj.type,
                         'name': base64_encryption.b64decode(obj.user.name),
                         'set_avator': obj.user.set_avator,
                         'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
@@ -226,8 +254,10 @@ def team_oper(request, oper_type, o_id):
                 response.note = {
                     'id': "用户id",
                     'name': "用户名称",
+                    'user_type': "用户在团队中的类型/角色id,  1 ==> 普通用户   2 ==> 管理员",
+                    'user_type_name': "用户在团队中的类型/角色名称",
                     'set_avator': "用户头像",
-                    'create_datetime': "用户加入时间"
+                    'create_datetime': "用户加入时间",
                 }
             else:
                 response.code = 301
