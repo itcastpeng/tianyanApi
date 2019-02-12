@@ -29,7 +29,7 @@ class Userprofile(models.Model):
     set_avator = models.CharField(
         verbose_name='头像',
         default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg',
-        max_length=128
+        max_length=256
     )
 
     qr_code = models.CharField(verbose_name="微信二维码", max_length=256, null=True, blank=True)
