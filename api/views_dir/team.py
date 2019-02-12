@@ -282,6 +282,7 @@ def team_oper(request, oper_type, o_id):
                 CODE=code,
             )
             ret = requests.get(url)
+            ret.encoding = "utf8"
             print("ret.text -->", ret.text)
 
             # data = {
@@ -299,6 +300,7 @@ def team_oper(request, oper_type, o_id):
                 OPENID=openid,
             )
             ret = requests.get(url)
+            ret.encoding = "utf8"
             print("ret.text -->", ret.text)
 
     return JsonResponse(response.__dict__)
