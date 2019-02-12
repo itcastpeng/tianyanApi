@@ -83,6 +83,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
 
         user_data['inviter_id'] = inviter_user_id
         user_data['set_avator'] = ret_obj.get('headimgurl')
+        user_data['subscribe'] = ret_obj.get('subscribe')
         user_data['name'] = encode_username
         user_data['openid'] = ret_obj.get('openid')
         user_data['overdue_date'] = overdue_date

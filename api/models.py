@@ -26,6 +26,8 @@ class Userprofile(models.Model):
     register_date = models.DateField(verbose_name="注册时间", auto_now_add=True)
     overdue_date = models.DateField(verbose_name="过期时间")
 
+    subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
+
     set_avator = models.CharField(
         verbose_name='头像',
         default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg',
