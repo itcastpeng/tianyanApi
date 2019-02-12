@@ -151,18 +151,19 @@ def team_oper(request, oper_type, o_id):
             if forms_obj.is_valid():
                 # print("验证通过")
                 # print(forms_obj.cleaned_data)
-                o_id = forms_obj.cleaned_data['o_id']
+                team_id = forms_obj.cleaned_data['o_id']
                 delete_user_id = forms_obj.cleaned_data['delete_user_id']
-
+                print('team_id -->', team_id)
+                print('delete_user_id -->', delete_user_id)
                 # 删除团队中的成员
                 models.UserprofileTeam.objects.filter(
-                    team_id=o_id,
+                    team_id=team_id,
                     type=1,
                     user_id=delete_user_id
                 ).delete()
 
                 response.code = 200
-                response.msg = "修改成功"
+                response.msg = "删除成功"
 
             else:
                 print("验证不通过")

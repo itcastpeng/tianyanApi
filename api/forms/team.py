@@ -97,9 +97,9 @@ class DeleteMemberForm(forms.Form):
         )
 
         if not objs:
-            self.add_error('o_id', '权限不足')
+            self.add_error('o_id', '成员不存在')
         else:
-            return o_id
+            return delete_user_id
 
 
 # 查询
