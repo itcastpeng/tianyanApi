@@ -81,9 +81,17 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
         # encode_username = str(encodestr, encoding='utf8')
         overdue_date = datetime.datetime.now() + datetime.timedelta(days=30)
 
+        subscribe = ret_obj.get('subscribe')
+
+        # 如果没有关注，获取个人信息判断是否关注
+        if not subscribe:
+            weichat_api_obj = WeChatApi()
+            ret_obj = weichat_api_obj.get_user_info(openid=openid)
+            subscribe = ret_obj.get('subscribe')
+
         user_data['inviter_id'] = inviter_user_id
         user_data['set_avator'] = ret_obj.get('headimgurl')
-        user_data['subscribe'] = ret_obj.get('subscribe')
+        user_data['subscribe'] = subscribe
         user_data['name'] = encode_username
         user_data['openid'] = ret_obj.get('openid')
         user_data['overdue_date'] = overdue_date
@@ -141,8 +149,6 @@ def wechat(request):
 
                 ret_obj = weichat_api_obj.get_user_info(openid=openid)
                 updateUserInfo(openid, inviter_user_id, ret_obj)
-
-
 
             # 取消关注
             elif event == "unsubscribe":
