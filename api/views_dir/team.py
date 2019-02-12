@@ -80,7 +80,7 @@ def team(request):
 # token验证
 @account.is_token(models.Userprofile)
 def team_oper(request, oper_type, o_id):
-    print('oper_type -->', oper_type)
+    # print('oper_type -->', oper_type)
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
@@ -280,6 +280,23 @@ def team_oper(request, oper_type, o_id):
                 APPID=weichat_api_obj.APPID,
                 SECRET=weichat_api_obj.APPSECRET,
                 CODE=code,
+            )
+            ret = requests.get(url)
+            print("ret.text -->", ret.text)
+
+            # data = {
+            #     "access_token": "18_8XaQg2pCSFY5e_oehj9OdBUaoiD1N-di6upPRAOT5OLZuLAZLQYzac4fYroEehQcZ8fT3wOoZ3xXniYyqdxJy9jgtUXNpPsPfWKzU4up-OY",
+            #     "expires_in": 7200,
+            #     "refresh_token": "18_Qdr4Y-on6K3T9Q4VcLw1rK9eGJX5OmRboyejrJWeWOxYJEPbMdehrhWNdppqZsLjnhtKqJY2u4kGN7D47OIjrTtOeWXf7AY-6nYyMmmikb4",
+            #     "openid": "oX0xv1pJPEv1nnhswmSxr0VyolLE",
+            #     "scope": "snsapi_userinfo"
+            # }
+
+            access_token = ret.json().get('access_token')
+            openid = ret.json().get('openid')
+            url = "https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN".format(
+                ACCESS_TOKEN=access_token,
+                OPENID=openid,
             )
             ret = requests.get(url)
             print("ret.text -->", ret.text)
