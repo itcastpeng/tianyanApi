@@ -63,9 +63,17 @@ class Userprofile(models.Model):
     static_image = models.CharField(verbose_name='静态横图', max_length=256, null=True, blank=True)
 
 
-# # 微商用户和团队关系表
-# class UserprofileTeam(models.Model):
-#
+# 微商用户和团队关系表
+class UserprofileTeam(models.Model):
+    user = models.ForeignKey('Userprofile', verbose_name="微商用户")
+    team = models.ForeignKey('Team', verbose_name="团队")
+    type_choices = (
+        (1, "普通成员"),
+        (2, "管理员"),
+    )
+    type = models.SmallIntegerField(verbose_name="成员类型", choices=type_choices, default=1)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
 
 # 客户表(用户的客户)
 class Customer(models.Model):
