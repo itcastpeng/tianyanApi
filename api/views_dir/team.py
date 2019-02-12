@@ -15,6 +15,7 @@ from publicFunc import base64_encryption
 from publicFunc.weixin import weixin_gongzhonghao_api
 import requests
 
+
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def team(request):

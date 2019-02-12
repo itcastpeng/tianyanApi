@@ -6,6 +6,8 @@ import random
 from django.http import JsonResponse
 
 from publicFunc import Response
+from tianyanApi.settings import NoValidationTokenRoute
+
 
 
 # 生产随机字符串
@@ -49,8 +51,12 @@ def get_token(pwd=None):
 def is_token(table_obj):
     def is_token_decorator(func):
         def inner(request, *args, **kwargs):
-            print('request -->', request.get_full_path())
-            print('request -->', request, dir(request))
+
+            # 不需要验证token的路由直接跳过
+            for route in NoValidationTokenRoute:
+                if request.get_full_path().startswith(route):
+                    return func(request, *args, **kwargs)
+
             rand_str = request.GET.get('rand_str')
             timestamp = request.GET.get('timestamp', '')
             user_id = request.GET.get('user_id')
