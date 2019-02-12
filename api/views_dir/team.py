@@ -5,7 +5,8 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.team import AddForm, UpdateForm, SelectForm
+from api.forms.team import AddForm, UpdateForm, SelectForm, \
+    SelectUserListForm, DeleteMemberForm, SetManagementForm
 import json
 
 from django.db.models import Q
@@ -24,15 +25,9 @@ def team(request):
             length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
             order = request.GET.get('order', 'create_datetime')
-            # field_dict = {
-            #     'id': '',
-            #     'name': '__contains',
-            #     'create_datetime': '',
-            # }
-            # q = conditionCom(request, field_dict)
-            # classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
-            user_obj = models.Userprofile.objects.get(id=user_id)
-            objs = user_obj.team.all().order_by(order)
+            objs = models.UserprofileTeam.objects.select_related('team').filter(
+                user_id=user_id,
+            ).order_by(order)
             # objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
             count = objs.count()
 
@@ -46,11 +41,13 @@ def team(request):
 
             for obj in objs:
                 #  将查询出来的数据 加入列表
+                team_id = obj.team_id
+                team_name = obj.team.name
                 ret_data.append({
-                    'id': obj.id,
-                    'name': obj.name,
+                    'id': team_id,
+                    'name': team_name,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                    'count': obj.userprofile_team.count()
+                    'count': models.UserprofileTeam.objects.filter(team_id=team_id).count()
                 })
             #  查询成功 返回200 状态码
             response.code = 200
@@ -61,7 +58,7 @@ def team(request):
             }
 
             response.note = {
-                'id': "文章id",
+                'id': "团队id",
                 'name': "团队名称",
                 'create_datetime': "创建时间",
                 'count': "团队总人数",
@@ -84,7 +81,7 @@ def team_oper(request, oper_type, o_id):
     user_id = request.GET.get('user_id')
     if request.method == "POST":
 
-        # 添加
+        # 添加团队
         if oper_type == "add":
             form_data = {
                 'create_user_id': user_id,
@@ -98,7 +95,11 @@ def team_oper(request, oper_type, o_id):
                 #  添加数据库
                 # print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
                 obj = models.Team.objects.create(**forms_obj.cleaned_data)
-                obj.userprofile_team.add(user_id)
+                obj.userprofileteam_set.create(
+                    user_id=user_id,
+                    team_id=obj.id,
+                    type=2
+                )
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'id': obj.id}
@@ -106,7 +107,7 @@ def team_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        # 修改
+        # 修改团队名称
         elif oper_type == "update":
             # 获取需要修改的信息
             form_data = {
@@ -138,31 +139,93 @@ def team_oper(request, oper_type, o_id):
                 #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
+        # 删除团队成员
+        elif oper_type == "delete_member":
+            delete_user_id = request.POST.get('delete_user_id')     # 要移除的成员id
+            form_data = {
+                'o_id': o_id,  # 团队id
+                'user_id': user_id,
+                'delete_user_id': delete_user_id,
+            }
+
+            forms_obj = DeleteMemberForm(form_data)
+            if forms_obj.is_valid():
+                # print("验证通过")
+                # print(forms_obj.cleaned_data)
+                team_id = forms_obj.cleaned_data['o_id']
+                delete_user_id = forms_obj.cleaned_data['delete_user_id']
+                print('team_id -->', team_id)
+                print('delete_user_id -->', delete_user_id)
+                # 删除团队中的成员
+                models.UserprofileTeam.objects.filter(
+                    team_id=team_id,
+                    type=1,
+                    user_id=delete_user_id
+                ).delete()
+
+                response.code = 200
+                response.msg = "删除成功"
+
+            else:
+                print("验证不通过")
+                response.code = 301
+                response.msg = json.loads(forms_obj.errors.as_json())
+
+        # 设置普通成员成为管理员
+        elif oper_type == "set_management":
+            set_user_id = request.POST.get('set_user_id')  # 要升级的成员id
+            form_data = {
+                'o_id': o_id,  # 团队id
+                'user_id': user_id,
+                'set_user_id': set_user_id,
+            }
+
+            forms_obj = SetManagementForm(form_data)
+            print('forms_obj.is_valid() -->', forms_obj.is_valid())
+            if forms_obj.is_valid():
+                team_id = forms_obj.cleaned_data['o_id']
+                set_user_id = forms_obj.cleaned_data['set_user_id']
+
+                # 修改成员类型为管理员
+                models.UserprofileTeam.objects.filter(
+                    team_id=team_id,
+                    type=1,
+                    user_id=set_user_id
+                ).update(type=2)
+
+                response.code = 200
+                response.msg = "修改成功"
+            else:
+                response.code = 301
+                response.data = json.loads(forms_obj.errors.as_json())
+
     else:
         # 查看团队人员列表
         if oper_type == "select_user_list":
             form_data = {
                 'team_id': o_id,
-                'current_page': request.GET.get('current_page'),
-                'length': request.GET.get('length'),
+                'current_page': request.GET.get('current_page', 1),
+                'length': request.GET.get('length', 10),
             }
-            forms_obj = SelectForm(form_data)
+            forms_obj = SelectUserListForm(form_data)
             if forms_obj.is_valid():
+                print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
                 current_page = forms_obj.cleaned_data['current_page']
                 length = forms_obj.cleaned_data['length']
                 team_id = forms_obj.cleaned_data['team_id']
-                print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
                 order = request.GET.get('order', 'create_datetime')
-                # field_dict = {
-                #     'id': '',
-                #     'name': '__contains',
-                #     'create_datetime': '',
-                # }
-                # q = conditionCom(request, field_dict)
-                # classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
+                field_dict = {
+                    'id': '',
+                    'type': '',
+                    'name': '__contains',
+                    'create_datetime': '',
+                }
+                q = conditionCom(request, field_dict)
 
-                team_obj = models.Team.objects.get(id=team_id)
-                objs = team_obj.userprofile_team.all().order_by(order)
+                print('q -->', q)
+                objs = models.UserprofileTeam.objects.select_related('user').filter(q).filter(
+                    team_id=team_id
+                ).order_by(order)
                 count = objs.count()
 
                 if length != 0:
@@ -175,10 +238,13 @@ def team_oper(request, oper_type, o_id):
 
                 for obj in objs:
                     #  将查询出来的数据 加入列表
+                    print('base64_encryption.b64encode(obj.user.name) -->', base64_encryption.b64encode(obj.user.name))
                     ret_data.append({
                         'id': obj.id,
-                        'name': base64_encryption.b64decode(obj.name),
-                        'set_avator': obj.set_avator,
+                        'user_type_name': obj.get_type_display(),
+                        'user_type': obj.type,
+                        'name': base64_encryption.b64decode(obj.user.name),
+                        'set_avator': obj.user.set_avator,
                         'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                     })
                 #  查询成功 返回200 状态码
@@ -192,8 +258,10 @@ def team_oper(request, oper_type, o_id):
                 response.note = {
                     'id': "用户id",
                     'name': "用户名称",
+                    'user_type': "用户在团队中的类型/角色id,  1 ==> 普通用户   2 ==> 管理员",
+                    'user_type_name': "用户在团队中的类型/角色名称",
                     'set_avator': "用户头像",
-                    'create_datetime': "用户加入时间"
+                    'create_datetime': "用户加入时间",
                 }
             else:
                 response.code = 301
