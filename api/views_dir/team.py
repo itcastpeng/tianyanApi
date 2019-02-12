@@ -15,6 +15,8 @@ from publicFunc import base64_encryption
 from publicFunc.weixin import weixin_gongzhonghao_api
 import requests
 
+from api.views_dir.wechat import updateUserInfo
+
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -274,7 +276,7 @@ def team_oper(request, oper_type, o_id):
         # 邀请成员
         elif oper_type == "invite_members":
             code = request.GET.get('code')
-            state = request.GET.get('state')
+            inviter_user_id = request.GET.get('state')  # 邀请人id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
             url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(
                 APPID=weichat_api_obj.APPID,
@@ -301,6 +303,10 @@ def team_oper(request, oper_type, o_id):
             )
             ret = requests.get(url)
             ret.encoding = "utf8"
-            print("ret.text -->", ret.text)
+            # print("ret.text -->", ret.text)
+            updateUserInfo(openid, inviter_user_id, ret.json())
+
+            response.code = 200
+            response.msg = "邀请成功"
 
     return JsonResponse(response.__dict__)
