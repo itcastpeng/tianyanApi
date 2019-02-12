@@ -79,6 +79,7 @@ def team(request):
 # token验证
 @account.is_token(models.Userprofile)
 def team_oper(request, oper_type, o_id):
+    print('oper_type -->', oper_type)
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
