@@ -46,4 +46,5 @@ urlpatterns = [
     url(r'^wechat$', wechat.wechat),     # 接受微信服务器发送的请求
     url(r'^weichat_generate_qrcode$', wechat.weichat_generate_qrcode)    # 微信获取带参数的二维码
 
+
 ]

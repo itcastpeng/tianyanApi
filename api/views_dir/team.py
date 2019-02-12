@@ -12,6 +12,8 @@ import json
 from django.db.models import Q
 from publicFunc import base64_encryption
 
+from publicFunc.weixin import weixin_gongzhonghao_api
+import requests
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -266,5 +268,18 @@ def team_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.data = json.loads(forms_obj.errors.as_json())
+
+        # 邀请成员
+        elif oper_type == "invite_members":
+            code = request.GET.get('code')
+            state = request.GET.get('state')
+            weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+            url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(
+                APPID=weichat_api_obj.APPID,
+                SECRET=weichat_api_obj.APPSECRET,
+                CODE=code,
+            )
+            ret = requests.get(url)
+            print("ret.text -->", ret.text)
 
     return JsonResponse(response.__dict__)
