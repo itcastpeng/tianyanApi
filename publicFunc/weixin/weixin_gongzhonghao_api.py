@@ -22,7 +22,7 @@ class WeChatApi(object):
         else:
             self.wechat_data_path = os.path.join(os.getcwd(), "publicFunc", "weixin", "wechat_data.json")
 
-        print(wechat_data_path)
+        # print(wechat_data_path)
         with open(self.wechat_data_path, "r", encoding="utf8") as f:
             data = json.loads(f.read())
 
@@ -39,7 +39,7 @@ class WeChatApi(object):
 
                 self.get_access_token()
 
-        self.get_users()
+        # self.get_users()
 
     # 获取access_token
     def get_access_token(self):
