@@ -51,6 +51,47 @@ class UpdateForm(forms.Form):
             return o_id
 
 
+# 更新
+class DeleteMemberForm(forms.Form):
+    o_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': '团队id不能为空'
+        }
+    )
+
+    delete_user_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "成员id不能为空"
+        }
+    )
+
+    # 查询当前用户是否在该团队中存在
+    def clean_o_id(self):
+        user_id = self.data['user_id']
+        o_id = self.data['o_id']        # 团队id
+        team_obj = models.Team.objects.get(id=o_id)
+        user_objs = team_obj.userprofile_team.filter(id=user_id)
+
+        if not user_objs:
+            self.add_error('o_id', '团队不存在')
+        else:
+            return o_id
+
+    # 查询被移除的成员是否在该团队中存在
+    def clean_delete_user_id(self):
+        delete_user_id = self.data['delete_user_id']
+        o_id = self.data['o_id']  # 团队id
+        team_obj = models.Team.objects.get(id=o_id)
+        user_objs = team_obj.userprofile_team.filter(id=delete_user_id)
+
+        if not user_objs:
+            self.add_error('o_id', '删除成员不在该团队中')
+        else:
+            return o_id
+
+
 # 查询
 class SelectForm(forms.Form):
 

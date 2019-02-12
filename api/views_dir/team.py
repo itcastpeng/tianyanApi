@@ -84,7 +84,7 @@ def team_oper(request, oper_type, o_id):
     user_id = request.GET.get('user_id')
     if request.method == "POST":
 
-        # 添加
+        # 添加团队
         if oper_type == "add":
             form_data = {
                 'create_user_id': user_id,
@@ -106,7 +106,7 @@ def team_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        # 修改
+        # 修改团队名称
         elif oper_type == "update":
             # 获取需要修改的信息
             form_data = {
@@ -138,6 +138,34 @@ def team_oper(request, oper_type, o_id):
                 #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
+        # 删除团队成员
+        elif oper_type == "delete_member":
+            delete_user_id = request.POST.get('delete_user_id')     # 要移除的成员id
+            form_data = {
+                'o_id': o_id,  # 团队id
+                'user_id': user_id,
+                'delete_user_id': delete_user_id,
+            }
+
+            forms_obj = UpdateForm(form_data)
+            if forms_obj.is_valid():
+                # print("验证通过")
+                # print(forms_obj.cleaned_data)
+                o_id = forms_obj.cleaned_data['o_id']
+                name = forms_obj.cleaned_data['name']
+
+                #  查询更新 数据
+                models.Team.objects.filter(id=o_id).update(
+                    name=name,
+                )
+
+                response.code = 200
+                response.msg = "修改成功"
+
+            else:
+                print("验证不通过")
+                response.code = 301
+                response.msg = json.loads(forms_obj.errors.as_json())
     else:
         # 查看团队人员列表
         if oper_type == "select_user_list":

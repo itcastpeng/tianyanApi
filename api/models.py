@@ -50,7 +50,7 @@ class Userprofile(models.Model):
         'Classify', verbose_name="品牌分类",
         related_name="userprofile_brand_classify"
     )
-    team = models.ManyToManyField('Team', verbose_name="所属团队", related_name="userprofile_team")
+    # team = models.ManyToManyField('Team', verbose_name="所属团队", related_name="userprofile_team")
 
     inviter = models.ForeignKey(
         'self',
@@ -62,6 +62,10 @@ class Userprofile(models.Model):
     )
     static_image = models.CharField(verbose_name='静态横图', max_length=256, null=True, blank=True)
 
+
+# # 微商用户和团队关系表
+# class UserprofileTeam(models.Model):
+#
 
 # 客户表(用户的客户)
 class Customer(models.Model):
