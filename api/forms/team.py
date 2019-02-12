@@ -97,7 +97,7 @@ class DeleteMemberForm(forms.Form):
         )
 
         if not objs:
-            self.add_error('o_id', '成员不存在')
+            self.add_error('delete_user_id', '成员不存在')
         else:
             return delete_user_id
 
@@ -145,7 +145,7 @@ class SetManagementForm(forms.Form):
         )
 
         if not objs:
-            self.add_error('o_id', '成员不存在')
+            self.add_error('set_user_id', '成员不存在')
         else:
             return set_user_id
 

@@ -181,6 +181,7 @@ def team_oper(request, oper_type, o_id):
             }
 
             forms_obj = SetManagementForm(form_data)
+            print('forms_obj.is_valid() -->', forms_obj.is_valid())
             if forms_obj.is_valid():
                 team_id = forms_obj.cleaned_data['o_id']
                 set_user_id = forms_obj.cleaned_data['set_user_id']
@@ -194,6 +195,9 @@ def team_oper(request, oper_type, o_id):
 
                 response.code = 200
                 response.msg = "修改成功"
+            else:
+                response.code = 301
+                response.data = json.loads(forms_obj.errors.as_json())
 
     else:
         # 查看团队人员列表
