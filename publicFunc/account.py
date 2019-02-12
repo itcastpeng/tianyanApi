@@ -49,6 +49,7 @@ def get_token(pwd=None):
 def is_token(table_obj):
     def is_token_decorator(func):
         def inner(request, *args, **kwargs):
+            print('request -->', request, dir(request))
             rand_str = request.GET.get('rand_str')
             timestamp = request.GET.get('timestamp', '')
             user_id = request.GET.get('user_id')
