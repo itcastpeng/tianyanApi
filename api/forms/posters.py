@@ -27,7 +27,14 @@ class AddForm(forms.Form):
             'required': "海报类型不能为空"
         }
     )
-
+    def clean_posters_url(self):
+        posters_url = self.data.get('posters_url')
+        posters_status = self.data.get('posters_status')
+        objs = models.Posters.objects.filter(posters_url=posters_url, posters_status=posters_status)
+        if not objs:
+            return posters_url
+        else:
+            self.add_error('posters_url', '该海报已存在')
 
 # 更新
 class UpdateForm(forms.Form):
@@ -66,7 +73,15 @@ class UpdateForm(forms.Form):
             return o_id, objs
         else:
             self.add_error('o_id', '修改ID不存在')
-
+    def clean_posters_url(self):
+        o_id = self.data.get('o_id')
+        posters_url = self.data.get('posters_url')
+        posters_status = self.data.get('posters_status')
+        objs = models.Posters.objects.filter(posters_url=posters_url, posters_status=posters_status).exclude(id=o_id)
+        if not objs:
+            return posters_url
+        else:
+            self.add_error('posters_url', '该海报已存在')
 
 # 查询
 class SelectForm(forms.Form):
