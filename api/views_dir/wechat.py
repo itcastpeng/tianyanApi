@@ -21,6 +21,85 @@ from publicFunc import account
 from publicFunc import base64_encryption
 
 
+# 创建或更新用户信息
+def updateUserInfo(openid, inviter_user_id, ret_obj):
+    """
+    :param openid:  微信openid
+    :param inviter_user_id: 邀请人id
+    :param ret_obj:  微信数据
+    :return:
+    """
+    print('ret_obj -->', ret_obj)
+    """
+        {
+            'subscribe_scene': 'ADD_SCENE_QR_CODE', 
+            'city': '丰台', 
+            'openid': 'oX0xv1pJPEv1nnhswmSxr0VyolLE', 
+            'qr_scene': 0, 
+            'tagid_list': [], 
+            'nickname': '张聪', 
+            'subscribe_time': 1527689396, 
+            'country': '中国', 
+            'groupid': 0, 
+            'subscribe': 1, 
+            'qr_scene_str': '{"timestamp": "1527689369548"}', 
+            'headimgurl': 'http://thirdwx.qlogo.cn/mmopen/oFswpUmYn53kTv5QdmmONicVJqp3okrhHospu6icoLF7Slc5XyZWR96STN9RiakoBQn1uoFJIWEicJgJ1QjR5iaGOgWNQ5BSVqFe5/132', 
+            'province': '北京', 
+            'sex': 1, 
+            'language': 'zh_CN', 
+            'remark': ''
+        }
+
+
+        {
+            "openid":"oX0xv1pJPEv1nnhswmSxr0VyolLE",
+            "nickname":"张聪",
+            "sex":1,
+            "language":"zh_CN",
+            "city":"丰台",
+            "province":"北京",
+            "country":"中国",
+            "headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTJWGnNTvluYlHj8qt8HnxMlwbRiadbv4TNrp4watI2ibPPAp2Hu6Sm1BqYf6IicNWsSrUyaYjIoy2Luw\/132",
+            "privilege":[]
+        }
+    """
+    # 保证1个微信只能够关联1个账号
+    user_objs = models.Userprofile.objects.filter(openid=openid)
+
+    user_data = {
+        "sex": ret_obj.get('sex'),
+        "country": ret_obj.get('country'),
+        "province": ret_obj.get('province'),
+        "city": ret_obj.get('city'),
+    }
+
+    if user_objs:
+        user_objs.update(**user_data)
+    else:
+        encode_username = base64_encryption.b64encode(ret_obj['nickname'])
+        # encodestr = base64.b64encode(ret_obj['nickname'].encode('utf8'))
+        # encode_username = str(encodestr, encoding='utf8')
+        overdue_date = datetime.datetime.now() + datetime.timedelta(days=30)
+
+        subscribe = ret_obj.get('subscribe')
+
+        # 如果没有关注，获取个人信息判断是否关注
+        if not subscribe:
+            weichat_api_obj = WeChatApi()
+            ret_obj = weichat_api_obj.get_user_info(openid=openid)
+            subscribe = ret_obj.get('subscribe')
+
+        user_data['inviter_id'] = inviter_user_id
+        user_data['set_avator'] = ret_obj.get('headimgurl')
+        user_data['subscribe'] = subscribe
+        user_data['name'] = encode_username
+        user_data['openid'] = ret_obj.get('openid')
+        user_data['overdue_date'] = overdue_date
+        user_data['token'] = get_token()
+        print("user_data --->", user_data)
+        models.Userprofile.objects.create(**user_data)
+
+
 # 微信服务器调用的接口
 def wechat(request):
     weichat_api_obj = WeChatApi()
@@ -68,55 +147,8 @@ def wechat(request):
                 inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
                 print('event_key -->', event_key)
 
-                # 保证1个微信只能够关联1个账号
-                user_objs = models.Userprofile.objects.filter(openid=openid)
                 ret_obj = weichat_api_obj.get_user_info(openid=openid)
-
-                print('ret_obj -->', ret_obj)
-                """
-                    {
-                        'subscribe_scene': 'ADD_SCENE_QR_CODE', 
-                            'city': '丰台', 
-                        'openid': 'oX0xv1pJPEv1nnhswmSxr0VyolLE', 
-                        'qr_scene': 0, 
-                        'tagid_list': [], 
-                        'nickname': '张聪', 
-                        'subscribe_time': 1527689396, 
-                            'country': '中国', 
-                        'groupid': 0, 
-                        'subscribe': 1, 
-                        'qr_scene_str': '{"timestamp": "1527689369548"}', 
-                        'headimgurl': 'http://thirdwx.qlogo.cn/mmopen/oFswpUmYn53kTv5QdmmONicVJqp3okrhHospu6icoLF7Slc5XyZWR96STN9RiakoBQn1uoFJIWEicJgJ1QjR5iaGOgWNQ5BSVqFe5/132', 
-                            'province': '北京', 
-                            'sex': 1, 
-                        'language': 'zh_CN', 
-                        'remark': ''
-                    }
-                """
-
-                user_data = {
-                    "sex": ret_obj['sex'],
-                    "country": ret_obj['country'],
-                    "province": ret_obj['province'],
-                    "city": ret_obj['city'],
-                }
-
-                if user_objs:
-                    user_objs.update(**user_data)
-                else:
-                    encode_username = base64_encryption.b64encode(ret_obj['nickname'])
-                    # encodestr = base64.b64encode(ret_obj['nickname'].encode('utf8'))
-                    # encode_username = str(encodestr, encoding='utf8')
-                    overdue_date = datetime.datetime.now() + datetime.timedelta(days=30)
-
-                    user_data['inviter_id'] = inviter_user_id
-                    user_data['set_avator'] = ret_obj['headimgurl']
-                    user_data['name'] = encode_username
-                    user_data['openid'] = ret_obj['openid']
-                    user_data['overdue_date'] = overdue_date
-                    user_data['token'] = get_token()
-                    print("user_data --->", user_data)
-                    models.Userprofile.objects.create(**user_data)
+                updateUserInfo(openid, inviter_user_id, ret_obj)
 
             # 取消关注
             elif event == "unsubscribe":
