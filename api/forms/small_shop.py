@@ -241,24 +241,24 @@ class UpdateGoodForm(forms.Form):
             'required': '商品名称不能为空'
         }
     )
-    price = forms.CharField(
-        required=True,
-        error_messages={
-            'required': '商品价格不能为空'
-        }
-    )
+    # price = forms.CharField(
+    #     required=True,
+    #     error_messages={
+    #         'required': '商品价格不能为空'
+    #     }
+    # )
     inventory = forms.IntegerField(
         required=False,
         error_messages={
             'required': '商品库存不能为空'
         }
     )
-    freight = forms.IntegerField(
-        required=False,
-        error_messages={
-            'required': '商品运费不能为空'
-        }
-    )
+    # freight = forms.IntegerField(
+    #     required=False,
+    #     error_messages={
+    #         'required': '商品运费不能为空'
+    #     }
+    # )
     goods_describe = forms.CharField(
         required=True,
         error_messages={
@@ -296,7 +296,8 @@ class UpdateGoodForm(forms.Form):
     def clean_goods_name(self):
         create_user_id = self.data.get('create_user_id')
         goods_name = self.data.get('goods_name')
-        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name)
+        o_id = self.data.get('o_id')
+        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name).exclude(id=o_id)
         if objs:
             self.add_error('goods_name', '商品名称已存在')
         else:

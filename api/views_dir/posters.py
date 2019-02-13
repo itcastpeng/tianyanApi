@@ -143,8 +143,17 @@ def posters_oper(request, oper_type, o_id):
                 response.code = 302
                 response.msg = '删除ID不存在'
 
-    else:
-        response.code = 402
-        response.msg = "请求异常"
+        # 修改海报信息
+        elif oper_type == 'update_poster_info':
+            pass
 
+    else:
+
+        # 查询海报信息
+        if oper_type == 'get_poster_info':
+            pass
+
+        else:
+            response.code = 402
+            response.msg = "请求异常"
     return JsonResponse(response.__dict__)
