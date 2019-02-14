@@ -195,7 +195,12 @@ class AddGoodForm(forms.Form):
             'required': '商品图片不能为空'
         }
     )
-
+    cover_img = forms.CharField(
+        required=True,
+        error_messages={
+            'required': '封面图片不能为空'
+        }
+    )
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
         create_user_id = self.data.get('create_user_id')
@@ -283,7 +288,12 @@ class UpdateGoodForm(forms.Form):
             'required': '商品图片不能为空'
         }
     )
-
+    cover_img = forms.CharField(
+        required=True,
+        error_messages={
+            'required': '封面图片不能为空'
+        }
+    )
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
         create_user_id = self.data.get('create_user_id')
