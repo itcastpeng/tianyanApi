@@ -170,6 +170,7 @@ class Goods(models.Model):
     )
     goods_status = models.SmallIntegerField(verbose_name='商品状态', choices=goods_status_choices, default=2)
     goods_picture = models.TextField(verbose_name='商品图片')
+    cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
 
 # # 微店订单管理
 # class SmallshopOrder(models.Model):
