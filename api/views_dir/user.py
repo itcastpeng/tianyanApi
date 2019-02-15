@@ -11,7 +11,6 @@ import re
 import datetime
 from publicFunc import base64_encryption
 
-
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def user(request):
@@ -48,7 +47,7 @@ def user(request):
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'name': obj.name,
+                    'name': base64_encryption.b64decode(obj.name),
                     'phone_number': obj.phone_number,
                     'signature': obj.signature,
                     'show_product': obj.show_product,
