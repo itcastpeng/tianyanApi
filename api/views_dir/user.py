@@ -56,7 +56,7 @@ def user(request):
                     'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
                     'set_avator': obj.set_avator,
                     'qr_code': obj.qr_code,
-                    'brand_list': brand_list,
+                    'brand_list': json.loads(brand_list),
                     'vip_type': obj.get_vip_type_display(),
                 })
             #  查询成功 返回200 状态码
