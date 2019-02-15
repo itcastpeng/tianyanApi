@@ -306,6 +306,8 @@ def team_oper(request, oper_type, o_id):
             # print("ret.text -->", ret.text)
             updateUserInfo(openid, inviter_user_id, ret.json())
 
+            # 此处跳转到邀请页面
+
             response.code = 200
             response.msg = "邀请成功"
 
