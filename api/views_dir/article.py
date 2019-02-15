@@ -77,7 +77,6 @@ def article(request):
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
-                'is_customer':forms_obj.cleaned_data['id'] # 判断是否为客户查看 (该字段有值 为客户查看详情 调用接口返回时长)
             }
 
             response.note = {
