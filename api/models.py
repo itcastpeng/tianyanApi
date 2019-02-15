@@ -100,8 +100,15 @@ class Customer(models.Model):
         max_length=128
     )
     openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
-
-
+    subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
+    inviter = models.ForeignKey(
+            'self',
+            verbose_name="邀请人",
+            related_name="userprofile_inviter",
+            null=True,
+            blank=True,
+            default=None
+        )
 # 团队表
 class Team(models.Model):
     name = models.CharField(verbose_name="团队名称", max_length=128)
