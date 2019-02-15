@@ -236,7 +236,7 @@ def base_merge(request):
                 if os.path.exists(file_save_path):
                     print('---file_save_path---file_save_path-----', file_save_path)
                     with open(file_save_path, 'rb') as f:
-                        fileData += str(base64.b64encode(f.read()))
+                        fileData += str(base64.b64decode(f.read()))
                     # os.remove(file_save_path)  # 删除分片 文件
 
 

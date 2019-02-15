@@ -188,6 +188,19 @@ class Goods(models.Model):
 # class SmallShopRefund(models.Model):
 #     pass
 
+# -------------------------- 续费----------------
+class renewal_management(models.Model):
+    price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
+    the_length_choices = (
+        (1, '一个月'),
+        (2, '半年'),
+        (3, '一年'),
+        (4, '两年'),
+    )
+    the_length = models.SmallIntegerField(verbose_name='时长', choices=the_length_choices, default=1)
+    renewal_number_days = models.IntegerField(verbose_name='续费天数', default=30)
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
 
 
 
