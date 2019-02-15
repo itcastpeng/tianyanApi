@@ -44,7 +44,7 @@ def user(request):
             ret_data = []
 
             for obj in objs:
-                brand_list = obj.brand_classify.values('name')
+                brand_list = [i['name'] for i in obj.brand_classify.values('name')]
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
