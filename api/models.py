@@ -65,6 +65,7 @@ class Userprofile(models.Model):
     small_shop_image = models.CharField(verbose_name='微店顶部静态横图', max_length=256, null=True, blank=True)
     posters_info = models.TextField(verbose_name='海报信息', default="{'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}")
 
+
 # 微商用户和团队关系表
 class UserprofileTeam(models.Model):
     user = models.ForeignKey('Userprofile', verbose_name="微商用户")
@@ -109,6 +110,16 @@ class Customer(models.Model):
             blank=True,
             default=None
         )
+
+
+# 客户查看文章日志表
+class SelectArticleLog(models.Model):
+    customer = models.ForeignKey('Customer', verbose_name="查看人")
+    article = models.ForeignKey('Article', verbose_name="查看文章")
+    close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+
 # 团队表
 class Team(models.Model):
     name = models.CharField(verbose_name="团队名称", max_length=128)
@@ -139,6 +150,7 @@ class Article(models.Model):
     source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
     look_num = models.IntegerField(verbose_name="查看次数", default=0)
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
+
 
 # ----------------------------------海报------------------------------------------------
 # 海报管理
@@ -194,6 +206,7 @@ class Goods(models.Model):
 # # 微店退款管理
 # class SmallShopRefund(models.Model):
 #     pass
+
 
 # -------------------------- 续费----------------
 class renewal_management(models.Model):

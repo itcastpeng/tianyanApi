@@ -8,11 +8,15 @@ from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
 import json
 
+import requests
+
 from django.db.models import Q
 from publicFunc.weixin import weixin_gongzhonghao_api
 
+from publicFunc import base64_encryption
+from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
+from publicFunc.account import get_token
 
-import requests
 
 
 # token验证 用户展示模块
@@ -233,10 +237,63 @@ def article_oper(request, oper_type, o_id):
             )
             ret = requests.get(url)
             ret.encoding = "utf8"
+            ret_obj = ret.json()
+            """
+            {
+                "openid":"oX0xv1pJPEv1nnhswmSxr0VyolLE",
+                "nickname":"张聪",
+                "sex":1,
+                "language":"zh_CN",
+                "city":"丰台",
+                "province":"北京",
+                "country":"中国",
+                "headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTJWGnNTvluYlHj8qt8HnxMlwbRiadbv4TNrp4watI2ibPPAp2Hu6Sm1BqYf6IicNWsSrUyaYjIoy2Luw\/132",
+                "privilege":[]
+            }
+            """
             # print("ret.text -->", ret.text)
             # updateUserInfo(openid, inviter_user_id, ret.json())
 
-            # 此处跳转到邀请页面
+
+            user_data = {
+                "sex": ret_obj.get('sex'),
+                "country": ret_obj.get('country'),
+                "province": ret_obj.get('province'),
+                "city": ret_obj.get('city'),
+            }
+            customer_objs = models.Customer.objects.filter(openid=openid)
+            if customer_objs:   # 客户已经存在
+                customer_objs.update(**user_data)
+                customer_obj = customer_objs[0]
+            else:   # 不存在，创建用户
+                encode_username = base64_encryption.b64encode(ret_obj['nickname'])
+                # encodestr = base64.b64encode(ret_obj['nickname'].encode('utf8'))
+                # encode_username = str(encodestr, encoding='utf8')
+
+                subscribe = ret_obj.get('subscribe')
+
+                # 如果没有关注，获取个人信息判断是否关注
+                if not subscribe:
+                    weichat_api_obj = WeChatApi()
+                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
+                    subscribe = ret_obj.get('subscribe')
+
+                user_data['inviter_id'] = inviter_user_id
+                user_data['set_avator'] = ret_obj.get('headimgurl')
+                user_data['subscribe'] = subscribe
+                user_data['name'] = encode_username
+                user_data['openid'] = ret_obj.get('openid')
+                user_data['token'] = get_token()
+                print("user_data --->", user_data)
+                customer_obj = models.Customer.objects.create(**user_data)
+
+            # 创建浏览文章记录
+            models.SelectArticleLog.objects.create(
+                customer=customer_obj,
+                article_id=article_id,
+            )
+
+            # 此处跳转到文章页面
 
             response.code = 200
             response.msg = "打开文章关联成功"
