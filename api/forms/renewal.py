@@ -22,18 +22,18 @@ class AddForm(forms.Form):
     )
 
     def clean_the_length(self):
-        the_length = self.data.get('the_length')
-
-        if int(the_length) == 2:
-            renewal_number_days = 180
-        elif int(the_length) == 3:
-            renewal_number_days = 365
-        elif int(the_length) == 4:
-            renewal_number_days = 730
-        else:
-            renewal_number_days = 30
-        print('renewal_number_days------> ', renewal_number_days)
-        return the_length, renewal_number_days
+        # the_length = self.data.get('the_length')
+        #
+        # if int(the_length) == 2:
+        #     renewal_number_days = 180
+        # elif int(the_length) == 3:
+        #     renewal_number_days = 365
+        # elif int(the_length) == 4:
+        #     renewal_number_days = 730
+        # else:
+        #     renewal_number_days = 30
+        # print('-=------------')
+        return 5
 
 # 更新
 class UpdateForm(forms.Form):

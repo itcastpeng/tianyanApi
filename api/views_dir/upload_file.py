@@ -149,7 +149,7 @@ def merge(request):
     return JsonResponse(response.__dict__)
 
 
-# 分片
+# base分片
 @csrf_exempt
 def upload_base_shard(request):
     response = Response.ResponseObj()
@@ -184,8 +184,8 @@ def upload_base_shard(request):
             print('img_data--------> ', img_data)
             img_name = timestamp + "_" + str(chunk) + '.' + expanded_name
             img_save_path = os.path.join('statics', 'tmp', img_name)
-            with open(img_save_path, "wb") as f:
-                f.write(eval(img_data))
+            with open(img_save_path, "w", encoding='utf8') as f:
+                f.write(img_data)
 
             if os.path.exists(img_save_path):
                 response.code = 200
@@ -201,7 +201,7 @@ def upload_base_shard(request):
         response.msg = '请求异常'
     return JsonResponse(response.__dict__)
 
-# 合并
+# base合并
 @csrf_exempt
 def base_merge(request):
     response = Response.ResponseObj()
@@ -235,8 +235,8 @@ def base_merge(request):
                 file_save_path = os.path.join('statics', 'tmp', file_name)
                 if os.path.exists(file_save_path):
                     print('---file_save_path---file_save_path-----', file_save_path)
-                    with open(file_save_path, 'rb') as f:
-                        fileData += str(base64.b64decode(f.read()))
+                    with open(file_save_path, 'r') as f:
+                        fileData += f.read()
                     # os.remove(file_save_path)  # 删除分片 文件
 
 
@@ -244,12 +244,11 @@ def base_merge(request):
             path = os.path.join(file_dir, video_name)
             try:
                 with open(path, 'ab')as f:
-                    f.write(eval(fileData))         # 写入
+                    f.write(base64.b64decode(fileData))         # 写入
             except Exception as e:
                 print('e--> ', e)
             response.data = {'url': path}
-
-
+            print('path-> ', path)
             response.code = 200
             response.msg = "上传{}成功".format(file_type)
 
