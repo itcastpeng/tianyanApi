@@ -214,6 +214,7 @@ def article_oper(request, oper_type, o_id):
         if oper_type == "share_article":
             code = request.GET.get('code')
             inviter_user_id = request.GET.get('state')  # 分享文章的用户id
+            article_id = o_id              # 分享文章的id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
             url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(
                 APPID=weichat_api_obj.APPID,
