@@ -12,7 +12,11 @@ class imgUploadForm(forms.Form):
             'required': "时间戳不能为空"
         }
     )
-
+    img_data = forms.CharField(
+        error_messages={
+            'required': "内容不能为空"
+        }
+    )
     chunk = forms.IntegerField(
         error_messages={
             'required': "当前是第几份文件不能为空",

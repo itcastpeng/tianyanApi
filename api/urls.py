@@ -50,7 +50,8 @@ urlpatterns = [
     # ---------------------------------图片上传---------------------------------
     url(r'^upload_shard$', upload_file.upload_shard),     # 分片
     url(r'^merge$', upload_file.merge),                   # 合并
-    url(r'^upload', upload_file.upload),                  # 普通上传图片
+    url(r'^upload_base_shard$', upload_file.upload_base_shard),                  # base64 上传分片
+    url(r'^base_merge', upload_file.base_merge),                                 # base64 合并
 
     # # 订单管理
     # url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
