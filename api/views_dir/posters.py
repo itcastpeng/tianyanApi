@@ -3,7 +3,7 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.posters import AddForm, UpdateForm, SelectForm
+from api.forms.posters import AddForm, UpdateForm, SelectForm, UpdatePosterInfoForm
 import json
 
 
@@ -112,7 +112,7 @@ def posters_oper(request, oper_type, o_id):
                 print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
-        
+
         # 修改海报
         elif oper_type == "update":
             forms_obj = UpdateForm(form_data)
@@ -145,14 +145,44 @@ def posters_oper(request, oper_type, o_id):
 
         # 修改海报信息
         elif oper_type == 'update_poster_info':
-            pass
+            form_data = {
+                'title': request.POST.get('title'),  # 正标题
+                'subtitle': request.POST.get('subtitle'),  # 副标题
+                'name': request.POST.get('name'),  # 姓名
+                'phone': request.POST.get('phone'),  # 电话
+                'time': request.POST.get('time'),  # 时间
+                'place': request.POST.get('place'),  # 地点
+            }
+
+            PosterObj = UpdatePosterInfoForm(form_data)
+            if PosterObj.is_valid():
+                objs = models.Userprofile.objects.filter(id=user_id)
+                objs.update(posters_info=PosterObj.data)
+                response.code = 200
+                response.msg = '修改成功'
+            else:
+                response.code = 301
+                response.msg = json.loads(PosterObj.errors.as_json())
 
     else:
 
         # 查询海报信息
         if oper_type == 'get_poster_info':
-            pass
+            objs = models.Userprofile.objects.filter(id=user_id)
+            if objs:
+                try:
+                    posters_info = eval(objs[0].posters_info)
+                except Exception:
+                    posters_info = {'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}
 
+                response.data = {
+                    'posters_info':posters_info
+                }
+                response.code = 200
+                response.msg = '查询成功'
+            else:
+                response.code = 301
+                response.msg = '非法用户'
         else:
             response.code = 402
             response.msg = "请求异常"
