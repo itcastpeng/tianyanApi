@@ -44,7 +44,7 @@ def user(request):
             ret_data = []
 
             for obj in objs:
-
+                brand_list = obj.brand_classify.values('name')
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
@@ -56,6 +56,7 @@ def user(request):
                     'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
                     'set_avator': obj.set_avator,
                     'qr_code': obj.qr_code,
+                    'brand_list': brand_list,
                     'vip_type': obj.get_vip_type_display(),
                 })
             #  查询成功 返回200 状态码
@@ -76,6 +77,7 @@ def user(request):
                 'set_avator': "头像",
                 'qr_code': "微信二维码",
                 'vip_type': "会员类型",
+                'brand_list': "公司/品牌列表",
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
