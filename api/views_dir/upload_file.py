@@ -148,10 +148,42 @@ def merge(request):
         response.msg = '请求异常'
     return JsonResponse(response.__dict__)
 
+# 普通上传图片
+@csrf_exempt
+def upload(request):
+    response = Response.ResponseObj()
+    if request.method == 'POST':
+        file_obj = request.FILES.get('file')
+        if file_obj:
+            fileName = file_obj.name
+            houzhui = re.search(r'[^.]+$', fileName).group(0)   # 获取点后面的后缀
 
+            file_name = encryption()    # 加密字符串
+            # 判断是否有后缀
+            file = file_name + '.' + houzhui
+            if '.' not in fileName:
+                response.code = 301
+                response.msg = '后缀名不能为空'
+                return JsonResponse(response.__dict__)
 
+            # 写入
+            file_abs_name = os.path.join("statics", 'img', file)
+            with open(file_abs_name, "wb") as f:
+                for chunk in file_obj.chunks():
+                    f.write(chunk)
 
+            # 拼接路径
+            path_name = 'statics/img/' + file
+            print('path_name=========> ',path_name)
+            response.code = 200
+            response.msg = '上传成功'
+            response.data = path_name
 
+    else:
+        response.code = 402
+        response.msg = '请求异常'
+
+    return JsonResponse(response.__dict__)
 
 
 
