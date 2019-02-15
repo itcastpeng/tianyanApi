@@ -1,11 +1,9 @@
-from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.renewal import AddForm, UpdateForm, SelectForm
-from publicFunc import base64_encryption
+from api.forms.renewal import AddForm, UpdateForm, DeleteForm, SelectForm
 import datetime, json
 
 # cerf  token验证 用户展示模块
@@ -18,17 +16,20 @@ def renewal(request):
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
-            order = request.GET.get('order', '-create_datetime')
+            order = request.GET.get('order', '-create_date')
             field_dict = {
                 'id': '',
-                'name': '__contains',
-                'create_datetime': '',
+                'price': '__contains',
+                'the_length': '',
+                'renewal_number_days': '',
+                'create_date': '',
+                'create_user_id': '',
             }
 
             q = conditionCom(request, field_dict)
 
             print('q -->', q)
-            objs = models.Userprofile.objects.filter(q).order_by(order)
+            objs = models.renewal_management.objects.filter(q).order_by(order)
             count = objs.count()
 
             if length != 0:
@@ -40,20 +41,15 @@ def renewal(request):
             ret_data = []
 
             for obj in objs:
-                brand_list = [i['name'] for i in obj.brand_classify.values('name')]
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'name': base64_encryption.b64decode(obj.name),
-                    'phone_number': obj.phone_number,
-                    'signature': obj.signature,
-                    'show_product': obj.show_product,
-                    'register_date': obj.register_date.strftime('%Y-%m-%d'),
-                    'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
-                    'set_avator': obj.set_avator,
-                    'qr_code': obj.qr_code,
-                    'brand_list': brand_list,
-                    'vip_type': obj.get_vip_type_display(),
+                    'price':obj.price,
+                    'the_length_id':obj.the_length,
+                    'the_length':obj.get_the_length_display(),
+                    'create_user_id':obj.create_user_id,
+                    'create_user__name':obj.create_user.name,
+                    'create_date':obj.create_date.strftime('%Y-%m-%d %H:%M:%S')
                 })
             #  查询成功 返回200 状态码
             response.code = 200
@@ -64,16 +60,12 @@ def renewal(request):
             }
             response.note = {
                 'id': "用户id",
-                'name': "姓名",
-                'phone_number': "手机号",
-                'signature': "个性签名",
-                'show_product': "文章底部是否显示产品",
-                'register_date': "注册时间",
-                'overdue_date': "过期时间",
-                'set_avator': "头像",
-                'qr_code': "微信二维码",
-                'vip_type': "会员类型",
-                'brand_list': "公司/品牌列表",
+                'price' : '钱数',
+                'the_length_id' : '时长ID(一个月， 一年....)',
+                'the_length' : '时长',
+                'create_user_id' : '创建人ID',
+                'create_user__name' : '创建人名字',
+                'create_date' : '创建时间',
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
@@ -102,35 +94,45 @@ def renewal_oper(request, oper_type, o_id):
         if oper_type == "add":
             form_obj = AddForm(form_data)
             if form_obj.is_valid():
-                print('form_obj.data-------> ', form_obj.data)
-                print(form_obj.data.get('the_length'))
-                # models.renewal_management.objects.create(**{
-                #     'price':form_obj.data.get('price'),
-                #     'the_length':the_length,
-                #     'renewal_number_days':renewal_number_days,
-                #     'create_user_id':form_obj.data.get('user_id')
-                # })
-                # response.code = 200
-                # response.msg = '添加成功'
+                the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
 
+                models.renewal_management.objects.create(**{
+                    'price':form_obj.data.get('price'),
+                    'the_length':the_length,
+                    'renewal_number_days':renewal_number_days,
+                    'create_user_id':form_obj.data.get('user_id')
+                })
+                response.code = 200
+                response.msg = '添加成功'
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
         # 修改续费
         elif oper_type == "update":
-            form_obj = AddForm(form_data)
+            form_obj = UpdateForm(form_data)
             if form_obj.is_valid():
-                pass
+                o_id, objs = form_obj.cleaned_data.get('o_id')
+                the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
+                objs.update(**{
+                    'price': form_obj.data.get('price'),
+                    'the_length': the_length,
+                    'renewal_number_days': renewal_number_days,
+                })
+                response.code = 200
+                response.msg = '修改成功'
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
         # 删除续费
         elif oper_type == "delete":
-            form_obj = AddForm(form_data)
+            form_obj = DeleteForm(form_data)
             if form_obj.is_valid():
-                pass
+                o_id, objs = form_obj.cleaned_data.get('o_id')
+                objs.delete()
+                response.code = 200
+                response.msg = '删除成功'
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
