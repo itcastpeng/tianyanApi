@@ -69,5 +69,7 @@ urlpatterns = [
     url(r'^renewal/(?P<oper_type>\w+)/(?P<o_id>\d+)$', renewal.renewal_oper),
     url(r'^renewal$', renewal.renewal),
 
+    # ----------------支付管理--------------------
+
 
 ]

@@ -1,7 +1,6 @@
 from django import forms
 
 from api import models
-from publicFunc import account
 import time, re
 
 
@@ -22,18 +21,17 @@ class AddForm(forms.Form):
     )
 
     def clean_the_length(self):
-        # the_length = self.data.get('the_length')
-        #
-        # if int(the_length) == 2:
-        #     renewal_number_days = 180
-        # elif int(the_length) == 3:
-        #     renewal_number_days = 365
-        # elif int(the_length) == 4:
-        #     renewal_number_days = 730
-        # else:
-        #     renewal_number_days = 30
-        # print('-=------------')
-        return 5
+        the_length = self.data.get('the_length')
+
+        if int(the_length) == 2:
+            renewal_number_days = 180
+        elif int(the_length) == 3:
+            renewal_number_days = 365
+        elif int(the_length) == 4:
+            renewal_number_days = 730
+        else:
+            renewal_number_days = 30
+        return the_length, renewal_number_days
 
 # 更新
 class UpdateForm(forms.Form):
@@ -44,43 +42,56 @@ class UpdateForm(forms.Form):
         }
     )
 
-    create_user_id = forms.IntegerField(
+    price = forms.IntegerField(
         required=True,
         error_messages={
-            'required': '创建人不能为空'
+            'required': '价格不能为空'
         }
     )
 
-    posters_url = forms.CharField(
+    the_length = forms.IntegerField(
         required=True,
         error_messages={
-            'required': "海报链接不能为空"
+            'required': "时长不能为空"
         }
     )
+    def clean_o_id(self):
+        o_id = self.data.get('o_id')
+        objs = models.renewal_management.objects.filter(id=o_id)
+        if objs:
+            return o_id, objs
+        else:
+            self.add_error('o_id', '修改ID不存在')
 
-    posters_status = forms.CharField(
+    def clean_the_length(self):
+        the_length = self.data.get('the_length')
+
+        if int(the_length) == 2:
+            renewal_number_days = 180
+        elif int(the_length) == 3:
+            renewal_number_days = 365
+        elif int(the_length) == 4:
+            renewal_number_days = 730
+        else:
+            renewal_number_days = 30
+        return the_length, renewal_number_days
+
+# 删除
+class DeleteForm(forms.Form):
+    o_id = forms.IntegerField(
         required=True,
         error_messages={
-            'required': "海报类型不能为空"
+            'invalid': "修改ID不能为空"
         }
     )
 
     def clean_o_id(self):
         o_id = self.data.get('o_id')
-        objs = models.Posters.objects.filter(id=o_id)
+        objs = models.renewal_management.objects.filter(id=o_id)
         if objs:
             return o_id, objs
         else:
-            self.add_error('o_id', '修改ID不存在')
-    def clean_posters_url(self):
-        o_id = self.data.get('o_id')
-        posters_url = self.data.get('posters_url')
-        posters_status = self.data.get('posters_status')
-        objs = models.Posters.objects.filter(posters_url=posters_url, posters_status=posters_status).exclude(id=o_id)
-        if not objs:
-            return posters_url
-        else:
-            self.add_error('posters_url', '该海报已存在')
+            self.add_error('o_id', '删除ID不存在')
 
 # 查询
 class SelectForm(forms.Form):
