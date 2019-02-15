@@ -2,7 +2,8 @@
 from django.conf.urls import url
 
 
-from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify
+from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
+    upload_file
 
 
 urlpatterns = [
@@ -46,10 +47,14 @@ urlpatterns = [
     url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
     url(r'^small_shop', small_shop.small_shop),
 
+    # ---------------------------------图片上传---------------------------------
+    url(r'^upload_shard$', upload_file.upload_shard),     # 分片
+    url(r'^merge$', upload_file.merge),                   # 合并
+
     # # 订单管理
     # url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
     # url(r'^small_shop', small_shop.small_shop),
-    #
+
     # # 退款管理
     # url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
     # url(r'^small_shop', small_shop.small_shop),
