@@ -180,6 +180,14 @@ def posters_oper(request, oper_type, o_id):
                 }
                 response.code = 200
                 response.msg = '查询成功'
+                response.note = {
+                    'title': '正标题',
+                    'subtitle': '副标题',
+                    'name': '姓名',
+                    'phone': '电话',
+                    'time': '时间',
+                    'place': '地点',
+                }
             else:
                 response.code = 301
                 response.msg = '非法用户'

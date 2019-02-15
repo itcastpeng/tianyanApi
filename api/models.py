@@ -62,7 +62,7 @@ class Userprofile(models.Model):
         blank=True,
         default=None
     )
-    static_image = models.CharField(verbose_name='静态横图', max_length=256, null=True, blank=True)
+    small_shop_image = models.CharField(verbose_name='微店顶部静态横图', max_length=256, null=True, blank=True)
     posters_info = models.TextField(verbose_name='海报信息', default="{'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}")
 
 # 微商用户和团队关系表
