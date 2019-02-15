@@ -63,7 +63,7 @@ class Userprofile(models.Model):
         default=None
     )
     static_image = models.CharField(verbose_name='静态横图', max_length=256, null=True, blank=True)
-
+    posters_info = models.TextField(verbose_name='海报信息', default="{'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}")
 
 # 微商用户和团队关系表
 class UserprofileTeam(models.Model):
@@ -133,7 +133,7 @@ class Article(models.Model):
     look_num = models.IntegerField(verbose_name="查看次数", default=0)
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
 
-
+# ----------------------------------海报------------------------------------------------
 # 海报管理
 class Posters(models.Model):
     create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="posters_create_user")
@@ -170,6 +170,33 @@ class Goods(models.Model):
     )
     goods_status = models.SmallIntegerField(verbose_name='商品状态', choices=goods_status_choices, default=2)
     goods_picture = models.TextField(verbose_name='商品图片')
+    cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
+
+# # 微店订单管理
+# class SmallshopOrder(models.Model):
+#     merchants_user = models.ForeignKey(to='Userprofile', verbose_name='商家')
+#     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+#     goods_name = models.CharField(verbose_name='商品名称', max_length=128)
+#     price = models.CharField(verbose_name='价格', max_length=16)
+#     freight = models.IntegerField(verbose_name='运费', default=0)
+#     goods_describe = models.CharField(verbose_name='商品描述', max_length=128)
+#     point_origin = models.CharField(verbose_name='发货地', max_length=256)
+#     goods_picture = models.TextField(verbose_name='商品图片')
+#     goods_num = models.IntegerField(verbose_name='商品数量', default=1)
+#
+# # 微店退款管理
+# class SmallShopRefund(models.Model):
+#     pass
+
+
+
+
+
+
+
+
+
+
 
 
 

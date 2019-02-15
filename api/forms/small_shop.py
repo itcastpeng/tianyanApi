@@ -195,7 +195,12 @@ class AddGoodForm(forms.Form):
             'required': '商品图片不能为空'
         }
     )
-
+    cover_img = forms.CharField(
+        required=True,
+        error_messages={
+            'required': '封面图片不能为空'
+        }
+    )
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
         create_user_id = self.data.get('create_user_id')
@@ -241,24 +246,24 @@ class UpdateGoodForm(forms.Form):
             'required': '商品名称不能为空'
         }
     )
-    price = forms.CharField(
-        required=True,
-        error_messages={
-            'required': '商品价格不能为空'
-        }
-    )
+    # price = forms.CharField(
+    #     required=True,
+    #     error_messages={
+    #         'required': '商品价格不能为空'
+    #     }
+    # )
     inventory = forms.IntegerField(
         required=False,
         error_messages={
             'required': '商品库存不能为空'
         }
     )
-    freight = forms.IntegerField(
-        required=False,
-        error_messages={
-            'required': '商品运费不能为空'
-        }
-    )
+    # freight = forms.IntegerField(
+    #     required=False,
+    #     error_messages={
+    #         'required': '商品运费不能为空'
+    #     }
+    # )
     goods_describe = forms.CharField(
         required=True,
         error_messages={
@@ -283,7 +288,12 @@ class UpdateGoodForm(forms.Form):
             'required': '商品图片不能为空'
         }
     )
-
+    cover_img = forms.CharField(
+        required=True,
+        error_messages={
+            'required': '封面图片不能为空'
+        }
+    )
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
         create_user_id = self.data.get('create_user_id')
@@ -296,63 +306,12 @@ class UpdateGoodForm(forms.Form):
     def clean_goods_name(self):
         create_user_id = self.data.get('create_user_id')
         goods_name = self.data.get('goods_name')
-        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name)
+        o_id = self.data.get('o_id')
+        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name).exclude(id=o_id)
         if objs:
             self.add_error('goods_name', '商品名称已存在')
         else:
             return goods_name
-
-# 商品删除
-class DeleteGoodForm(forms.Form):
-    o_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': '文章id不能为空'
-        }
-    )
-
-    title = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "标题不能为空"
-        }
-    )
-    content = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "内容不能为空"
-        }
-    )
-
-    # 查询文章标题是否存在
-    def clean_o_id(self):
-        create_user_id = self.data['create_user_id']
-        o_id = self.data['o_id']        # 文章id
-
-        objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
-            id=o_id,
-        )
-        if not objs:
-            self.add_error('o_id', '文章不存在')
-        else:
-            return o_id
-
-    # 查询文章标题是否存在
-    def clean_title(self):
-        create_user_id = self.data['create_user_id']
-        title = self.data['title']
-        o_id = self.data['o_id']        # 文章id
-        print('o_id -->', o_id)
-        objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
-            title=title,
-        ).exclude(id=o_id)
-        if objs:
-            self.add_error('title', '标题已存在')
-        else:
-            return title
-
 
 
 # 查询

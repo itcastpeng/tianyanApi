@@ -2,7 +2,7 @@
 from django.conf.urls import url
 
 
-from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team
+from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify
 
 
 urlpatterns = [
@@ -34,13 +34,25 @@ urlpatterns = [
     # 客户管理  用户的用户称为客户
     url(r'^customer', customer.customer),
 
+    # 品牌管理
+    url(r'^brand/(?P<oper_type>\w+)/(?P<o_id>\d+)', brand.brand_oper),
+    url(r'^brand', brand.brand),
+
+    # --------------------------------微店----------------------# 微店分类
+    url(r'^goods_classify/(?P<oper_type>\w+)/(?P<o_id>\d+)', goods_classify.goods_classify_oper),
+    url(r'^goods_classify', goods_classify.goods_classify),
+
     # 微店管理
     url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
     url(r'^small_shop', small_shop.small_shop),
 
-    # 品牌管理
-    url(r'^brand/(?P<oper_type>\w+)/(?P<o_id>\d+)', brand.brand_oper),
-    url(r'^brand', brand.brand),
+    # # 订单管理
+    # url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
+    # url(r'^small_shop', small_shop.small_shop),
+    #
+    # # 退款管理
+    # url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
+    # url(r'^small_shop', small_shop.small_shop),
 
     # ---------------- 公众号操作 ----------------
     url(r'^wechat$', wechat.wechat),     # 接受微信服务器发送的请求
