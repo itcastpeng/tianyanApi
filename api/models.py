@@ -102,19 +102,20 @@ class Customer(models.Model):
     )
     openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
     subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
-    inviter = models.ForeignKey(
-            'self',
-            verbose_name="邀请人",
-            related_name="userprofile_inviter",
-            null=True,
-            blank=True,
-            default=None
-        )
 
 
 # 客户查看文章日志表
 class SelectArticleLog(models.Model):
     customer = models.ForeignKey('Customer', verbose_name="查看人")
+    inviter = models.ForeignKey(
+        'Userprofile',
+        verbose_name="分享人",
+        related_name="userprofile_inviter",
+        null=True,
+        blank=True,
+        default=None
+    )
+
     article = models.ForeignKey('Article', verbose_name="查看文章")
     close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)

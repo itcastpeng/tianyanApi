@@ -278,7 +278,6 @@ def article_oper(request, oper_type, o_id):
                     ret_obj = weichat_api_obj.get_user_info(openid=openid)
                     subscribe = ret_obj.get('subscribe')
 
-                user_data['inviter_id'] = inviter_user_id
                 user_data['set_avator'] = ret_obj.get('headimgurl')
                 user_data['subscribe'] = subscribe
                 user_data['name'] = encode_username
@@ -291,6 +290,7 @@ def article_oper(request, oper_type, o_id):
             models.SelectArticleLog.objects.create(
                 customer=customer_obj,
                 article_id=article_id,
+                inviter_id=inviter_user_id
             )
 
             # 此处跳转到文章页面
