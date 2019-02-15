@@ -93,8 +93,9 @@ def renewal_oper(request, oper_type, o_id):
         'o_id':o_id,
         'user_id':request.GET.get('user_id'),
         'price':request.POST.get('price'),
-        'the_length':request.POST.get('the_length'),
+        'the_length':request.POST.get('the_length')
     }
+    print('form_data------> ', form_data)
     if request.method == "POST":
 
         # 添加续费
@@ -102,8 +103,7 @@ def renewal_oper(request, oper_type, o_id):
             form_obj = AddForm(form_data)
             if form_obj.is_valid():
                 print('form_obj.data-------> ', form_obj.data)
-                the_length = form_obj.data.get('the_length')
-                print('the_length----> ', the_length)
+                print(form_obj.data.get('the_length'))
                 # models.renewal_management.objects.create(**{
                 #     'price':form_obj.data.get('price'),
                 #     'the_length':the_length,
