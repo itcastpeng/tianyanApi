@@ -9,6 +9,10 @@ from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyFor
 import json
 
 from django.db.models import Q
+from publicFunc.weixin import weixin_gongzhonghao_api
+
+
+import requests
 
 
 # token验证 用户展示模块
@@ -77,7 +81,6 @@ def article(request):
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
-                'is_customer':forms_obj.cleaned_data['id'] # 判断是否为客户查看 (该字段有值 为客户查看详情 调用接口返回时长)
             }
 
             response.note = {
@@ -208,7 +211,36 @@ def article_oper(request, oper_type, o_id):
                 #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
     else:
-        response.code = 402
-        response.msg = "请求异常"
+        if oper_type == "share_article":
+            code = request.GET.get('code')
+            inviter_user_id = request.GET.get('state')  # 分享文章的用户id
+            article_id = o_id              # 分享文章的id
+            weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+            url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(
+                APPID=weichat_api_obj.APPID,
+                SECRET=weichat_api_obj.APPSECRET,
+                CODE=code,
+            )
+            ret = requests.get(url)
+            ret.encoding = "utf8"
+            print("ret.text -->", ret.text)
+
+            access_token = ret.json().get('access_token')
+            openid = ret.json().get('openid')
+            url = "https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN".format(
+                ACCESS_TOKEN=access_token,
+                OPENID=openid,
+            )
+            ret = requests.get(url)
+            ret.encoding = "utf8"
+            # print("ret.text -->", ret.text)
+            # updateUserInfo(openid, inviter_user_id, ret.json())
+
+            # 此处跳转到邀请页面
+
+            response.code = 200
+            response.msg = "打开文章关联成功"
+        # response.code = 402
+        # response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)
