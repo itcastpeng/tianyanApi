@@ -110,7 +110,7 @@ class SelectArticleLog(models.Model):
     inviter = models.ForeignKey(
         'Userprofile',
         verbose_name="分享人",
-        related_name="userprofile_inviter",
+        related_name="select_article_log_inviter",
         null=True,
         blank=True,
         default=None
