@@ -25,7 +25,7 @@ def brand(request):
                 'id': '',
                 'name': '__contains',
                 'classify_id': '__in',
-                'create_user_id': '__in',
+                'create_user_id': '',
                 'create_datetime': '',
             }
             q = conditionCom(request, field_dict)
