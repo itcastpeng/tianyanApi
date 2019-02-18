@@ -238,6 +238,8 @@ def article_oper(request, oper_type, o_id):
             ret = requests.get(url)
             ret.encoding = "utf8"
             ret_obj = ret.json()
+            print('ret.text -->', ret.text)
+            print('ret_obj -->', ret_obj)
             """
             {
                 "openid":"oX0xv1pJPEv1nnhswmSxr0VyolLE",
