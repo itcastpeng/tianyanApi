@@ -3,7 +3,7 @@ from django.conf.urls import url
 
 
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
-    upload_file, renewal
+    upload_file, renewal, prepaidManagement
 
 
 urlpatterns = [
@@ -70,6 +70,7 @@ urlpatterns = [
     url(r'^renewal$', renewal.renewal),
 
     # ----------------支付管理--------------------
-
+    url(r'wxpay', prepaidManagement.wxpay),  # 回调信息
+    url(r'yuZhiFu$', prepaidManagement.yuZhiFu),  # 预支付
 
 ]
