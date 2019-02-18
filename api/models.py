@@ -103,6 +103,19 @@ class Customer(models.Model):
     openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
     subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
 
+# 客户信息备注 对应 用户
+class customer_information_the_user(models.Model):
+    user = models.ForeignKey(to='Userprofile', verbose_name='用户', null=True, blank=True)
+    customer = models.ForeignKey(to='Customer', verbose_name='客户', null=True, blank=True)
+    remote_type_choices = (
+        (1, "跟进状态"),
+        (2, "产品购买"),
+        (3, "课程活动"),
+    )
+    remote_type = models.SmallIntegerField(verbose_name="备注类型", choices=remote_type_choices, default=1)
+
+    remote = models.TextField(verbose_name="记录信息，存json格式", null=True, blank=True)
+
 
 # 客户查看文章日志表
 class SelectArticleLog(models.Model):

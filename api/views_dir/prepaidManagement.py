@@ -54,6 +54,7 @@ class pub(object):
 
 
 @csrf_exempt
+@account.is_token(models.Userprofile)
 def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
     pub_obj = pub()  # 实例 公共函数
@@ -63,7 +64,7 @@ def weixin_pay(request, oper_type, o_id):
 
     # 预支付
     if oper_type == 'yuZhiFu':
-        user_id = request.POST.get('user_id')
+        user_id = request.GET.get('user_id')
         fee_objs = models.renewal_management.objects.filter(id=o_id)
         if fee_objs:
             userObjs = models.Userprofile.objects.filter(id=user_id)
