@@ -114,6 +114,12 @@ def brand_oper(request, oper_type, o_id):
                 # print(forms_obj.errors.as_json())
                 response.msg = json.loads(forms_obj.errors.as_json())
 
+        elif oper_type == "delete":
+            models.Userprofile.objects.get(id=user_id).brand_classify.remove(o_id)
+
+            response.code = 200
+            response.msg = "删除成功"
+
     else:
         response.code = 402
         response.msg = "请求异常"
