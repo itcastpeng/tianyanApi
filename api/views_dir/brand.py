@@ -120,8 +120,9 @@ def brand_oper(request, oper_type, o_id):
             response.code = 200
             response.msg = "删除成功"
 
+    else:
         # 获取我的品牌列表
-        elif oper_type == "get_brand_list":
+        if oper_type == "get_brand_list":
             brand_objs = models.Userprofile.objects.get(id=user_id).brand_classify.all()
 
             # 返回的数据
@@ -146,9 +147,5 @@ def brand_oper(request, oper_type, o_id):
                 'title': "品牌名称",
                 'create_datetime': "创建时间",
             }
-
-    else:
-        response.code = 402
-        response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)
