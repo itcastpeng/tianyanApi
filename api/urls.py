@@ -70,7 +70,7 @@ urlpatterns = [
     url(r'^renewal$', renewal.renewal),
 
     # ----------------支付管理--------------------
-    url(r'payback$', prepaidManagement.payback),  # 回调信息
+    url(r'wxpay', prepaidManagement.wxpay),  # 回调信息
     url(r'yuZhiFu$', prepaidManagement.yuZhiFu),  # 预支付
 
 ]
