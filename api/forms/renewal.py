@@ -4,6 +4,19 @@ from api import models
 import time, re
 
 
+def length_the_days(the_length):
+    if int(the_length) == 2:
+        renewal_number_days = 180
+    elif int(the_length) == 3:
+        renewal_number_days = 365
+    elif int(the_length) == 4:
+        renewal_number_days = 730
+    else:
+        renewal_number_days = 30
+
+    return the_length, renewal_number_days
+
+
 # 添加
 class AddForm(forms.Form):
     price = forms.IntegerField(
@@ -19,18 +32,16 @@ class AddForm(forms.Form):
             'required': "时长不能为空"
         }
     )
+    original_price = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "原价不能为空"
+        }
+    )
 
     def clean_the_length(self):
         the_length = self.data.get('the_length')
-
-        if int(the_length) == 2:
-            renewal_number_days = 180
-        elif int(the_length) == 3:
-            renewal_number_days = 365
-        elif int(the_length) == 4:
-            renewal_number_days = 730
-        else:
-            renewal_number_days = 30
+        the_length, renewal_number_days = length_the_days(the_length)
         return the_length, renewal_number_days
 
 # 更新
@@ -55,6 +66,12 @@ class UpdateForm(forms.Form):
             'required': "时长不能为空"
         }
     )
+    original_price = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "原价不能为空"
+        }
+    )
     def clean_o_id(self):
         o_id = self.data.get('o_id')
         objs = models.renewal_management.objects.filter(id=o_id)
@@ -65,15 +82,7 @@ class UpdateForm(forms.Form):
 
     def clean_the_length(self):
         the_length = self.data.get('the_length')
-
-        if int(the_length) == 2:
-            renewal_number_days = 180
-        elif int(the_length) == 3:
-            renewal_number_days = 365
-        elif int(the_length) == 4:
-            renewal_number_days = 730
-        else:
-            renewal_number_days = 30
+        the_length, renewal_number_days = length_the_days(the_length)
         return the_length, renewal_number_days
 
 # 删除
