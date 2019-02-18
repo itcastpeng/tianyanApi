@@ -70,7 +70,6 @@ urlpatterns = [
     url(r'^renewal$', renewal.renewal),
 
     # ----------------支付管理--------------------
-    url(r'wxpay', prepaidManagement.wxpay),  # 回调信息
-    url(r'yuZhiFu$', prepaidManagement.yuZhiFu),  # 预支付
+    url(r'^weixin_pay/(?P<oper_type>\w+)$', prepaidManagement.weixin_pay),
 
 ]
