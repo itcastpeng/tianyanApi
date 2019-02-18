@@ -36,12 +36,12 @@ class SelectForm(forms.Form):
             if objs[0].overdue_date >= now_date:
                 return user_id
             else:
-                self.add_error('user_id','您的会员已经到期, 为了避免您的正常使用, 请续费')
+                self.add_error('user_id','您的会员已经到期, 为了避免您的正常使用, 请续费继续使用')
         else:
             if not objs:
                 self.add_error('user_id', '非法用户')
             else:
-                self.add_error('user_id', '您的会员已经到期, 为了避免您的正常使用, 请续费')
+                self.add_error('user_id', '您的会员已经到期, 为了避免您的正常使用, 请续费继续使用')
 
     def clean_current_page(self):
         if 'current_page' not in self.data:

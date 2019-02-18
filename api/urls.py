@@ -73,6 +73,7 @@ urlpatterns = [
     url(r'^weixin_pay/(?P<oper_type>\w+)/(?P<o_id>\d+)$', prepaidManagement.weixin_pay),
 
     # ----------------天眼---------------------
-    url(r'^day_eye', day_eye.day_eye),
+    url(r'^day_eye/(?P<oper_type>\w+)/(?P<o_id>\d+)$', day_eye.day_eye_oper),
+    url(r'^day_eye$', day_eye.day_eye),
 
 ]

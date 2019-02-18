@@ -5,29 +5,31 @@ from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.day_eye import SelectForm
+from django.db.models import Count, Sum
 import json
 
 
 # cerf  token验证 用户展示模块
-# @account.is_token(models.Userprofile)
+@account.is_token(models.Userprofile)
 def day_eye(request):
     response = Response.ResponseObj()
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
+            is_article = request.GET.get('is_article')
             current_page = forms_obj.cleaned_data['current_page']
+            user_id = forms_obj.cleaned_data['user_id']
             length = forms_obj.cleaned_data['length']
             order = request.GET.get('order', '-create_datetime')
-            field_dict = {
-                'id': '',
-            }
 
-            q = conditionCom(request, field_dict)
+            # field_dict = {
+            #     'id': '',
+            # }
+            #
+            # q = conditionCom(request, field_dict)
+            objs = models.SelectArticleLog.objects.filter(inviter_id=user_id).order_by(order)
 
-            print('q -->', q)
-            objs = models.SelectArticleLog.objects.filter(q).order_by(order)
             count = objs.count()
-
             if length != 0:
                 start_line = (current_page - 1) * length
                 stop_line = start_line + length
@@ -35,8 +37,10 @@ def day_eye(request):
 
             # 返回的数据
             ret_data = []
-
             for obj in objs:
+                close_datetime = ''
+                if obj.close_datetime:
+                    close_datetime = obj.close_datetime.strftime('%Y-%m-%d %H:%M:%S')
                 ret_data.append({
                     'id':obj.id,
                     'customer_id':obj.customer_id,
@@ -45,7 +49,7 @@ def day_eye(request):
                     'inviter__name':obj.inviter.name,
                     'article_id':obj.article_id,
                     'article__title':obj.article.title,
-                    'close_datetime':obj.close_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    'close_datetime':close_datetime,
                     'create_datetime':obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
 
@@ -81,11 +85,12 @@ def day_eye(request):
 def day_eye_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
-    print('request.POST -->', request.POST)
+
     if request.method == "POST":
-        # 设置推荐分类
+
         if oper_type == "":
-            pass
+            customer_id = o_id
+
 
     else:
         response.code = 402
