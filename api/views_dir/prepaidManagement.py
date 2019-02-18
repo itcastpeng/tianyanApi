@@ -54,112 +54,119 @@ class pub(object):
 
 
 @csrf_exempt
-def weixin_pay(request, oper_type):
+def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
+    pub_obj = pub()  # 实例 公共函数
+    SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'
+    appid = 'wx0f55c67abd0ebf3d'
+    mch_id = '1488841842'
 
     # 预支付
     if oper_type == 'yuZhiFu':
-        pub_obj = pub() # 实例 公共函数
-        url = 'https://api.mch.weixin.qq.com/pay/unifiedorder'  # 微信支付接口
+        user_id = request.POST.get('user_id')
+        fee_objs = models.renewal_management.objects.filter(id=o_id)
+        if fee_objs:
+            userObjs = models.Userprofile.objects.filter(id=user_id)
+            user_obj = userObjs[0]
+            fee_obj = fee_objs[0]
 
-        user_id = request.GET.get('user_id')
 
-        userObjs = models.Userprofile.objects.filter(id=user_id)
+            url = 'https://api.mch.weixin.qq.com/pay/unifiedorder'  # 微信支付接口
 
-        openid = userObjs[0].openid  # openid  用户标识
-        print('openid-----------> ', openid)
-        total_fee = 100
-        ymdhms = time.strftime("%Y%m%d%H%M%S", time.localtime())  # 年月日时分秒
-        shijianchuoafter5 = str(int(time.time() * 1000))[8:]  # 时间戳 后五位
-        dingdanhao = str(ymdhms) + shijianchuoafter5 + str(random.randint(10, 99))
+            ymdhms = time.strftime("%Y%m%d%H%M%S", time.localtime())  # 年月日时分秒
+            shijianchuoafter5 = str(int(time.time() * 1000))[8:]  # 时间戳 后五位
+            dingdanhao = shijianchuoafter5 + str(ymdhms) + str(random.randint(10, 99))
 
-        result_data = {
-            'appid': 'wx0f55c67abd0ebf3d',  # appid
-            'mch_id': '1488841842',  # 商户号
-            'nonce_str': pub_obj.generateRandomStamping(),  # 32位随机值a
-            'openid': openid,
-            'body': 'zhuge-vip',  # 描述
-            'out_trade_no': dingdanhao,  # 订单号
-            'total_fee': total_fee,  # 金额
-            'spbill_create_ip': '0.0.0.0',  # 终端IP
-            'notify_url': 'http://tianyan.zhangcong.top/api/wxpay',
-            'trade_type': 'JSAPI'
-        }
+            total_fee = int(fee_obj.price) * 100
 
-        stringSignTemp = pub_obj.shengchengsign(result_data)
-        print('stringSignTemp-------> ', stringSignTemp)
-        result_data['sign'] = pub_obj.md5(stringSignTemp).upper()
-        print('result_data------------> ', result_data)
-        xml_data = pub_obj.toXml(result_data)
-        print('xml_data--> ', xml_data)
-        ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
-        ret.encoding = 'utf8'
-        print(ret.text)
+            result_data = {
+                'appid': appid,                                 # appid
+                'mch_id': mch_id,                               # 商户号
+                'nonce_str': pub_obj.generateRandomStamping(),  # 32位随机值a
+                'openid': user_obj.openid,                      # 微信用户唯一标识
+                'body': '天眼-会员续费'.encode('utf8'),           # 描述
+                'out_trade_no': dingdanhao,                     # 订单号
+                'total_fee': total_fee,                         # 金额(分 为单位)
+                'spbill_create_ip': '0.0.0.0',                  # 终端IP
+                'notify_url': 'http://api.zhugeyingxiao.com/tianyan/wxpay', # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
+                'trade_type': 'JSAPI'
+            }
 
-        # DOMTree = xmldom.parseString(ret.text)
-        # collection = DOMTree.documentElement
-        # data = ['return_code', 'return_msg']
-        # resultData = xmldom_parsing.xmldom(collection, data)
-        #
-        # if resultData['return_code'] == 'SUCCESS':        # 判断预支付返回参数 是否正确
-        #     data = ['prepay_id']
-        #     resultData = xmldom_parsing.xmldom(collection, data)
-        #     response.code = 200
-        #     response.msg = '预支付请求成功'
-        # 预支付成功 创建订单
-        #     if not fukuan: # 判断是否已经存在订单
-        #         dingDanObjs = models.zgld_shangcheng_dingdan_guanli.objects
-        #         date_time = datetime.datetime.today().strftime('%Y-%m-%d %H:%M:%S')
-        #         commissionFee = 0
-        #         if goodsObjs[0].commissionFee:
-        #             commissionFee = goodsObjs[0].commissionFee
-        #
-        #         dingDanObjs.create(
-        #             shangpinguanli_id = goodsId,            # 商品ID
-        #             orderNumber = int(getWxPayOrderId),     # 订单号
-        #             yingFuKuan = float(total_fee)/100,      # 应付款
-        #             goodsPrice = goodsObjs[0].goodsPrice,   # 商品单价
-        #             youHui = 0,                             # 优惠
-        #             unitRiceNum=int(goodsNum),              # 数量
-        #             yewuUser_id = u_id,                     # 业务
-        #             gongsimingcheng_id = company_id,        # 公司
-        #             yongJin = commissionFee,                # 佣金
-        #             shouHuoRen_id = user_id,                # 收货人
-        #             theOrderStatus = 1,                     # 订单状态
-        #             createDate=date_time,
-        #             goodsName=goodsObjs[0].goodsName,
-        #             detailePicture=goodsObjs[0].detailePicture,
-        #             phone=phoneNumber
-        #         )
-        #         # code_url = collection.getElementsByTagName("code_url")[0].childNodes[0].data # 二维码
-        #         prepay_id = resultData['prepay_id'] # 直接支付
-        #         data_dict = {
-        #             # 'appId' : 'wx1add8692a23b5976',
-        #             'appId' : appid,
-        #             'timeStamp': int(time.time()),
-        #             'nonceStr':generateRandomStamping(),
-        #             'package': 'prepay_id=' + prepay_id,
-        #             'signType': 'MD5'
-        #         }
-        #         stringSignTemp = shengchengsign(data_dict, SHANGHUKEY)
-        #         data_dict['paySign'] = md5(stringSignTemp).upper() # upper转换为大写
-        #         response.data = data_dict
-        #
-        #     return JsonResponse(response.__dict__)
-        # else:
-        #     if not fukuan:
-        #         response.msg = '预支付失败, 原因:{}'.format(resultData['return_msg'])
-        #     else:
-        #         response.msg = '支付失败, 原因:{}'.format(resultData['return_msg'])
-        #
-        #     response.code = 301
-        #     response.data = ''
+            stringSignTemp = pub_obj.shengchengsign(result_data, KEY=SHANGHUKEY)
+            result_data['sign'] = pub_obj.md5(stringSignTemp).upper()
+
+            xml_data = pub_obj.toXml(result_data)
+            ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
+            ret.encoding = 'utf8'
+
+            DOMTree = xmldom.parseString(ret.text)
+            collection = DOMTree.documentElement
+            data = ['return_code', 'return_msg']
+            resultData = xmldom_parsing.xmldom(collection, data)
+            if resultData['return_code'] == 'SUCCESS':        # 判断预支付返回参数 是否正确
+                data = ['prepay_id']
+
+                order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao) # 创建订单日志
+
+                renewal_number_days = fee_obj.renewal_number_days # 续费天数
+                overdue_date = (user_obj.overdue_date + datetime.timedelta(days=renewal_number_days)) # 续费后 到期时间
+                if not order_objs:
+                    models.renewal_log.objects.create(
+                        pay_order_no=dingdanhao,
+                        the_length=fee_obj.get_the_length_display(), # 续费时长
+                        renewal_number_days=renewal_number_days,
+                        create_user_id=user_id,
+                        price=total_fee,
+                        original_price=fee_obj.original_price, # 原价
+                        overdue_date=overdue_date,
+                    )
+                response.data = {'prepay_id':xmldom_parsing.xmldom(collection, data)}
+                response.code = 200
+                response.msg = '预支付请求成功'
+            else:
+                response.code = 301
+                response.msg = '支付失败, 原因:{}'.format(resultData['return_msg'])
+        else:
+            response.code = 301
+            response.msg = '请选择一项会员'
+
 
     # 微信回调
     elif oper_type == 'wxpay':
-        print('------------------------------回调')
+        isSuccess = 0
+        print('------------------------------回调-----------------------')
         response.code = 200
+        print('request.body---------> ', request.body)
+        DOMTree = xmldom.parseString(request.body)
+        collection = DOMTree.documentElement
+        data = ['mch_id', 'return_code', 'appid', 'openid', 'cash_fee', 'out_trade_no']
+        resultData = xmldom_parsing.xmldom(collection, data)
 
+        renewal_log_objs = models.renewal_log.objects.filter(pay_order_no=resultData['out_trade_no'])
+        if resultData['return_code'] == 'SUCCESS':
+            renewal_log_obj = renewal_log_objs[0]
 
+            # 查询订单是否付款成功
+            result_data = {
+                'appid': resultData['appid'],  # appid
+                'mch_id': resultData['mch_id'],  # 商户号
+                'out_trade_no': resultData['out_trade_no'],  # 订单号
+                'nonce_str': pub_obj.generateRandomStamping(),  # 32位随机值
+            }
+            url = 'https://api.mch.weixin.qq.com/pay/orderquery'
+            stringSignTemp = pub_obj.shengchengsign(result_data, SHANGHUKEY)
+            result_data['sign'] = pub_obj.md5(stringSignTemp).upper()
+            xml_data = pub_obj.toXml(result_data)
+            ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
+            ret.encoding = 'utf8'
+            print('ret.text------------> ', ret.text)
+            DOMTree = xmldom.parseString(ret.text)
+            collection = DOMTree.documentElement
+            return_code = collection.getElementsByTagName("return_code")[0].childNodes[0].data
+            if return_code == 'SUCCESS':
+                isSuccess = 1
+                user_objs = models.Userprofile.objects.filter(id=renewal_log_obj.create_user_id)
+                user_objs.update(overdue_date=renewal_log_obj.overdue_date)
 
+        renewal_log_objs.update(isSuccess=isSuccess) # 修改订单状态
     return JsonResponse(response.__dict__)

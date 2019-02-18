@@ -45,6 +45,7 @@ def renewal(request):
                 ret_data.append({
                     'id': obj.id,
                     'price':obj.price,
+                    'original_price':obj.original_price,
                     'the_length_id':obj.the_length,
                     'the_length':obj.get_the_length_display(),
                     'create_user_id':obj.create_user_id,
@@ -65,6 +66,7 @@ def renewal(request):
                 'the_length' : '时长',
                 'create_user_id' : '创建人ID',
                 'create_user__name' : '创建人名字',
+                'original_price' : '原价',
                 'create_date' : '创建时间',
             }
         else:
@@ -85,6 +87,7 @@ def renewal_oper(request, oper_type, o_id):
         'o_id':o_id,
         'user_id':request.GET.get('user_id'),
         'price':request.POST.get('price'),
+        'original_price':request.POST.get('original_price'), # 原价
         'the_length':request.POST.get('the_length')
     }
     print('form_data------> ', form_data)
@@ -97,10 +100,11 @@ def renewal_oper(request, oper_type, o_id):
                 the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
 
                 models.renewal_management.objects.create(**{
-                    'price':form_obj.data.get('price'),
+                    'price':form_obj.cleaned_data.get('price'),
+                    'original_price':form_obj.cleaned_data.get('original_price'),
                     'the_length':the_length,
                     'renewal_number_days':renewal_number_days,
-                    'create_user_id':form_obj.data.get('user_id')
+                    'create_user_id':form_obj.cleaned_data.get('user_id')
                 })
                 response.code = 200
                 response.msg = '添加成功'
@@ -115,7 +119,8 @@ def renewal_oper(request, oper_type, o_id):
                 o_id, objs = form_obj.cleaned_data.get('o_id')
                 the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
                 objs.update(**{
-                    'price': form_obj.data.get('price'),
+                    'price': form_obj.cleaned_data.get('price'),
+                    'original_price': form_obj.cleaned_data.get('original_price'),
                     'the_length': the_length,
                     'renewal_number_days': renewal_number_days,
                 })
