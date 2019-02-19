@@ -44,6 +44,7 @@ def team(request):
             # 返回的数据
             ret_data = []
 
+            # 此处代码需要优化，设计多次数据库查询
             for obj in objs:
                 #  将查询出来的数据 加入列表
                 team_id = obj.team_id
