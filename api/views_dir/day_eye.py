@@ -6,6 +6,7 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.day_eye import SelectForm, AddForm, UpdateForm, Form
 from django.db.models import Count, Sum
+from publicFunc.base64_encryption import b64decode
 import json
 
 
@@ -29,14 +30,13 @@ def get_min_s(start_time=None, stop_time=None):
         mins = str(min) + '分钟'
         if second:
             mins = str(min) + '分'
-
     if second:
         seconds = str(second) + '秒'
 
     return days + hours + mins + seconds
 
 
-# cerf  token验证 谁看了我(列表及详情)
+# cerf  token验证 谁看了我(列表)
 @account.is_token(models.Userprofile)
 def day_eye(request):
     response = Response.ResponseObj()
@@ -46,22 +46,15 @@ def day_eye(request):
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             user_id = forms_obj.cleaned_data['user_id']
-            order = request.GET.get('order', '-create_datetime')
-            customer = request.GET.get('customer_id')
 
-            if not customer:  # 列表页
-                objs = models.SelectArticleLog.objects.filter(
-                    inviter_id=user_id
-                ).select_related(
-                    'customer'
-                ).values(
-                    'customer_id', 'customer__name'
-                ).distinct().annotate(Count('customer_id'))
+            objs = models.SelectArticleLog.objects.filter(
+                inviter_id=user_id
+            ).select_related(
+                'customer'
+            ).values(
+                'customer_id', 'customer__name'
+            ).distinct().annotate(Count('customer_id'))
 
-            else: # 详情页
-                objs = models.SelectArticleLog.objects.filter(
-                    inviter_id=user_id
-                ).filter(customer_id=customer).order_by(order)
 
             if length != 0:
                 start_line = (current_page - 1) * length
@@ -72,33 +65,18 @@ def day_eye(request):
             # 返回的数据
             ret_data = []
             for obj in objs:
-                if not customer: # 列表页
-                    customer_id = obj.get('customer_id')
-                    article_count = models.SelectArticleLog.objects.filter(
-                        customer_id=customer_id,
-                        inviter_id=user_id,
-                    ).values('article_id').distinct().count()
+                customer_id = obj.get('customer_id')
+                article_count = models.SelectArticleLog.objects.filter(
+                    customer_id=customer_id,
+                    inviter_id=user_id,
+                ).values('article_id').distinct().count()
 
-                    ret_data.append({
-                        'customer_id': customer_id,
-                        'customer__name': obj.get('customer__name'),
-                        'customer_id__count': obj.get('customer_id__count'), # 总共查看几次
-                        'article_count': article_count,                      # 总共查看几篇文章
-                    })
-
-                else:
-                    time_length = '1秒'
-                    if obj.close_datetime:
-                        time_length = get_min_s(obj.close_datetime, obj.create_datetime)
-                    ret_data.append({
-                        'id': obj.id,
-                        'customer_id': obj.customer_id,
-                        'customer__name': obj.customer.name,
-                        'article_id': obj.article_id,
-                        'article__title': obj.article.title,
-                        'time_length':time_length,
-                        'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                    })
+                ret_data.append({
+                    'customer_id': customer_id,
+                    'customer__name': obj.get('customer__name'),
+                    'customer_id__count': obj.get('customer_id__count'), # 总共查看几次
+                    'article_count': article_count,                      # 总共查看几篇文章
+                })
 
             #  查询成功 返回200 状态码
             response.code = 200
@@ -133,100 +111,93 @@ def day_eye(request):
 def day_eye_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
+    forms_obj = SelectForm(request.GET)
+    if forms_obj.is_valid():
+        current_page = forms_obj.cleaned_data['current_page']
+        length = forms_obj.cleaned_data['length']
+        order = request.GET.get('order', '-create_datetime')
 
-    if request.method == "POST":
-        form_data = {
-            'o_id':o_id,
-            'user_id':user_id,
-            'customer_id': request.POST.get('customer_id'),
-            'remote_type': request.POST.get('remote_type'),
-            'title': request.POST.get('title'),
-            'create_date': request.POST.get('create_date'),
-            'remote': request.POST.get('remote')
-        }
 
-        # 添加客户信息备注
-        if oper_type == "add":
-            form_obj = AddForm(form_data)
-            if form_obj.is_valid():
-                remote_type = form_obj.cleaned_data.get('remote_type')
-                title = form_obj.cleaned_data.get('title')
-                remote = form_obj.cleaned_data.get('remote')
-                customer_id = form_obj.cleaned_data.get('customer_id')
-                create_date = form_obj.cleaned_data.get('create_date')
+        if request.method == "POST":
+            form_data = {
+                'o_id':o_id,
+                'user_id':user_id,
+                'customer_id': request.POST.get('customer_id'),
+                'remote_type': request.POST.get('remote_type'),
+                'title': request.POST.get('title'),
+                'create_date': request.POST.get('create_date'),
+                'remote': request.POST.get('remote')
+            }
 
-                if remote_type == 2:
-                    remote_text = {'create_date':create_date, 'title':title, 'remote':remote}
+            # 添加客户信息备注
+            if oper_type == "add":
+                form_obj = AddForm(form_data)
+                if form_obj.is_valid():
+                    remote_type = form_obj.cleaned_data.get('remote_type')
+                    title = form_obj.cleaned_data.get('title')
+                    remote = form_obj.cleaned_data.get('remote')
+                    customer_id = form_obj.cleaned_data.get('customer_id')
+                    create_date = form_obj.cleaned_data.get('create_date')
 
-                elif remote_type == 3:
-                    remote_text = {'title':title, 'remote':remote}
+                    remote_text = {
+                        'create_date': create_date,
+                        'title': title,
+                        'remote': remote
+                    }
 
-                else:
-                    remote_text = {'remote':remote}
-
-                data = {
-                    'user_id':user_id,
-                    'customer_id':customer_id,
-                    'remote_type':remote_type,
-                    'remote':remote_text
-                }
-                models.customer_information_the_user.objects.create(**data)
-                response.code = 200
-                response.msg = '保存成功'
-
-            else:
-                response.code = 301
-                response.msg = json.loads(form_obj.errors.as_json())
-
-        # 修改客户信息备注
-        elif oper_type == 'update':
-            form_obj = UpdateForm(form_data)
-            if form_obj.is_valid():
-                o_id, remote_type = form_obj.cleaned_data.get('o_id')
-                title = form_obj.cleaned_data.get('title')
-                remote = form_obj.cleaned_data.get('remote')
-                create_date = form_obj.cleaned_data.get('create_date')
-
-                if remote_type == 2:
-                    remote_text = {'create_date':create_date, 'title':title, 'remote':remote}
-
-                elif remote_type == 3:
-                    remote_text = {'title':title, 'remote':remote}
+                    data = {
+                        'user_id':user_id,
+                        'customer_id':customer_id,
+                        'remote_type':remote_type,
+                        'remote':remote_text
+                    }
+                    models.customer_information_the_user.objects.create(**data)
+                    response.code = 200
+                    response.msg = '保存成功'
 
                 else:
-                    remote_text = {'remote':remote}
+                    response.code = 301
+                    response.msg = json.loads(form_obj.errors.as_json())
 
-                models.customer_information_the_user.objects.filter(id=o_id).update(
-                    remote=remote_text
-                )
-                response.code = 200
-                response.msg = '保存成功'
+            # 修改客户信息备注
+            elif oper_type == 'update':
+                form_obj = UpdateForm(form_data)
+                if form_obj.is_valid():
+                    o_id, remote_type = form_obj.cleaned_data.get('o_id')
+                    title = form_obj.cleaned_data.get('title')
+                    remote = form_obj.cleaned_data.get('remote')
+                    create_date = form_obj.cleaned_data.get('create_date')
+                    remote_text = {
+                        'create_date': create_date,
+                        'title': title,
+                        'remote': remote
+                    }
 
-            else:
-                response.code = 301
-                response.msg = json.loads(form_obj.errors.as_json())
+                    models.customer_information_the_user.objects.filter(id=o_id).update(
+                        remote=remote_text
+                    )
+                    response.code = 200
+                    response.msg = '保存成功'
 
-        # 删除客户信息备注
-        elif oper_type == 'delete':
-            objs = models.customer_information_the_user.objects.filter(id=o_id)
-            if not objs:
-                response.code = 301
-                response.msg = '刪除数据不存在'
-            else:
-                objs.delete()
-                response.code = 200
-                response.msg = '删除成功'
+                else:
+                    response.code = 301
+                    response.msg = json.loads(form_obj.errors.as_json())
 
-    else:
+            # 删除客户信息备注
+            elif oper_type == 'delete':
+                objs = models.customer_information_the_user.objects.filter(id=o_id)
+                if not objs:
+                    response.code = 301
+                    response.msg = '刪除数据不存在'
+                else:
+                    objs.delete()
+                    response.code = 200
+                    response.msg = '删除成功'
 
-        # 查询客户信息备注
-        if oper_type == 'get_customer_note':
-            forms_obj = Form(request.GET)
-            if forms_obj.is_valid():
-                current_page = forms_obj.cleaned_data['current_page']
-                length = forms_obj.cleaned_data['length']
-                order = request.GET.get('order', '-create_datetime')
+        else:
 
+            # 查询客户信息备注
+            if oper_type == 'get_customer_note':
                 field_dict = {
                     'id': '',
                     'remote_type':'',
@@ -283,32 +254,57 @@ def day_eye_oper(request, oper_type, o_id):
                     'ret_data':ret_data,
                 }
 
-            else:
-                response.code = 301
-                response.msg = json.loads(forms_obj.errors.as_json())
+            # 谁看了我 详情
+            elif oper_type == 'day_eye_detail':
+                user_id = forms_obj.cleaned_data['user_id']
+                customer = request.GET.get('customer_id')
 
-        # 按文章查看(天眼功能)
-        elif oper_type == 'view_by_article':
-            form_obj = Form(request.GET)
-            if form_obj.is_valid():
-                user_id = request.GET.get('user_id')
-                article_id = request.GET.get('article_id')
+                objs = models.SelectArticleLog.objects.filter(
+                    inviter_id=user_id
+                ).filter(customer_id=customer).order_by(order)
 
-                current_page = form_obj.cleaned_data['current_page']
-                length = form_obj.cleaned_data['length']
-                # order = request.GET.get('order', '-create_datetime')
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+                count = objs.count()
+                ret_data = []
+                for obj in objs:
+                    time_length = '1秒'
+                    if obj.close_datetime:
+                        time_length = get_min_s(obj.close_datetime, obj.create_datetime)
+                    ret_data.append({
+                        'id': obj.id,
+                        'customer_id': obj.customer_id,
+                        'customer__name': obj.customer.name,
+                        'article_id': obj.article_id,
+                        'article__title': obj.article.title,
+                        'time_length': time_length,
+                        'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    })
 
-                if not article_id:# 列表页
-                    objs = models.SelectArticleLog.objects.filter(
-                        inviter_id=user_id
-                    ).values('article_id', 'article__title').distinct().annotate(Count('id'))
-                else:
-                    objs = models.SelectArticleLog.objects.filter(
-                        inviter_id=user_id,
-                        article_id=article_id
-                    ).values('customer_id', 'customer__name').distinct().annotate(Count('id'))
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data': ret_data,
+                    'data_count': count,
+                }
+                response.note = {
+                    'id': "用户id",
+                    'customer_id': "查看人ID",
+                    'customer__name': "查看人姓名",
+                    'article_id': "文章ID",
+                    'article__title': "文章标题",
+                    'close_datetime': "关闭页面时间",
+                    'create_datetime': "创建时间",
+                }
 
-                print('objs--> ', objs)
+            # 按文章查看(天眼功能)列表页
+            elif oper_type == 'view_by_article':
+
+                objs = models.SelectArticleLog.objects.filter(
+                    inviter_id=user_id
+                ).values('article_id', 'article__title').distinct().annotate(Count('id'))
 
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -318,19 +314,11 @@ def day_eye_oper(request, oper_type, o_id):
 
                 ret_data = []
                 for obj in objs:
-                    if not article_id:
-                        ret_data.append({
-                            'article_id':obj['article_id'],
-                            'article__title':obj['article__title'],
-                            'id__count':obj['id__count'],
-                        })
-
-                    else:
-                        ret_data.append({
-                            'customer_id':obj['customer_id'],
-                            'customer__name':obj['customer__name'],
-                            'id__count':obj['id__count'],
-                        })
+                    ret_data.append({
+                        'article_id':obj['article_id'],
+                        'article__title':obj['article__title'],
+                        'id__count':obj['id__count'],
+                    })
 
                 response.code = 200
                 response.msg = '查询成功'
@@ -342,18 +330,46 @@ def day_eye_oper(request, oper_type, o_id):
                     'article_id':'文章ID',
                     'article__title':'文章标题',
                     'id__count ':'查看该文章人 总数',
-                    '----以下为详情数据----':'',
-                    'customer_id':'客户ID',
-                    'customer__name':'客户名称',
-                    'id__count':'该人查看该文章 总数',
+                }
+
+            # 按文章查看(详情)
+            elif oper_type == 'view_by_article_detail':
+                article_id = request.GET.get('article_id')
+                objs = models.SelectArticleLog.objects.filter(
+                    inviter_id=user_id,
+                    article_id=article_id
+                ).values('customer_id', 'customer__name').distinct().annotate(Count('id'))
+
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+                count = objs.count()
+                ret_data = []
+                for obj in objs:
+                    ret_data.append({
+                        'customer_id': obj['customer_id'],
+                        'customer__name': b64decode(obj['customer__name']),
+                        'id__count': obj['id__count'],
+                    })
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data': ret_data,
+                    'count': count,
+                }
+                response.note = {
+                    'customer_id': '客户ID',
+                    'customer__name': '客户名称',
+                    'id__count': '该人查看该文章 总数',
                 }
 
             else:
-                response.code = 301
-                response.msg = json.loads(form_obj.errors.as_json())
-
-        else:
-            response.code = 402
-            response.msg = '请求异常'
+                response.code = 402
+                response.msg = '请求异常'
+    else:
+        response.code = 301
+        response.msg = json.loads(forms_obj.errors.as_json())
 
     return JsonResponse(response.__dict__)

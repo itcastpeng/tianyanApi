@@ -11,8 +11,8 @@ import time
 import os
 import sys
 import datetime
-import hashlib
-
+import hashlib, uuid
+from publicFunc.weixin.weixin_pay_api import pub
 
 class WeChatApi(object):
 
@@ -286,9 +286,34 @@ class WeChatApi(object):
         ret = requests.get(url)
         return ret.json()
 
+    # 获取jsapi_ticket 签名算法用
+    def get_jsapi_ticket(self):
+        url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={}&type=jsapi'.format(self.access_token)
+        ret = requests.get(url)
+
+        return ret.json()
+
+    # 获取signature
+    def get_signature(self, ret_obj):
+        pub_obj = pub()
+        noncestr = int(time.time()) # 随机字符串
+        ticket = ret_obj.get('ticket')
+        result_data = {
+            'noncestr':pub_obj.generateRandomStamping(),  # 随机值32位
+            'jsapi_ticket':ticket,
+            'timestamp':noncestr,
+            'url':'http://tianyan.zhangcong.top/api/letter_operation/js_sdk_permissions'
+        }
+        str1 = pub_obj.shengchengsign(result_data)
+        signature = pub_obj.sha1(str1)
+        return signature
+
+    # 获取appid 和 商户KEY
+    def get_appid_appsecret(self):
+        return self.APPID, self.APPSECRET
 
 if __name__ == '__main__':
 
     obj = WeChatApi("wechat_data.json")
-
+    obj.get_jsapi_ticket()
 
