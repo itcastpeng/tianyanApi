@@ -238,7 +238,7 @@ def team_oper(request, oper_type, o_id):
                 print('q -->', q)
                 objs = models.UserprofileTeam.objects.select_related('user').filter(q).filter(
                     team_id=team_id
-                ).exclude(user_id=user_id).order_by(order)
+                ).order_by(order)
                 count = objs.count()
 
                 if length != 0:
