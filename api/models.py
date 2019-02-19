@@ -115,6 +115,7 @@ class customer_information_the_user(models.Model):
     remote_type = models.SmallIntegerField(verbose_name="备注类型", choices=remote_type_choices, default=1)
 
     remote = models.TextField(verbose_name="记录信息，存json格式", null=True, blank=True)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 
 # 客户查看文章日志表
