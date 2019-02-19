@@ -4,7 +4,7 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.day_eye import SelectForm, AddForm, UpdateForm
+from api.forms.day_eye import SelectForm, AddForm, UpdateForm, Form
 from django.db.models import Count, Sum
 import json
 
@@ -221,8 +221,128 @@ def day_eye_oper(request, oper_type, o_id):
 
         # 查询客户信息备注
         if oper_type == 'get_customer_note':
-            pass
+            forms_obj = Form(request.GET)
+            if forms_obj.is_valid():
+                current_page = forms_obj.cleaned_data['current_page']
+                length = forms_obj.cleaned_data['length']
+                order = request.GET.get('order', '-create_datetime')
 
+                field_dict = {
+                    'id': '',
+                    'remote_type':'',
+                    'customer_id':'',
+                    'user_id':'',
+                }
+
+                q = conditionCom(request, field_dict)
+                objs = models.customer_information_the_user.objects.filter(q).order_by(order)
+
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+                count = objs.count()
+
+                ret_data = []
+                remote_type = request.GET.get('remote_type')
+
+                for obj in objs:
+                    remote_obj = eval(obj.remote)
+                    remote = remote_obj.get('remote')
+                    title = remote_obj.get('title')
+                    create_date = remote_obj.get('create_date')
+
+                    if int(remote_type) == 1:
+                        ret_data.append({
+                            'remote':remote
+                        })
+                    elif int(remote_type) == 2:
+                        ret_data.append({
+                            'remote': remote,
+                            'create_date':create_date,
+                            'title':title,
+                        })
+                    else:
+                        ret_data.append({
+                            'remote': remote,
+                            'title': title,
+                        })
+
+                remote_type_choices = []
+                for i in models.customer_information_the_user.remote_type_choices:
+                    remote_type_choices.append({
+                        'id':i[0],
+                        'name':i[1]
+                    })
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'remote_type':remote_type_choices,
+                    'count':count,
+                    'ret_data':ret_data,
+                }
+
+            else:
+                response.code = 301
+                response.msg = json.loads(forms_obj.errors.as_json())
+
+        # 按文章查看(天眼功能)
+        elif oper_type == 'view_by_article':
+            form_obj = Form(request.GET)
+            if form_obj.is_valid():
+                user_id = request.GET.get('user_id')
+                article_id = request.GET.get('article_id')
+
+                current_page = form_obj.cleaned_data['current_page']
+                length = form_obj.cleaned_data['length']
+                # order = request.GET.get('order', '-create_datetime')
+
+                if not article_id:# 列表页
+                    objs = models.SelectArticleLog.objects.filter(
+                        inviter_id=user_id
+                    ).values('article_id', 'article__title').distinct().annotate(Count('id'))
+                else:
+                    objs = models.SelectArticleLog.objects.filter(
+                        inviter_id=user_id,
+                        article_id=article_id
+                    ).values('customer_id', 'customer__name').distinct().annotate(Count('id'))
+
+                print('objs--> ', objs)
+
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+                count = objs.count()
+
+                ret_data = []
+                for obj in objs:
+                    if not article_id:
+                        ret_data.append({
+                            'article_id':obj['article_id'],
+                            'article__title':obj['article__title'],
+                            'id__count':obj['id__count'],
+                        })
+
+                    else:
+                        for obj in objs:
+                            ret_data.append({
+                                'customer_id':obj['customer_id'],
+                                'customer__name':obj['customer__name'],
+                                'id__count':obj['id__count'],
+                            })
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data':ret_data,
+                    'count':count,
+                }
+
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
         else:
             response.code = 402
             response.msg = '请求异常'
