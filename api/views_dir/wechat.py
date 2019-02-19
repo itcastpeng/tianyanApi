@@ -200,9 +200,11 @@ def weichat_generate_qrcode(request):
     qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
     print(qc_code_url)
 
+    expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
     response.code = 200
     response.data = {
         'qc_code_url': qc_code_url,
+        'expire_date': expire_date
     }
 
     return JsonResponse(response.__dict__)

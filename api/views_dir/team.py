@@ -44,15 +44,20 @@ def team(request):
             # 返回的数据
             ret_data = []
 
+            # 此处代码需要优化，设计多次数据库查询
             for obj in objs:
                 #  将查询出来的数据 加入列表
                 team_id = obj.team_id
                 team_name = obj.team.name
+
+                team_admin_user_id_list = [i[0] for i in models.UserprofileTeam.objects.filter(team_id=team_id, type=2).values_list('user_id')]
                 ret_data.append({
                     'id': team_id,
                     'name': team_name,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                    'count': models.UserprofileTeam.objects.filter(team_id=team_id).count()
+                    'count': models.UserprofileTeam.objects.filter(team_id=team_id).count(),
+                    'create_user_id': obj.team.create_user_id,
+                    'team_admin_user_id_list': team_admin_user_id_list
                 })
             #  查询成功 返回200 状态码
             response.code = 200
@@ -67,6 +72,8 @@ def team(request):
                 'name': "团队名称",
                 'create_datetime': "创建时间",
                 'count': "团队总人数",
+                'create_user_id': "创建团队用户id",
+                'team_admin_user_id_list': "团队管理员列表",
             }
         else:
             response.code = 301
@@ -223,7 +230,7 @@ def team_oper(request, oper_type, o_id):
                 field_dict = {
                     'id': '',
                     'type': '',
-                    'name': '__contains',
+                    # 'user__name': '__contains',
                     'create_datetime': '',
                 }
                 q = conditionCom(request, field_dict)
