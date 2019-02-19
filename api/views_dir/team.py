@@ -223,7 +223,7 @@ def team_oper(request, oper_type, o_id):
                 field_dict = {
                     'id': '',
                     'type': '',
-                    'name': '__contains',
+                    'team__name': '__contains',
                     'create_datetime': '',
                 }
                 q = conditionCom(request, field_dict)
