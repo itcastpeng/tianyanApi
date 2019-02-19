@@ -73,7 +73,7 @@ def day_eye(request):
 
                 ret_data.append({
                     'customer_id': customer_id,
-                    'customer__name': obj.get('customer__name'),
+                    'customer__name': b64decode(obj.get('customer__name')),
                     'customer_id__count': obj.get('customer_id__count'), # 总共查看几次
                     'article_count': article_count,                      # 总共查看几篇文章
                 })

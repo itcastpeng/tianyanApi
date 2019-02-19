@@ -1,6 +1,6 @@
 
-import hashlib, uuid, time, random
-
+import hashlib, uuid, time, random, requests, xml.dom.minidom as xmldom
+from publicFunc import account, xmldom_parsing
 class pub(object):
     def __init__(self):
         pass
@@ -56,3 +56,47 @@ class pub(object):
         dingdanhao = timestamp_after_five + str(ymdhms) + str(random.randint(10, 99))
         return dingdanhao
 
+    # 预支付功能
+    def yuzhifu(self, data):
+        appid = data.get('appid')
+        mch_id = data.get('mch_id')
+        openid = data.get('openid')
+        total_fee = data.get('total_fee')
+        SHANGHUKEY = data.get('SHANGHUKEY')
+        url = 'https://api.mch.weixin.qq.com/pay/unifiedorder'  # 微信支付接
+
+        dingdanhao = self.shengcheng_dingdanhao()       # 生成订单号
+        result_data = {
+            'appid': appid,                             # appid
+            'mch_id': mch_id,                           # 商户号
+            'nonce_str': self.generateRandomStamping(), # 32位随机值a
+            'openid': openid,                           # 微信用户唯一标识
+            'body': '天眼-会员续费'.encode('utf8'),       # 描述
+            'out_trade_no': dingdanhao,                 # 订单号
+            'total_fee': total_fee,                     # 金额(分 为单位)
+            'spbill_create_ip': '0.0.0.0',              # 终端IP
+            'notify_url': 'http://api.zhugeyingxiao.com/tianyan/wxpay', # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
+            'trade_type': 'JSAPI'
+        }
+        print('result_data--> ', result_data)
+        # stringSignTemp = self.shengchengsign(result_data, KEY=SHANGHUKEY)
+        # result_data['sign'] = self.md5(stringSignTemp).upper()
+        # xml_data = self.toXml(result_data)
+        # ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
+        # ret.encoding = 'utf8'
+        #
+        # DOMTree = xmldom.parseString(ret.text)
+        # print('ret.text----------> ', ret.text)
+        # collection = DOMTree.documentElement
+        # data = ['return_code', 'return_msg']
+        # resultData = xmldom_parsing.xmldom(collection, data)
+        # data = ['prepay_id']
+        # prepay_id = xmldom_parsing.xmldom(collection, data)
+        # ret_data = {
+        #     'return_code':resultData['return_code'],
+        #     'return_msg':resultData['return_msg'],
+        #     'dingdanhao':dingdanhao,
+        #     'prepay_id':prepay_id,
+        # }
+        ret_data = []
+        return ret_data
