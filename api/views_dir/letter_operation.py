@@ -11,13 +11,19 @@ def letter_operation(request, oper_type):
     if oper_type == 'js_sdk_permissions':
         weixin_obj = weixin_gongzhonghao_api.WeChatApi()
         jsapi_ticket = weixin_obj.get_jsapi_ticket()
-        get_signature = weixin_obj.get_signature(jsapi_ticket)
-        print('get_signature-> ', get_signature)
+        signature, timestamp, noncestr = weixin_obj.get_signature(jsapi_ticket)
 
         response.code = 200
         response.msg = '查询成功'
         response.data = {
-            'get_signature':get_signature
+            'signature':signature,
+            'timestamp':timestamp,
+            'noncestr':noncestr,
+        }
+        response.note = {
+            'signature': 'signature',
+            'timestamp': '时间戳',
+            'noncestr': '随机值(32位)',
         }
     return JsonResponse(response.__dict__)
 
