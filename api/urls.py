@@ -3,7 +3,7 @@ from django.conf.urls import url
 
 
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
-    upload_file, renewal, prepaidManagement, day_eye
+    upload_file, renewal, prepaidManagement, day_eye, letter_operation
 
 
 urlpatterns = [
@@ -75,5 +75,8 @@ urlpatterns = [
     # ----------------天眼---------------------
     url(r'^day_eye/(?P<oper_type>\w+)/(?P<o_id>\d+)$', day_eye.day_eye_oper),
     url(r'^day_eye$', day_eye.day_eye),
+
+    # ----------------转发朋友圈等(微信操作)-----------
+    url(r'^letter_operation/(?P<oper_type>\w+)$', letter_operation.letter_operation),
 
 ]
