@@ -296,17 +296,18 @@ class WeChatApi(object):
     # 获取signature
     def get_signature(self, ret_obj):
         pub_obj = pub()
-        noncestr = int(time.time()) # 随机字符串
+        timestamp = int(time.time()) # 随机字符串
         ticket = ret_obj.get('ticket')
+        noncestr = pub_obj.generateRandomStamping()
         result_data = {
-            'noncestr':pub_obj.generateRandomStamping(),  # 随机值32位
+            'noncestr':noncestr,  # 随机值32位
             'jsapi_ticket':ticket,
-            'timestamp':noncestr,
+            'timestamp':timestamp,
             'url':'http://tianyan.zhangcong.top/api/letter_operation/js_sdk_permissions'
         }
         str1 = pub_obj.shengchengsign(result_data)
         signature = pub_obj.sha1(str1)
-        return signature
+        return signature, timestamp, noncestr
 
     # 获取appid 和 商户KEY
     def get_appid_appsecret(self):
