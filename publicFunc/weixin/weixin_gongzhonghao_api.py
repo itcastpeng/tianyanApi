@@ -112,7 +112,7 @@ class WeChatApi(object):
             TOKENPOST=self.access_token
         )
         post_data = {
-            "expire_seconds": 604800,
+            "expire_seconds": 2592000,
             "action_name": "QR_STR_SCENE",
             "action_info": {
                 "scene": {
