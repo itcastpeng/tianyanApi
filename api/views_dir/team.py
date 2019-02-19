@@ -223,14 +223,14 @@ def team_oper(request, oper_type, o_id):
                 field_dict = {
                     'id': '',
                     'type': '',
-                    'user__name': '__contains',
+                    # 'user__name': '__contains',
                     'create_datetime': '',
                 }
                 q = conditionCom(request, field_dict)
 
                 print('q -->', q)
                 objs = models.UserprofileTeam.objects.select_related('user').filter(q).filter(
-                    team_id=team_id
+                    team_id=team_id,
                 ).order_by(order)
                 count = objs.count()
 
