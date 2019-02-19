@@ -49,7 +49,7 @@ def team(request):
                 team_id = obj.team_id
                 team_name = obj.team.name
 
-                team_admin_user_id_list = [i[0] for i in models.UserprofileTeam.objects.filter(id=team_id, type=2).values_list('user_id')]
+                team_admin_user_id_list = [i[0] for i in models.UserprofileTeam.objects.filter(team_id=team_id, type=2).values_list('user_id')]
                 ret_data.append({
                     'id': team_id,
                     'name': team_name,
