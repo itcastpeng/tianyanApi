@@ -326,12 +326,11 @@ def day_eye_oper(request, oper_type, o_id):
                         })
 
                     else:
-                        for obj in objs:
-                            ret_data.append({
-                                'customer_id':obj['customer_id'],
-                                'customer__name':obj['customer__name'],
-                                'id__count':obj['id__count'],
-                            })
+                        ret_data.append({
+                            'customer_id':obj['customer_id'],
+                            'customer__name':obj['customer__name'],
+                            'id__count':obj['id__count'],
+                        })
 
                 response.code = 200
                 response.msg = '查询成功'
@@ -339,10 +338,20 @@ def day_eye_oper(request, oper_type, o_id):
                     'ret_data':ret_data,
                     'count':count,
                 }
+                response.note = {
+                    'article_id':'文章ID',
+                    'article__title':'文章标题',
+                    'id__count ':'查看该文章人 总数',
+                    '----以下为详情数据----':'',
+                    'customer_id':'客户ID',
+                    'customer__name':'客户名称',
+                    'id__count':'该人查看该文章 总数',
+                }
 
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
+
         else:
             response.code = 402
             response.msg = '请求异常'
