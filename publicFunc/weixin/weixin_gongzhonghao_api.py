@@ -12,7 +12,7 @@ import os
 import sys
 import datetime
 import hashlib, uuid
-from publicFunc.weixin.weixin_pay_api import pub
+from publicFunc.weixin.weixin_pay_api import micro_public_letter
 
 class WeChatApi(object):
 
@@ -295,7 +295,7 @@ class WeChatApi(object):
 
     # 获取signature
     def get_signature(self, ret_obj):
-        pub_obj = pub()
+        pub_obj = micro_public_letter()
         timestamp = int(time.time()) # 随机字符串
         ticket = ret_obj.get('ticket')
         noncestr = pub_obj.generateRandomStamping()
@@ -310,8 +310,8 @@ class WeChatApi(object):
         return signature, timestamp, noncestr
 
     # 获取appid 和 商户KEY
-    def get_appid_appsecret(self):
-        return self.APPID, self.APPSECRET
+    def get_appid(self):
+        return self.APPID
 
 if __name__ == '__main__':
 

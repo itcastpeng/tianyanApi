@@ -1,7 +1,7 @@
 
 import hashlib, uuid, time, random, requests, xml.dom.minidom as xmldom
 from publicFunc import account, xmldom_parsing
-class pub(object):
+class micro_public_letter(object):
     def __init__(self):
         pass
 
@@ -78,25 +78,44 @@ class pub(object):
             'notify_url': 'http://api.zhugeyingxiao.com/tianyan/wxpay', # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
             'trade_type': 'JSAPI'
         }
-        print('result_data--> ', result_data)
-        # stringSignTemp = self.shengchengsign(result_data, KEY=SHANGHUKEY)
-        # result_data['sign'] = self.md5(stringSignTemp).upper()
-        # xml_data = self.toXml(result_data)
-        # ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
-        # ret.encoding = 'utf8'
-        #
-        # DOMTree = xmldom.parseString(ret.text)
-        # print('ret.text----------> ', ret.text)
-        # collection = DOMTree.documentElement
-        # data = ['return_code', 'return_msg']
-        # resultData = xmldom_parsing.xmldom(collection, data)
-        # data = ['prepay_id']
-        # prepay_id = xmldom_parsing.xmldom(collection, data)
-        # ret_data = {
-        #     'return_code':resultData['return_code'],
-        #     'return_msg':resultData['return_msg'],
-        #     'dingdanhao':dingdanhao,
-        #     'prepay_id':prepay_id,
-        # }
-        ret_data = []
+        stringSignTemp = self.shengchengsign(result_data, KEY=SHANGHUKEY)
+        result_data['sign'] = self.md5(stringSignTemp).upper()
+        xml_data = self.toXml(result_data)
+        ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
+        ret.encoding = 'utf8'
+
+        DOMTree = xmldom.parseString(ret.text)
+        collection = DOMTree.documentElement
+        data = ['return_code', 'return_msg']
+        resultData = xmldom_parsing.xmldom(collection, data)
+        data = ['prepay_id']
+        prepay_id = xmldom_parsing.xmldom(collection, data)
+        ret_data = {
+            'return_code':resultData['return_code'],
+            'return_msg':resultData['return_msg'],
+            'dingdanhao':dingdanhao,
+            'prepay_id':prepay_id,
+        }
         return ret_data
+
+
+    # 回调 判断是否支付成功
+    def weixin_back_pay(self, result_data):
+        SHANGHUKEY = result_data['SHANGHUKEY']
+        url = 'https://api.mch.weixin.qq.com/pay/orderquery'
+        stringSignTemp = self.shengchengsign(result_data, SHANGHUKEY)
+        result_data['sign'] = self.md5(stringSignTemp).upper()
+        xml_data = self.toXml(result_data)
+        ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
+        ret.encoding = 'utf8'
+        DOMTree = xmldom.parseString(ret.text)
+        collection = DOMTree.documentElement
+        return_code = collection.getElementsByTagName("return_code")[0].childNodes[0].data
+
+        return return_code
+
+
+
+
+
+
