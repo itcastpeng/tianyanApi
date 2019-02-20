@@ -127,6 +127,7 @@ class SetManagementForm(forms.Form):
             team_id=o_id,
             user_id=user_id
         )
+        print(o_id, user_id)
 
         if not objs:
             self.add_error('o_id', '权限不足')
