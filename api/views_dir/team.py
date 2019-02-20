@@ -284,10 +284,10 @@ def team_oper(request, oper_type, o_id):
                 response.code = 301
                 response.data = json.loads(forms_obj.errors.as_json())
 
-        # 邀请成员确认邀请
+        # 邀请成员确认邀请,微信调用
         elif oper_type == "invite_members":
             code = request.GET.get('code')
-            team_id = request.GET.get('team_id')  # 团队id
+            team_id = o_id  # 团队id
             inviter_user_id = request.GET.get('state')  # 邀请人id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
             url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(

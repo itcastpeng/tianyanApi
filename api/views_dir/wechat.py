@@ -233,8 +233,15 @@ def wechat_oper(request, oper_type):
             response.data = {
                 "open_weixin_url": open_weixin_url,
                 "team_name": obj.team.name,
-                "user_name": obj.user.name,
+                "user_name": base64_encryption.b64decode(obj.user.name),
                 "set_avator": obj.user.set_avator
+            }
+
+            response.note = {
+                "open_weixin_url": "点击接受邀请后请求的url, /invite_members/10  #10代表团队id   &state=1  #1代表邀请人id",
+                "team_name": "团队名称",
+                "user_name": "邀请人名称",
+                "set_avator": "邀请人头像"
             }
 
     return JsonResponse(response.__dict__)
