@@ -216,6 +216,7 @@ def wechat_oper(request, oper_type):
                 'expire_date': expire_date
             }
 
+        # 邀请成员页面展示信息
         elif oper_type == "invite_members":
             user_id = request.GET.get('user_id')
             team_id = request.GET.get('team_id')
