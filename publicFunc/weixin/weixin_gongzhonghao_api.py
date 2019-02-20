@@ -108,8 +108,8 @@ class WeChatApi(object):
         :return:
         """
         print("-" * 30 + "生成二维码" + "-" * 30)
-        url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={TOKENPOST}".format(
-            TOKENPOST=self.access_token
+        url = "https://api.weixin.qq.com/cgi-bin/qrcode/create?access_token={access_token}".format(
+            access_token=self.access_token
         )
         post_data = {
             "expire_seconds": 2592000,
