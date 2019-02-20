@@ -284,9 +284,10 @@ def team_oper(request, oper_type, o_id):
                 response.code = 301
                 response.data = json.loads(forms_obj.errors.as_json())
 
-        # 邀请成员
+        # 邀请成员确认邀请
         elif oper_type == "invite_members":
             code = request.GET.get('code')
+            team_id = request.GET.get('team_id')  # 团队id
             inviter_user_id = request.GET.get('state')  # 邀请人id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
             url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(
@@ -315,9 +316,14 @@ def team_oper(request, oper_type, o_id):
             ret = requests.get(url)
             ret.encoding = "utf8"
             # print("ret.text -->", ret.text)
-            updateUserInfo(openid, inviter_user_id, ret.json())
+            user_id = updateUserInfo(openid, inviter_user_id, ret.json())
 
-            # 此处跳转到邀请页面
+            # 添加该成员到团队中
+            objs = models.UserprofileTeam.objects.filter(team_id=team_id, user_id=user_id)
+            if not objs:
+                models.UserprofileTeam.objects.create(team_id=team_id, user_id=user_id)
+
+            # 此处跳转到天眼首页
 
             response.code = 200
             response.msg = "邀请成功"

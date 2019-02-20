@@ -16,7 +16,7 @@ import xml.dom.minidom
 
 from publicFunc.account import get_token
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-from publicFunc.Response import ResponseObj
+from publicFunc import Response
 from publicFunc import account
 from publicFunc import base64_encryption
 
@@ -74,6 +74,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
     }
 
     if user_objs:
+        user_id = user_objs[0].id
         user_objs.update(**user_data)
     else:
         encode_username = base64_encryption.b64encode(ret_obj['nickname'])
@@ -97,7 +98,9 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
         user_data['overdue_date'] = overdue_date
         user_data['token'] = get_token()
         print("user_data --->", user_data)
-        models.Userprofile.objects.create(**user_data)
+        user_obj = models.Userprofile.objects.create(**user_data)
+        user_id = user_obj.id
+    return user_id
 
 
 # 微信服务器调用的接口
@@ -191,20 +194,64 @@ def wechat(request):
 #     return JsonResponse(response.__dict__)
 
 
-# 获取用于登录的微信二维码
 @account.is_token(models.Userprofile)
-def weichat_generate_qrcode(request):
-    weichat_api_obj = WeChatApi()
-    response = ResponseObj()
-    user_id = request.GET.get('user_id')
-    qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
-    print(qc_code_url)
+def weichat_oper(request, oper_type, o_id):
+    # print('oper_type -->', oper_type)
+    response = Response.ResponseObj()
+    if request.method == "POST":
+        pass
 
-    expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
-    response.code = 200
-    response.data = {
-        'qc_code_url': qc_code_url,
-        'expire_date': expire_date
-    }
+    else:
+        # 获取用于登录的微信二维码
+        weichat_api_obj = WeChatApi()
+        if oper_type == "generate_qrcode":
+            user_id = request.GET.get('user_id')
+            qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
+            print(qc_code_url)
+
+            expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+            response.code = 200
+            response.data = {
+                'qc_code_url': qc_code_url,
+                'expire_date': expire_date
+            }
+
+        elif oper_type == "invite_members":
+            user_id = request.GET.get('user_id')
+            team_id = request.GET.get('team_id')
+
+            redirect_uri = "http://api.zhugeyingxiao.com/tianyan/team/invite_members/{team_id}".format(team_id=team_id)
+            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo&state={user_id}#wechat_redirect".format(
+                appid=weichat_api_obj.APPID,
+                redirect_uri=redirect_uri,
+                user_id=user_id
+            )
+
+            obj = models.UserprofileTeam.objects.select_related('team, user').get(team_id=team_id, user_id=user_id)
+            response.code = 200
+            response.data = {
+                "open_weixin_url": open_weixin_url,
+                "team_name": obj.team.name,
+                "user_name": obj.user.name,
+                "set_avator": obj.user.set_avator
+            }
 
     return JsonResponse(response.__dict__)
+
+# # 获取用于登录的微信二维码
+# @account.is_token(models.Userprofile)
+# def weichat_generate_qrcode(request):
+#     weichat_api_obj = WeChatApi()
+#     response = ResponseObj()
+#     user_id = request.GET.get('user_id')
+#     qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
+#     print(qc_code_url)
+#
+#     expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+#     response.code = 200
+#     response.data = {
+#         'qc_code_url': qc_code_url,
+#         'expire_date': expire_date
+#     }
+#
+#     return JsonResponse(response.__dict__)
