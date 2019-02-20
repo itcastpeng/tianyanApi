@@ -195,7 +195,7 @@ def wechat(request):
 
 
 @account.is_token(models.Userprofile)
-def weichat_oper(request, oper_type, o_id):
+def wechat_oper(request, oper_type):
     # print('oper_type -->', oper_type)
     response = Response.ResponseObj()
     if request.method == "POST":

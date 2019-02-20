@@ -62,7 +62,7 @@ urlpatterns = [
     # url(r'^small_shop', small_shop.small_shop),
 
     # ---------------- 公众号操作 ----------------
-    url(r'^wechat$/(?P<oper_type>\w+)/(?P<o_id>\d+)$', wechat.wechat_oper),
+    url(r'^wechat$/(?P<oper_type>\w+)$', wechat.wechat_oper),
     url(r'^wechat$', wechat.wechat),     # 接受微信服务器发送的请求
     # url(r'^weichat_generate_qrcode$', wechat.weichat_generate_qrcode),    # 微信获取带参数的二维码
 

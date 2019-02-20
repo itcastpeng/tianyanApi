@@ -177,5 +177,6 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'statics')]
 # 不验证token的请求
 NoValidationTokenRoute = [
     "/api/team/invite_members",
+    "/api/team/invite_members",
     "/api/article/share_article"
 ]
