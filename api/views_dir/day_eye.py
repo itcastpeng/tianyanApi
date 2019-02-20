@@ -257,7 +257,7 @@ def day_eye_oper(request, oper_type, o_id):
             # 谁看了我 详情
             elif oper_type == 'day_eye_detail':
                 user_id = forms_obj.cleaned_data['user_id']
-                customer = request.GET.get('customer_id')
+                customer = o_id
 
                 objs = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id
@@ -334,7 +334,7 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 按文章查看(详情)
             elif oper_type == 'view_by_article_detail':
-                article_id = request.GET.get('article_id')
+                article_id = o_id
                 objs = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id,
                     article_id=article_id
