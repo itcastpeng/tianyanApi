@@ -4,7 +4,7 @@ from publicFunc import Response
 from publicFunc import account, xmldom_parsing
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from publicFunc.weixin.weixin_pay_api import pub
+from publicFunc.weixin.weixin_pay_api import micro_public_letter
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 
@@ -13,10 +13,11 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 @account.is_token(models.Userprofile)
 def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
-    pub_obj = pub()  # 实例 公共函数
+    pub_obj = micro_public_letter()  # 实例 公共函数
     weixin_obj = WeChatApi()
     mch_id = '1488841842'
-    appid, SHANGHUKEY = weixin_obj.get_appid_appsecret()
+    SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'
+    appid = weixin_obj.get_appid()
 
     # 预支付
     if oper_type == 'yuZhiFu':
@@ -35,7 +36,7 @@ def weixin_pay(request, oper_type, o_id):
                 'openid': user_obj.openid,  # 微信用户唯一标识
                 'SHANGHUKEY': SHANGHUKEY,   # 商户KEY
             }
-            result = pub_obj.yuzhifu(data)
+            result = pub_obj.yuzhifu(data)  # 预支付
             return_code = result.get('return_code')
             return_msg = result.get('return_msg')
             dingdanhao = result.get('dingdanhao')
@@ -70,9 +71,7 @@ def weixin_pay(request, oper_type, o_id):
     # 微信回调
     elif oper_type == 'wxpay':
         isSuccess = 0
-        print('------------------------------回调-----------------------')
         response.code = 200
-        print('request.body---------> ', request.body)
         DOMTree = xmldom.parseString(request.body)
         collection = DOMTree.documentElement
         data = ['mch_id', 'return_code', 'appid', 'openid', 'cash_fee', 'out_trade_no']
@@ -84,21 +83,14 @@ def weixin_pay(request, oper_type, o_id):
 
             # 查询订单是否付款成功
             result_data = {
-                'appid': resultData['appid'],  # appid
-                'mch_id': resultData['mch_id'],  # 商户号
-                'out_trade_no': resultData['out_trade_no'],  # 订单号
+                'appid': resultData['appid'],                   # appid
+                'mch_id': resultData['mch_id'],                 # 商户号
+                'out_trade_no': resultData['out_trade_no'],     # 订单号
                 'nonce_str': pub_obj.generateRandomStamping(),  # 32位随机值
+                'SHANGHUKEY': SHANGHUKEY,                       # 商户KEY
             }
-            url = 'https://api.mch.weixin.qq.com/pay/orderquery'
-            stringSignTemp = pub_obj.shengchengsign(result_data, SHANGHUKEY)
-            result_data['sign'] = pub_obj.md5(stringSignTemp).upper()
-            xml_data = pub_obj.toXml(result_data)
-            ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
-            ret.encoding = 'utf8'
-            print('ret.text------------> ', ret.text)
-            DOMTree = xmldom.parseString(ret.text)
-            collection = DOMTree.documentElement
-            return_code = collection.getElementsByTagName("return_code")[0].childNodes[0].data
+            return_code = pub_obj.weixin_back_pay(result_data)
+
             if return_code == 'SUCCESS':
                 isSuccess = 1
                 user_objs = models.Userprofile.objects.filter(id=renewal_log_obj.create_user_id)
