@@ -228,7 +228,7 @@ def wechat_oper(request, oper_type):
                 user_id=user_id
             )
 
-            obj = models.UserprofileTeam.objects.select_related('team, user').get(team_id=team_id, user_id=user_id)
+            obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
             response.code = 200
             response.data = {
                 "open_weixin_url": open_weixin_url,
