@@ -227,7 +227,7 @@ class renewal_log(models.Model):
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
     price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
-    original_price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
+    original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
     overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
     isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
 
