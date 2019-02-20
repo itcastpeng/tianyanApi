@@ -17,8 +17,8 @@ def weixin_pay(request, oper_type, o_id):
     weixin_obj = WeChatApi()
     mch_id = '1488841842'
     SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'
-    appid = weixin_obj.get_appid()
-
+    appid = weixin_obj.APPID
+    print('appid--> ', appid)
     # 预支付
     if oper_type == 'yuZhiFu':
         user_id = request.GET.get('user_id')
