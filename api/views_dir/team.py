@@ -188,7 +188,7 @@ def team_oper(request, oper_type, o_id):
         elif oper_type == "set_management":
             print('request.POST -->', request.POST)
             print('request.GET -->', request.GET)
-            set_user_id = request.POST.getlist('set_user_id[]')
+            set_user_id = request.POST.getlist('set_user_id')
             print('set_user_id -->', set_user_id)
             form_data = {
                 'o_id': o_id,  # 团队id
