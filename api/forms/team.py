@@ -111,7 +111,7 @@ class SetManagementForm(forms.Form):
         }
     )
 
-    set_user_id = forms.IntegerField(
+    set_user_id = forms.CharField(
         required=True,
         error_messages={
             'required': "成员id不能为空"
@@ -136,18 +136,8 @@ class SetManagementForm(forms.Form):
     # 查询被移除的成员是否在该团队中存在
     def clean_set_user_id(self):
         set_user_id = self.data['set_user_id']
-        o_id = self.data['o_id']  # 团队id
-
-        objs = models.UserprofileTeam.objects.filter(
-            type=1,
-            team_id=o_id,
-            user_id=set_user_id
-        )
-
-        if not objs:
-            self.add_error('set_user_id', '成员不存在')
-        else:
-            return set_user_id
+        set_user_id_list = [int(i) for i in set_user_id]
+        return set_user_id_list
 
 
 # 查询
