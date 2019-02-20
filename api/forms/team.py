@@ -1,8 +1,7 @@
 from django import forms
 
 from api import models
-from publicFunc import account
-import time
+import json
 
 
 # 添加
@@ -137,7 +136,7 @@ class SetManagementForm(forms.Form):
     # 查询被移除的成员是否在该团队中存在
     def clean_set_user_id(self):
         set_user_id = self.data['set_user_id']
-        set_user_id_list = [int(i) for i in set_user_id]
+        set_user_id_list = json.loads(set_user_id)
         return set_user_id_list
 
 
