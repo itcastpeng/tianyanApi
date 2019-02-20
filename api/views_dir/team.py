@@ -186,6 +186,8 @@ def team_oper(request, oper_type, o_id):
 
         # 设置普通成员成为管理员
         elif oper_type == "set_management":
+            print('request.POST -->', request.POST)
+            print('request.GET -->', request.GET)
             set_user_id = request.POST.getlist('set_user_id[]')
             print('set_user_id -->', set_user_id)
             form_data = {
