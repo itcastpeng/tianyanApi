@@ -186,7 +186,10 @@ def team_oper(request, oper_type, o_id):
 
         # 设置普通成员成为管理员
         elif oper_type == "set_management":
-            set_user_id = request.POST.get('set_user_id')  # 要升级的成员id
+            print('request.POST -->', request.POST)
+            print('request.GET -->', request.GET)
+            set_user_id = request.POST.get('set_user_id')
+            print('set_user_id -->', set_user_id)
             form_data = {
                 'o_id': o_id,  # 团队id
                 'user_id': user_id,
@@ -194,16 +197,17 @@ def team_oper(request, oper_type, o_id):
             }
 
             forms_obj = SetManagementForm(form_data)
-            print('forms_obj.is_valid() -->', forms_obj.is_valid())
             if forms_obj.is_valid():
-                team_id = forms_obj.cleaned_data['o_id']
-                set_user_id = forms_obj.cleaned_data['set_user_id']
+                set_user_id_list = forms_obj.cleaned_data.get('set_user_id')
+                team_id = forms_obj.cleaned_data.get('o_id')
+
+                # 先将所有成员改成普通用户
+                models.UserprofileTeam.objects.filter(team_id=team_id).update(type=1)
 
                 # 修改成员类型为管理员
                 models.UserprofileTeam.objects.filter(
                     team_id=team_id,
-                    type=1,
-                    user_id=set_user_id
+                    user_id__in=set_user_id_list
                 ).update(type=2)
 
                 response.code = 200
@@ -253,7 +257,7 @@ def team_oper(request, oper_type, o_id):
                     #  将查询出来的数据 加入列表
                     print('base64_encryption.b64encode(obj.user.name) -->', base64_encryption.b64encode(obj.user.name))
                     ret_data.append({
-                        'id': obj.id,
+                        'id': obj.user_id,
                         'user_type_name': obj.get_type_display(),
                         'user_type': obj.type,
                         'name': base64_encryption.b64decode(obj.user.name),
