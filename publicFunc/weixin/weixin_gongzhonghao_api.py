@@ -307,7 +307,14 @@ class WeChatApi(object):
         }
         str1 = pub_obj.shengchengsign(result_data)
         signature = pub_obj.sha1(str1)
-        return signature, timestamp, noncestr
+        appid = self.get_appid()
+        data = {
+            'signature':signature,
+            'timestamp':timestamp,
+            'noncestr':noncestr,
+            'appid':appid,
+        }
+        return data
 
     # 获取appid 和 商户KEY
     def get_appid(self):
