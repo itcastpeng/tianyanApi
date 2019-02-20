@@ -62,7 +62,7 @@ class DeleteMemberForm(forms.Form):
         }
     )
 
-    delete_user_id = forms.IntegerField(
+    delete_user_id = forms.CharField(
         required=True,
         error_messages={
             'required': "成员id不能为空"
@@ -87,18 +87,8 @@ class DeleteMemberForm(forms.Form):
     # 查询被移除的成员是否在该团队中存在
     def clean_delete_user_id(self):
         delete_user_id = self.data['delete_user_id']
-        o_id = self.data['o_id']  # 团队id
-
-        objs = models.UserprofileTeam.objects.filter(
-            type=1,
-            team_id=o_id,
-            user_id=delete_user_id
-        )
-
-        if not objs:
-            self.add_error('delete_user_id', '成员不存在')
-        else:
-            return delete_user_id
+        delete_user_id_list = json.loads(delete_user_id)
+        return delete_user_id_list
 
 
 # 设置普通成员成为管理员

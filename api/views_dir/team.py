@@ -166,14 +166,14 @@ def team_oper(request, oper_type, o_id):
                 # print("验证通过")
                 # print(forms_obj.cleaned_data)
                 team_id = forms_obj.cleaned_data['o_id']
-                delete_user_id = forms_obj.cleaned_data['delete_user_id']
+                delete_user_id_list = forms_obj.cleaned_data['delete_user_id']
                 print('team_id -->', team_id)
                 print('delete_user_id -->', delete_user_id)
                 # 删除团队中的成员
                 models.UserprofileTeam.objects.filter(
                     team_id=team_id,
                     type=1,
-                    user_id=delete_user_id
+                    user_id__in=delete_user_id_list
                 ).delete()
 
                 response.code = 200
