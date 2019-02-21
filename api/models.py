@@ -165,7 +165,7 @@ class Article(models.Model):
     source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
     look_num = models.IntegerField(verbose_name="查看次数", default=0)
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
-
+    cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
 
 # 海报管理
 class Posters(models.Model):

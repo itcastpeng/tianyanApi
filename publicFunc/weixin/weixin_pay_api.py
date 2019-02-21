@@ -1,6 +1,8 @@
 
 import hashlib, uuid, time, random, requests, xml.dom.minidom as xmldom
 from publicFunc import account, xmldom_parsing
+from publicFunc.weixin import weixin_gongzhonghao_api
+
 class micro_public_letter(object):
     def __init__(self):
         pass
@@ -58,11 +60,9 @@ class micro_public_letter(object):
 
     # 预支付功能
     def yuzhifu(self, data):
-        appid = data.get('appid')
-        mch_id = data.get('mch_id')
+        appid, mch_id, SHANGHUKEY = self.get_pay_info()
         openid = data.get('openid')
         total_fee = data.get('total_fee')
-        SHANGHUKEY = data.get('SHANGHUKEY')
         url = 'https://api.mch.weixin.qq.com/pay/unifiedorder'  # 微信支付接
 
         dingdanhao = self.shengcheng_dingdanhao()       # 生成订单号
@@ -101,7 +101,7 @@ class micro_public_letter(object):
 
     # 回调 判断是否支付成功
     def weixin_back_pay(self, result_data):
-        SHANGHUKEY = result_data['SHANGHUKEY']
+        appid, mch_id, SHANGHUKEY = self.get_pay_info()
         url = 'https://api.mch.weixin.qq.com/pay/orderquery'
         stringSignTemp = self.shengchengsign(result_data, SHANGHUKEY)
         result_data['sign'] = self.md5(stringSignTemp).upper()
@@ -114,8 +114,11 @@ class micro_public_letter(object):
 
         return return_code
 
-
-
-
-
+    # 获取支付信息
+    def get_pay_info(self):
+        weixin_obj = weixin_gongzhonghao_api.WeChatApi()
+        appid = weixin_obj.APPID
+        mch_id = '1488841842'
+        SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'
+        return appid, mch_id, SHANGHUKEY
 
