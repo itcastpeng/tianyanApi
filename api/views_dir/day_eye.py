@@ -358,6 +358,8 @@ def day_eye_oper(request, oper_type, o_id):
                     'article_id':'文章ID',
                     'article__title':'文章标题',
                     'id__count ':'查看该文章人 总数',
+                    'cover_img ':'文章封面',
+                    'after_time ':'最后查看日期',
                 }
 
             # 按文章查看(详情)

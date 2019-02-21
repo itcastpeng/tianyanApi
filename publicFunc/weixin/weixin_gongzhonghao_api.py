@@ -315,8 +315,8 @@ class WeChatApi(object):
         }
         return data
 
-if __name__ == '__main__':
-
-    obj = WeChatApi("wechat_data.json")
-    obj.get_jsapi_ticket()
+# if __name__ == '__main__':
+#
+#     obj = WeChatApi("wechat_data.json")
+#     obj.get_jsapi_ticket()
 
