@@ -1,11 +1,11 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.small_shop import AddForm, UpdateForm, SelectForm, AddGoodForm, UpdateGoodForm
+from api.forms.small_shop import SelectForm, AddGoodForm, UpdateGoodForm
 import json
 
 
@@ -13,7 +13,7 @@ import json
 @account.is_token(models.Userprofile)
 def small_shop(request):
     response = Response.ResponseObj()
-    user_id = request.GET.get('user_id')
+    # user_id = request.GET.get('user_id')
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
@@ -47,26 +47,26 @@ def small_shop(request):
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'goods_classify_id': obj.goods_classify_id,             # 分类ID
-                    'goods_classify': obj.goods_classify.goods_classify,    # 分类名称
-                    'goods_name': obj.goods_name,                           # 商品名称
-                    'price': obj.price,                                     # 商品价格
-                    'inventory': obj.inventory,                             # 商品库存
-                    'freight': obj.freight,                                 # 商品运费
-                    'goods_describe': obj.goods_describe,                   # 商品描述
-                    'point_origin': obj.point_origin,                       # 商品发货地
-                    'goods_status_id': obj.goods_status,                    # 商品状态ID
-                    'goods_status': obj.get_goods_status_display(),         # 商品状态
-                    'goods_picture': obj.goods_picture,                     # 商品图片
-                    'cover_img': obj.cover_img,                             # 商品封面图片
+                    'goods_classify_id': obj.goods_classify_id,  # 分类ID
+                    'goods_classify': obj.goods_classify.goods_classify,  # 分类名称
+                    'goods_name': obj.goods_name,  # 商品名称
+                    'price': obj.price,  # 商品价格
+                    'inventory': obj.inventory,  # 商品库存
+                    'freight': obj.freight,  # 商品运费
+                    'goods_describe': obj.goods_describe,  # 商品描述
+                    'point_origin': obj.point_origin,  # 商品发货地
+                    'goods_status_id': obj.goods_status,  # 商品状态ID
+                    'goods_status': obj.get_goods_status_display(),  # 商品状态
+                    'goods_picture': obj.goods_picture,  # 商品图片
+                    'cover_img': obj.cover_img,  # 商品封面图片
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
 
             goods_status_list = []
             for i in models.Goods.goods_status_choices:
                 goods_status_list.append({
-                    'id':i[0],
-                    'name':i[1]
+                    'id': i[0],
+                    'name': i[1]
                 })
 
             #  查询成功 返回200 状态码
@@ -79,16 +79,16 @@ def small_shop(request):
             }
             response.note = {
                 'id': "文章id",
-                'goods_classify':'商品分类',
-                'goods_name':'分类名称',
-                'price':'商品价格',
-                'inventory':'商品库存',
-                'freight':'商品运费',
-                'goods_describe':'商品描述',
-                'point_origin':'商品发货地',
-                'goods_status':'商品状态',
-                'goods_picture':'商品图片',
-                'create_datetime':'商品创建时间',
+                'goods_classify': '商品分类',
+                'goods_name': '分类名称',
+                'price': '商品价格',
+                'inventory': '商品库存',
+                'freight': '商品运费',
+                'goods_describe': '商品描述',
+                'point_origin': '商品发货地',
+                'goods_status': '商品状态',
+                'goods_picture': '商品图片',
+                'create_datetime': '商品创建时间',
             }
         else:
             response.code = 301
@@ -125,16 +125,16 @@ def small_shop_oper(request, oper_type, o_id):
         elif oper_type == "add_good":
             form_data = {
                 'create_user_id': user_id,
-                'goods_classify_id': request.POST.get('goods_classify_id'), # 商品分类
-                'goods_name': request.POST.get('goods_name'),               # 商品名称
-                'price': request.POST.get('price'),                         # 商品价格
-                'inventory': request.POST.get('inventory'),                 # 库存
-                'freight': request.POST.get('freight', 0),                  # 运费
-                'goods_describe': request.POST.get('goods_describe'),       # 商品描述
-                'point_origin': request.POST.get('point_origin'),           # 发货地
-                'goods_status': request.POST.get('goods_status', 2),        # 商品状态
-                'goods_picture': request.POST.get('goods_picture'),         # 商品图片
-                'cover_img': request.POST.get('cover_img'),                 # 封面图片
+                'goods_classify_id': request.POST.get('goods_classify_id'),  # 商品分类
+                'goods_name': request.POST.get('goods_name'),  # 商品名称
+                'price': request.POST.get('price'),  # 商品价格
+                'inventory': request.POST.get('inventory'),  # 库存
+                'freight': request.POST.get('freight', 0),  # 运费
+                'goods_describe': request.POST.get('goods_describe'),  # 商品描述
+                'point_origin': request.POST.get('point_origin'),  # 发货地
+                'goods_status': request.POST.get('goods_status', 2),  # 商品状态
+                'goods_picture': request.POST.get('goods_picture'),  # 商品图片
+                'cover_img': request.POST.get('cover_img'),  # 封面图片
             }
             print('form_data-------> ', form_data)
 
@@ -143,16 +143,16 @@ def small_shop_oper(request, oper_type, o_id):
                 print("验证通过")
                 form_obj = forms_obj.cleaned_data
                 obj = models.Goods.objects.create(**{
-                    'goods_classify_id':form_obj.get('goods_classify_id'),
-                    'goods_name':form_obj.get('goods_name'),
-                    'price':form_obj.get('price'),
-                    'inventory':form_obj.get('inventory'),
-                    'freight':form_obj.get('freight'),
-                    'goods_describe':form_obj.get('goods_describe'),
-                    'point_origin':form_obj.get('point_origin'),
-                    'goods_status':form_obj.get('goods_status'),
-                    'goods_picture':form_obj.get('goods_picture'),
-                    'cover_img':form_obj.get('cover_img')
+                    'goods_classify_id': form_obj.get('goods_classify_id'),
+                    'goods_name': form_obj.get('goods_name'),
+                    'price': form_obj.get('price'),
+                    'inventory': form_obj.get('inventory'),
+                    'freight': form_obj.get('freight'),
+                    'goods_describe': form_obj.get('goods_describe'),
+                    'point_origin': form_obj.get('point_origin'),
+                    'goods_status': form_obj.get('goods_status'),
+                    'goods_picture': form_obj.get('goods_picture'),
+                    'cover_img': form_obj.get('cover_img')
                 })
                 response.code = 200
                 response.msg = "添加成功"
@@ -165,18 +165,18 @@ def small_shop_oper(request, oper_type, o_id):
         # 修改商品
         elif oper_type == "update_good":
             form_data = {
-                'o_id':o_id,
+                'o_id': o_id,
                 'create_user_id': user_id,
-                'goods_classify_id': request.POST.get('goods_classify_id'),     # 商品分类
-                'goods_name': request.POST.get('goods_name'),                   # 商品名称
-                'price': request.POST.get('price'),                             # 商品价格
-                'inventory': request.POST.get('inventory'),                     # 库存
-                'freight': request.POST.get('freight', 0),                      # 运费
-                'goods_describe': request.POST.get('goods_describe'),           # 商品描述
-                'point_origin': request.POST.get('point_origin'),               # 发货地
-                'goods_status': request.POST.get('goods_status', 2),            # 商品状态
-                'goods_picture': request.POST.get('goods_picture'),             # 商品图片
-                'cover_img': request.POST.get('cover_img'),                     # 商品图片
+                'goods_classify_id': request.POST.get('goods_classify_id'),  # 商品分类
+                'goods_name': request.POST.get('goods_name'),  # 商品名称
+                'price': request.POST.get('price'),  # 商品价格
+                'inventory': request.POST.get('inventory'),  # 库存
+                'freight': request.POST.get('freight', 0),  # 运费
+                'goods_describe': request.POST.get('goods_describe'),  # 商品描述
+                'point_origin': request.POST.get('point_origin'),  # 发货地
+                'goods_status': request.POST.get('goods_status', 2),  # 商品状态
+                'goods_picture': request.POST.get('goods_picture'),  # 商品图片
+                'cover_img': request.POST.get('cover_img'),  # 商品图片
             }
 
             forms_obj = UpdateGoodForm(form_data)

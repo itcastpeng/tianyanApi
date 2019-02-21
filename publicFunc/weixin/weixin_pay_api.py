@@ -1,6 +1,9 @@
 
-import hashlib, uuid, time, random, requests, xml.dom.minidom as xmldom
-from publicFunc import account, xmldom_parsing
+import time
+import random
+import requests
+import xml.dom.minidom as xmldom
+from publicFunc import xmldom_parsing
 from publicFunc.weixin.weixin_api_public import WeixinApiPublic
 
 
@@ -28,13 +31,15 @@ class weixin_pay_api(WeixinApiPublic):
         result_data = {
             'appid': appid,                             # appid
             'mch_id': self.mch_id,                           # 商户号
-            'nonce_str': self.generateRandomStamping(), # 32位随机值a
+            'nonce_str': self.generateRandomStamping(),     # 32位随机值a
             'openid': openid,                           # 微信用户唯一标识
             'body': '天眼-会员续费'.encode('utf8'),       # 描述
             'out_trade_no': dingdanhao,                 # 订单号
             'total_fee': total_fee,                     # 金额(分 为单位)
             'spbill_create_ip': '0.0.0.0',              # 终端IP
-            'notify_url': 'http://api.zhugeyingxiao.com/tianyan/wxpay', # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
+
+            # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
+            'notify_url': 'http://api.zhugeyingxiao.com/tianyan/wxpay',
             'trade_type': 'JSAPI'
         }
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
@@ -70,4 +75,3 @@ class weixin_pay_api(WeixinApiPublic):
         return_code = collection.getElementsByTagName("return_code")[0].childNodes[0].data
 
         return return_code
-

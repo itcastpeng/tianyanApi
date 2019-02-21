@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
@@ -9,7 +9,7 @@ from api.forms.team import AddForm, UpdateForm, SelectForm, \
     SelectUserListForm, DeleteMemberForm, SetManagementForm
 import json
 
-from django.db.models import Q
+# from django.db.models import Q
 from publicFunc import base64_encryption
 
 from publicFunc.weixin import weixin_gongzhonghao_api
@@ -50,7 +50,9 @@ def team(request):
                 team_id = obj.team_id
                 team_name = obj.team.name
 
-                team_admin_user_id_list = [i[0] for i in models.UserprofileTeam.objects.filter(team_id=team_id, type=2).values_list('user_id')]
+                team_admin_user_id_list = [i[0] for i in
+                                           models.UserprofileTeam.objects.filter(team_id=team_id, type=2).values_list(
+                                               'user_id')]
                 ret_data.append({
                     'id': team_id,
                     'name': team_name,
@@ -124,7 +126,7 @@ def team_oper(request, oper_type, o_id):
         elif oper_type == "update":
             # 获取需要修改的信息
             form_data = {
-                'o_id': o_id,   # 团队id
+                'o_id': o_id,  # 团队id
                 'user_id': user_id,
                 'name': request.POST.get('name'),
             }
@@ -154,7 +156,7 @@ def team_oper(request, oper_type, o_id):
 
         # 删除团队成员
         elif oper_type == "delete_member":
-            delete_user_id = request.POST.get('delete_user_id')     # 要移除的成员id
+            delete_user_id = request.POST.get('delete_user_id')  # 要移除的成员id
             form_data = {
                 'o_id': o_id,  # 团队id
                 'user_id': user_id,
@@ -290,19 +292,23 @@ def team_oper(request, oper_type, o_id):
             team_id = o_id  # 团队id
             inviter_user_id = request.GET.get('state')  # 邀请人id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
-            url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(
-                APPID=weichat_api_obj.APPID,
-                SECRET=weichat_api_obj.APPSECRET,
-                CODE=code,
-            )
+            url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code=" \
+                  "{CODE}&grant_type=authorization_code"\
+                .format(
+                    APPID=weichat_api_obj.APPID,
+                    SECRET=weichat_api_obj.APPSECRET,
+                    CODE=code,
+                )
             ret = requests.get(url)
             ret.encoding = "utf8"
             print("ret.text -->", ret.text)
 
             # data = {
-            #     "access_token": "18_8XaQg2pCSFY5e_oehj9OdBUaoiD1N-di6upPRAOT5OLZuLAZLQYzac4fYroEehQcZ8fT3wOoZ3xXniYyqdxJy9jgtUXNpPsPfWKzU4up-OY",
+            #     "access_token": "18_8XaQg2pCSFY5e_oehj9OdBUaoiD1N-di6upPRAOT5OLZuLAZLQYzac4fYroEehQcZ8
+            #                       fT3wOoZ3xXniYyqdxJy9jgtUXNpPsPfWKzU4up-OY",
             #     "expires_in": 7200,
-            #     "refresh_token": "18_Qdr4Y-on6K3T9Q4VcLw1rK9eGJX5OmRboyejrJWeWOxYJEPbMdehrhWNdppqZsLjnhtKqJY2u4kGN7D47OIjrTtOeWXf7AY-6nYyMmmikb4",
+            #     "refresh_token": "18_Qdr4Y-on6K3T9Q4VcLw1rK9eGJX5OmRboyejrJWeWOxYJEPbMdehrhWNdppqZsLjnhtKqJY2
+            #           u4kGN7D47OIjrTtOeWXf7AY-6nYyMmmikb4",
             #     "openid": "oX0xv1pJPEv1nnhswmSxr0VyolLE",
             #     "scope": "snsapi_userinfo"
             # }

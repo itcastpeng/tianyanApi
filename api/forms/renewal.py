@@ -1,7 +1,7 @@
 from django import forms
 
 from api import models
-import time, re
+import re
 
 
 def length_the_days(the_length):
@@ -44,6 +44,7 @@ class AddForm(forms.Form):
         the_length, renewal_number_days = length_the_days(the_length)
         return the_length, renewal_number_days
 
+
 # 更新
 class UpdateForm(forms.Form):
     o_id = forms.IntegerField(
@@ -72,6 +73,7 @@ class UpdateForm(forms.Form):
             'required': "原价不能为空"
         }
     )
+
     def clean_o_id(self):
         o_id = self.data.get('o_id')
         objs = models.renewal_management.objects.filter(id=o_id)
@@ -84,6 +86,7 @@ class UpdateForm(forms.Form):
         the_length = self.data.get('the_length')
         the_length, renewal_number_days = length_the_days(the_length)
         return the_length, renewal_number_days
+
 
 # 删除
 class DeleteForm(forms.Form):
@@ -101,6 +104,7 @@ class DeleteForm(forms.Form):
             return o_id, objs
         else:
             self.add_error('o_id', '删除ID不存在')
+
 
 # 查询
 class SelectForm(forms.Form):
@@ -131,6 +135,7 @@ class SelectForm(forms.Form):
         else:
             length = int(self.data['length'])
         return length
+
 
 # 海报修改
 class UpdatePosterInfoForm(forms.Form):
@@ -164,15 +169,17 @@ class UpdatePosterInfoForm(forms.Form):
             'invalid': "地点不能为空"
         }
     )
+
     time = forms.CharField(
         required=True,
         error_messages={
             'invalid': "时间不能为空"
         }
     )
+
     def clean_phone(self):
         phone = self.data.get('phone')
-        phone_pat = re.compile('^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$')
+        phone_pat = re.compile("^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$")
         res = re.search(phone_pat, phone)
         if res:
             return phone
@@ -200,12 +207,14 @@ class UpdatePosterInfoForm(forms.Form):
             return title
         else:
             self.add_error('title', '标题过长')
+
     def clean_subtitle(self):
         subtitle = self.data.get('subtitle')
         if len(subtitle) <= 15:
             return subtitle
         else:
             self.add_error('subtitle', '副标题过长')
+
     def clean_place(self):
         place = self.data.get('place')
         if len(place) <= 20:

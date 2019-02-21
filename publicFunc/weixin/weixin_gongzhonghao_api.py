@@ -9,9 +9,10 @@ import requests
 import json
 import time
 import os
-import sys
-import datetime
-import hashlib, uuid
+# import sys
+# import datetime
+import hashlib
+# import uuid
 # from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_api_public import WeixinApiPublic
 
@@ -297,22 +298,22 @@ class WeChatApi(WeixinApiPublic):
 
     # 获取signature
     def get_signature(self):
-        timestamp = int(time.time()) # 随机字符串
+        timestamp = int(time.time())    # 随机字符串
         ticket = self.get_jsapi_ticket()
         noncestr = self.generateRandomStamping()
         result_data = {
-            'noncestr':noncestr,  # 随机值32位
-            'jsapi_ticket':ticket,
-            'timestamp':timestamp,
-            'url':'http://tianyan.zhangcong.top/api/letter_operation/js_sdk_permissions'
+            'noncestr': noncestr,   # 随机值32位
+            'jsapi_ticket': ticket,
+            'timestamp': timestamp,
+            'url': 'http://tianyan.zhangcong.top/api/letter_operation/js_sdk_permissions'
         }
         str1 = self.shengchengsign(result_data)
         signature = self.sha1(str1)
         data = {
-            'signature':signature,
-            'timestamp':timestamp,
-            'noncestr':noncestr,
-            'appid':self.APPID,
+            'signature': signature,
+            'timestamp': timestamp,
+            'noncestr': noncestr,
+            'appid': self.APPID,
         }
         return data
 
@@ -320,4 +321,3 @@ class WeChatApi(WeixinApiPublic):
 #
 #     obj = WeChatApi("wechat_data.json")
 #     obj.get_jsapi_ticket()
-

@@ -1,8 +1,10 @@
 from django import forms
 
 from api import models
-from publicFunc import account
-import time
+
+
+# from publicFunc import account
+# import time
 
 
 # 商品分类添加
@@ -35,6 +37,7 @@ class AddForm(forms.Form):
         else:
             return goods_classify
 
+
 # 商品分类更新
 class UpdateForm(forms.Form):
     o_id = forms.IntegerField(
@@ -64,7 +67,6 @@ class UpdateForm(forms.Form):
             return o_id, objs
         else:
             self.add_error('o_id', '修改ID不存在')
-
 
     # 查询文章标题是否存在
     def clean_goods_classify(self):
@@ -106,7 +108,7 @@ class DeleteForm(forms.Form):
     # 查询文章标题是否存在
     def clean_o_id(self):
         create_user_id = self.data['create_user_id']
-        o_id = self.data['o_id']        # 文章id
+        o_id = self.data['o_id']  # 文章id
 
         objs = models.Article.objects.filter(
             create_user_id=create_user_id,
@@ -121,7 +123,7 @@ class DeleteForm(forms.Form):
     def clean_title(self):
         create_user_id = self.data['create_user_id']
         title = self.data['title']
-        o_id = self.data['o_id']        # 文章id
+        o_id = self.data['o_id']  # 文章id
         print('o_id -->', o_id)
         objs = models.Article.objects.filter(
             create_user_id=create_user_id,
@@ -201,6 +203,7 @@ class AddGoodForm(forms.Form):
             'required': '封面图片不能为空'
         }
     )
+
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
         create_user_id = self.data.get('create_user_id')
@@ -209,6 +212,7 @@ class AddGoodForm(forms.Form):
             return goods_classify_id
         else:
             self.add_error('goods_classify_id', '无此分类')
+
     def clean_goods_name(self):
         create_user_id = self.data.get('create_user_id')
         goods_name = self.data.get('goods_name')
@@ -294,6 +298,7 @@ class UpdateGoodForm(forms.Form):
             'required': '封面图片不能为空'
         }
     )
+
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
         create_user_id = self.data.get('create_user_id')
@@ -307,7 +312,8 @@ class UpdateGoodForm(forms.Form):
         create_user_id = self.data.get('create_user_id')
         goods_name = self.data.get('goods_name')
         o_id = self.data.get('o_id')
-        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name).exclude(id=o_id)
+        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name).exclude(
+            id=o_id)
         if objs:
             self.add_error('goods_name', '商品名称已存在')
         else:
@@ -343,4 +349,3 @@ class SelectForm(forms.Form):
         else:
             length = int(self.data['length'])
         return length
-

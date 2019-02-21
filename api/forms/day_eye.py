@@ -1,9 +1,8 @@
 from django import forms
 
 from api import models
-from publicFunc import account
-import time, datetime
-
+# from publicFunc import account
+import datetime
 
 
 # 判断是否是数字
@@ -36,7 +35,7 @@ class SelectForm(forms.Form):
             if objs[0].overdue_date >= now_date:
                 return user_id
             else:
-                self.add_error('user_id','您的会员已经到期, 为了避免您的正常使用, 请续费继续使用')
+                self.add_error('user_id', '您的会员已经到期, 为了避免您的正常使用, 请续费继续使用')
         else:
             if not objs:
                 self.add_error('user_id', '非法用户')
@@ -60,7 +59,6 @@ class SelectForm(forms.Form):
 
 # 添加客户备注
 class AddForm(forms.Form):
-
     remote_type = forms.IntegerField(
         required=True,
         error_messages={
@@ -81,7 +79,6 @@ class AddForm(forms.Form):
             'required': "标题类型错误"
         }
     )
-
 
     create_date = forms.CharField(
         required=False,
@@ -107,7 +104,6 @@ class AddForm(forms.Form):
 
 # 修改客户备注
 class UpdateForm(forms.Form):
-
     o_id = forms.IntegerField(
         required=True,
         error_messages={
@@ -167,6 +163,7 @@ class UpdateForm(forms.Form):
         else:
             self.add_error('o_id', '数据异常')
 
+
 class Form(forms.Form):
     current_page = forms.IntegerField(
         required=False,
@@ -195,14 +192,3 @@ class Form(forms.Form):
         else:
             length = int(self.data['length'])
         return length
-
-
-
-
-
-
-
-
-
-
-

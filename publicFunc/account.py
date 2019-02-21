@@ -9,12 +9,11 @@ from publicFunc import Response
 from tianyanApi.settings import NoValidationTokenRoute
 
 
-
 # 生产随机字符串
 def randon_str():
-    STR = [chr(i) for i in range(65, 91)]  # 65-91对应字符A-Z
-    str = [chr(i) for i in range(97, 123)]  # a-z
-    number = [chr(i) for i in range(48, 58)]  # 0-9
+    STR = [chr(i) for i in range(65, 91)]       # 65-91对应字符A-Z
+    str = [chr(i) for i in range(97, 123)]      # a-z
+    number = [chr(i) for i in range(48, 58)]    # 0-9
 
     str_list = []
     str_list.extend(STR)
@@ -43,8 +42,7 @@ def get_token(pwd=None):
     if not pwd:
         pwd = randon_str()
     tmp_str = str(int(time.time()*1000)) + pwd
-    token = str_encrypt(tmp_str)
-    return token
+    return str_encrypt(tmp_str)
 
 
 # 装饰器 判断token 是否正确
@@ -92,7 +90,3 @@ if __name__ == '__main__':
     token = "892836aad41572b8d8fdd58c04103472"
     user_id = 1
     print(timestamp, str_encrypt(timestamp + token))
-
-
-
-

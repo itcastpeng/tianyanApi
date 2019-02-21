@@ -1,5 +1,6 @@
 from django.db import models
 
+
 # Create your models here.
 
 
@@ -63,7 +64,8 @@ class Userprofile(models.Model):
         default=None
     )
     small_shop_image = models.CharField(verbose_name='微店顶部静态横图', max_length=256, null=True, blank=True)
-    posters_info = models.TextField(verbose_name='海报信息', default="{'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}")
+    posters_info = models.TextField(verbose_name='海报信息',
+                                    default="{'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}")
 
 
 # 微商用户和团队关系表
@@ -102,6 +104,7 @@ class Customer(models.Model):
     )
     openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
     subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
+
 
 # 客户信息备注 对应 用户
 class customer_information_the_user(models.Model):
@@ -152,7 +155,7 @@ class Classify(models.Model):
         related_name="classify_create_user",
         null=True,
         blank=True
-    )   # 该字段为空，表示为默认(推荐)分类，不为空表示品牌分类
+    )  # 该字段为空，表示为默认(推荐)分类，不为空表示品牌分类
 
 
 # 文章管理
@@ -161,11 +164,12 @@ class Article(models.Model):
     content = models.TextField(verbose_name="文章内容")
     classify = models.ForeignKey('Classify', verbose_name='所属分类', null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户',  related_name="article_create_user")
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="article_create_user")
     source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
     look_num = models.IntegerField(verbose_name="查看次数", default=0)
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
+
 
 # 海报管理
 class Posters(models.Model):
@@ -177,6 +181,7 @@ class Posters(models.Model):
         (2, '邀请函')
     )
     posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
+
 
 # 商品分类
 class GoodsClassify(models.Model):
@@ -219,6 +224,7 @@ class renewal_management(models.Model):
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
 
+
 # 续费日志
 class renewal_log(models.Model):
     pay_order_no = models.CharField(verbose_name='订单号', max_length=128, null=True, blank=True)
@@ -230,14 +236,3 @@ class renewal_log(models.Model):
     original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
     overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
     isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
-
-
-
-
-
-
-
-
-
-
-

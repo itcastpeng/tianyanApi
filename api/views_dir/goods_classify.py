@@ -1,11 +1,11 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.small_shop import AddForm, UpdateForm, SelectForm, AddGoodForm, UpdateGoodForm
+from api.forms.small_shop import AddForm, UpdateForm, SelectForm
 import json
 
 
@@ -45,8 +45,8 @@ def goods_classify(request):
             response.code = 200
             response.msg = '查询成功'
             response.data = {
-                'ret_data':data_list,
-                'data_count':objs.count()
+                'ret_data': data_list,
+                'data_count': objs.count()
             }
             response.note = {
                 'id': '商品分类ID',
@@ -87,11 +87,10 @@ def goods_classify_oper(request, oper_type, o_id):
                 print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
-        
         # 修改商品分类
         elif oper_type == "update_classify":
             form_data = {
-                'o_id':o_id,
+                'o_id': o_id,
                 'oper_user_id': user_id,
                 'goods_classify': request.POST.get('goods_classify'),
             }
@@ -130,8 +129,6 @@ def goods_classify_oper(request, oper_type, o_id):
             else:
                 response.code = 302
                 response.msg = '删除ID不存在'
-
-
     else:
 
         # 查询商品分类

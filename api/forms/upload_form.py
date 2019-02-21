@@ -1,5 +1,6 @@
 from django import forms
 
+
 # 分片上传验证
 class imgUploadForm(forms.Form):
     img_name = forms.CharField(
@@ -24,12 +25,13 @@ class imgUploadForm(forms.Form):
         }
     )
 
-    img_source =  forms.CharField(
+    img_source = forms.CharField(
         error_messages={
             'required': "文件类型不能为空",
-            'invalid':  "必须是字符串"
+            'invalid': "必须是字符串"
         }
     )
+
 
 # 合并图片 Form 验证
 class imgMergeForm(forms.Form):
@@ -50,9 +52,9 @@ class imgMergeForm(forms.Form):
             'invalid': '总份数必须是整数类型'
         }
     )
-    img_source =  forms.CharField(
+    img_source = forms.CharField(
         error_messages={
             'required': "文件类型不能为空",
-            'invalid':  "必须是字符串"
+            'invalid': "必须是字符串"
         }
     )

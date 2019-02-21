@@ -1,8 +1,8 @@
 from django import forms
 
 from api import models
-from publicFunc import account
-import time, re
+# from publicFunc import account
+import re
 
 
 # 添加
@@ -27,6 +27,7 @@ class AddForm(forms.Form):
             'required': "海报类型不能为空"
         }
     )
+
     def clean_posters_url(self):
         posters_url = self.data.get('posters_url')
         posters_status = self.data.get('posters_status')
@@ -35,6 +36,7 @@ class AddForm(forms.Form):
             return posters_url
         else:
             self.add_error('posters_url', '该海报已存在')
+
 
 # 更新
 class UpdateForm(forms.Form):
@@ -73,6 +75,7 @@ class UpdateForm(forms.Form):
             return o_id, objs
         else:
             self.add_error('o_id', '修改ID不存在')
+
     def clean_posters_url(self):
         o_id = self.data.get('o_id')
         posters_url = self.data.get('posters_url')
@@ -82,6 +85,7 @@ class UpdateForm(forms.Form):
             return posters_url
         else:
             self.add_error('posters_url', '该海报已存在')
+
 
 # 查询
 class SelectForm(forms.Form):
@@ -112,6 +116,7 @@ class SelectForm(forms.Form):
         else:
             length = int(self.data['length'])
         return length
+
 
 # 海报修改
 class UpdatePosterInfoForm(forms.Form):
@@ -151,6 +156,7 @@ class UpdatePosterInfoForm(forms.Form):
             'invalid': "时间不能为空"
         }
     )
+
     def clean_phone(self):
         phone = self.data.get('phone')
         phone_pat = re.compile('^(13\d|14[5|7]|15\d|166|17[3|6|7]|18\d)\d{8}$')
@@ -181,12 +187,14 @@ class UpdatePosterInfoForm(forms.Form):
             return title
         else:
             self.add_error('title', '标题过长')
+
     def clean_subtitle(self):
         subtitle = self.data.get('subtitle')
         if len(subtitle) <= 15:
             return subtitle
         else:
             self.add_error('subtitle', '副标题过长')
+
     def clean_place(self):
         place = self.data.get('place')
         if len(place) <= 20:

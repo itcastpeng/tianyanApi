@@ -5,7 +5,8 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.renewal import AddForm, UpdateForm, DeleteForm, SelectForm
 from publicFunc.base64_encryption import b64decode
-import datetime, json
+import json
+
 
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -45,13 +46,13 @@ def renewal(request):
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'price':obj.price,
-                    'original_price':obj.original_price,
-                    'the_length_id':obj.the_length,
-                    'the_length':obj.get_the_length_display(),
-                    'create_user_id':obj.create_user_id,
-                    'create_user__name':b64decode(obj.create_user.name),
-                    'create_date':obj.create_date.strftime('%Y-%m-%d %H:%M:%S')
+                    'price': obj.price,
+                    'original_price': obj.original_price,
+                    'the_length_id': obj.the_length,
+                    'the_length': obj.get_the_length_display(),
+                    'create_user_id': obj.create_user_id,
+                    'create_user__name': b64decode(obj.create_user.name),
+                    'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S')
                 })
             #  查询成功 返回200 状态码
             response.code = 200
@@ -62,13 +63,13 @@ def renewal(request):
             }
             response.note = {
                 'id': "用户id",
-                'price' : '钱数',
-                'the_length_id' : '时长ID(一个月， 一年....)',
-                'the_length' : '时长',
-                'create_user_id' : '创建人ID',
-                'create_user__name' : '创建人名字',
-                'original_price' : '原价',
-                'create_date' : '创建时间',
+                'price': '钱数',
+                'the_length_id': '时长ID(一个月， 一年....)',
+                'the_length': '时长',
+                'create_user_id': '创建人ID',
+                'create_user__name': '创建人名字',
+                'original_price': '原价',
+                'create_date': '创建时间',
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
@@ -85,11 +86,11 @@ def renewal_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
 
     form_data = {
-        'o_id':o_id,
-        'user_id':request.GET.get('user_id'),
-        'price':request.POST.get('price'),
-        'original_price':request.POST.get('original_price'), # 原价
-        'the_length':request.POST.get('the_length')
+        'o_id': o_id,
+        'user_id': request.GET.get('user_id'),
+        'price': request.POST.get('price'),
+        'original_price': request.POST.get('original_price'),  # 原价
+        'the_length': request.POST.get('the_length')
     }
     print('form_data------> ', form_data)
     if request.method == "POST":
@@ -101,11 +102,11 @@ def renewal_oper(request, oper_type, o_id):
                 the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
 
                 models.renewal_management.objects.create(**{
-                    'price':form_obj.cleaned_data.get('price'),
-                    'original_price':form_obj.cleaned_data.get('original_price'),
-                    'the_length':the_length,
-                    'renewal_number_days':renewal_number_days,
-                    'create_user_id':form_obj.cleaned_data.get('user_id')
+                    'price': form_obj.cleaned_data.get('price'),
+                    'original_price': form_obj.cleaned_data.get('original_price'),
+                    'the_length': the_length,
+                    'renewal_number_days': renewal_number_days,
+                    'create_user_id': form_obj.cleaned_data.get('user_id')
                 })
                 response.code = 200
                 response.msg = '添加成功'

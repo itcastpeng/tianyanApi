@@ -1,8 +1,8 @@
 from django import forms
 
 from api import models
-from publicFunc import account
-import time
+# from publicFunc import account
+# import time
 
 
 # 添加
@@ -200,4 +200,3 @@ class SelectForm(forms.Form):
             self.add_error('classify_id', '分类类型传参异常')
         else:
             return int(classify_type)
-

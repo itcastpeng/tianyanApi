@@ -4,12 +4,12 @@
 # Email:zc_92@sina.com
 
 
-from django.shortcuts import render, HttpResponse
+from django.shortcuts import HttpResponse
 from django.http import JsonResponse
 
 from api import models
-import base64
-import time
+# import base64
+# import time
 import datetime
 import json
 import xml.dom.minidom
@@ -32,21 +32,22 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
     print('ret_obj -->', ret_obj)
     """
         {
-            'subscribe_scene': 'ADD_SCENE_QR_CODE', 
-            'city': '丰台', 
-            'openid': 'oX0xv1pJPEv1nnhswmSxr0VyolLE', 
-            'qr_scene': 0, 
-            'tagid_list': [], 
-            'nickname': '张聪', 
-            'subscribe_time': 1527689396, 
-            'country': '中国', 
-            'groupid': 0, 
-            'subscribe': 1, 
-            'qr_scene_str': '{"timestamp": "1527689369548"}', 
-            'headimgurl': 'http://thirdwx.qlogo.cn/mmopen/oFswpUmYn53kTv5QdmmONicVJqp3okrhHospu6icoLF7Slc5XyZWR96STN9RiakoBQn1uoFJIWEicJgJ1QjR5iaGOgWNQ5BSVqFe5/132', 
-            'province': '北京', 
-            'sex': 1, 
-            'language': 'zh_CN', 
+            'subscribe_scene': 'ADD_SCENE_QR_CODE',
+            'city': '丰台',
+            'openid': 'oX0xv1pJPEv1nnhswmSxr0VyolLE',
+            'qr_scene': 0,
+            'tagid_list': [],
+            'nickname': '张聪',
+            'subscribe_time': 1527689396,
+            'country': '中国',
+            'groupid': 0,
+            'subscribe': 1,
+            'qr_scene_str': '{"timestamp": "1527689369548"}',
+            'headimgurl': 'http://thirdwx.qlogo.cn/mmopen/oFswpUmYn53kTv5QdmmONicVJqp3okrhHospu6icoLF7Slc5XyZWR
+                            96STN9RiakoBQn1uoFJIWEicJgJ1QjR5iaGOgWNQ5BSVqFe5/132',
+            'province': '北京',
+            'sex': 1,
+            'language': 'zh_CN',
             'remark': ''
         }
 
@@ -59,7 +60,8 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
             "city":"丰台",
             "province":"北京",
             "country":"中国",
-            "headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTJWGnNTvluYlHj8qt8HnxMlwbRiadbv4TNrp4watI2ibPPAp2Hu6Sm1BqYf6IicNWsSrUyaYjIoy2Luw\/132",
+            "headimgurl":"http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJWGnNTvluYlHj8qt8HnxMlwbRiad
+                            bv4TNrp4watI2ibPPAp2Hu6Sm1BqYf6IicNWsSrUyaYjIoy2Luw/132",
             "privilege":[]
         }
     """
@@ -222,11 +224,14 @@ def wechat_oper(request, oper_type):
             team_id = request.GET.get('team_id')
 
             redirect_uri = "http://api.zhugeyingxiao.com/tianyan/team/invite_members/{team_id}".format(team_id=team_id)
-            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo&state={user_id}#wechat_redirect".format(
-                appid=weichat_api_obj.APPID,
-                redirect_uri=redirect_uri,
-                user_id=user_id
-            )
+            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                              "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                              "&state={user_id}#wechat_redirect"\
+                .format(
+                    appid=weichat_api_obj.APPID,
+                    redirect_uri=redirect_uri,
+                    user_id=user_id
+                )
 
             obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
             response.code = 200

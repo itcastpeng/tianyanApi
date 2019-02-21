@@ -1,9 +1,8 @@
 from django import forms
 
-from api import models
-from publicFunc import account
-import time
-
+# from api import models
+# from publicFunc import account
+# import time
 
 
 # 判断是否是数字

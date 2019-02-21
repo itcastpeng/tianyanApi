@@ -27,5 +27,3 @@ def conditionCom(request, field_dict):
                 q.add(Q(**{k: value}), Q.AND)
 
     return q
-
-

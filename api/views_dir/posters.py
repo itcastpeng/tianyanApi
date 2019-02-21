@@ -11,7 +11,7 @@ import json
 @account.is_token(models.Userprofile)
 def posters(request):
     response = Response.ResponseObj()
-    user_id = request.GET.get('user_id')
+    # user_id = request.GET.get('user_id')
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
@@ -55,8 +55,8 @@ def posters(request):
             posters_choices = []
             for i in models.Posters.posters_choices:
                 posters_choices.append({
-                    'id':i[0],
-                    'name':i[1]
+                    'id': i[0],
+                    'name': i[1]
                 })
             #  查询成功 返回200 状态码
             response.code = 200
@@ -93,7 +93,7 @@ def posters_oper(request, oper_type, o_id):
 
     if request.method == "POST":
         form_data = {
-            'o_id':o_id,
+            'o_id': o_id,
             'create_user_id': user_id,
             'posters_url': request.POST.get('posters_url'),
             'posters_status': request.POST.get('posters_status', 1),
@@ -176,7 +176,7 @@ def posters_oper(request, oper_type, o_id):
                     posters_info = {'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}
 
                 response.data = {
-                    'posters_info':posters_info
+                    'posters_info': posters_info
                 }
                 response.code = 200
                 response.msg = '查询成功'

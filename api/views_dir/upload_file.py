@@ -1,11 +1,19 @@
-from api import models
-from publicFunc import Response, account
+# from api import models
+from publicFunc import Response
 from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
+from django.views.decorators.csrf import csrf_exempt
 from api.forms import upload_form
-import os, requests, re, hashlib, platform, time, random, json, base64
+import os
+import re
+import hashlib
+import platform
+import time
+import random
+import json
+import base64
 
 sysstr = platform.system()
+
 
 # 加密名字
 def encryption():
@@ -15,12 +23,11 @@ def encryption():
     hash.update(pwd.encode())
     return hash.hexdigest()
 
+
 # 获取名字后缀
 def get_name_suffix(fileName):
     houzhui = re.search(r'[^.]+$', fileName).group(0)  # 获取点后面的后缀
     return houzhui
-
-
 
 # 分片
 @csrf_exempt
@@ -44,8 +51,10 @@ def upload_shard(request):
                     return JsonResponse(response.__dict__)
 
             elif img_source == 'img':
-                if expanded_name.lower().strip() not in ['bmp', 'dib', 'rle', 'emf', 'gif', 'jpg', 'jpeg', 'jpe', 'jif',
-                                                         'pcx', 'dcx', 'pic', 'png', 'tga', 'tif', 'tiffxif', 'wmf', 'jfif', 'pdf']:
+                if expanded_name.lower().strip() not in [
+                    'bmp', 'dib', 'rle', 'emf', 'gif', 'jpg', 'jpeg', 'jpe', 'jif', 'pcx', 'dcx', 'pic', 'png',
+                    'tga', 'tif', 'tiffxif', 'wmf', 'jfif', 'pdf'
+                ]:
                     response.code = 301
                     response.msg = '请上传正确(图片)格式'
                     return JsonResponse(response.__dict__)
@@ -126,7 +135,6 @@ def merge(request):
                         fileData += str(f.read())
                     # os.remove(file_save_path)  # 删除分片 文件
 
-
             video_name = encryption() + img_name
             path = os.path.join(file_dir, video_name)
             try:
@@ -135,7 +143,6 @@ def merge(request):
             except Exception as e:
                 print('e--> ', e)
             response.data = {'url': path}
-
 
             response.code = 200
             response.msg = "上传{}成功".format(file_type)
@@ -171,8 +178,11 @@ def upload_base_shard(request):
                     return JsonResponse(response.__dict__)
 
             elif img_source == 'img':
-                if expanded_name.lower().strip() not in ['bmp', 'dib', 'rle', 'emf', 'gif', 'jpg', 'jpeg', 'jpe', 'jif',
-                                                         'pcx', 'dcx', 'pic', 'png', 'tga', 'tif', 'tiffxif', 'wmf', 'jfif', 'pdf']:
+                extension_list = [
+                    'bmp', 'dib', 'rle', 'emf', 'gif', 'jpg', 'jpeg', 'jpe', 'jif', 'pcx', 'dcx', 'pic', 'png',
+                    'tga', 'tif', 'tiffxif', 'wmf', 'jfif', 'pdf'
+                ]
+                if expanded_name.lower().strip() not in extension_list:
                     response.code = 301
                     response.msg = '请上传正确(图片)格式'
                     return JsonResponse(response.__dict__)
@@ -239,7 +249,6 @@ def base_merge(request):
                         fileData += f.read()
                     # os.remove(file_save_path)  # 删除分片 文件
 
-
             video_name = encryption() + img_name
             path = os.path.join(file_dir, video_name)
             try:
@@ -259,21 +268,6 @@ def base_merge(request):
         response.code = 402
         response.msg = '请求异常'
     return JsonResponse(response.__dict__)
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 # 上传图片/视频
@@ -432,12 +426,14 @@ def base_merge(request):
 #                         path = 'statics/video/' + file
 #                         cover_path = 'statics/img/' + encryption() + '.jpg'
 #                         if (sysstr == "Windows"):   # windows 系统
-#                             cmd = "C:\\baidu_Downloads\\ffmpeg-20190114-d52a1be-win64-static\\bin/ffmpeg -i {video_path} -y -f image2 -ss 8 -t 0.001 -s 1024*768 {img_path}".format(
+#                             cmd = "C:\\baidu_Downloads\\ffmpeg-20190114-d52a1be-win64-static\\bin/ffmpeg -i
+#                                       {video_path} -y -f image2 -ss 8 -t 0.001 -s 1024*768 {img_path}".format(
 #                             video_path=path,
 #                             img_path=cover_path
 #                         )
 #                         elif (sysstr == "Linux"):   # Linux 系统
-#                             cmd = "/usr/local/bin/ffmpeg -i {video_path} -y -f image2 -ss 8 -t 0.001 -s 1024*768 {img_path}".format(
+#                             cmd = "/usr/local/bin/ffmpeg -i {video_path} -y -f image2 -ss 8 -t 0.001 -s 1024*768
+#                               {img_path}".format(
 #                                 video_path=path,
 #                                 img_path=cover_path
 #                             )

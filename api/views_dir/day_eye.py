@@ -364,7 +364,7 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 按文章查看(详情)
             elif oper_type == 'view_by_article_detail':
-                article_obj= models.SelectArticleLog.objects.filter(
+                article_obj = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id,
                     article_id=o_id
                 )
@@ -383,7 +383,7 @@ def day_eye_oper(request, oper_type, o_id):
                     ret_data.append({
                         'customer_id': obj['customer_id'],
                         'customer__name': b64decode(obj['customer__name']),
-                        'article_info':'看了' + str(obj['id__count']) + '次-' + after_time + '前',
+                        'article_info': '看了' + str(obj['id__count']) + '次-' + after_time + '前',
                     })
 
                 response.code = 200
