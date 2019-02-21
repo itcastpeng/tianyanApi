@@ -1,4 +1,4 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
@@ -13,7 +13,7 @@ import json
 @account.is_token(models.Userprofile)
 def brand(request):
     response = Response.ResponseObj()
-    user_id = request.GET.get('user_id')
+    # user_id = request.GET.get('user_id')
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():

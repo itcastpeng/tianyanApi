@@ -1,13 +1,14 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.day_eye import SelectForm, AddForm, UpdateForm, Form
-from django.db.models import Count, Sum
+from api.forms.day_eye import SelectForm, AddForm, UpdateForm
+from django.db.models import Count
 from publicFunc.base64_encryption import b64decode
-import json, datetime
+import json
+import datetime
 
 
 # 放入开始和结束时间 返回 天 时 分 秒
@@ -16,7 +17,7 @@ def get_min_s(start_time=None, stop_time=None, ms=None):
     day = date_time.days
     hour, date_time = divmod(date_time.seconds, 3600)
     min, date_time = divmod(date_time, 60)
-    second =    date_time
+    second = date_time
 
     days = ''
     hours = ''
@@ -57,7 +58,6 @@ def day_eye(request):
                 'customer_id', 'customer__name', 'customer__set_avator'
             ).distinct().annotate(Count('customer_id'))
 
-
             if length != 0:
                 start_line = (current_page - 1) * length
                 stop_line = start_line + length
@@ -77,8 +77,8 @@ def day_eye(request):
                     'customer_id': customer_id,
                     'customer__name': b64decode(obj.get('customer__name')),
                     'customer__set_avator': obj.get('customer__set_avator'),
-                    'customer_id__count': obj.get('customer_id__count'), # 总共查看几次
-                    'article_count': article_count,                      # 总共查看几篇文章
+                    'customer_id__count': obj.get('customer_id__count'),    # 总共查看几次
+                    'article_count': article_count,                         # 总共查看几篇文章
                 })
 
             #  查询成功 返回200 状态码
@@ -91,9 +91,9 @@ def day_eye(request):
             response.note = {
                 'customer_id': "查看人ID",
                 'customer__name': "查看人姓名",
-                'customer_id__count':'总共查看几次',
-                'article_count':'总共查看几篇文章',
-                'customer__set_avator':'客户头像',
+                'customer_id__count': '总共查看几次',
+                'article_count': '总共查看几篇文章',
+                'customer__set_avator': '客户头像',
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
@@ -117,8 +117,8 @@ def day_eye_oper(request, oper_type, o_id):
 
         if request.method == "POST":
             form_data = {
-                'o_id':o_id,
-                'user_id':user_id,
+                'o_id': o_id,
+                'user_id': user_id,
                 'customer_id': request.POST.get('customer_id'),
                 'remote_type': request.POST.get('remote_type'),
                 'title': request.POST.get('title'),
@@ -143,10 +143,10 @@ def day_eye_oper(request, oper_type, o_id):
                     }
 
                     data = {
-                        'user_id':user_id,
-                        'customer_id':customer_id,
-                        'remote_type':remote_type,
-                        'remote':remote_text
+                        'user_id': user_id,
+                        'customer_id': customer_id,
+                        'remote_type': remote_type,
+                        'remote': remote_text
                     }
                     models.customer_information_the_user.objects.create(**data)
                     response.code = 200
@@ -197,9 +197,9 @@ def day_eye_oper(request, oper_type, o_id):
             if oper_type == 'get_customer_note':
                 field_dict = {
                     'id': '',
-                    'remote_type':'',
-                    'customer_id':'',
-                    'user_id':'',
+                    'remote_type': '',
+                    'customer_id': '',
+                    'user_id': '',
                 }
 
                 q = conditionCom(request, field_dict)
@@ -222,13 +222,13 @@ def day_eye_oper(request, oper_type, o_id):
 
                     if int(remote_type) == 1:
                         ret_data.append({
-                            'remote':remote
+                            'remote': remote
                         })
                     elif int(remote_type) == 2:
                         ret_data.append({
                             'remote': remote,
-                            'create_date':create_date,
-                            'title':title,
+                            'create_date': create_date,
+                            'title': title,
                         })
                     else:
                         ret_data.append({
@@ -239,33 +239,33 @@ def day_eye_oper(request, oper_type, o_id):
                 remote_type_choices = []
                 for i in models.customer_information_the_user.remote_type_choices:
                     remote_type_choices.append({
-                        'id':i[0],
-                        'name':i[1]
+                        'id': i[0],
+                        'name': i[1]
                     })
 
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'remote_type':remote_type_choices,
-                    'count':count,
-                    'ret_data':ret_data,
+                    'remote_type': remote_type_choices,
+                    'count': count,
+                    'ret_data': ret_data,
                 }
 
             # 谁看了我 详情
             elif oper_type == 'day_eye_detail':
                 user_id = forms_obj.cleaned_data['user_id']
-                ArticleLogObjs =models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id)
-                info_objs = ArticleLogObjs.order_by(order)
+                article_objs = models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id)
+                info_objs = article_objs.order_by(order)
 
                 # 客户基本信息
                 obj = info_objs[0]
                 customer_info = {
-                    'customer_id':obj.customer_id,
-                    'customer__name':b64decode(obj.customer.name),
-                    'customer__set_avator':obj.customer.set_avator,
+                    'customer_id': obj.customer_id,
+                    'customer__name': b64decode(obj.customer.name),
+                    'customer__set_avator': obj.customer.set_avator,
                 }
 
-                objs = ArticleLogObjs.values('article_id', 'article__title').annotate(Count('id'))
+                objs = article_objs.values('article_id', 'article__title').annotate(Count('id'))
 
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -277,9 +277,9 @@ def day_eye_oper(request, oper_type, o_id):
                 ret_data = []
                 for obj in objs:
                     article_id = obj.get('article_id')
-                    article_obj = ArticleLogObjs.filter(article_id=article_id).order_by(order)[:1]
+                    article_obj = article_objs.filter(article_id=article_id).order_by(order)[:1]
 
-                    time_detail = [] # 查看时长及时间
+                    time_detail = []    # 查看时长及时间
                     for info_obj in info_objs:
                         if int(info_obj.article_id) == int(article_id):
                             time_length = '1秒'
@@ -287,17 +287,17 @@ def day_eye_oper(request, oper_type, o_id):
                             if info_obj.close_datetime:
                                 time_length = get_min_s(info_obj.close_datetime, create_datetime)
                             time_detail.append({
-                                'time_length':time_length,
-                                'select_datetime':create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                                'time_length': time_length,
+                                'select_datetime': create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                             })
 
                     create_datetime = article_obj[0].create_datetime
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
                     ret_data.append({
-                        'article_id':article_id,
-                        'article__title':obj.get('article__title'),
-                        'article_info':'看了' + str(obj.get('id__count')) + '次' + '-' + after_time + '前',
-                        'time_detail':time_detail,
+                        'article_id': article_id,
+                        'article__title': obj.get('article__title'),
+                        'article_info': '看了' + str(obj.get('id__count')) + '次' + '-' + after_time + '前',
+                        'time_detail': time_detail,
                     })
 
                 response.code = 200
@@ -336,30 +336,30 @@ def day_eye_oper(request, oper_type, o_id):
                 ret_data = []
                 for obj in objs:
                     article_obj = models.SelectArticleLog.objects.filter(article_id=obj['article_id']).order_by(order)
-                    cover_img = article_obj[0].article.cover_img # 文章封面
+                    cover_img = article_obj[0].article.cover_img    # 文章封面
                     create_datetime = article_obj[0].create_datetime
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
 
                     ret_data.append({
-                        'article_id':obj['article_id'],
-                        'article__title':obj['article__title'],
-                        'id__count':obj['id__count'],
-                        'after_time':after_time + '前',
-                        'cover_img':cover_img,
+                        'article_id': obj['article_id'],
+                        'article__title': obj['article__title'],
+                        'id__count': obj['id__count'],
+                        'after_time': after_time + '前',
+                        'cover_img': cover_img,
                     })
 
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'ret_data':ret_data,
-                    'count':count,
+                    'ret_data': ret_data,
+                    'count': count,
                 }
                 response.note = {
-                    'article_id':'文章ID',
-                    'article__title':'文章标题',
-                    'id__count ':'查看该文章人 总数',
-                    'cover_img ':'文章封面',
-                    'after_time ':'最后查看日期',
+                    'article_id': '文章ID',
+                    'article__title': '文章标题',
+                    'id__count': '查看该文章人 总数',
+                    'cover_img': '文章封面',
+                    'after_time': '最后查看日期',
                 }
 
             # 按文章查看(详情)

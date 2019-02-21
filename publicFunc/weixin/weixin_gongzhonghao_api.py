@@ -296,9 +296,9 @@ class WeChatApi(WeixinApiPublic):
         return ret.json()
 
     # 获取signature
-    def get_signature(self, ret_obj):
+    def get_signature(self):
         timestamp = int(time.time()) # 随机字符串
-        ticket = ret_obj.get('ticket')
+        ticket = self.get_jsapi_ticket()
         noncestr = self.generateRandomStamping()
         result_data = {
             'noncestr':noncestr,  # 随机值32位

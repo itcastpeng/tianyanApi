@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
@@ -8,7 +7,8 @@ from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
 import json
 
-import requests, random
+import requests
+import random
 
 from django.db.models import Q
 from publicFunc.weixin import weixin_gongzhonghao_api
@@ -16,7 +16,6 @@ from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc import base64_encryption
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
-
 
 
 # token验证 用户展示模块
@@ -161,7 +160,6 @@ def article_oper(request, oper_type, o_id):
         #     else:
         #         response.code = 302
         #         response.msg = '删除ID不存在'
-        
         # 修改文章
         elif oper_type == "update":
             # 获取需要修改的信息
@@ -232,21 +230,25 @@ def article_oper(request, oper_type, o_id):
             inviter_user_id = request.GET.get('state')  # 分享文章的用户id
             article_id = o_id              # 分享文章的id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
-            url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code".format(
-                APPID=weichat_api_obj.APPID,
-                SECRET=weichat_api_obj.APPSECRET,
-                CODE=code,
-            )
+            url = "https://api.weixin.qq.com/sns/oauth2/access_token?" \
+                  "appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code"\
+                .format(
+                    APPID=weichat_api_obj.APPID,
+                    SECRET=weichat_api_obj.APPSECRET,
+                    CODE=code,
+                )
             ret = requests.get(url)
             ret.encoding = "utf8"
             print("ret.text -->", ret.text)
 
             access_token = ret.json().get('access_token')
             openid = ret.json().get('openid')
-            url = "https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN".format(
-                ACCESS_TOKEN=access_token,
-                OPENID=openid,
-            )
+            url = "https://api.weixin.qq.com/sns/userinfo?access_token=" \
+                  "{ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN"\
+                .format(
+                    ACCESS_TOKEN=access_token,
+                    OPENID=openid,
+                )
             ret = requests.get(url)
             ret.encoding = "utf8"
             ret_obj = ret.json()
@@ -261,13 +263,13 @@ def article_oper(request, oper_type, o_id):
                 "city":"丰台",
                 "province":"北京",
                 "country":"中国",
-                "headimgurl":"http:\/\/thirdwx.qlogo.cn\/mmopen\/vi_32\/Q0j4TwGTfTJWGnNTvluYlHj8qt8HnxMlwbRiadbv4TNrp4watI2ibPPAp2Hu6Sm1BqYf6IicNWsSrUyaYjIoy2Luw\/132",
+                "headimgurl":"http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJWGnNTvluYlHj8qt8HnxMlwbRia
+                                dbv4TNrp4watI2ibPPAp2Hu6Sm1BqYf6IicNWsSrUyaYjIoy2Luw/132",
                 "privilege":[]
             }
             """
             # print("ret.text -->", ret.text)
             # updateUserInfo(openid, inviter_user_id, ret.json())
-
 
             user_data = {
                 "sex": ret_obj.get('sex'),
@@ -280,9 +282,9 @@ def article_oper(request, oper_type, o_id):
                 customer_objs.update(**user_data)
                 customer_obj = customer_objs[0]
             else:   # 不存在，创建用户
-                encode_username = base64_encryption.b64encode(ret_obj['nickname'])
-                # encodestr = base64.b64encode(ret_obj['nickname'].encode('utf8'))
-                # encode_username = str(encodestr, encoding='utf8')
+                encode_username = base64_encryption.b64encode(
+                    ret_obj['nickname']
+                )
 
                 subscribe = ret_obj.get('subscribe')
 
