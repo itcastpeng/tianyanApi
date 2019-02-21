@@ -2,7 +2,7 @@
 import hashlib, uuid, time, random, requests, xml.dom.minidom as xmldom
 from publicFunc import account, xmldom_parsing
 
-class micro_public_letter(object):
+class weixin_pay_api(object):
     def __init__(self):
         pass
 
@@ -59,9 +59,10 @@ class micro_public_letter(object):
 
     # 预支付功能
     def yuzhifu(self, data):
-        appid, mch_id, SHANGHUKEY = self.get_pay_info()
+        mch_id, SHANGHUKEY = self.get_pay_info()
         openid = data.get('openid')
         total_fee = data.get('total_fee')
+        appid = data.get('appid')
         url = 'https://api.mch.weixin.qq.com/pay/unifiedorder'  # 微信支付接
 
         dingdanhao = self.shengcheng_dingdanhao()       # 生成订单号
