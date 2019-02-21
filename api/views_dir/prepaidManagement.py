@@ -5,7 +5,6 @@ from publicFunc import account, xmldom_parsing
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from publicFunc.weixin.weixin_pay_api import micro_public_letter
-from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 
 
@@ -14,11 +13,6 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
     pub_obj = micro_public_letter()  # 实例 公共函数
-    weixin_obj = WeChatApi()
-    mch_id = '1488841842'
-    SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'
-    appid = weixin_obj.APPID
-    print('appid--> ', appid)
     # 预支付
     if oper_type == 'yuZhiFu':
         user_id = request.GET.get('user_id')
@@ -30,11 +24,8 @@ def weixin_pay(request, oper_type, o_id):
             total_fee = int(fee_obj.price) * 100
 
             data = {
-                'appid': appid,             # appid
-                'mch_id': mch_id,           # 商户号
                 'total_fee': total_fee,     # 金额(分 为单位)
                 'openid': user_obj.openid,  # 微信用户唯一标识
-                'SHANGHUKEY': SHANGHUKEY,   # 商户KEY
             }
             result = pub_obj.yuzhifu(data)  # 预支付
             return_code = result.get('return_code')
@@ -87,7 +78,6 @@ def weixin_pay(request, oper_type, o_id):
                 'mch_id': resultData['mch_id'],                 # 商户号
                 'out_trade_no': resultData['out_trade_no'],     # 订单号
                 'nonce_str': pub_obj.generateRandomStamping(),  # 32位随机值
-                'SHANGHUKEY': SHANGHUKEY,                       # 商户KEY
             }
             return_code = pub_obj.weixin_back_pay(result_data)
 

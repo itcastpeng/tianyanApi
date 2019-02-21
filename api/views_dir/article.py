@@ -8,7 +8,7 @@ from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
 import json
 
-import requests
+import requests, random
 
 from django.db.models import Q
 from publicFunc.weixin import weixin_gongzhonghao_api
@@ -77,6 +77,7 @@ def article(request):
                     'like_num': obj.like_num,
                     'classify_id': obj.classify_id,
                     'classify_name': obj.classify.name,
+                    'cover_img': obj.cover_img,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
             #  查询成功 返回200 状态码
@@ -96,6 +97,7 @@ def article(request):
                 'classify_id': "所属分类id",
                 'classify_name': "所属分类名称",
                 'create_datetime': "创建时间",
+                'cover_img': "封面图",
             }
         else:
             response.code = 301
@@ -129,6 +131,16 @@ def article_oper(request, oper_type, o_id):
                 #  添加数据库
                 # print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
                 obj = models.Article.objects.create(**forms_obj.cleaned_data)
+                cover_img_list = [
+                    'http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png',
+                    'http://tianyan.zhangcong.top/statics/img/ca47a146ff6b6b7f45742742326075cdnews3.png',
+                    'http://tianyan.zhangcong.top/statics/img/651397a20f5f8fe15b1c12cf150ff3d3news2.png',
+                    'http://tianyan.zhangcong.top/statics/img/a105a02aff72958b5cfb0fca97e4363anews1.png',
+                    'http://tianyan.zhangcong.top/statics/img/1f75da72013edbb7fcaae9660ca55cbenews5.png'
+                                  ]
+                cover_img = random.sample(cover_img_list, 1)
+                obj.cover_img = cover_img[0]
+                obj.save()
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'id': obj.id}
