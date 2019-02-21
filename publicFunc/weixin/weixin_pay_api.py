@@ -1,7 +1,6 @@
 
 import hashlib, uuid, time, random, requests, xml.dom.minidom as xmldom
 from publicFunc import account, xmldom_parsing
-from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 class micro_public_letter(object):
     def __init__(self):
@@ -101,7 +100,7 @@ class micro_public_letter(object):
 
     # 回调 判断是否支付成功
     def weixin_back_pay(self, result_data):
-        appid, mch_id, SHANGHUKEY = self.get_pay_info()
+        mch_id, SHANGHUKEY = self.get_pay_info()
         url = 'https://api.mch.weixin.qq.com/pay/orderquery'
         stringSignTemp = self.shengchengsign(result_data, SHANGHUKEY)
         result_data['sign'] = self.md5(stringSignTemp).upper()
@@ -116,9 +115,7 @@ class micro_public_letter(object):
 
     # 获取支付信息
     def get_pay_info(self):
-        weixin_obj = WeChatApi()
-        appid = weixin_obj.APPID
         mch_id = '1488841842'
         SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'
-        return appid, mch_id, SHANGHUKEY
+        return mch_id, SHANGHUKEY
 

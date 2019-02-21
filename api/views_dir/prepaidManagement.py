@@ -5,6 +5,7 @@ from publicFunc import account, xmldom_parsing
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from publicFunc.weixin.weixin_pay_api import micro_public_letter
+from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 
 
@@ -22,10 +23,12 @@ def weixin_pay(request, oper_type, o_id):
             user_obj = userObjs[0]
             fee_obj = fee_objs[0]
             total_fee = int(fee_obj.price) * 100
-
+            weixin_obj = WeChatApi()
+            appid = weixin_obj.APPID
             data = {
                 'total_fee': total_fee,     # 金额(分 为单位)
                 'openid': user_obj.openid,  # 微信用户唯一标识
+                'appid': appid,             # appid
             }
             result = pub_obj.yuzhifu(data)  # 预支付
             return_code = result.get('return_code')
