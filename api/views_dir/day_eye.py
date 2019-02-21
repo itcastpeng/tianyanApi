@@ -364,11 +364,11 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 按文章查看(详情)
             elif oper_type == 'view_by_article_detail':
-                article_id = o_id
-                objs = models.SelectArticleLog.objects.filter(
+                article_obj= models.SelectArticleLog.objects.filter(
                     inviter_id=user_id,
-                    article_id=article_id
-                ).values('customer_id', 'customer__name').distinct().annotate(Count('id'))
+                    article_id=o_id
+                )
+                objs = article_obj.values('customer_id', 'customer__name').distinct().annotate(Count('id'))
 
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -377,10 +377,13 @@ def day_eye_oper(request, oper_type, o_id):
                 count = objs.count()
                 ret_data = []
                 for obj in objs:
+                    objs = article_obj.filter(customer_id=obj['customer_id'])[:1]
+                    create_datetime = objs[0].create_datetime
+                    after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
                     ret_data.append({
                         'customer_id': obj['customer_id'],
                         'customer__name': b64decode(obj['customer__name']),
-                        'id__count': obj['id__count'],
+                        'article_info':'看了' + str(obj['id__count']) + '次-' + after_time + '前',
                     })
 
                 response.code = 200
@@ -392,7 +395,7 @@ def day_eye_oper(request, oper_type, o_id):
                 response.note = {
                     'customer_id': '客户ID',
                     'customer__name': '客户名称',
-                    'id__count': '该人查看该文章 总数',
+                    'article_info': '该人查看该文章 总数/ 时长',
                 }
 
             else:
