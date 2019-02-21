@@ -4,7 +4,7 @@ from publicFunc import Response
 from publicFunc import account, xmldom_parsing
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from publicFunc.weixin.weixin_pay_api import micro_public_letter
+from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 
@@ -13,7 +13,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 @account.is_token(models.Userprofile)
 def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
-    pub_obj = micro_public_letter()  # 实例 公共函数
+    pub_obj = weixin_pay_api()  # 实例 公共函数
     # 预支付
     if oper_type == 'yuZhiFu':
         user_id = request.GET.get('user_id')
