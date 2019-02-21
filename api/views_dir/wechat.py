@@ -238,7 +238,7 @@ def wechat_oper(request, oper_type):
             }
 
             response.note = {
-                "open_weixin_url": "点击接受邀请后请求的url, /invite_members/10  #10代表团队id   &state=1  #1代表邀请人id",
+                "open_weixin_url": "点击接受邀请后请求的url",
                 "team_name": "团队名称",
                 "user_name": "邀请人名称",
                 "set_avator": "邀请人头像"
