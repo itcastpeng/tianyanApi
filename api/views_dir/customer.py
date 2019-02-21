@@ -1,7 +1,7 @@
-from django.shortcuts import render
+# from django.shortcuts import render
 from api import models
 from publicFunc import Response
-from publicFunc import account
+# from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.customer import SelectForm
@@ -74,13 +74,12 @@ def customer(request):
 # @account.is_token(models.Userprofile)
 def customer_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
-    user_id = request.GET.get('user_id')
+    # user_id = request.GET.get('user_id')
     print('request.POST -->', request.POST)
     if request.method == "POST":
         # 记录客户查看文章时长
         if oper_type == "record_length":
             pass
-
 
     else:
         response.code = 402
