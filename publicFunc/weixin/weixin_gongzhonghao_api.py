@@ -12,9 +12,11 @@ import os
 import sys
 import datetime
 import hashlib, uuid
-from publicFunc.weixin.weixin_pay_api import weixin_pay_api
+# from publicFunc.weixin.weixin_pay_api import weixin_pay_api
+from publicFunc.weixin.weixin_api_public import WeixinApiPublic
 
-class WeChatApi(object):
+
+class WeChatApi(WeixinApiPublic):
 
     def __init__(self, wechat_data_path=None):
         if wechat_data_path:
@@ -295,18 +297,17 @@ class WeChatApi(object):
 
     # 获取signature
     def get_signature(self, ret_obj):
-        pub_obj = weixin_pay_api()
         timestamp = int(time.time()) # 随机字符串
         ticket = ret_obj.get('ticket')
-        noncestr = pub_obj.generateRandomStamping()
+        noncestr = self.generateRandomStamping()
         result_data = {
             'noncestr':noncestr,  # 随机值32位
             'jsapi_ticket':ticket,
             'timestamp':timestamp,
             'url':'http://tianyan.zhangcong.top/api/letter_operation/js_sdk_permissions'
         }
-        str1 = pub_obj.shengchengsign(result_data)
-        signature = pub_obj.sha1(str1)
+        str1 = self.shengchengsign(result_data)
+        signature = self.sha1(str1)
         data = {
             'signature':signature,
             'timestamp':timestamp,

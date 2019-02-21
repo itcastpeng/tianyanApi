@@ -13,7 +13,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 @account.is_token(models.Userprofile)
 def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
-    pub_obj = weixin_pay_api()  # 实例 公共函数
+    weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
     # 预支付
     if oper_type == 'yuZhiFu':
         user_id = request.GET.get('user_id')
@@ -30,7 +30,7 @@ def weixin_pay(request, oper_type, o_id):
                 'openid': user_obj.openid,  # 微信用户唯一标识
                 'appid': appid,             # appid
             }
-            result = pub_obj.yuzhifu(data)  # 预支付
+            result = weixin_pay_api_obj.yuzhifu(data)  # 预支付
             return_code = result.get('return_code')
             return_msg = result.get('return_msg')
             dingdanhao = result.get('dingdanhao')

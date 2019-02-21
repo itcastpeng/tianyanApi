@@ -1,54 +1,13 @@
 
 import hashlib, uuid, time, random, requests, xml.dom.minidom as xmldom
 from publicFunc import account, xmldom_parsing
+from publicFunc.weixin.weixin_api_public import WeixinApiPublic
 
-class weixin_pay_api(object):
+
+class weixin_pay_api(WeixinApiPublic):
     def __init__(self):
-        pass
-
-    def sha1(self, string):
-        return hashlib.sha1(string.encode('utf8')).hexdigest()
-
-
-    def md5(self, string):
-        m = hashlib.md5()
-        m.update(string.encode('utf8'))
-        return m.hexdigest()
-
-    # 返回 xml
-    def toXml(self, params):
-        xml = []
-        for k in sorted(params.keys()):
-            v = params.get(k)
-            if k == 'detail' and not v.startswith('<![CDATA['):
-                v = '<![CDATA[{}]]>'.format(v)
-            xml.append('<{key}>{value}</{key}>'.format(key=k, value=v))
-        return '<xml>{}</xml>'.format(''.join(xml))
-
-    # 返回32为 时间戳
-    def generateRandomStamping(self):
-        return str(uuid.uuid4()).replace('-', '')
-
-    # 生成二维码
-    # def create_qrcode(self, url):
-    #     img = qrcode.make(url)
-    #     img.get_image().show()
-    #     img.save('hello.png')
-
-    # 生成 签名
-    def shengchengsign(self, result_data, KEY=None):
-        ret = []
-        for k in sorted(result_data.keys()):
-            if (k != 'sign') and (k != '') and (result_data[k] is not None):
-                ret.append('%s=%s' % (k, result_data[k]))
-        stringA = '&'.join(ret)
-        stringSignTemp = stringA
-        if KEY:
-            stringSignTemp = '{stringA}&key={key}'.format(
-                stringA=stringA,
-                key=KEY
-            )
-        return stringSignTemp
+        self.mch_id = '1488841842'      # 支付商户号
+        self.SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'        # 商户api 密钥
 
     # 生成订单号
     def shengcheng_dingdanhao(self):
@@ -59,7 +18,7 @@ class weixin_pay_api(object):
 
     # 预支付功能
     def yuzhifu(self, data):
-        mch_id, SHANGHUKEY = self.get_pay_info()
+        # mch_id, SHANGHUKEY = self.get_pay_info()
         openid = data.get('openid')
         total_fee = data.get('total_fee')
         appid = data.get('appid')
@@ -68,7 +27,7 @@ class weixin_pay_api(object):
         dingdanhao = self.shengcheng_dingdanhao()       # 生成订单号
         result_data = {
             'appid': appid,                             # appid
-            'mch_id': mch_id,                           # 商户号
+            'mch_id': self.mch_id,                           # 商户号
             'nonce_str': self.generateRandomStamping(), # 32位随机值a
             'openid': openid,                           # 微信用户唯一标识
             'body': '天眼-会员续费'.encode('utf8'),       # 描述
@@ -78,45 +37,37 @@ class weixin_pay_api(object):
             'notify_url': 'http://api.zhugeyingxiao.com/tianyan/wxpay', # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
             'trade_type': 'JSAPI'
         }
-        stringSignTemp = self.shengchengsign(result_data, KEY=SHANGHUKEY)
-        result_data['sign'] = self.md5(stringSignTemp).upper()
+        string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
+        result_data['sign'] = self.md5(string_sign_temp).upper()
         xml_data = self.toXml(result_data)
         ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
         ret.encoding = 'utf8'
 
-        DOMTree = xmldom.parseString(ret.text)
-        collection = DOMTree.documentElement
+        dom_tree = xmldom.parseString(ret.text)
+        collection = dom_tree.documentElement
         data = ['return_code', 'return_msg']
-        resultData = xmldom_parsing.xmldom(collection, data)
+        result_data = xmldom_parsing.xmldom(collection, data)
         data = ['prepay_id']
         prepay_id = xmldom_parsing.xmldom(collection, data)
         ret_data = {
-            'return_code':resultData['return_code'],
-            'return_msg':resultData['return_msg'],
-            'dingdanhao':dingdanhao,
-            'prepay_id':prepay_id,
+            'return_code': result_data['return_code'],
+            'return_msg': result_data['return_msg'],
+            'dingdanhao': dingdanhao,
+            'prepay_id': prepay_id,
         }
         return ret_data
 
-
     # 回调 判断是否支付成功
     def weixin_back_pay(self, result_data):
-        mch_id, SHANGHUKEY = self.get_pay_info()
         url = 'https://api.mch.weixin.qq.com/pay/orderquery'
-        stringSignTemp = self.shengchengsign(result_data, SHANGHUKEY)
-        result_data['sign'] = self.md5(stringSignTemp).upper()
+        string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
+        result_data['sign'] = self.md5(string_sign_temp).upper()
         xml_data = self.toXml(result_data)
         ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
         ret.encoding = 'utf8'
-        DOMTree = xmldom.parseString(ret.text)
-        collection = DOMTree.documentElement
+        dom_tree = xmldom.parseString(ret.text)
+        collection = dom_tree.documentElement
         return_code = collection.getElementsByTagName("return_code")[0].childNodes[0].data
 
         return return_code
-
-    # 获取支付信息
-    def get_pay_info(self):
-        mch_id = '1488841842'
-        SHANGHUKEY = 'fk1hzTGe5G5qt2mlR8UD5AqOgftWuTsK'
-        return mch_id, SHANGHUKEY
 
