@@ -4,7 +4,7 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm
+from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike
 import json
 
 import requests
@@ -59,7 +59,8 @@ def article(request):
                 team_user_objs = models.user_share_article.objects.filter(share_article__in=team_user_list)
                 for i in team_user_objs:
                     article_list.append(i.share_article_id)
-                q.add(Q(id__in=article_list), Q.AND)
+                print('article_list----------------> ', article_list)
+                q.add(Q(**{'id__in':article_list}), Q.AND)
 
 
             if classify_objs:
@@ -77,7 +78,7 @@ def article(request):
                 stop_line = start_line + length
                 objs = objs[start_line: stop_line]
 
-            # 返回的数据
+            # 返回的数据s
             ret_data = []
 
             for obj in objs:
@@ -238,6 +239,7 @@ def article_oper(request, oper_type, o_id):
                 # print(forms_obj.errors.as_json())
                 #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
+
     else:
         if oper_type == "share_article":
             code = request.GET.get('code')
@@ -327,7 +329,51 @@ def article_oper(request, oper_type, o_id):
 
             response.code = 200
             response.msg = "打开文章关联成功"
-        # response.code = 402
-        # response.msg = "请求异常"
+
+        else:
+            response.code = 402
+            response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)
+
+
+def give_a_like(request):
+    response = Response.ResponseObj()
+    form_data = {
+        'article_id': request.GET.get('article_id'),
+        'customer_id': request.GET.get('customer_id')
+    }
+
+    form_obj = GiveALike(form_data)
+    if form_obj.is_valid():
+        customer_id = form_obj.cleaned_data.get('customer_id')
+        article_id = form_obj.cleaned_data.get('article_id')
+
+        objs = models.SelectClickArticleLog.objects.filter(customer_id=customer_id, article_id=article_id)
+
+        response.code = 200
+        response.msg = '点赞成功'
+        if objs:
+            if objs[0].is_click:
+                is_click = False
+                response.msg = '取消点赞'
+            else:
+                is_click = True
+            objs.update(is_click=is_click)
+        else:
+            models.SelectClickArticleLog.objects.create(**{
+                'customer_id':customer_id,
+                'article_id':article_id
+            })
+
+    return JsonResponse(response.__dict__)
+
+
+
+
+
+
+
+
+
+

@@ -221,3 +221,33 @@ class SelectForm(forms.Form):
                     return int(classify_type)
         else:
             self.add_error('classify_type', '请选择一项分类')
+
+
+# 点赞
+class GiveALike(forms.Form):
+    article_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "文章ID不能为空"
+        }
+    )
+    customer_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "客户ID不能为空"
+        }
+    )
+
+    def clean_article_id(self):
+        article_id = self.data.get('article_id')
+        if models.Article.objects.filter(id=article_id):
+            return article_id
+        else:
+            self.add_error('article_id', '文章不存在')
+
+    def clean_customer_id(self):
+        customer_id = self.data.get('customer_id')
+        if models.Customer.objects.filter(id=customer_id):
+            return customer_id
+        else:
+            self.add_error('customer_id', '客户ID不存在')
