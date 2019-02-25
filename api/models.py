@@ -137,6 +137,14 @@ class SelectArticleLog(models.Model):
     close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
+# 客户点赞文章日志表
+class SelectClickArticleLog(models.Model):
+    customer = models.ForeignKey('Customer', verbose_name="查看人")
+    article = models.ForeignKey('Article', verbose_name="点赞文章")
+    is_click = models.BooleanField(verbose_name='是否点赞', default=True)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+
 
 # 团队表
 class Team(models.Model):
