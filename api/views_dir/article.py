@@ -52,11 +52,12 @@ def article(request):
             article_list = []
             # 团队
             if team_list and len(team_list) >= 1:
-                team_objs = models.UserprofileTeam.objects.filter(team__in=json.loads(team_list)).values('user_id').distinct()
+                team_objs = models.UserprofileTeam.objects.filter(team_id__in=json.loads(team_list)).values('user_id').distinct()
                 team_user_list = []
                 for team_obj in team_objs:
                     team_user_list.append(team_obj['user_id'])
-                team_user_objs = models.user_share_article.objects.filter(share_article__in=team_user_list)
+                print('team_user_list--------------> ', team_user_list )
+                team_user_objs = models.user_share_article.objects.filter(share_user_id__in=team_user_list)
                 for i in team_user_objs:
                     article_list.append(i.share_article_id)
                 print('article_list----------------> ', article_list)
