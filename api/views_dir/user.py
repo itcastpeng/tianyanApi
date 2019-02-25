@@ -61,6 +61,7 @@ def user(request):
                     'set_avator': obj.set_avator,
                     'qr_code': obj.qr_code,
                     'brand_list': brand_list,
+                    'team_list': team_list,
                     'vip_type': obj.get_vip_type_display(),
                 })
             #  查询成功 返回200 状态码
