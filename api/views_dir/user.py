@@ -40,14 +40,14 @@ def user(request):
                 stop_line = start_line + length
                 objs = objs[start_line: stop_line]
 
-            # 返回的数据
-            team_list = []
-            team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)
-            for team_obj in team_objs:
-                team_list.append(team_obj.team_id)
 
             ret_data = []
             for obj in objs:
+                # 返回的数据
+                team_list = []
+                team_objs = models.UserprofileTeam.objects.filter(user_id=obj.id)
+                for team_obj in team_objs:
+                    team_list.append(team_obj.team_id)
                 brand_list = [i['name'] for i in obj.brand_classify.values('name')]
                 #  将查询出来的数据 加入列表
                 ret_data.append({
@@ -69,7 +69,6 @@ def user(request):
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
-                'team_list': team_list,
             }
             response.note = {
                 'id': "用户id",
