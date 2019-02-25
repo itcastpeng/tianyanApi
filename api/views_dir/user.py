@@ -18,6 +18,7 @@ def user(request):
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
+            user_id = request.GET.get('user_id')
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
@@ -40,8 +41,12 @@ def user(request):
                 objs = objs[start_line: stop_line]
 
             # 返回的数据
-            ret_data = []
+            team_list = []
+            team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)
+            for team_obj in team_objs:
+                team_list.append(team_obj.team_id)
 
+            ret_data = []
             for obj in objs:
                 brand_list = [i['name'] for i in obj.brand_classify.values('name')]
                 #  将查询出来的数据 加入列表
@@ -64,6 +69,7 @@ def user(request):
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
+                'team_list': team_list,
             }
             response.note = {
                 'id': "用户id",
@@ -77,6 +83,7 @@ def user(request):
                 'qr_code': "微信二维码",
                 'vip_type': "会员类型",
                 'brand_list': "公司/品牌列表",
+                'team_list': "团队ID数组",
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)

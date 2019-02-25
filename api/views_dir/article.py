@@ -23,6 +23,7 @@ from publicFunc.account import get_token
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
+    team_list = request.GET.get('team_list')
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
@@ -47,6 +48,19 @@ def article(request):
                 classify_objs = user_obj.recommend_classify.all()
             elif classify_type == 2:    # 品牌分类
                 classify_objs = user_obj.brand_classify.all()
+
+            article_list = []
+            # 团队
+            if team_list and len(team_list) >= 1:
+                team_objs = models.UserprofileTeam.objects.filter(team__in=json.loads(team_list)).values('user_id').distinct()
+                team_user_list = []
+                for team_obj in team_objs:
+                    team_user_list.append(team_obj['user_id'])
+                team_user_objs = models.user_share_article.objects.filter(share_article__in=team_user_list)
+                for i in team_user_objs:
+                    article_list.append(i.share_article_id)
+                q.add(Q(id__in=article_list), Q.AND)
+
 
             if classify_objs:
                 classify_id_list = [obj.id for obj in classify_objs]
