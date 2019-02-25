@@ -157,6 +157,12 @@ class Classify(models.Model):
         blank=True
     )  # 该字段为空，表示为默认(推荐)分类，不为空表示品牌分类
 
+# 用户分享的文章
+class user_share_article(models.Model):
+    share_user = models.ForeignKey('Userprofile', verbose_name='分享的用户',
+        related_name="user_share_article_share_user", null=True)
+    share_article = models.ForeignKey('Article', verbose_name='分享的文章')
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 # 文章管理
 class Article(models.Model):

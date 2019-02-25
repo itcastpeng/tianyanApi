@@ -1,6 +1,7 @@
 from django import forms
 
 from api import models
+import json
 # from publicFunc import account
 # import time
 
@@ -172,10 +173,16 @@ class SelectForm(forms.Form):
     )
 
     classify_type = forms.IntegerField(
-        required=True,
+        required=False,
         error_messages={
             'required': "分类类型不能为空",
             'invalid': "分类类型只能为整数"
+        }
+    )
+    team_list = forms.CharField(
+        required=False,
+        error_messages={
+            'invalid': "团队分类"
         }
     )
 
@@ -195,8 +202,22 @@ class SelectForm(forms.Form):
 
     def clean_classify_type(self):
         classify_type = self.data.get('classify_type')
-        # print('classify_type -->', classify_type, type(classify_type))
-        if classify_type not in ["1", "2"]:
-            self.add_error('classify_id', '分类类型传参异常')
+        team_list = self.data.get('team_list')
+        if team_list or classify_type:
+            if team_list:
+                team_list = json.loads(team_list)
+                if len(team_list) >= 1:
+                    print('=======================')
+                    if models.UserprofileTeam.objects.filter(team__in=team_list):
+                        return team_list
+                    else:
+                        self.add_error('team_list', '团队不存在')
+                else:
+                    self.add_error('team_list', '团队ID不能为空')
+            else:
+                if classify_type not in ["1", "2"]:
+                    self.add_error('classify_id', '分类类型传参异常')
+                else:
+                    return int(classify_type)
         else:
-            return int(classify_type)
+            self.add_error('classify_type', '请选择一项分类')
