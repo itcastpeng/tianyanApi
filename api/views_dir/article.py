@@ -116,6 +116,9 @@ def article(request):
                 'classify_name': "所属分类名称",
                 'create_datetime': "创建时间",
                 'cover_img': "封面图",
+                'create_user_id': "创建人ID",
+                'create_user__name': "创建人姓名",
+                'create_user__set_avator': "创建人头像",
             }
         else:
             response.code = 301
