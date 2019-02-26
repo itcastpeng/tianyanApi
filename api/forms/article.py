@@ -63,10 +63,8 @@ class AddForm(forms.Form):
 
     # P标签分离 数组格式存入
     def clean_content(self):
-        content = json.dumps(self.data.get('content'))
-        soup = BeautifulSoup(content, 'lxml')
-        content = soup.find_all('p')
-        return content
+        content = self.data.get('content')
+        return json.dumps(content)
 
 # 更新
 class UpdateForm(forms.Form):
