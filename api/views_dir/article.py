@@ -4,7 +4,7 @@ from publicFunc import account
 from django.http import JsonResponse
 
 from publicFunc.condition_com import conditionCom
-from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike
+from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm
 import json
 
 import requests
@@ -92,6 +92,9 @@ def article(request):
                     'like_num': obj.like_num,
                     'classify_id': obj.classify_id,
                     'classify_name': obj.classify.name,
+                    'create_user_id': obj.create_user_id,
+                    'create_user__name': obj.create_user.name,
+                    'create_user__set_avator': obj.create_user.set_avator,
                     'cover_img': obj.cover_img,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
@@ -335,40 +338,44 @@ def article_oper(request, oper_type, o_id):
 
         # 热门文章查询
         elif oper_type == 'popula_articles':
-            current_page = request.GET.get('current_page')
-            length = request.GET.get('length')
-            objs = models.Article.objects.filter(title__isnull=False).order_by('look_num')
-            if length != 0:
-                start_line = (current_page - 1) * length
-                stop_line = start_line + length
-                objs = objs[start_line: stop_line]
+            form_obj = PopulaSelectForm(request.GET)
+            if form_obj.is_valid():
+                current_page = form_obj.cleaned_data['current_page']
+                length = form_obj.cleaned_data['length']
+                objs = models.Article.objects.filter(title__isnull=False).order_by('look_num')
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
 
-            count = objs.count()
-            #  将查询出来的数据 加入列表
-            ret_data = []
-            for obj in objs:
-                ret_data.append({
-                    'id': obj.id,
-                    'title': obj.title,
-                    # 'content': obj.content,
-                    # 'look_num': obj.look_num,
-                    # 'like_num': obj.like_num,
-                    # 'classify_id': obj.classify_id,
-                    # 'classify_name': obj.classify.name,
-                    'cover_img': obj.cover_img,
-                    # 'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                })
-            response.code = 200
-            response.msg = '查询成功'
-            response.data = {
-                'ret_data':ret_data,
-                'count':count
-            }
-            response.note = {
-                'title': '文章标题',
-                'cover_img': '文章封面'
-            }
-
+                count = objs.count()
+                #  将查询出来的数据 加入列表
+                ret_data = []
+                for obj in objs:
+                    ret_data.append({
+                        'id': obj.id,
+                        'title': obj.title,
+                        # 'content': obj.content,
+                        # 'look_num': obj.look_num,
+                        # 'like_num': obj.like_num,
+                        # 'classify_id': obj.classify_id,
+                        # 'classify_name': obj.classify.name,
+                        'cover_img': obj.cover_img,
+                        # 'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    })
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data':ret_data,
+                    'count':count
+                }
+                response.note = {
+                    'title': '文章标题',
+                    'cover_img': '文章封面'
+                }
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
         else:
             response.code = 402
             response.msg = "请求异常"
