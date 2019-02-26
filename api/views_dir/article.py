@@ -387,7 +387,7 @@ def article_oper(request, oper_type, o_id):
 
         # 临时转换文章内容为数组
         elif oper_type == 'linshi':
-            objs = models.Article.objects.filter(id=o_id)
+            objs = models.Article.objects.all()
             for obj in objs:
                 soup = BeautifulSoup(obj.content, 'lxml')
                 p_tag = soup.find_all('p')
@@ -398,6 +398,7 @@ def article_oper(request, oper_type, o_id):
                 content = json.dumps(str(content))
                 obj.content = content
                 obj.save()
+            response.code = 200
 
 
         else:
