@@ -79,26 +79,31 @@ def article(request):
                 stop_line = start_line + length
                 objs = objs[start_line: stop_line]
 
+            id = request.GET.get('id')
             # 返回的数据s
             ret_data = []
-
             for obj in objs:
-                #  将查询出来的数据 加入列表
-                ret_data.append({
+                result_data = {
                     'id': obj.id,
                     'title': obj.title,
-                    'content': obj.content,
                     'look_num': obj.look_num,
                     'like_num': obj.like_num,
                     'classify_id': obj.classify_id,
                     'classify_name': obj.classify.name,
                     'create_user_id': obj.create_user_id,
-                    'create_user__name': obj.create_user.name,
-                    'create_user__set_avator': obj.create_user.set_avator,
                     'cover_img': obj.cover_img,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                })
-            #  查询成功 返回20s0 状态码
+                }
+                if id: # 如果查询详情 返回文章内容 否则数据过大
+                    result_data['content'] = obj.content
+
+                if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
+                    result_data['create_user__name'] = obj.create_user.name
+                    result_data['create_user__set_avator'] = obj.create_user.set_avator
+
+                #  将查询出来的数据 加入列表
+                ret_data.append(result_data)
+
             response.code = 200
             response.msg = '查询成功'
             response.data = {
@@ -148,10 +153,11 @@ def article_oper(request, oper_type, o_id):
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
                 print("验证通过")
-                # print(forms_obj.cleaned_data)
                 #  添加数据库
-                # print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
+                print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
+
                 obj = models.Article.objects.create(**forms_obj.cleaned_data)
+
                 cover_img_list = [
                     'http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png',
                     'http://tianyan.zhangcong.top/statics/img/ca47a146ff6b6b7f45742742326075cdnews3.png',
@@ -160,6 +166,7 @@ def article_oper(request, oper_type, o_id):
                     'http://tianyan.zhangcong.top/statics/img/1f75da72013edbb7fcaae9660ca55cbenews5.png'
                                   ]
                 cover_img = random.sample(cover_img_list, 1)
+
                 obj.cover_img = cover_img[0]
                 obj.save()
                 response.code = 200
@@ -167,9 +174,7 @@ def article_oper(request, oper_type, o_id):
                 response.data = {'id': obj.id}
             else:
                 print("验证不通过")
-                # print(forms_obj.errors)
                 response.code = 301
-                # print(forms_obj.errors.as_json())
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # elif oper_type == "delete":

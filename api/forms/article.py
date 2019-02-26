@@ -1,5 +1,5 @@
 from django import forms
-
+from bs4 import BeautifulSoup
 from api import models
 import json
 # from publicFunc import account
@@ -61,6 +61,12 @@ class AddForm(forms.Form):
         else:
             return classify_id
 
+    # P标签分离 数组格式存入
+    def clean_content(self):
+        content = json.dumps(self.data.get('content'))
+        soup = BeautifulSoup(content, 'lxml')
+        content = soup.find_all('p')
+        return content
 
 # 更新
 class UpdateForm(forms.Form):
