@@ -16,7 +16,7 @@ from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc import base64_encryption
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
-
+from bs4 import BeautifulSoup
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -95,7 +95,7 @@ def article(request):
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 }
                 if id: # 如果查询详情 返回文章内容 否则数据过大
-                    result_data['content'] = obj.content
+                    result_data['content'] = eval(json.loads(obj.content))
 
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
                     result_data['create_user__name'] = obj.create_user.name
@@ -167,11 +167,11 @@ def article_oper(request, oper_type, o_id):
                                   ]
                 cover_img = random.sample(cover_img_list, 1)
 
-                obj.cover_img = cover_img[0]
-                obj.save()
-                response.code = 200
-                response.msg = "添加成功"
-                response.data = {'id': obj.id}
+                # obj.cover_img = cover_img[0]
+                # obj.save()
+                # response.code = 200
+                # response.msg = "添加成功"
+                # response.data = {'id': obj.id}
             else:
                 print("验证不通过")
                 response.code = 301
@@ -384,6 +384,22 @@ def article_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
+
+        # 临时转换文章内容为数组
+        elif oper_type == 'linshi':
+            objs = models.Article.objects.filter(id=o_id)
+            for obj in objs:
+                soup = BeautifulSoup(obj.content, 'lxml')
+                p_tag = soup.find_all('p')
+                content = []
+                for i in p_tag:
+                    content.append(str(i))
+                print(content)
+                content = json.dumps(str(content))
+                obj.content = content
+                obj.save()
+
+
         else:
             response.code = 402
             response.msg = "请求异常"
