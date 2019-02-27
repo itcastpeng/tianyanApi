@@ -214,28 +214,32 @@ def day_eye_oper(request, oper_type, o_id):
                 ret_data = []
                 remote_type = request.GET.get('remote_type')
 
+                num = 0
                 for obj in objs:
+                    create_datetime = obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S')
                     remote_obj = eval(obj.remote)
                     remote = remote_obj.get('remote')
                     title = remote_obj.get('title')
                     create_date = remote_obj.get('create_date')
 
-                    if int(remote_type) == 1:
+                    if int(remote_type) == 2:
                         ret_data.append({
-                            'remote': remote
-                        })
-                    elif int(remote_type) == 2:
-                        ret_data.append({
-                            'remote': remote,
                             'create_date': create_date,
+                            'title': title,
+                        })
+                    elif int(remote_type) == 3:
+                        ret_data.append({
                             'title': title,
                         })
                     else:
                         ret_data.append({
-                            'remote': remote,
-                            'title': title,
+
                         })
 
+                    ret_data[num]['create_datetime'] = create_datetime
+                    ret_data[num]['remote'] = remote
+                    ret_data[num]['id'] = obj.id
+                    num += 1
                 remote_type_choices = []
                 for i in models.customer_information_the_user.remote_type_choices:
                     remote_type_choices.append({
@@ -251,6 +255,13 @@ def day_eye_oper(request, oper_type, o_id):
                     'ret_data': ret_data,
                 }
 
+                response.note = {
+                    'create_datetime':'创建时间',
+                    'remote':'备注',
+                    'id':'备注ID',
+                    'create_date':'用户自定时间',
+                    'title':'标题',
+                }
             # 谁看了我 详情
             elif oper_type == 'day_eye_detail':
                 user_id = forms_obj.cleaned_data['user_id']
