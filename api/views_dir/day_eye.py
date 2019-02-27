@@ -183,14 +183,15 @@ def day_eye_oper(request, oper_type, o_id):
             # 删除客户信息备注
             elif oper_type == 'delete':
                 customer_id = request.POST.get('customer_id')
+                print(user_id,customer_id)
                 if customer_id:
                     objs = models.customer_information_the_user.objects.filter(
-                        user_id=user_id ,
-                        customer_id=o_id
+                        user_id=user_id,
+                        customer_id=customer_id
                     )
                 else:
                     objs = models.customer_information_the_user.objects.filter(id=o_id)
-
+                print('user-----> ', objs)
                 if not objs:
                     response.code = 301
                     response.msg = '刪除数据不存在'
