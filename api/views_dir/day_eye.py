@@ -265,7 +265,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'customer__set_avator': obj.customer.set_avator,
                 }
 
-                objs = article_objs.values('article_id', 'article__title').annotate(Count('id'))
+                objs = article_objs.values('article_id', 'article__title', 'article__cover_img').annotate(Count('id'))
 
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -298,6 +298,7 @@ def day_eye_oper(request, oper_type, o_id):
                         'article__title': obj.get('article__title'),
                         'article_info': '看了' + str(obj.get('id__count')) + '次' + '-' + after_time + '前',
                         'time_detail': time_detail,
+                        'article__cover_img': obj.get('article__cover_img'),
                     })
 
                 response.code = 200
@@ -318,6 +319,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'article_info': "看了几次 最后一次查看时间",
                     'time_length': "时长",
                     'select_datetime': "查看时间",
+                    'article__cover_img': "文章图片",
                 }
 
             # 按文章查看(天眼功能)列表页

@@ -386,19 +386,19 @@ def article_oper(request, oper_type, o_id):
                 response.msg = json.loads(form_obj.errors.as_json())
 
         # 临时转换文章内容为数组
-        elif oper_type == 'linshi':
-            objs = models.Article.objects.all()
-            for obj in objs:
-                soup = BeautifulSoup(obj.content, 'lxml')
-                p_tag = soup.find_all('p')
-                content = []
-                for i in p_tag:
-                    content.append(str(i))
-                print(content)
-                content = json.dumps(str(content))
-                obj.content = content
-                obj.save()
-            response.code = 200
+        # elif oper_type == 'linshi':
+        #     objs = models.Article.objects.all()
+        #     for obj in objs:
+        #         soup = BeautifulSoup(obj.content, 'lxml')
+        #         p_tag = soup.find_all('p')
+        #         content = []
+        #         for i in p_tag:
+        #             content.append(str(i))
+        #         print(content)
+        #         content = json.dumps(str(content))
+        #         obj.content = content
+        #         obj.save()
+        #     response.code = 200
 
 
         else:
