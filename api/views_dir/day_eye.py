@@ -182,7 +182,15 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 删除客户信息备注
             elif oper_type == 'delete':
-                objs = models.customer_information_the_user.objects.filter(id=o_id)
+                customer_id = request.POST.get('customer_id')
+                if customer_id:
+                    objs = models.customer_information_the_user.objects.filter(
+                        user_id=user_id ,
+                        customer_id=o_id
+                    )
+                else:
+                    objs = models.customer_information_the_user.objects.filter(id=o_id)
+
                 if not objs:
                     response.code = 301
                     response.msg = '刪除数据不存在'
@@ -262,6 +270,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'create_date':'用户自定时间',
                     'title':'标题',
                 }
+
             # 谁看了我 详情
             elif oper_type == 'day_eye_detail':
                 user_id = forms_obj.cleaned_data['user_id']
@@ -277,6 +286,7 @@ def day_eye_oper(request, oper_type, o_id):
                 }
 
                 objs = article_objs.values('article_id', 'article__title', 'article__cover_img').annotate(Count('id'))
+                is_remake_count = models.customer_information_the_user.objects.filter(user_id=user_id, customer_id=o_id).count()
 
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -284,6 +294,10 @@ def day_eye_oper(request, oper_type, o_id):
                     objs = objs[start_line: stop_line]
 
                 count = objs.count()
+
+                is_remake = False
+                if is_remake_count >= 1:
+                    is_remake = True
 
                 ret_data = []
                 for obj in objs:
@@ -318,6 +332,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'customer_info': customer_info,
                     'ret_data': ret_data,
                     'data_count': count,
+                    'is_remake': is_remake,
                 }
                 response.note = {
                     'customer_id': "客户id",
@@ -331,6 +346,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'time_length': "时长",
                     'select_datetime': "查看时间",
                     'article__cover_img': "文章图片",
+                    'is_remake': "该客户是否有备注(如果有那么可删除)",
                 }
 
             # 按文章查看(天眼功能)列表页
