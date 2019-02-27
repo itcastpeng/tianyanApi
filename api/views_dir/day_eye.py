@@ -39,7 +39,7 @@ def get_min_s(start_time=None, stop_time=None, ms=None):
         return days + hours + mins + seconds
 
 
-# cerf  token验证 谁看了我(列表)
+# cerf  token验证 谁看了我(列s表)
 @account.is_token(models.Userprofile)
 def day_eye(request):
     response = Response.ResponseObj()
@@ -212,29 +212,17 @@ def day_eye_oper(request, oper_type, o_id):
                 count = objs.count()
 
                 ret_data = []
-                remote_type = request.GET.get('remote_type')
 
                 for obj in objs:
                     remote_obj = eval(obj.remote)
                     remote = remote_obj.get('remote')
                     title = remote_obj.get('title')
                     create_date = remote_obj.get('create_date')
-
-                    if int(remote_type) == 1:
-                        ret_data.append({
-                            'remote': remote
-                        })
-                    elif int(remote_type) == 2:
-                        ret_data.append({
-                            'remote': remote,
-                            'create_date': create_date,
-                            'title': title,
-                        })
-                    else:
-                        ret_data.append({
-                            'remote': remote,
-                            'title': title,
-                        })
+                    ret_data.append({
+                        'remote': remote,
+                        'create_date': create_date,
+                        'title': title,
+                    })
 
                 remote_type_choices = []
                 for i in models.customer_information_the_user.remote_type_choices:

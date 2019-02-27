@@ -86,21 +86,26 @@ class AddForm(forms.Form):
             'required': "创建时间类型错误"
         }
     )
-
+    customer_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'required': "客户不能为空"
+        }
+    )
     def clean_remote_type(self):
         remote_type = int(self.data.get('remote_type'))
         title = self.data.get('title')
         create_date = self.data.get('create_date')
 
-        if remote_type in [2, 3]:
+        if remote_type in [1, 2, 3]:
             if not title:
                 self.add_error('remote_type', '请备注产品名称')
-        if remote_type == 2:
-            if not create_date:
+            elif not create_date:
                 self.add_error('remote_type', '请填写产品购买时间')
-
-        return remote_type
-
+            else:
+                return remote_type
+        else:
+            self.add_error('remote_type', '选择备注类型')
 
 # 修改客户备注
 class UpdateForm(forms.Form):
@@ -131,7 +136,6 @@ class UpdateForm(forms.Form):
             'required': "标题类型错误"
         }
     )
-
     create_date = forms.CharField(
         required=False,
         error_messages={
@@ -150,14 +154,16 @@ class UpdateForm(forms.Form):
                 title = self.data.get('title')
                 create_date = self.data.get('create_date')
 
-                if remote_type in [2, 3]:
+                if remote_type in [1, 2, 3]:
                     if not title:
-                        self.add_error('o_id', '请备注产品名称')
-                if remote_type == 2:
-                    if not create_date:
-                        self.add_error('o_id', '请填写产品购买时间')
+                        self.add_error('remote_type', '请备注产品名称')
+                    elif not create_date:
+                        self.add_error('remote_type', '请填写产品购买时间')
+                    else:
+                        return o_id, remote_type
+                else:
+                    self.add_error('remote_type', '选择备注类型')
 
-                return o_id, remote_type
             else:
                 self.add_error('o_id', '暂无权限')
         else:
