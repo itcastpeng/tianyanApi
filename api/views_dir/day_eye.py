@@ -493,9 +493,9 @@ def day_eye_oper(request, oper_type, o_id):
                         'customer_remake': '',
                         'customer_demand': [],
                         'customer_label': {
-                            'xueli': 1,
-                            'diqu': '',
-                            'guanxi': 1,
+                            'xueli': '初中',
+                            'diqu': '北京',
+                            'guanxi': '朋友',
                             'qinmidu': 1,
                             'yingxiangli': 1,
                             'qituxin': 1,
