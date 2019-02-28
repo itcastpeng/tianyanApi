@@ -491,7 +491,7 @@ def day_eye_oper(request, oper_type, o_id):
                         'customer_professional': '',
                         'customer_birthday': '',
                         'customer_remake': '',
-                        'customer_demand': '',
+                        'customer_demand': [],
                         'customer_label': {
                             'xueli': 1,
                             'diqu': '',
@@ -592,16 +592,3 @@ def day_eye_oper(request, oper_type, o_id):
 
     return JsonResponse(response.__dict__)
 
-
-p = {
-    'customer_sex':'',
-    'customer_set_avator':'',
-    'customer_name':'',
-    'customer_wechat':'',
-    'customer_phone':'',
-    'customer_professional':'',
-    'customer_birthday':'',
-    'customer_remake':'',
-    'customer_demand':'',
-    'customer_label':{},
-}
