@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.day_eye import SelectForm, AddForm, UpdateForm
 from django.db.models import Count
-from publicFunc.base64_encryption import b64decode
+from publicFunc.base64_encryption import b64decode, b64encode
 import json
 import datetime
 
@@ -526,7 +526,8 @@ def day_eye_oper(request, oper_type, o_id):
                 if info.get('customer_set_avator'):
                     customer_set_avator = info.get('customer_set_avator')
 
-                customer_name = obj.customer.name
+                customer = b64decode(obj.customer.name)
+                customer_name = customer
                 if info.get('customer_name'):
                     customer_name = info.get('customer_name')
 
@@ -534,7 +535,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'customer_sex': customer_sex,
                     'customer_set_avator': customer_set_avator,
                     'customer_name': customer_name,
-                    'customer_wechat': obj.customer.name,
+                    'customer_wechat': customer,
                     'customer_phone': info.get('customer_phone'),
                     'customer_professional': info.get('customer_professional'),
                     'customer_birthday': info.get('customer_birthday'),
