@@ -82,7 +82,7 @@ class UserprofileTeam(models.Model):
 
 # 客户表(用户的客户)
 class Customer(models.Model):
-    name = models.CharField(verbose_name="姓名", max_length=128)
+    name = models.CharField(verbose_name="微信姓名", max_length=128)
 
     sex_choices = (
         (1, "男"),
@@ -119,6 +119,12 @@ class customer_information_the_user(models.Model):
 
     remote = models.TextField(verbose_name="记录信息，存json格式", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+# 用户备注客户信息
+class user_comments_customer_information(models.Model):
+    customer = models.ForeignKey('Customer', verbose_name="客户")
+    user = models.ForeignKey(to='Userprofile', verbose_name='用户', null=True, blank=True)
+    customer_info = models.TextField(verbose_name='客户信息', null=True, blank=True)
 
 
 # 客户查看文章日志表
