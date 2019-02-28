@@ -114,7 +114,6 @@ def day_eye_oper(request, oper_type, o_id):
         current_page = forms_obj.cleaned_data['current_page']
         length = forms_obj.cleaned_data['length']
         order = request.GET.get('order', '-create_datetime')
-
         if request.method == "POST":
             form_data = {
                 'o_id': o_id,
@@ -200,6 +199,52 @@ def day_eye_oper(request, oper_type, o_id):
                     response.code = 200
                     response.msg = '删除成功'
 
+
+            # 添加客户资料
+            elif oper_type == 'add_customer_info':
+                pass
+
+            # 修改客户资料
+            elif oper_type == 'update_customer_info':
+                customer_info = request.POST.get('customer_info')
+                objs = models.user_comments_customer_information.objects.filter(
+                    user_id=user_id,
+                    customer_id=o_id
+                )
+
+                if objs:
+                    objs.update(customer_info=customer_info)
+                else:
+                    objs.create(
+                        customer_info=customer_info,
+                        user_id=user_id,
+                        customer_id=o_id
+                    )
+                response.code = 200
+                response.msg = '保存成功'
+                response.note = {
+                    'customer_info':'用户所有信息',
+                    'customer_sex': '用户性别 默认微信性别',
+                    'customer_set_avator': '用户头像 默认微信头像',
+                    'customer_name': '用户姓名 备注 默认微信名称',
+                    'customer_wechat': '用户微信名称',
+                    'customer_phone': '用户电话',
+                    'customer_professional': '用户职业',
+                    'customer_birthday': '用户生日',
+                    'customer_remake': '用户备注',
+                    'customer_demand': '用户需求',
+                    'customer_label': {
+                        'xueli':'学历ID',
+                        'diqu':'地区名称',
+                        'guanxi':'关系',
+                        'qinmidu':'亲密度',
+                        'yingxiangli':'影响力',
+                        'qituxin':'企图心',
+                        'shiyetaidu':'事业态度',
+                        'renmaiquan':'人脉圈',
+                        'jingjinengli':'经济能力',
+                    },
+                }
         else:
 
             # 查询客户信息备注
@@ -398,7 +443,7 @@ def day_eye_oper(request, oper_type, o_id):
                     inviter_id=user_id,
                     article_id=o_id
                 )
-                objs = article_obj.values('customer_id', 'customer__name').distinct().annotate(Count('id'))
+                objs = article_obj.values('customer_id', 'customer__name', 'customer__set_avator').distinct().annotate(Count('id'))
 
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -412,6 +457,7 @@ def day_eye_oper(request, oper_type, o_id):
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
                     ret_data.append({
                         'customer_id': obj['customer_id'],
+                        'customer__set_avator': obj['customer__set_avator'],
                         'customer__name': b64decode(obj['customer__name']),
                         'article_info': '看了' + str(obj['id__count']) + '次-' + after_time + '前',
                     })
@@ -428,6 +474,113 @@ def day_eye_oper(request, oper_type, o_id):
                     'article_info': '该人查看该文章 总数/ 时长',
                 }
 
+            # 查询客户资料
+            elif oper_type == 'get_customer_info':
+                objs = models.user_comments_customer_information.objects.filter(
+                    user_id=user_id,
+                    customer_id=o_id
+                )
+
+                if not objs:
+                    customer_info = {
+                        'customer_sex': '',
+                        'customer_set_avator': '',
+                        'customer_name': '',
+                        'customer_wechat': '',
+                        'customer_phone': '',
+                        'customer_professional': '',
+                        'customer_birthday': '',
+                        'customer_remake': '',
+                        'customer_demand': '',
+                        'customer_label': {
+                            'xueli': 1,
+                            'diqu': '',
+                            'guanxi': 1,
+                            'qinmidu': 1,
+                            'yingxiangli': 1,
+                            'qituxin': 1,
+                            'shiyetaidu': 1,
+                            'renmaiquan': 1,
+                            'jingjinengli': 1,
+                        },
+                    }
+                    models.user_comments_customer_information.objects.create(
+                        user_id=user_id,
+                        customer_id=o_id,
+                        customer_info=customer_info
+                    )
+
+                    objs = models.user_comments_customer_information.objects.filter(
+                        user_id=user_id,
+                        customer_id=o_id
+                    )
+
+                obj = objs[0]
+                info = eval(obj.customer_info)
+
+                customer_sex = obj.customer.sex
+                if info.get('customer_sex'):
+                    customer_sex = info.get('customer_sex')
+
+                customer_set_avator = obj.customer.set_avator
+                if info.get('customer_set_avator'):
+                    customer_set_avator = info.get('customer_set_avator')
+
+                customer_name = obj.customer.name
+                if info.get('customer_name'):
+                    customer_name = info.get('customer_name')
+
+                ret_data = {
+                    'customer_sex': customer_sex,
+                    'customer_set_avator': customer_set_avator,
+                    'customer_name': customer_name,
+                    'customer_wechat': obj.customer.name,
+                    'customer_phone': info.get('customer_phone'),
+                    'customer_professional': info.get('customer_professional'),
+                    'customer_birthday': info.get('customer_birthday'),
+                    'customer_remake': info.get('customer_remake'),
+                    'customer_demand': info.get('customer_demand'),
+                    'customer_label': {
+                        'xueli': info.get('customer_label').get('xueli'),
+                        'diqu': info.get('customer_label').get('diqu'),
+                        'guanxi': info.get('customer_label').get('guanxi'),
+                        'qinmidu': info.get('customer_label').get('qinmidu'),
+                        'yingxiangli': info.get('customer_label').get('yingxiangli'),
+                        'qituxin': info.get('customer_label').get('qituxin'),
+                        'shiyetaidu': info.get('customer_label').get('shiyetaidu'),
+                        'renmaiquan': info.get('customer_label').get('renmaiquan'),
+                        'jingjinengli': info.get('customer_label').get('jingjinengli'),
+                    }
+                }
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data':ret_data
+                }
+                response.note = {
+                    'customer_sex': '用户性别 默认微信性别',
+                    'customer_set_avator': '用户头像 默认微信头像',
+                    'customer_name': '用户姓名 备注 默认微信名称',
+                    'customer_wechat': '用户微信名称',
+                    'customer_phone': '用户电话',
+                    'customer_professional': '用户职业',
+                    'customer_birthday': '用户生日',
+                    'customer_remake': '用户备注',
+                    'customer_demand': '用户需求',
+                    'customer_label': {
+                        'xueli':'学历ID',
+                        'diqu':'地区名称',
+                        'guanxi':'关系',
+                        'qinmidu':'亲密度',
+                        'yingxiangli':'影响力',
+                        'qituxin':'企图心',
+                        'shiyetaidu':'事业态度',
+                        'renmaiquan':'人脉圈',
+                        'jingjinengli':'经济能力',
+                    }
+                }
+
             else:
                 response.code = 402
                 response.msg = '请求异常'
@@ -437,3 +590,17 @@ def day_eye_oper(request, oper_type, o_id):
         response.msg = json.loads(forms_obj.errors.as_json())
 
     return JsonResponse(response.__dict__)
+
+
+p = {
+    'customer_sex':'',
+    'customer_set_avator':'',
+    'customer_name':'',
+    'customer_wechat':'',
+    'customer_phone':'',
+    'customer_professional':'',
+    'customer_birthday':'',
+    'customer_remake':'',
+    'customer_demand':'',
+    'customer_label':{},
+}
