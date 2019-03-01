@@ -125,7 +125,7 @@ class user_comments_customer_information(models.Model):
     customer = models.ForeignKey('Customer', verbose_name="客户")
     user = models.ForeignKey(to='Userprofile', verbose_name='用户', null=True, blank=True)
     customer_info = models.TextField(verbose_name='客户信息', null=True, blank=True)
-
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 # 客户查看文章日志表
 class SelectArticleLog(models.Model):
