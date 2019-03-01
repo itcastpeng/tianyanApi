@@ -110,11 +110,17 @@ def small_shop_oper(request, oper_type, o_id):
     if request.method == "POST":
 
         # 修改微店 静态横图
-        if oper_type == "static_image":
+        if oper_type == "update_small_shop_info":
             static_image = request.POST.get('static_image')
+            small_shop_avator = request.POST.get('small_shop_avator')
+            small_shop_name = request.POST.get('small_shop_name')
             objs = models.Userprofile.objects.filter(id=user_id)
             if objs:
-                objs.update(static_image=static_image)
+                objs.update(
+                    static_image=static_image,
+                    small_shop_name=small_shop_name,
+                    small_shop_avator=small_shop_avator,
+                )
                 response.code = 200
                 response.msg = '修改成功'
             else:
@@ -215,7 +221,29 @@ def small_shop_oper(request, oper_type, o_id):
                 response.msg = '删除ID不存在'
 
     else:
-        response.code = 402
-        response.msg = "请求异常"
+
+        # 查询微店资料
+        if oper_type == 'get_small_shop_info':
+            objs = models.Userprofile.objects.filter(id=user_id)
+            if objs:
+                obj = objs[0]
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'small_shop_avator': obj.small_shop_avator,
+                    'small_shop_name': obj.small_shop_name,
+                    'small_shop_image': obj.small_shop_image,
+                }
+                response.node = {
+                    'small_shop_avator': '微店头像',
+                    'small_shop_name': '微店名称',
+                    'small_shop_image': '微店横图',
+                }
+            else:
+                response.code = 301
+                response.msg = '非法用户'
+        else:
+            response.code = 402
+            response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)

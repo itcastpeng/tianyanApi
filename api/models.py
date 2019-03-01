@@ -63,6 +63,9 @@ class Userprofile(models.Model):
         blank=True,
         default=None
     )
+
+    small_shop_name = models.CharField(verbose_name='微店名称', max_length=32, default='店小二')
+    small_shop_avator = models.CharField(verbose_name='微店头像', max_length=256, default='')
     small_shop_image = models.CharField(verbose_name='微店顶部静态横图', max_length=256, null=True, blank=True)
     posters_info = models.TextField(verbose_name='海报信息',
                                     default="{'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}")
