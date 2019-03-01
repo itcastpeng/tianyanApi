@@ -49,7 +49,10 @@ def small_shop(request):
                     goods_picture = eval(obj.goods_picture)
                 except Exception:
                     goods_picture = obj.goods_picture
-
+                try:
+                    goods_describe = json.loads(obj.goods_describe)
+                except Exception:
+                    goods_describe = obj.goods_describe
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
@@ -59,7 +62,7 @@ def small_shop(request):
                     'price': obj.price,  # 商品价格
                     'inventory': obj.inventory,  # 商品库存
                     'freight': obj.freight,  # 商品运费
-                    'goods_describe': obj.goods_describe,  # 商品描述
+                    'goods_describe': goods_describe,  # 商品描述
                     'point_origin': obj.point_origin,  # 商品发货地
                     'goods_status_id': obj.goods_status,  # 商品状态ID
                     'goods_status': obj.get_goods_status_display(),  # 商品状态
