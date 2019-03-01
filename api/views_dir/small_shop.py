@@ -111,13 +111,13 @@ def small_shop_oper(request, oper_type, o_id):
 
         # 修改微店 静态横图
         if oper_type == "update_small_shop_info":
-            static_image = request.POST.get('static_image')
+            small_shop_image = request.POST.get('small_shop_image')
             small_shop_avator = request.POST.get('small_shop_avator')
             small_shop_name = request.POST.get('small_shop_name')
             objs = models.Userprofile.objects.filter(id=user_id)
             if objs:
                 objs.update(
-                    static_image=static_image,
+                    small_shop_image=small_shop_image,
                     small_shop_name=small_shop_name,
                     small_shop_avator=small_shop_avator,
                 )
