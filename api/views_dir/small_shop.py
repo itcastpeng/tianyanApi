@@ -116,7 +116,6 @@ def small_shop_oper(request, oper_type, o_id):
             small_shop_name = request.POST.get('small_shop_name')
             objs = models.Userprofile.objects.filter(id=user_id)
             if objs:
-
                 objs.update(
                     small_shop_image=small_shop_image,
                     small_shop_name=small_shop_name,

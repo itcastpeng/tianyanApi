@@ -65,7 +65,7 @@ class Userprofile(models.Model):
     )
 
     small_shop_name = models.CharField(verbose_name='微店名称', max_length=32, default='店小二')
-    small_shop_avator = models.CharField(verbose_name='微店头像', max_length=256, default='')
+    small_shop_avator = models.CharField(verbose_name='微店头像', max_length=256, default='http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png')
     small_shop_image = models.CharField(verbose_name='微店顶部静态横图', max_length=256, null=True, blank=True)
     posters_info = models.TextField(verbose_name='海报信息',
                                     default="{'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}")
