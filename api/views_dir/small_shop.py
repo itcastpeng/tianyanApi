@@ -49,10 +49,13 @@ def small_shop(request):
                     goods_picture = eval(obj.goods_picture)
                 except Exception:
                     goods_picture = obj.goods_picture
+
+                print('obj.goods_describe----> ', type(eval(obj.goods_describe)), obj.goods_describe)
                 try:
                     goods_describe = eval(obj.goods_describe)
                 except Exception:
                     goods_describe = obj.goods_describe
+
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
@@ -106,7 +109,7 @@ def small_shop(request):
     else:
         response.code = 402
         response.msg = "请求异常"
-
+    print(response.data)
     return JsonResponse(response.__dict__)
 
 
