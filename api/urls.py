@@ -60,7 +60,7 @@ urlpatterns = [
 
     # # 退款管理
     # url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
-    # url(r'^small_shop', small_shop.small_shop),
+    # url(r'^small_shop', small_shop.small_shop)s,
 
     # ---------------- 公众号操作 ----------------
     url(r'^wechat/(?P<oper_type>\w+)$', wechat.wechat_oper),
