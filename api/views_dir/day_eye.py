@@ -553,7 +553,8 @@ def day_eye_oper(request, oper_type, o_id):
                         'shiyetaidu': customer_label.get('shiyetaidu'),
                         'renmaiquan': customer_label.get('renmaiquan'),
                         'jingjinengli': customer_label.get('jingjinengli'),
-                    }
+                    },
+                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S')
                 }
 
                 response.code = 200
