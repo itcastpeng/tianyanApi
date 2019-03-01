@@ -326,12 +326,16 @@ def day_eye_oper(request, oper_type, o_id):
 
                 # 谁看了我详情 右上角星星数据
                 info_data = {
+                    'xueli': '初中',
+                    'diqu': '北京',
+                    'guanxi': '朋友',
                     'qinmidu': 1,
                     'yingxiangli': 1,
                     'qituxin': 1,
                     'shiyetaidu': 1,
                     'renmaiquan': 1,
                     'jingjinengli': 1,
+                    'customer_demand':[]
                 }
                 information_objs = models.user_comments_customer_information.objects.filter(user_id=user_id, customer_id=o_id)
                 if information_objs:
@@ -342,17 +346,27 @@ def day_eye_oper(request, oper_type, o_id):
                         customer_info = information_obj.customer_info
                     customer_label = customer_info.get('customer_label')
 
+                    try:
+                        customer_demand = json.loads(customer_info.get('customer_demand'))
+                    except Exception:
+                        customer_demand = customer_info.get('customer_demand')
+
                     info_data = {
+                        'xueli': customer_label.get('xueli'),
+                        'diqu': customer_label.get('diqu'),
+                        'guanxi': customer_label.get('guanxi'),
                         'qinmidu': customer_label.get('qinmidu'),
                         'yingxiangli': customer_label.get('yingxiangli'),
                         'qituxin': customer_label.get('qituxin'),
                         'shiyetaidu': customer_label.get('shiyetaidu'),
                         'renmaiquan': customer_label.get('renmaiquan'),
                         'jingjinengli': customer_label.get('jingjinengli'),
+                        'customer_demand': customer_demand,
                     }
                 avg_stars_list = []
                 for k, v in info_data.items():
-                    avg_stars_list.append(int(v))
+                    if k in ['qinmidu', 'yingxiangli', 'qituxin', 'shiyetaidu', 'renmaiquan', 'jingjinengli']:
+                        avg_stars_list.append(int(v))
                 avg_stars = sum(avg_stars_list) / 6  # 右上角星星 平均值
 
                 # 客户基本信息
