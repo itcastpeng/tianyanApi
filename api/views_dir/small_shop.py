@@ -44,6 +44,12 @@ def small_shop(request):
             ret_data = []
 
             for obj in objs:
+
+                try:
+                    goods_picture = json.loads(obj.goods_picture)
+                except Exception:
+                    goods_picture = obj.goods_picture
+
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
@@ -57,7 +63,7 @@ def small_shop(request):
                     'point_origin': obj.point_origin,  # 商品发货地
                     'goods_status_id': obj.goods_status,  # 商品状态ID
                     'goods_status': obj.get_goods_status_display(),  # 商品状态
-                    'goods_picture': obj.goods_picture,  # 商品图片
+                    'goods_picture': goods_picture,  # 商品图片
                     'cover_img': obj.cover_img,  # 商品封面图片
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
