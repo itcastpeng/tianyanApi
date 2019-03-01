@@ -50,7 +50,7 @@ def small_shop(request):
                 except Exception:
                     goods_picture = obj.goods_picture
                 try:
-                    goods_describe = json.loads(obj.goods_describe)
+                    goods_describe = eval(obj.goods_describe)
                 except Exception:
                     goods_describe = obj.goods_describe
                 #  将查询出来的数据 加入列表
