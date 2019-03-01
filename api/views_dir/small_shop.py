@@ -46,7 +46,7 @@ def small_shop(request):
             for obj in objs:
 
                 try:
-                    goods_picture = json.loads(obj.goods_picture)
+                    goods_picture = eval(obj.goods_picture)
                 except Exception:
                     goods_picture = obj.goods_picture
 
