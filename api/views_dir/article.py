@@ -167,11 +167,11 @@ def article_oper(request, oper_type, o_id):
                                   ]
                 cover_img = random.sample(cover_img_list, 1)
 
-                # obj.cover_img = cover_img[0]
-                # obj.save()
-                # response.code = 200
-                # response.msg = "添加成功"
-                # response.data = {'id': obj.id}
+                obj.cover_img = cover_img[0]
+                obj.save()
+                response.code = 200
+                response.msg = "添加成功"
+                response.data = {'id': obj.id}
             else:
                 print("验证不通过")
                 response.code = 301
