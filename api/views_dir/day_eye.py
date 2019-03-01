@@ -352,7 +352,7 @@ def day_eye_oper(request, oper_type, o_id):
                     }
                 avg_stars_list = []
                 for k, v in info_data.items():
-                    avg_stars_list.append(v)
+                    avg_stars_list.append(int(v))
                 avg_stars = sum(avg_stars_list) / 6  # 右上角星星 平均值
 
                 # 客户基本信息
