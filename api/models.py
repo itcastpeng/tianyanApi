@@ -221,7 +221,7 @@ class Goods(models.Model):
     price = models.CharField(verbose_name='价格', max_length=16)
     inventory = models.IntegerField(verbose_name='库存', default=1)
     freight = models.IntegerField(verbose_name='运费', default=0)
-    goods_describe = models.CharField(verbose_name='商品描述', max_length=128)
+    goods_describe = models.CharField(verbose_name='商品描述', max_length=128, default=[])
     point_origin = models.CharField(verbose_name='发货地', max_length=256)
     goods_status_choices = (
         (1, '上架'),
