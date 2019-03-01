@@ -323,22 +323,50 @@ def day_eye_oper(request, oper_type, o_id):
                 article_objs = models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id)
                 info_objs = article_objs.order_by(order)
 
+
+                # 谁看了我详情 右上角星星数据
+                info_data = {
+                    'qinmidu': 1,
+                    'yingxiangli': 1,
+                    'qituxin': 1,
+                    'shiyetaidu': 1,
+                    'renmaiquan': 1,
+                    'jingjinengli': 1,
+                }
+                information_objs = models.user_comments_customer_information.objects.filter(user_id=user_id, customer_id=o_id)
+                if information_objs:
+                    information_obj = information_objs[0]
+                    try:
+                        customer_info = eval(information_obj.customer_info)
+                    except Exception:
+                        customer_info = information_obj.customer_info
+                    customer_label = customer_info.get('customer_label')
+
+                    info_data = {
+                        'qinmidu': customer_label.get('qinmidu'),
+                        'yingxiangli': customer_label.get('yingxiangli'),
+                        'qituxin': customer_label.get('qituxin'),
+                        'shiyetaidu': customer_label.get('shiyetaidu'),
+                        'renmaiquan': customer_label.get('renmaiquan'),
+                        'jingjinengli': customer_label.get('jingjinengli'),
+                    }
+                avg_stars_list = []
+                for k, v in info_data.items():
+                    avg_stars_list.append(v)
+                avg_stars = sum(avg_stars_list) / 6  # 右上角星星 平均值
+
                 # 客户基本信息
                 obj = info_objs[0]
                 customer_info = {
                     'customer_id': obj.customer_id,
                     'customer__name': b64decode(obj.customer.name),
                     'customer__set_avator': obj.customer.set_avator,
+                    'info_data': info_data,
+                    'avg_stars': avg_stars,
                 }
 
                 objs = article_objs.values('article_id', 'article__title', 'article__cover_img').annotate(Count('id'))
                 is_remake_count = models.customer_information_the_user.objects.filter(user_id=user_id, customer_id=o_id).count()
-
-                if length != 0:
-                    start_line = (current_page - 1) * length
-                    stop_line = start_line + length
-                    objs = objs[start_line: stop_line]
-
                 count = objs.count()
 
                 is_remake = False
@@ -393,6 +421,13 @@ def day_eye_oper(request, oper_type, o_id):
                     'select_datetime': "查看时间",
                     'article__cover_img': "文章图片",
                     'is_remake': "该客户是否有备注(如果有那么可删除)",
+                    'qinmidu': '亲密度',
+                    'yingxiangli': '影响力',
+                    'qituxin': '企图心',
+                    'shiyetaidu': '事业态度',
+                    'renmaiquan': '人脉圈',
+                    'jingjinengli': '经济能力',
+                    'avg_stars':'星星平均值'
                 }
 
             # 按文章查看(天眼功能)列表页
@@ -533,6 +568,11 @@ def day_eye_oper(request, oper_type, o_id):
 
                 customer_label = info.get('customer_label')
                 print('customer_label-------> ', customer_label)
+                try:
+                    customer_demand = eval(info.get('customer_demand'))
+                except Exception:
+                    customer_demand = info.get('customer_demand')
+
                 ret_data = {
                     'customer_sex': customer_sex,
                     'customer_set_avator': customer_set_avator,
@@ -542,7 +582,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'customer_professional': info.get('customer_professional'),
                     'customer_birthday': info.get('customer_birthday'),
                     'customer_remake': info.get('customer_remake'),
-                    'customer_demand': info.get('customer_demand'),
+                    'customer_demand': customer_demand,
                     'customer_label': {
                         'xueli': customer_label.get('xueli'),
                         'diqu': customer_label.get('diqu'),
