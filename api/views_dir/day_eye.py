@@ -531,6 +531,8 @@ def day_eye_oper(request, oper_type, o_id):
                 if info.get('customer_name'):
                     customer_name = info.get('customer_name')
 
+                customer_label = info.get('customer_label')
+                print('customer_label-------> ', customer_label)
                 ret_data = {
                     'customer_sex': customer_sex,
                     'customer_set_avator': customer_set_avator,
@@ -542,15 +544,15 @@ def day_eye_oper(request, oper_type, o_id):
                     'customer_remake': info.get('customer_remake'),
                     'customer_demand': info.get('customer_demand'),
                     'customer_label': {
-                        'xueli': info.get('customer_label').get('xueli'),
-                        'diqu': info.get('customer_label').get('diqu'),
-                        'guanxi': info.get('customer_label').get('guanxi'),
-                        'qinmidu': info.get('customer_label').get('qinmidu'),
-                        'yingxiangli': info.get('customer_label').get('yingxiangli'),
-                        'qituxin': info.get('customer_label').get('qituxin'),
-                        'shiyetaidu': info.get('customer_label').get('shiyetaidu'),
-                        'renmaiquan': info.get('customer_label').get('renmaiquan'),
-                        'jingjinengli': info.get('customer_label').get('jingjinengli'),
+                        'xueli': customer_label.get('xueli'),
+                        'diqu': customer_label.get('diqu'),
+                        'guanxi': customer_label.get('guanxi'),
+                        'qinmidu': customer_label.get('qinmidu'),
+                        'yingxiangli': customer_label.get('yingxiangli'),
+                        'qituxin': customer_label.get('qituxin'),
+                        'shiyetaidu': customer_label.get('shiyetaidu'),
+                        'renmaiquan': customer_label.get('renmaiquan'),
+                        'jingjinengli': customer_label.get('jingjinengli'),
                     }
                 }
 
