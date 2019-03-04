@@ -30,10 +30,10 @@ def testGroupTree(oper_user_id, parent_classify_id=None):
             'expand': False,
             'checked': False,
         }
-        children_data = testGroupTree(oper_user_id, obj.id)
-        current_data['children'] = children_data
+        if parent_classify_id:
+            children_data = testGroupTree(oper_user_id, obj.id)
+            current_data['children'] = children_data
         result_data.append(current_data)
-
     return result_data
 
 
@@ -42,8 +42,10 @@ def testGroupTree(oper_user_id, parent_classify_id=None):
 def goods_classify(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
+    parent_classify_id = request.GET.get('parent_classify_id')
     if request.method == "GET":
-        data_list = testGroupTree(user_id)
+
+        data_list = testGroupTree(user_id, parent_classify_id=parent_classify_id)
         response.code = 200
         response.msg = '查询成功'
         response.data = {
