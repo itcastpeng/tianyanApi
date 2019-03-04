@@ -55,10 +55,17 @@ def goods_classify(request):
 
             data_list = []
             for obj in objs:
+
+                parent_classify_id = ''
+                parent_classify_goods_classify = ''
+                if obj.parent_classify_id:
+                    parent_classify_id = obj.parent_classify_id
+                    parent_classify_goods_classify = obj.parent_classify.goods_classify
+
                 data_list.append({
                     'id': obj.id,
-                    'parent_classify_id': obj.parent_classify_id,
-                    'parent_classify_goods_classify': obj.parent_classify.goods_classify,
+                    'parent_classify_id': parent_classify_id,
+                    'parent_classify_goods_classify': parent_classify_goods_classify,
                     'goods_classify': obj.goods_classify,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S')
                 })
