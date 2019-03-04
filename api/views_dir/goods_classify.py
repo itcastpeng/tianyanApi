@@ -81,7 +81,7 @@ def goods_classify(request):
             response.msg = '查询成功'
             response.data = {
                 'ret_data': data_list,
-                'data_count': data_count,
+                'count': data_count,
             }
             response.note = {
                 'id': '商品分类ID',
