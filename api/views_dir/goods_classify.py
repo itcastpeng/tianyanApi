@@ -15,6 +15,7 @@ def testGroupTree(oper_user_id, parent_classify_id=None):
     q = Q()
     q.add(Q(oper_user_id=oper_user_id) & Q(parent_classify_id=parent_classify_id), Q.AND)
     objs = models.GoodsClassify.objects.filter(q)
+    print('objs-----> ', objs)
     for obj in objs:
         current_data = {
             'id': obj.id,
@@ -23,11 +24,10 @@ def testGroupTree(oper_user_id, parent_classify_id=None):
             'expand': False,
             'checked': False,
         }
-        if parent_classify_id:
-            children_data = testGroupTree(oper_user_id, obj.id)
-            current_data['children'] = children_data
+        children_data = testGroupTree(oper_user_id, obj.id)
+        current_data['children'] = children_data
         result_data.append(current_data)
-        return result_data
+    return result_data
 
 # 判断删除 分类下 是否有商品
 def groupTree(oper_user_id, parent_classify_id, data):
