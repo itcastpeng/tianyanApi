@@ -5,12 +5,12 @@ from publicFunc import account
 from django.http import JsonResponse
 from django.db.models import Q
 from publicFunc.condition_com import conditionCom
-from api.forms.small_shop import AddForm, UpdateForm, SelectForm, groupTree
+from api.forms.small_shop import AddForm, UpdateForm, SelectForm
 import json
 
 
 # 分组树状图（包含测试用例详情）
-def testGroupTree(oper_user_id, parent_classify_id=None):
+def testGroupTree(oper_user_id, parent_classify_id=None, data=None):
     result_data = []
     q = Q()
     q.add(Q(oper_user_id=oper_user_id) & Q(parent_classify_id=parent_classify_id), Q.AND)
@@ -25,10 +25,11 @@ def testGroupTree(oper_user_id, parent_classify_id=None):
             'checked': False,
         }
         if parent_classify_id:
-            children_data = testGroupTree(oper_user_id, obj.id)
+            data.append(obj.id)
+            children_data = testGroupTree(oper_user_id, obj.id, data)
             current_data['children'] = children_data
         result_data.append(current_data)
-    return result_data
+    return result_data, data
 
 
 # token验证 微店展示模块
@@ -120,7 +121,9 @@ def goods_classify_oper(request, oper_type, o_id):
             # 删除 ID
             objs = models.GoodsClassify.objects.filter(id=o_id)
             data = []
-            result_data, data = groupTree(user_id, o_id, data)
+            result_data, data = testGroupTree(user_id, o_id, data)
+            data.append(o_id)
+            print('------> ', data)
             if objs:
                 if models.Goods.objects.filter(goods_classify_id__in=data):
                     response.code = 301
