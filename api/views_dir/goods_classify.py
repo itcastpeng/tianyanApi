@@ -24,6 +24,7 @@ def testGroupTree(oper_user_id, parent_classify_id=None):
 
         current_data = {
             'id': obj.id,
+            'goods_classify': obj.goods_classify,
             'parent_classify_id': parent_id,
             'parent_classify_goods_classify': parent_classify_goods_classify,
             'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
