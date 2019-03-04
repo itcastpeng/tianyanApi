@@ -16,17 +16,10 @@ def testGroupTree(oper_user_id, parent_classify_id=None):
     q.add(Q(oper_user_id=oper_user_id) & Q(parent_classify_id=parent_classify_id), Q.AND)
     objs = models.GoodsClassify.objects.filter(q)
     for obj in objs:
-        parent_id = ''
-        parent_classify_goods_classify = ''
-        if obj.parent_classify_id:
-            parent_id = obj.parent_classify_id
-            parent_classify_goods_classify = obj.parent_classify.goods_classify
 
         current_data = {
             'id': obj.id,
             'goods_classify': obj.goods_classify,
-            'parent_classify_id': parent_id,
-            'parent_classify_goods_classify': parent_classify_goods_classify,
             'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
             'expand': False,
             'checked': False,
