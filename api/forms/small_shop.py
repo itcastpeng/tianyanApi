@@ -45,7 +45,7 @@ class AddForm(forms.Form):
 
     def clean_parent_classify_id(self):
         parent_classify_id = self.data.get('parent_classify_id')
-        objs = models.GoodsClassify.objects.filter(parent_classify_id=parent_classify_id)
+        objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
         if not objs:
             self.add_error('parent_classify_id',  '上级分类不存在')
         else:
@@ -102,7 +102,7 @@ class UpdateForm(forms.Form):
             return goods_classify
     def clean_parent_classify_id(self):
         parent_classify_id = self.data.get('parent_classify_id')
-        objs = models.GoodsClassify.objects.filter(parent_classify_id=parent_classify_id)
+        objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
         if not objs:
             self.add_error('parent_classify_id',  '上级分类不存在')
         else:
