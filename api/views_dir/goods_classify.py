@@ -61,6 +61,7 @@ def goods_classify(request):
                 start_line = (current_page - 1) * length
                 stop_line = start_line + length
                 objs = objs[start_line: stop_line]
+            data_count = objs.count()
 
             data_list = []
             for obj in objs:
@@ -80,6 +81,7 @@ def goods_classify(request):
             response.msg = '查询成功'
             response.data = {
                 'ret_data': data_list,
+                'data_count': data_count,
             }
             response.note = {
                 'id': '商品分类ID',
