@@ -55,7 +55,7 @@ def goods_classify(request):
                 'id': '',
             }
             q = conditionCom(request, field_dict)
-            objs = models.GoodsClassify.objects.filter(q, oper_user_id=user_id)
+            objs = models.GoodsClassify.objects.filter(q, oper_user_id=user_id).order_by(order)
 
             if length != 0:
                 start_line = (current_page - 1) * length
