@@ -10,23 +10,32 @@ import json
 
 
 # 分组树状图（包含测试用例详情）
-def testGroupTree(parent_category, parent_class_id=None):
+def testGroupTree(oper_user_id, parent_classify_id=None):
     result_data = []
     q = Q()
-    q.add(Q(parent_category=parent_category) & Q(parent_class_id=parent_class_id), Q.AND)
+    q.add(Q(oper_user_id=oper_user_id) & Q(parent_classify_id=parent_classify_id), Q.AND)
     objs = models.GoodsClassify.objects.filter(q)
     for obj in objs:
+        parent_id = ''
+        parent_classify_goods_classify = ''
+        if obj.parent_classify_id:
+            parent_id = obj.parent_classify_id
+            parent_classify_goods_classify = obj.parent_classify.goods_classify
+
         current_data = {
             'id': obj.id,
-            'classification_name':obj.classification_name,
+            'parent_classify_id': parent_id,
+            'parent_classify_goods_classify': parent_classify_goods_classify,
+            'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
             'expand': False,
             'checked': False,
         }
-        children_data = testGroupTree(parent_category, obj.id)
+        children_data = testGroupTree(oper_user_id, obj.id)
         current_data['children'] = children_data
         result_data.append(current_data)
 
     return result_data
+
 
 # token验证 微店展示模块
 @account.is_token(models.Userprofile)
@@ -34,58 +43,19 @@ def goods_classify(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "GET":
-        forms_obj = SelectForm(request.GET)
-        if forms_obj.is_valid():
-            current_page = forms_obj.cleaned_data['current_page']
-            length = forms_obj.cleaned_data['length']
-            order = request.GET.get('order', '-create_datetime')
-            field_dict = {
-                'id': '',
-                'goods_classify': '',
-                'oper_user_id': '__contains',
-                'create_datetime': '',
-            }
-            q = conditionCom(request, field_dict)
-            objs = models.GoodsClassify.objects.filter(q, oper_user_id=user_id).order_by(order)
-
-            if length != 0:
-                start_line = (current_page - 1) * length
-                stop_line = start_line + length
-                objs = objs[start_line: stop_line]
-
-            data_list = []
-            for obj in objs:
-
-                parent_classify_id = ''
-                parent_classify_goods_classify = ''
-                if obj.parent_classify_id:
-                    parent_classify_id = obj.parent_classify_id
-                    parent_classify_goods_classify = obj.parent_classify.goods_classify
-
-                data_list.append({
-                    'id': obj.id,
-                    'parent_classify_id': parent_classify_id,
-                    'parent_classify_goods_classify': parent_classify_goods_classify,
-                    'goods_classify': obj.goods_classify,
-                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S')
-                })
-
-            response.code = 200
-            response.msg = '查询成功'
-            response.data = {
-                'ret_data': data_list,
-                'data_count': objs.count()
-            }
-            response.note = {
-                'id': '商品分类ID',
-                'goods_classify': '商品分类名称',
-                'create_datetime': '该商品分类创建时间',
-                'parent_classify_goods_classify': '分类父级名称',
-                'parent_classify_id': '分类父级ID',
-            }
-        else:
-            response.code = 301
-            response.msg = json.loads(forms_obj.errors.as_json())
+        data_list = testGroupTree(user_id)
+        response.code = 200
+        response.msg = '查询成功'
+        response.data = {
+            'ret_data': data_list,
+        }
+        response.note = {
+            'id': '商品分类ID',
+            'goods_classify': '商品分类名称',
+            'create_datetime': '该商品分类创建时间',
+            'parent_classify_goods_classify': '分类父级名称',
+            'parent_classify_id': '分类父级ID',
+        }
     else:
         response.code = 402
         response.msg = "请求异常"
