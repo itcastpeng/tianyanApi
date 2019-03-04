@@ -22,6 +22,12 @@ class AddForm(forms.Form):
             'required': "分类名称不能为空"
         }
     )
+    parent_classify_id = forms.IntegerField(
+        required=False,
+        error_messages={
+            'required': "父级分类类型错误"
+        }
+    )
 
     # 查询文章标题是否存在
     def clean_goods_classify(self):
@@ -37,6 +43,13 @@ class AddForm(forms.Form):
         else:
             return goods_classify
 
+    def clean_parent_classify_id(self):
+        parent_classify_id = self.data.get('parent_classify_id')
+        objs = models.GoodsClassify.objects.filter(parent_classify_id=parent_classify_id)
+        if not objs:
+            self.add_error('parent_classify_id',  '上级分类不存在')
+        else:
+            return parent_classify_id
 
 # 商品分类更新
 class UpdateForm(forms.Form):
@@ -56,6 +69,12 @@ class UpdateForm(forms.Form):
         required=True,
         error_messages={
             'required': "分类名称不能为空"
+        }
+    )
+    parent_classify_id = forms.IntegerField(
+        required=False,
+        error_messages={
+            'required': "父级分类类型错误"
         }
     )
 
@@ -81,7 +100,13 @@ class UpdateForm(forms.Form):
             self.add_error('goods_classify', '分类名称已存在')
         else:
             return goods_classify
-
+    def clean_parent_classify_id(self):
+        parent_classify_id = self.data.get('parent_classify_id')
+        objs = models.GoodsClassify.objects.filter(parent_classify_id=parent_classify_id)
+        if not objs:
+            self.add_error('parent_classify_id',  '上级分类不存在')
+        else:
+            return parent_classify_id
 
 # 商品分类删除
 class DeleteForm(forms.Form):
