@@ -41,7 +41,10 @@ class AddForm(forms.Form):
         if objs:
             self.add_error('goods_classify', '分类名称已存在')
         else:
-            return goods_classify
+            if len(goods_classify) > 10:
+                self.add_error('goods_classify', '名称不得大于10个字')
+            else:
+                return goods_classify
 
     def clean_parent_classify_id(self):
         parent_classify_id = self.data.get('parent_classify_id')
@@ -99,7 +102,11 @@ class UpdateForm(forms.Form):
         if objs:
             self.add_error('goods_classify', '分类名称已存在')
         else:
-            return goods_classify
+            if len(goods_classify) > 10:
+                self.add_error('goods_classify', '名称不得大于10个字')
+            else:
+                return goods_classify
+
     def clean_parent_classify_id(self):
         parent_classify_id = self.data.get('parent_classify_id')
         objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
