@@ -64,12 +64,16 @@ def goods_classify(request):
 
             data_list = []
             for obj in objs:
+                is_good = False
+                if obj.goods_set.all():
+                    is_good = True
                 data_list.append({
                     'id':obj.id,
                     'goods_classify':obj.goods_classify,
                     'oper_user_id':obj.oper_user_id,
                     'oper_user':b64decode(obj.oper_user.name),
                     'create_datetime':obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    'is_good':is_good,
                 })
 
             response.code = 200
@@ -80,6 +84,7 @@ def goods_classify(request):
             response.note = {
                 'id': '商品分类ID',
                 'goods_classify': '商品分类名称',
+                'is_good': '该分类中是否有商品',
                 'create_datetime': '该商品分类创建时间',
             }
         else:
