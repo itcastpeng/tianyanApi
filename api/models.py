@@ -209,6 +209,7 @@ class Posters(models.Model):
 # 商品分类
 class GoodsClassify(models.Model):
     oper_user = models.ForeignKey(to='Userprofile', verbose_name='归属人')
+    parent_classify = models.ForeignKey(to='self', verbose_name='父级分类名称', null=True, blank=True)
     goods_classify = models.CharField(verbose_name='分类名称', max_length=128)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
