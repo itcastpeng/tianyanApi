@@ -138,22 +138,23 @@ class UpdateForm(forms.Form):
 
     def clean_parent_classify_id(self):
         parent_classify_id = self.data.get('parent_classify_id')
-        oper_user_id = self.data['oper_user_id']
-        o_id = self.data.get('o_id')
-        objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
-        if not objs:
-            self.add_error('parent_classify_id',  '上级分类不存在')
-        else:
-            data = []
-            result_data, data = testGroupTree(oper_user_id, parent_classify_id, data)
-            data_len = len(data)
-            if int(o_id) in data:
-                self.add_error('parent_classify_id', '选择该分类 容易造成数据混乱')
+        if parent_classify_id:
+            oper_user_id = self.data['oper_user_id']
+            o_id = self.data.get('o_id')
+            objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
+            if not objs:
+                self.add_error('parent_classify_id',  '上级分类不存在')
             else:
-                if data_len >= 3:
-                    self.add_error('parent_classify_id', '分类不能超过三级')
+                data = []
+                result_data, data = testGroupTree(oper_user_id, parent_classify_id, data)
+                data_len = len(data)
+                if int(o_id) in data:
+                    self.add_error('parent_classify_id', '选择该分类 容易造成数据混乱')
                 else:
-                    return parent_classify_id
+                    if data_len >= 3:
+                        self.add_error('parent_classify_id', '分类不能超过三级')
+                    else:
+                        return parent_classify_id
 
 # 商品分类删除
 class DeleteForm(forms.Form):
