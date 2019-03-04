@@ -5,7 +5,7 @@ from publicFunc import account
 from django.http import JsonResponse
 from django.db.models import Q
 from publicFunc.condition_com import conditionCom
-from api.forms.small_shop import AddForm, UpdateForm, SelectForm
+from api.forms.small_shop import AddForm, UpdateForm, SelectForm, groupTree
 import json
 
 
@@ -119,8 +119,10 @@ def goods_classify_oper(request, oper_type, o_id):
         elif oper_type == "delete_classify":
             # 删除 ID
             objs = models.GoodsClassify.objects.filter(id=o_id)
+            data = []
+            result_data, data = groupTree(user_id, o_id, data)
             if objs:
-                if models.Goods.objects.filter(goods_classify_id=o_id):
+                if models.Goods.objects.filter(goods_classify_id__in=data):
                     response.code = 301
                     response.msg = '请先移除该分类下商品'
                 else:
