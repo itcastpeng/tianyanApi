@@ -7,23 +7,23 @@ from django.db.models import Q
 # import time
 
 # 判断级别 最多不能超过三级 分类
-def groupTree(oper_user_id, parent_classify_id, data):
-    result_data = []
-    q = Q()
-    q.add(Q(oper_user_id=oper_user_id) & Q(id=parent_classify_id), Q.AND)
-    objs = models.GoodsClassify.objects.filter(q)
-    for obj in objs:
-
-        current_data = {
-            'id': obj.id,
-        }
-        data.append(obj.id)
-        if parent_classify_id:
-            children_data = groupTree(oper_user_id, obj.parent_classify_id, data)
-            current_data['children'] = children_data
-        result_data.append(current_data)
-
-    return result_data, data
+# def groupTree(oper_user_id, parent_classify_id, data):
+#     result_data = []
+#     q = Q()
+#     q.add(Q(oper_user_id=oper_user_id) & Q(id=parent_classify_id), Q.AND)
+#     objs = models.GoodsClassify.objects.filter(q)
+#     for obj in objs:
+#
+#         current_data = {
+#             'id': obj.id,
+#         }
+#         data.append(obj.id)
+#         if parent_classify_id:
+#             children_data = groupTree(oper_user_id, obj.parent_classify_id, data)
+#             current_data['children'] = children_data
+#         result_data.append(current_data)
+#
+#     return result_data, data
 
 # 商品分类添加
 class AddForm(forms.Form):
@@ -40,12 +40,12 @@ class AddForm(forms.Form):
             'required': "分类名称不能为空"
         }
     )
-    parent_classify_id = forms.IntegerField(
-        required=False,
-        error_messages={
-            'required': "父级分类类型错误"
-        }
-    )
+    # parent_classify_id = forms.IntegerField(
+    #     required=False,
+    #     error_messages={
+    #         'required': "父级分类类型错误"
+    #     }
+    # )
 
     # 查询文章标题是否存在
     def clean_goods_classify(self):
@@ -64,21 +64,21 @@ class AddForm(forms.Form):
             else:
                 return goods_classify
 
-    def clean_parent_classify_id(self):
-        parent_classify_id = self.data.get('parent_classify_id')
-        oper_user_id = self.data['oper_user_id']
-        if parent_classify_id:
-            objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
-            if not objs:
-                self.add_error('parent_classify_id',  '上级分类不存在')
-            else:
-                data = []
-                result_data, data = groupTree(oper_user_id, parent_classify_id, data)
-                data_len = len(data)
-                if data_len >= 3:
-                    self.add_error('parent_classify_id', '分类不能超过三级')
-                else:
-                    return parent_classify_id
+    # def clean_parent_classify_id(self):
+    #     parent_classify_id = self.data.get('parent_classify_id')
+    #     oper_user_id = self.data['oper_user_id']
+    #     if parent_classify_id:
+    #         objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
+    #         if not objs:
+    #             self.add_error('parent_classify_id',  '上级分类不存在')
+    #         else:
+    #             data = []
+    #             result_data, data = groupTree(oper_user_id, parent_classify_id, data)
+    #             data_len = len(data)
+    #             if data_len >= 2:
+    #                 self.add_error('parent_classify_id', '分类不能超过两级')
+    #             else:
+    #                 return parent_classify_id
 
 # 商品分类更新
 class UpdateForm(forms.Form):
@@ -100,12 +100,12 @@ class UpdateForm(forms.Form):
             'required': "分类名称不能为空"
         }
     )
-    parent_classify_id = forms.IntegerField(
-        required=False,
-        error_messages={
-            'required': "父级分类类型错误"
-        }
-    )
+    # parent_classify_id = forms.IntegerField(
+    #     required=False,
+    #     error_messages={
+    #         'required': "父级分类类型错误"
+    #     }
+    # )
 
     # 判断是否有该分类
     def clean_o_id(self):
@@ -137,25 +137,25 @@ class UpdateForm(forms.Form):
             else:
                 return goods_classify
 
-    def clean_parent_classify_id(self):
-        parent_classify_id = self.data.get('parent_classify_id')
-        if parent_classify_id:
-            oper_user_id = self.data['oper_user_id']
-            o_id = self.data.get('o_id')
-            objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
-            if not objs:
-                self.add_error('parent_classify_id',  '上级分类不存在')
-            else:
-                data = []
-                result_data, data = groupTree(oper_user_id, parent_classify_id, data)
-                data_len = len(data)
-                if int(o_id) in data:
-                    self.add_error('parent_classify_id', '选择该分类 容易造成数据混乱')
-                else:
-                    if data_len >= 3:
-                        self.add_error('parent_classify_id', '分类不能超过三级')
-                    else:
-                        return parent_classify_id
+    # def clean_parent_classify_id(self):
+    #     parent_classify_id = self.data.get('parent_classify_id')
+    #     if parent_classify_id:
+    #         oper_user_id = self.data['oper_user_id']
+    #         o_id = self.data.get('o_id')
+    #         objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
+    #         if not objs:
+    #             self.add_error('parent_classify_id',  '上级分类不存在')
+    #         else:
+    #             data = []
+    #             result_data, data = groupTree(oper_user_id, parent_classify_id, data)
+    #             data_len = len(data)
+    #             if int(o_id) in data:
+    #                 self.add_error('parent_classify_id', '选择该分类 容易造成数据混乱')
+    #             else:
+    #                 if data_len >= 3:
+    #                     self.add_error('parent_classify_id', '分类不能超过三级')
+    #                 else:
+    #                     return parent_classify_id
 
 # 商品分类删除
 class DeleteForm(forms.Form):
