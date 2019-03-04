@@ -10,13 +10,12 @@ import json
 
 
 # 分组树状图（包含测试用例详情）
-def testGroupTree(oper_user_id, parent_classify_id=None, data=None):
+def testGroupTree(oper_user_id, parent_classify_id=None):
     result_data = []
     q = Q()
     q.add(Q(oper_user_id=oper_user_id) & Q(parent_classify_id=parent_classify_id), Q.AND)
     objs = models.GoodsClassify.objects.filter(q)
     for obj in objs:
-
         current_data = {
             'id': obj.id,
             'goods_classify': obj.goods_classify,
@@ -25,12 +24,21 @@ def testGroupTree(oper_user_id, parent_classify_id=None, data=None):
             'checked': False,
         }
         if parent_classify_id:
-            data.append(obj.id)
-            children_data = testGroupTree(oper_user_id, obj.id, data)
+            children_data = testGroupTree(oper_user_id, obj.id)
             current_data['children'] = children_data
         result_data.append(current_data)
-    return result_data, data
+        return result_data
 
+# 判断删除 分类下 是否有商品
+def groupTree(oper_user_id, parent_classify_id, data):
+    q = Q()
+    q.add(Q(oper_user_id=oper_user_id) & Q(parent_classify_id=parent_classify_id), Q.AND)
+    objs = models.GoodsClassify.objects.filter(q)
+    for obj in objs:
+        if parent_classify_id:
+            data.append(obj.id)
+            testGroupTree(oper_user_id, obj.id)
+    return data
 
 # token验证 微店展示模块
 @account.is_token(models.Userprofile)
@@ -39,7 +47,6 @@ def goods_classify(request):
     user_id = request.GET.get('user_id')
     parent_classify_id = request.GET.get('parent_classify_id')
     if request.method == "GET":
-
         data_list = testGroupTree(user_id, parent_classify_id=parent_classify_id)
         response.code = 200
         response.msg = '查询成功'
@@ -121,9 +128,8 @@ def goods_classify_oper(request, oper_type, o_id):
             # 删除 ID
             objs = models.GoodsClassify.objects.filter(id=o_id)
             data = []
-            result_data, data = testGroupTree(user_id, o_id, data)
+            data = groupTree(user_id, o_id, data)
             data.append(o_id)
-            print('------> ', data)
             if objs:
                 if models.Goods.objects.filter(goods_classify_id__in=data):
                     response.code = 301
