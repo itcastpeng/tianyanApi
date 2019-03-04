@@ -7,7 +7,7 @@ from django.db.models import Q
 # import time
 
 # 判断级别 最多不能超过三级 分类
-def testGroupTree(oper_user_id, parent_classify_id, data):
+def groupTree(oper_user_id, parent_classify_id, data):
     result_data = []
     q = Q()
     q.add(Q(oper_user_id=oper_user_id) & Q(id=parent_classify_id), Q.AND)
@@ -19,7 +19,7 @@ def testGroupTree(oper_user_id, parent_classify_id, data):
         }
         data.append(obj.id)
         if parent_classify_id:
-            children_data = testGroupTree(oper_user_id, obj.parent_classify_id, data)
+            children_data = groupTree(oper_user_id, obj.parent_classify_id, data)
             current_data['children'] = children_data
         result_data.append(current_data)
 
@@ -72,7 +72,7 @@ class AddForm(forms.Form):
             self.add_error('parent_classify_id',  '上级分类不存在')
         else:
             data = []
-            result_data, data = testGroupTree(oper_user_id, parent_classify_id, data)
+            result_data, data = groupTree(oper_user_id, parent_classify_id, data)
             data_len = len(data)
             if data_len >= 3:
                 self.add_error('parent_classify_id', '分类不能超过三级')
@@ -146,7 +146,7 @@ class UpdateForm(forms.Form):
                 self.add_error('parent_classify_id',  '上级分类不存在')
             else:
                 data = []
-                result_data, data = testGroupTree(oper_user_id, parent_classify_id, data)
+                result_data, data = groupTree(oper_user_id, parent_classify_id, data)
                 data_len = len(data)
                 if int(o_id) in data:
                     self.add_error('parent_classify_id', '选择该分类 容易造成数据混乱')
