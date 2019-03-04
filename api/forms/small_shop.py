@@ -67,17 +67,18 @@ class AddForm(forms.Form):
     def clean_parent_classify_id(self):
         parent_classify_id = self.data.get('parent_classify_id')
         oper_user_id = self.data['oper_user_id']
-        objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
-        if not objs:
-            self.add_error('parent_classify_id',  '上级分类不存在')
-        else:
-            data = []
-            result_data, data = groupTree(oper_user_id, parent_classify_id, data)
-            data_len = len(data)
-            if data_len >= 3:
-                self.add_error('parent_classify_id', '分类不能超过三级')
+        if parent_classify_id:
+            objs = models.GoodsClassify.objects.filter(id=parent_classify_id)
+            if not objs:
+                self.add_error('parent_classify_id',  '上级分类不存在')
             else:
-                return parent_classify_id
+                data = []
+                result_data, data = groupTree(oper_user_id, parent_classify_id, data)
+                data_len = len(data)
+                if data_len >= 3:
+                    self.add_error('parent_classify_id', '分类不能超过三级')
+                else:
+                    return parent_classify_id
 
 # 商品分类更新
 class UpdateForm(forms.Form):
