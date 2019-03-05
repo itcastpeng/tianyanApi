@@ -306,7 +306,8 @@ class WeChatApi(WeixinApiPublic):
             'noncestr': noncestr,   # 随机值32位
             'jsapi_ticket': ticket,
             'timestamp': timestamp,
-            'url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/letter_operation/js_sdk_permissions'
+            # 'url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/letter_operation/js_sdk_permissions'
+            'url': 'http://zhugeleida.zhugeyingxiao.com/tianyan'
             # 'url': 'http://tianyan.zhangcong.top/api/letter_operation/js_sdk_permissions'
         }
         str1 = self.shengchengsign(result_data)
