@@ -291,27 +291,40 @@ class WeChatApi(WeixinApiPublic):
 
     # 获取jsapi_ticket 签名算法用
     def get_jsapi_ticket(self):
+        print('self.access_token-----------------> ', self.access_token)
         url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={}&type=jsapi'.format(self.access_token)
         ret = requests.get(url)
 
-        return ret.json().get('ticket')
+        return str(ret.json().get('ticket'))
 
     # 获取signature
     def get_signature(self):
-        timestamp = int(time.time())    # 随机字符串
-        ticket = self.get_jsapi_ticket()
+
+        timestamp = int(time.time())
         noncestr = self.generateRandomStamping()
-        print('ticket---> ', ticket)
+        ticket = self.get_jsapi_ticket()
+
         result_data = {
             'noncestr': noncestr,   # 随机值32位
             'jsapi_ticket': ticket,
             'timestamp': timestamp,
-            # 'url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/letter_operation/js_sdk_permissions'
-            'url': 'http://zhugeleida.zhugeyingxiao.com/tianyan'
+            'url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
             # 'url': 'http://tianyan.zhangcong.top/api/letter_operation/js_sdk_permissions'
+
         }
+
+        # result_data = {
+        #     "noncestr": "Wm3WZYTPz0wzccnW",
+        #     "jsapi_ticket": "sM4AOVdWfPE4DxkXGEs8VMCPGGVi4C3VM0P37wVUCFvkVAy_90u5h9nbSlYy3-Sl-HhTdfl2fzFy1AOcHKP7qg",
+        #     "timestamp": "1414587457",
+        #     "url": "http://mp.weixin.qq.com?params=value",
+        # }
+
+        print('result_data---> ', result_data)
         str1 = self.shengchengsign(result_data)
+        print('str1--------> ', str1)
         signature = self.sha1(str1)
+        print('signature---------> ', signature)
         data = {
             'signature': signature,
             'timestamp': timestamp,
