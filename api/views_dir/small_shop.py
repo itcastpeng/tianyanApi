@@ -45,10 +45,10 @@ def small_shop(request):
 
             for obj in objs:
 
-                try:
-                    goods_picture = eval(obj.goods_picture)
-                except Exception:
-                    goods_picture = obj.goods_picture
+                # try:
+                #     goods_picture = eval(obj.goods_picture)
+                # except Exception:
+                #     goods_picture = obj.goods_picture
 
                 print('obj.goods_describe----> ', type(eval(obj.goods_describe)), obj.goods_describe)
                 try:
