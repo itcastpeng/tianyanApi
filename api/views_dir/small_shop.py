@@ -69,7 +69,7 @@ def small_shop(request):
                     'point_origin': obj.point_origin,  # 商品发货地
                     'goods_status_id': obj.goods_status,  # 商品状态ID
                     'goods_status': obj.get_goods_status_display(),  # 商品状态
-                    'goods_picture': goods_picture,  # 商品图片
+                    # 'goods_picture': goods_picture,  # 商品图片
                     'cover_img': obj.cover_img,  # 商品封面图片
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
@@ -99,7 +99,7 @@ def small_shop(request):
                 'goods_describe': '商品描述',
                 'point_origin': '商品发货地',
                 'goods_status': '商品状态',
-                'goods_picture': '商品图片',
+                # 'goods_picture': '商品图片',
                 'create_datetime': '商品创建时间',
             }
         else:
@@ -151,7 +151,7 @@ def small_shop_oper(request, oper_type, o_id):
                 'goods_describe': request.POST.get('goods_describe'),  # 商品描述
                 'point_origin': request.POST.get('point_origin'),  # 发货地
                 'goods_status': request.POST.get('goods_status', 2),  # 商品状态
-                'goods_picture': request.POST.get('goods_picture'),  # 商品图片
+                # 'goods_picture': request.POST.get('goods_picture'),  # 商品图片
                 'cover_img': request.POST.get('cover_img'),  # 封面图片
             }
             print('form_data-------> ', form_data)
@@ -169,7 +169,7 @@ def small_shop_oper(request, oper_type, o_id):
                     'goods_describe': form_obj.get('goods_describe'),
                     'point_origin': form_obj.get('point_origin'),
                     'goods_status': form_obj.get('goods_status'),
-                    'goods_picture': form_obj.get('goods_picture'),
+                    # 'goods_picture': form_obj.get('goods_picture'),
                     'cover_img': form_obj.get('cover_img')
                 })
                 response.code = 200
@@ -193,7 +193,7 @@ def small_shop_oper(request, oper_type, o_id):
                 'goods_describe': request.POST.get('goods_describe'),  # 商品描述
                 'point_origin': request.POST.get('point_origin'),  # 发货地
                 'goods_status': request.POST.get('goods_status', 2),  # 商品状态
-                'goods_picture': request.POST.get('goods_picture'),  # 商品图片
+                # 'goods_picture': request.POST.get('goods_picture'),  # 商品图片
                 'cover_img': request.POST.get('cover_img'),  # 商品图片
             }
 
@@ -210,7 +210,7 @@ def small_shop_oper(request, oper_type, o_id):
                     'goods_describe': form_obj.get('goods_describe'),
                     'point_origin': form_obj.get('point_origin'),
                     'goods_status': form_obj.get('goods_status'),
-                    'goods_picture': form_obj.get('goods_picture'),
+                    # 'goods_picture': form_obj.get('goods_picture'),
                     'cover_img': form_obj.get('cover_img')
                 })
                 response.code = 200

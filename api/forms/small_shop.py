@@ -265,12 +265,12 @@ class AddGoodForm(forms.Form):
             'required': '商品状态不能为空'
         }
     )
-    goods_picture = forms.CharField(
-        required=True,
-        error_messages={
-            'required': '商品图片不能为空'
-        }
-    )
+    # goods_picture = forms.CharField(
+    #     required=True,
+    #     error_messages={
+    #         'required': '商品图片不能为空'
+    #     }
+    # )
     cover_img = forms.CharField(
         required=True,
         error_messages={
@@ -360,12 +360,12 @@ class UpdateGoodForm(forms.Form):
             'required': '商品状态不能为空'
         }
     )
-    goods_picture = forms.CharField(
-        required=True,
-        error_messages={
-            'required': '商品图片不能为空'
-        }
-    )
+    # goods_picture = forms.CharField(
+    #     required=True,
+    #     error_messages={
+    #         'required': '商品图片不能为空'
+    #     }
+    # )
     cover_img = forms.CharField(
         required=True,
         error_messages={
