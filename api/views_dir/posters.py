@@ -68,6 +68,7 @@ def posters(request):
                 'ret_data': ret_data,
                 'data_count': count,
                 'posters_choices': posters_choices,
+                'set_avator': user_obj.set_avator,
                 'username': user_obj.name,
                 'phone_number': user_obj.phone_number,
             }
@@ -82,6 +83,7 @@ def posters(request):
                 'create_user__name': "创建人名字",
                 'username': "用户姓名",
                 'phone_number': "用户电话号",
+                'set_avator': "用户头像",
             }
 
         else:
