@@ -17,6 +17,7 @@ def posters(request):
         if forms_obj.is_valid():
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
+            user_id = request.GET.get('user_id')
 
             order = request.GET.get('order', '-create_datetime')
             field_dict = {
@@ -39,6 +40,8 @@ def posters(request):
 
             # 返回的数据
             ret_data = []
+
+            user_obj = models.Userprofile.objects.get(id=user_id)
 
             for obj in objs:
                 #  将查询出来的数据 加入列表
@@ -65,6 +68,9 @@ def posters(request):
                 'ret_data': ret_data,
                 'data_count': count,
                 'posters_choices': posters_choices,
+                'set_avator': user_obj.set_avator,
+                'username': user_obj.name,
+                'phone_number': user_obj.phone_number,
             }
 
             response.note = {
@@ -75,6 +81,9 @@ def posters(request):
                 'create_datetime': "创建时间",
                 'create_user_id': "创建人ID",
                 'create_user__name': "创建人名字",
+                'username': "用户姓名",
+                'phone_number': "用户电话号",
+                'set_avator': "用户头像",
             }
 
         else:
@@ -165,33 +174,7 @@ def posters_oper(request, oper_type, o_id):
                 response.msg = json.loads(PosterObj.errors.as_json())
 
     else:
+        response.code = 402
+        response.msg = "请求异常"
 
-        # 查询海报信息
-        if oper_type == 'get_poster_info':
-            objs = models.Userprofile.objects.filter(id=user_id)
-            if objs:
-                try:
-                    posters_info = eval(objs[0].posters_info)
-                except Exception:
-                    posters_info = {'title': '', 'subtitle': '', 'name': '', 'phone': '', 'time': '', 'place': ''}
-
-                response.data = {
-                    'posters_info': posters_info
-                }
-                response.code = 200
-                response.msg = '查询成功'
-                response.note = {
-                    'title': '正标题',
-                    'subtitle': '副标题',
-                    'name': '姓名',
-                    'phone': '电话',
-                    'time': '时间',
-                    'place': '地点',
-                }
-            else:
-                response.code = 301
-                response.msg = '非法用户'
-        else:
-            response.code = 402
-            response.msg = "请求异常"
     return JsonResponse(response.__dict__)
