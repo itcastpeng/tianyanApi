@@ -26,7 +26,7 @@ class watermark():
 
         # 正能量海报水印
         if posters_status == 1:
-            font = ImageFont.truetype('/usr/share/fonts/chinese/simsun.ttc', 15)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMSUN.TTC', 15)  # 使用自定义的字体，第二个参数表示字符大小
             # 文字rgb颜色
             rgb_color = (0, 0, 0)
             set_avator = self.data.get('set_avator')
@@ -63,8 +63,8 @@ class watermark():
 
             text = '详询:' + text
 
-            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/simhei.ttf', 20)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/simhei.ttf', 15)
+            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 20)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 15)
 
             zhu_title_x, zhu_title_y = image_draw.textsize(zhu_title, font=zhu_title_font)
             fu_title_x, fu_title_y = image_draw.textsize(fu_title, font=font)
