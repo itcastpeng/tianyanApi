@@ -11,9 +11,9 @@ import time
 import random
 import json
 import base64
+from PIL import Image,ImageFont,ImageDraw
 
 sysstr = platform.system()
-
 
 # 加密名字
 def encryption():
@@ -23,6 +23,24 @@ def encryption():
     hash.update(pwd.encode())
     return hash.hexdigest()
 
+# 上传海报水印
+def upload_poster_watermark(poster_path, video_name):
+    logo_path = os.path.join('statics', 'img', 'tianyan_logo.png')
+    image = Image.open(poster_path).convert('RGBA')
+
+    # 绘图句柄
+    image_draw = ImageDraw.Draw(image)
+    font = ImageFont.truetype('/usr/share/fonts/chinese/simsun.ttc', 15)  # 使用自定义的字体，第二个参数表示字符大小
+
+    text_size_x, text_size_y = image_draw.textsize('微商天眼', font=font)
+    image_draw.text((40, 20), '微商天眼', font=font, fill=(0, 0, 0))
+
+    logo_img = Image.open(logo_path) # logo
+    logo_img = logo_img.resize((20, 20), Image.ANTIALIAS)
+    image.paste(logo_img, (18, 18))
+    path = os.path.join('statics', 'img', video_name)
+    image.save(path)
+    return path
 
 # 获取名字后缀
 def get_name_suffix(fileName):
@@ -216,18 +234,16 @@ def upload_base_shard(request):
 def base_merge(request):
     response = Response.ResponseObj()
     if request.method == 'POST':
+        is_posters = request.GET.get('is_posters') # 判断是否为海报  如果该参数有值 则打水印
         forms_obj = upload_form.imgMergeForm(request.POST)
         if forms_obj.is_valid():
-
             img_source = forms_obj.cleaned_data.get('img_source')   # 文件类型
             img_name = forms_obj.cleaned_data.get('img_name')       # 图片名称
             timestamp = forms_obj.cleaned_data.get('timestamp')     # 时间戳
             chunk_num = forms_obj.cleaned_data.get('chunk_num')     # 一共多少份
             expanded_name = get_name_suffix(img_name)               # 获取扩展名称
 
-            file_dir = ''
             file_type = '图片'
-
             if img_source == 'img':
                 file_dir = os.path.join('statics', 'img')
 
@@ -238,16 +254,16 @@ def base_merge(request):
             else:
                 response.code = 402
                 response.msg = '合并异常'
+                return JsonResponse(response.__dict__)
 
             fileData = ''
             for chunk in range(chunk_num):
                 file_name = timestamp + "_" + str(chunk) + '.' + expanded_name
                 file_save_path = os.path.join('statics', 'tmp', file_name)
                 if os.path.exists(file_save_path):
-                    print('---file_save_path---file_save_path-----', file_save_path)
                     with open(file_save_path, 'r') as f:
                         fileData += f.read()
-                    # os.remove(file_save_path)  # 删除分片 文件
+                    os.remove(file_save_path)  # 删除分片 文件
 
             video_name = encryption() + img_name
             path = os.path.join(file_dir, video_name)
@@ -256,6 +272,15 @@ def base_merge(request):
                     f.write(base64.b64decode(fileData))         # 写入
             except Exception as e:
                 print('e--> ', e)
+            print('is_posters------> ', is_posters)
+            if is_posters: # 海报打水印
+                path_name = encryption() + '.png'
+                print('video_name------> ', video_name)
+                path = upload_poster_watermark(path, path_name)
+
+                os.remove(os.path.join(file_dir, video_name)) # 删除原始上传图片
+
+
             response.data = {'url': path}
             print('path-> ', path)
             response.code = 200
@@ -268,241 +293,3 @@ def base_merge(request):
         response.code = 402
         response.msg = '请求异常'
     return JsonResponse(response.__dict__)
-
-
-# 上传图片/视频
-# @csrf_exempt
-# @account.is_token(models.hzxy_userprofile)
-# def img_upload(request, oper_type):
-#     response = Response.ResponseObj()
-#
-#     if (sysstr == "Windows"):  # windows 系统
-#         YUMING = 'http://192.168.10.207:8004/'
-#     else:
-#         YUMING = 'http://xueyuan.bjhzkq.com/'
-#
-#
-#     # 上传文件
-#     if oper_type == 'file_upload':
-#         test = request.GET.get('test')     # 判断是否为机器请求
-#         file_obj = request.FILES.get('file')
-#
-#         if file_obj:
-#             fileName, houzhui = get_name_suffix(file_obj.name) # 获取点后面的后缀
-#
-#             # 判断是否有后缀
-#             if '.' not in fileName:
-#                 response.code = 301
-#                 response.msg = '后缀名不能为空'
-#                 return JsonResponse(response.__dict__)
-#
-#             # 判断文件格式
-#             if houzhui.lower().strip() not in ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf']:
-#                 response.code = 301
-#                 response.msg = '请上传正确(文件)格式'
-#                 return JsonResponse(response.__dict__)
-#
-#             if test:        # 自动上传数据 使用原文件名
-#                 file = fileName
-#
-#             else:  # 用户手动上传
-#                 file_name = encryption() # 加密字符串
-#                 file = file_name + '.' + houzhui
-#
-#             # 写入
-#             file_abs_name = os.path.join("statics", 'file', file)
-#             with open(file_abs_name, "wb") as f:
-#                 for chunk in file_obj.chunks():
-#                     f.write(chunk)
-#
-#             # 拼接路径
-#             path_name = '{}statics/file/'.format(YUMING) + file
-#             print('path_name=========> ',path_name)
-#             response.code = 200
-#             response.msg = '上传成功'
-#             response.data = path_name
-#
-#         else:
-#             response.code = 301
-#             response.msg = '上传为空'
-#
-#     # 上传图片
-#     elif oper_type == 'book_upload':
-#         test = request.GET.get('test')     # 判断是否为机器请求
-#         file_obj = request.FILES.get('file')
-#
-#         if file_obj:
-#             fileName = file_obj.name
-#             houzhui = re.search(r'[^.]+$', fileName).group(0)   # 获取点后面的后缀
-#
-#             if test:    # 本地上传数据
-#                 file = fileName
-#                 if '127' in YUMING:
-#                     file = str(1) + fileName
-#
-#             else:   # 外网用户上传
-#                 file_name = encryption()    # 加密字符串
-#                 # 判断是否有后缀
-#                 file = file_name + '.' + houzhui
-#                 if '.' not in fileName:
-#                     response.code = 301
-#                     response.msg = '后缀名不能为空'
-#                     return JsonResponse(response.__dict__)
-#
-#             # 判断图片格式
-#             if houzhui.lower().strip() not in ['bmp', 'dib', 'rle', 'emf', 'gif', 'jpg', 'jpeg', 'jpe',
-#                     'jif', 'pcx', 'dcx', 'pic', 'png', 'tga', 'tif', 'tiffxif', 'wmf', 'jfif', 'pdf']:
-#                 response.code = 301
-#                 response.msg = '请上传正确(图片)格式'
-#                 return JsonResponse(response.__dict__)
-#
-#             # 写入
-#             file_abs_name = os.path.join("statics", 'img', file)
-#             with open(file_abs_name, "wb") as f:
-#                 for chunk in file_obj.chunks():
-#                     f.write(chunk)
-#
-#             # 拼接路径
-#             path_name = '{YUMING}statics/img/'.format(YUMING=YUMING) + file
-#             print('path_name=========> ',path_name)
-#             response.code = 200
-#             response.msg = '上传成功'
-#             response.data = path_name
-#
-#         else:
-#             response.code = 301
-#             response.msg = '上传为空'
-#
-#     # 上传视频
-#     elif oper_type == 'video_upload':
-#         file_obj = request.FILES.get('file')
-#         test = request.GET.get('test')  # 判断是否为机器请求
-#         if file_obj:
-#             fileName = file_obj.name
-#             houzhui = re.search(r'[^.]+$', fileName).group(0)
-#
-#             # 判断是否有后缀
-#             if '.' not in fileName:
-#                 response.code = 301
-#                 response.msg = '后缀名不能为空'
-#                 return JsonResponse(response.__dict__)
-#
-#             if test:
-#                 file = fileName
-#                 if '127' in YUMING:
-#                     file = str(1) + fileName
-#
-#             else:
-#                 # 判断视频格式
-#                 file_name = encryption()  # 加密字符串
-#                 file = file_name + '.' + houzhui
-#
-#             if houzhui.lower().strip() not in ['rm', 'rmvb', '3gp','avi','mpeg','mpg','mkv','dat','asf',
-#                     'wmv', 'flv', 'mov','mp4','ogg','ogm']:
-#                 response.code = 301
-#                 response.msg = '请上传正确视频格式'
-#                 return JsonResponse(response.__dict__)
-#
-#             # 写入
-#             file_abs_name = os.path.join("statics", 'video', file)
-#             with open(file_abs_name, "wb") as f:
-#                 for chunk in file_obj.chunks():
-#                     f.write(chunk)
-#
-#             # 拼接视频路径
-#             path_name = '{}statics/video/'.format(YUMING) + file
-#
-#             cover_path = ''
-#             # 截取视频第一帧 (封面)
-#             if not test:
-#                 num = 0
-#                 time.sleep(1)
-#                 while True:
-#                     if num >= 3:
-#                         break
-#                     work_path = os.path.exists('statics/video/' + file)
-#                     if work_path:
-#
-#                         path = 'statics/video/' + file
-#                         cover_path = 'statics/img/' + encryption() + '.jpg'
-#                         if (sysstr == "Windows"):   # windows 系统
-#                             cmd = "C:\\baidu_Downloads\\ffmpeg-20190114-d52a1be-win64-static\\bin/ffmpeg -i
-#                                       {video_path} -y -f image2 -ss 8 -t 0.001 -s 1024*768 {img_path}".format(
-#                             video_path=path,
-#                             img_path=cover_path
-#                         )
-#                         elif (sysstr == "Linux"):   # Linux 系统
-#                             cmd = "/usr/local/bin/ffmpeg -i {video_path} -y -f image2 -ss 8 -t 0.001 -s 1024*768
-#                               {img_path}".format(
-#                                 video_path=path,
-#                                 img_path=cover_path
-#                             )
-#                         else:
-#                             cmd = ''
-#
-#                         os.system(cmd)
-#                         break
-#
-#                     else:
-#                         num += 1
-#                         continue
-#
-#             response.code = 200
-#             response.msg = '上传成功'
-#             response.data = {
-#                 'path_name':path_name,
-#                 'cover_path':YUMING + cover_path,
-#             }
-#         else:
-#             response.code = 301
-#             response.msg = '上传为空'
-#
-#
-#     # 图片,视频 上传到线上服务器(内部服务器定时刷新, statics图片视频上传线上)
-#     elif oper_type == 'upload_online':
-#         path_list = ['video'] # 路径
-#         for path in path_list:
-#             # 判断该路径下是否有文件
-#             work_path = os.listdir(os.path.join("statics", path))
-#             if work_path:
-#                 # 循环该文件夹中文件
-#                 for i in range(0, len(work_path)):
-#                     file_path = os.path.join('statics', path, work_path[i])
-#
-#                     params = {
-#                         'timestamp': '1545822031837',
-#                         'rand_str': 'a02d66aba9e84f59a0912513eab37eaf',
-#                         'user_id': '2',
-#                         'test': '1',
-#                     }
-#
-#                     if path == 'video':
-#                         qubie_path = 'video_upload'  # 上传路径拼接
-#                     else:
-#                         qubie_path = 'book_upload'
-#                     url = '{YUMING}/upload_video_book/{qubie_path}'.format(YUMING=YUMING, qubie_path=qubie_path)
-#
-#                     try:
-#                         # 打开文件并且上传到服务器
-#                         with open(file_path, 'rb') as f:
-#                             data = {'file': f}
-#                             ret = requests.post(url, files=data, params=params)
-#
-#                         if ret.json():
-#                             if int(ret.json().get('code')) == 200:
-#                                 os.remove(file_path)
-#
-#                     except Exception:
-#                         continue
-#                 response.code = 200
-#                 response.msg = '上传成功'
-#
-#             else:
-#                 response.code = 301
-#                 response.msg = '无任务'
-#
-#     else:
-#         response.code = 402
-#         response.msg = '请求异常'
-#
-#     return JsonResponse(response.__dict__)
