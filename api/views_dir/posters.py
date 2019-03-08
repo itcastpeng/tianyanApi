@@ -5,7 +5,8 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.posters import AddForm, UpdateForm, SelectForm, UpdatePosterInfoForm
 import json
-
+from publicFunc.play_watermark import watermark # 图片打水印
+from publicFunc.base64_encryption import b64decode
 
 # token验证 海报展示模块
 @account.is_token(models.Userprofile)
@@ -68,9 +69,6 @@ def posters(request):
                 'ret_data': ret_data,
                 'data_count': count,
                 'posters_choices': posters_choices,
-                'set_avator': user_obj.set_avator,
-                'username': user_obj.name,
-                'phone_number': user_obj.phone_number,
             }
 
             response.note = {
@@ -81,9 +79,6 @@ def posters(request):
                 'create_datetime': "创建时间",
                 'create_user_id': "创建人ID",
                 'create_user__name': "创建人名字",
-                'username': "用户姓名",
-                'phone_number': "用户电话号",
-                'set_avator': "用户头像",
             }
 
         else:
@@ -174,7 +169,51 @@ def posters_oper(request, oper_type, o_id):
                 response.msg = json.loads(PosterObj.errors.as_json())
 
     else:
-        response.code = 402
-        response.msg = "请求异常"
+
+        # 海报打水印
+        if oper_type == 'play_watermark':
+            posters_status = request.GET.get('posters_status')  # 水印类型
+            img_path = request.GET.get('img_path')              # 海报地址
+
+            posters_status = int(posters_status)
+            if posters_status == 1:
+                obj = models.Userprofile.objects.get(id=user_id)
+                set_avator = 'statics' + obj.set_avator.split('statics')[1]
+                # set_avator = 'statics/img/set_avator.png'
+                data = {
+                    'posters_status': posters_status,
+                    'img_path': img_path,
+                    'name': b64decode(obj.name),
+                    'phone': obj.phone_number,
+                    'set_avator': set_avator,
+                }
+
+            else:
+                place = request.GET.get('place')                # 地址
+                time = request.GET.get('time')                  # 时间
+                fu_title = request.GET.get('fu_title')          # 副标题
+                zhu_title = request.GET.get('zhu_title')        # 主标题
+                name = request.GET.get('name')                  # 姓名
+                phone = request.GET.get('phone')                # 电话
+                data = {
+                    'posters_status': posters_status,
+                    'img_path': img_path,
+                    'name': name,
+                    'phone': phone,
+                    'zhu_title': zhu_title,
+                    'fu_title': fu_title,
+                    'time': time,
+                    'place': place,
+                }
+
+            watermark_objs = watermark(data)
+            path = watermark_objs.posters_play_watermark()
+
+            response.code = 200
+            response.msg = '生成成功'
+            response.data = {'path':path}
+        else:
+            response.code = 402
+            response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)

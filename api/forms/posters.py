@@ -201,3 +201,7 @@ class UpdatePosterInfoForm(forms.Form):
             return place
         else:
             self.add_error('place', '地点过长')
+
+
+
+
