@@ -225,57 +225,66 @@ def user_oper(request, oper_type, o_id):
 
 
 # 用户登录
-def user_login_oper(request, oper_type):
+def user_login(request):
     response = Response.ResponseObj()
     weichat_api_obj = WeChatApi()
-    if oper_type == 'login':
-        redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
-        weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-                     "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                     "&state=STATE#wechat_redirect" \
-            .format(
-            appid=weichat_api_obj.APPID,
-            redirect_uri=redirect_uri,
-        )
-        response.code = 200
-        response.msg = '登录链接返回'
-        response.data = {'weixin_url':weixin_url}
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
+    weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                 "&state=STATE#wechat_redirect" \
+        .format(
+        appid=weichat_api_obj.APPID,
+        redirect_uri=redirect_uri,
+    )
+    response.code = 200
+    response.msg = '登录链接返回'
+    response.data = {'weixin_url':weixin_url}
 
-    # 判断该用户是否存在 不存在创建 存在更新 返回该用户基本信息
-    if oper_type == 'user_login_get_info':
-        code = request.GET.get('code')
-        print('code-----code-------code--------code--------code-------> ', code)
-        ret_obj = weichat_api_obj.get_openid(code)
-        openid = ret_obj.get('openid')
-        user_data = {
-            "sex": ret_obj.get('sex'),
-            "country": ret_obj.get('country'),
-            "province": ret_obj.get('province'),
-            "city": ret_obj.get('city'),
-        }
-        user_objs = models.Userprofile.objects.filter(openid=openid)
-        if user_objs:  # 客户已经存在
-            user_objs.update(**user_data)
-            user_objs = user_objs[0]
-        else:  # 不存在，创建用户
-            encode_username = base64_encryption.b64encode(
-                ret_obj['nickname']
-            )
-
-            subscribe = ret_obj.get('subscribe')
-
-            # 如果没有关注，获取个人信息判断是否关注
-            if not subscribe:
-                weichat_api_obj = WeChatApi()
-                ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                subscribe = ret_obj.get('subscribe')
-
-            user_data['set_avator'] = ret_obj.get('headimgurl')
-            user_data['subscribe'] = subscribe
-            user_data['name'] = encode_username
-            user_data['openid'] = ret_obj.get('openid')
-            user_data['token'] = get_token()
-            print("user_data --->", user_data)
-            user_objs = models.Userprofile.objects.create(**user_data)
+    # # 判断该用户是否存在 不存在创建 存在更新 返回该用户基本信息
+    # if oper_type == 'user_login_get_info':
+    #     code = request.GET.get('code')
+    #     print('code-----code-------code--------code--------code-------> ', code)
+    #     ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+    #     openid = ret_obj.get('openid')
+    #     user_data = {
+    #         "sex": ret_obj.get('sex'),
+    #         "country": ret_obj.get('country'),
+    #         "province": ret_obj.get('province'),
+    #         "city": ret_obj.get('city'),
+    #     }
+    #     user_objs = models.Userprofile.objects.filter(openid=openid)
+    #     if user_objs:  # 客户已经存在
+    #         user_objs.update(**user_data)
+    #         user_objs = user_objs[0]
+    #     else:  # 不存在，创建用户
+    #         encode_username = base64_encryption.b64encode(
+    #             ret_obj['nickname']
+    #         )
+    #
+    #         subscribe = ret_obj.get('subscribe')
+    #
+    #         # 如果没有关注，获取个人信息判断是否关注
+    #         if not subscribe:
+    #             weichat_api_obj = WeChatApi()
+    #             ret_obj = weichat_api_obj.get_user_info(openid=openid)
+    #             subscribe = ret_obj.get('subscribe')
+    #
+    #         user_data['set_avator'] = ret_obj.get('headimgurl')
+    #         user_data['subscribe'] = subscribe
+    #         user_data['name'] = encode_username
+    #         user_data['openid'] = ret_obj.get('openid')
+    #         user_data['token'] = get_token()
+    #         print("user_data --->", user_data)
+    #         user_objs = models.Userprofile.objects.create(**user_data)
+    #
+    #     objs = models.Userprofile.objects.filter(openid=openid)
+    #     obj = objs[0]
+    #     response.code = 200
+    #     response.msg = '登录成功'
+    #     response.data = {
+    #         'id':obj.id,
+    #         'name':obj.name,
+    #         'set_avator':obj.set_avator,
+    #     }
 
     return JsonResponse(response.__dict__)
