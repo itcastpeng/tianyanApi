@@ -19,7 +19,7 @@ urlpatterns = [
     # 文章管理
     url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)', article.article_oper),
     url(r'^article$', article.article),
-    url(r'^give_a_like$', article.give_a_like),
+    url(r'^give_a_like$', article.give_a_like), # 点赞
 
     # 用户管理
     url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)', user.user_oper),
@@ -48,7 +48,6 @@ urlpatterns = [
     # 微店管理
     url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
     url(r'^small_shop', small_shop.small_shop),
-    url(r'^customer_small_shop', small_shop.customer_small_shop), # 客户查看微店
 
     # ---------------------------------图片上传---------------------------------
     url(r'^upload_shard$', upload_file.upload_shard),     # 分片
