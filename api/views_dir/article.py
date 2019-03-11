@@ -16,53 +16,53 @@ import requests, datetime
 
 
 # token验证 用户展示模块
-# @account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
+@account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     team_list = request.GET.get('team_list')
-    code = request.GET.get('code')
+    # code = request.GET.get('code')
     if request.method == "GET":
-        print('code---------code-------------code----------code-----------> ', code)
-        weichat_api_obj = WeChatApi()
-        if code:
-            ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
-            openid = ret_obj.get('openid')
-            user_data = {
-                "sex": ret_obj.get('sex'),
-                "country": ret_obj.get('country'),
-                "province": ret_obj.get('province'),
-                "city": ret_obj.get('city'),
-            }
-            user_objs = models.Userprofile.objects.filter(openid=openid)
-            if user_objs:  # 客户已经存在
-                user_id = user_objs[0].id
-                print('-================客户已经存在========================================')
-                user_objs.update(**user_data)
-                user_objs = user_objs[0]
-            else:  # 不存在，创建用户
-                print('============================不存在，创建用户===============================')
-                encode_username = base64_encryption.b64encode(
-                    ret_obj['nickname']
-                )
-
-                subscribe = ret_obj.get('subscribe')
-
-                # 如果没有关注，获取个人信息判断是否关注
-                if not subscribe:
-                    weichat_api_obj = WeChatApi()
-                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                    subscribe = ret_obj.get('subscribe')
-
-                user_data['set_avator'] = ret_obj.get('headimgurl')
-                user_data['subscribe'] = subscribe
-                user_data['name'] = encode_username
-                user_data['openid'] = ret_obj.get('openid')
-                user_data['token'] = get_token()
-                user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
-                print("user_data --->", user_data)
-                objs = models.Userprofile.objects.create(**user_data)
-                user_id = objs.id
+        # print('code---------code-------------code----------code-----------> ', code)
+        # weichat_api_obj = WeChatApi()
+        # if code:
+        #     ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+        #     openid = ret_obj.get('openid')
+        #     user_data = {
+        #         "sex": ret_obj.get('sex'),
+        #         "country": ret_obj.get('country'),
+        #         "province": ret_obj.get('province'),
+        #         "city": ret_obj.get('city'),
+        #     }
+        #     user_objs = models.Userprofile.objects.filter(openid=openid)
+        #     if user_objs:  # 客户已经存在
+        #         user_id = user_objs[0].id
+        #         print('-================客户已经存在========================================')
+        #         user_objs.update(**user_data)
+        #         user_objs = user_objs[0]
+        #     else:  # 不存在，创建用户
+        #         print('============================不存在，创建用户===============================')
+        #         encode_username = base64_encryption.b64encode(
+        #             ret_obj['nickname']
+        #         )
+        #
+        #         subscribe = ret_obj.get('subscribe')
+        #
+        #         # 如果没有关注，获取个人信息判断是否关注
+        #         if not subscribe:
+        #             weichat_api_obj = WeChatApi()
+        #             ret_obj = weichat_api_obj.get_user_info(openid=openid)
+        #             subscribe = ret_obj.get('subscribe')
+        #
+        #         user_data['set_avator'] = ret_obj.get('headimgurl')
+        #         user_data['subscribe'] = subscribe
+        #         user_data['name'] = encode_username
+        #         user_data['openid'] = ret_obj.get('openid')
+        #         user_data['token'] = get_token()
+        #         user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
+        #         print("user_data --->", user_data)
+        #         objs = models.Userprofile.objects.create(**user_data)
+        #         user_id = objs.id
 
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
