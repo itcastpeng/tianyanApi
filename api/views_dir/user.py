@@ -280,9 +280,9 @@ def user_login_oper(request, oper_type):
             user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
             print("user_data --->", user_data)
             user_objs = models.Userprofile.objects.create(**user_data)
-
+        print('---------------------------------------------------------')
         timestamp = str(int(time.time()))
-        redirect_url = 'http://127.0.0.1:8008/api/article?timestamp={timestamp}&rand_str={rand_str}&user_id={user_id}&classify_type=1'.format(
+        redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article?timestamp={timestamp}&rand_str={rand_str}&user_id={user_id}&classify_type=1'.format(
             timestamp=timestamp,
             rand_str=str_encrypt(timestamp + user_objs.token),
             user_id=user_objs.id,
