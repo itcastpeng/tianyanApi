@@ -60,7 +60,8 @@ def article(request):
                 user_data['token'] = get_token()
                 user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
                 print("user_data --->", user_data)
-                models.Userprofile.objects.create(**user_data)
+                objs = models.Userprofile.objects.create(**user_data)
+                user_id = objs.id
 
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
