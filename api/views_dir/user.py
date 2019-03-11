@@ -228,7 +228,7 @@ def user_oper(request, oper_type, o_id):
 def user_login(request):
     response = Response.ResponseObj()
     weichat_api_obj = WeChatApi()
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article?classify_type=1'
     weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                  "&state=STATE#wechat_redirect" \

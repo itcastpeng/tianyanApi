@@ -23,6 +23,7 @@ def article(request):
     team_list = request.GET.get('team_list')
     code = request.GET.get('code')
     if request.method == "GET":
+        print('code---------code-------------code----------code-----------> ', code)
         weichat_api_obj = WeChatApi()
         if code:
             ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
@@ -35,9 +36,11 @@ def article(request):
             }
             user_objs = models.Userprofile.objects.filter(openid=openid)
             if user_objs:  # 客户已经存在
+                print('-================客户已经存在========================================')
                 user_objs.update(**user_data)
                 user_objs = user_objs[0]
             else:  # 不存在，创建用户
+                print('============================不存在，创建用户===============================')
                 encode_username = base64_encryption.b64encode(
                     ret_obj['nickname']
                 )
