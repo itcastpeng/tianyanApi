@@ -231,12 +231,13 @@ def user_login_oper(request, oper_type):
     if oper_type == 'login':
         redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
         weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-                     "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                     "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base" \
                      "&state=STATE#wechat_redirect" \
             .format(
             appid=weichat_api_obj.APPID,
             redirect_uri=redirect_uri,
         )
+
         response.code = 200
         response.msg = '登录链接返回'
         response.data = {'weixin_url':weixin_url}
@@ -280,7 +281,6 @@ def user_login_oper(request, oper_type):
             user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
             print("user_data --->", user_data)
             user_objs = models.Userprofile.objects.create(**user_data)
-        print('---------------------------------------------------------')
         timestamp = str(int(time.time()))
         redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article?timestamp={timestamp}&rand_str={rand_str}&user_id={user_id}&classify_type=1'.format(
             timestamp=timestamp,
