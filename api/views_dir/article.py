@@ -353,6 +353,11 @@ def article_oper(request, oper_type, o_id):
             response.data = {
                 'customer_data': customer_data
             }
+            response.note = {
+                'id': '用户ID',
+                'name': '用户名称',
+                'token': '用户token',
+            }
 
         # 热门文章查询
         elif oper_type == 'popula_articles':
