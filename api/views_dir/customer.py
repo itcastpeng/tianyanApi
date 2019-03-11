@@ -1,13 +1,13 @@
-# from django.shortcuts import render
+from django.shortcuts import render, redirect
 from api import models
 from publicFunc import Response
 # from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.customer import SelectForm
-import json
+import json, requests
 # from django.db.models import Q
-
+from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 # cerf  token验证 用户展示模块
 # @account.is_token(models.Userprofile)
@@ -77,12 +77,50 @@ def customer_oper(request, oper_type, o_id):
     # user_id = request.GET.get('user_id')
     print('request.POST -->', request.POST)
     if request.method == "POST":
-        # 记录客户查看文章时长
-        if oper_type == "record_length":
-            pass
+        # 添加客户
+        if oper_type == "add_customer":
+
+            weixin_obj = WeChatApi()
+
+            redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/customer_small_shop/0?goods_classify__oper_user_id={}'.format(o_id)
+            params = {
+                'appid': weixin_obj.APPID,
+                'redirect_uri': redirect_url,
+                'response_type': 200,
+                'scope': 'snsapi_base',
+            }
+            url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type={response_type}&scope={scope}&state={state}#wechat_redirect".format(
+                appid=params['appid'],
+                redirect_uri=params['redirect_uri'],
+                response_type=params['response_type'],
+                scope=params['scope'],
+                state='',
+            )
+            return redirect(url)
 
     else:
         response.code = 402
         response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
