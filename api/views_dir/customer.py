@@ -76,7 +76,7 @@ def customer_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     # user_id = request.GET.get('user_id')
     print('request.POST -->', request.POST)
-    if request.method == "POST":
+    if request.method == "GET":
         # 添加客户
         if oper_type == "add_customer":
 
