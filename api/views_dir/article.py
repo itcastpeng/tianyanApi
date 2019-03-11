@@ -36,6 +36,7 @@ def article(request):
             }
             user_objs = models.Userprofile.objects.filter(openid=openid)
             if user_objs:  # 客户已经存在
+                user_id = user_objs[0].id
                 print('-================客户已经存在========================================')
                 user_objs.update(**user_data)
                 user_objs = user_objs[0]
