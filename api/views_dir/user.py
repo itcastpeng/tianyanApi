@@ -277,6 +277,7 @@ def user_login_oper(request, oper_type):
             user_data['name'] = encode_username
             user_data['openid'] = ret_obj.get('openid')
             user_data['token'] = get_token()
+            user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
             print("user_data --->", user_data)
             user_objs = models.Userprofile.objects.create(**user_data)
 
