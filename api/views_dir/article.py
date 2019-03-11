@@ -2,29 +2,62 @@ from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
-
 from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm
 import json
-
+from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 import requests
 import random
-
 from django.db.models import Q
 from publicFunc.weixin import weixin_gongzhonghao_api
-
 from publicFunc import base64_encryption
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
 from bs4 import BeautifulSoup
 
 # token验证 用户展示模块
-@account.is_token(models.Userprofile)
+# @account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     team_list = request.GET.get('team_list')
+    code = request.GET.get('code')
     if request.method == "GET":
+        weichat_api_obj = WeChatApi()
+        if code:
+            ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+            openid = ret_obj.get('openid')
+            user_data = {
+                "sex": ret_obj.get('sex'),
+                "country": ret_obj.get('country'),
+                "province": ret_obj.get('province'),
+                "city": ret_obj.get('city'),
+            }
+            user_objs = models.Userprofile.objects.filter(openid=openid)
+            if user_objs:  # 客户已经存在
+                user_objs.update(**user_data)
+                user_objs = user_objs[0]
+            else:  # 不存在，创建用户
+                encode_username = base64_encryption.b64encode(
+                    ret_obj['nickname']
+                )
+
+                subscribe = ret_obj.get('subscribe')
+
+                # 如果没有关注，获取个人信息判断是否关注
+                if not subscribe:
+                    weichat_api_obj = WeChatApi()
+                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
+                    subscribe = ret_obj.get('subscribe')
+
+                user_data['set_avator'] = ret_obj.get('headimgurl')
+                user_data['subscribe'] = subscribe
+                user_data['name'] = encode_username
+                user_data['openid'] = ret_obj.get('openid')
+                user_data['token'] = get_token()
+                print("user_data --->", user_data)
+                models.Userprofile.objects.create(**user_data)
+
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
             current_page = forms_obj.cleaned_data['current_page']
