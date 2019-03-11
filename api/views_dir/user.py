@@ -280,7 +280,7 @@ def user_login_oper(request, oper_type):
             print("user_data --->", user_data)
             user_objs = models.Userprofile.objects.create(**user_data)
 
-        timestamp = int(time.time())
+        timestamp = str(int(time.time()))
         redirect_url = 'http://127.0.0.1:8008/api/article?timestamp={timestamp}&rand_str={rand_str}&user_id={user_id}&classify_type=1'.format(
             timestamp=timestamp,
             rand_str=str_encrypt(timestamp + user_objs.token),
