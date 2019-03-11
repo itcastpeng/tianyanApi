@@ -77,27 +77,9 @@ def customer_oper(request, oper_type, o_id):
     # user_id = request.GET.get('user_id')
     print('request.POST -->', request.POST)
     if request.method == "GET":
-        # 添加客户
         if oper_type == "add_customer":
 
-            weixin_obj = WeChatApi()
-
-            redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/customer_small_shop/0?goods_classify__oper_user_id={}'.format(o_id)
-            params = {
-                'appid': weixin_obj.APPID,
-                'redirect_uri': redirect_url,
-                'response_type': 200,
-                'scope': 'snsapi_userinfos',
-            }
-            url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type={response_type}&scope={scope}&state={state}#wechat_redirect".format(
-                appid=params['appid'],
-                redirect_uri=params['redirect_uri'],
-                response_type=params['response_type'],
-                scope=params['scope'],
-                state='',
-            )
-            print(url)
-
+            pass
     else:
         response.code = 402
         response.msg = "请求异常"

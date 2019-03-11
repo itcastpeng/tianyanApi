@@ -339,10 +339,20 @@ def article_oper(request, oper_type, o_id):
                 inviter_id=inviter_user_id
             )
 
-            # 此处跳转到文章页面
+            objs = models.Customer.objects.filter(openid=openid)
+            obj = objs[0]
+            customer_data = {
+                'id': obj.id,
+                'name': obj.name,
+                'token': obj.token,
+            }
 
+            # 此处跳转到文章页面
             response.code = 200
             response.msg = "打开文章关联成功"
+            response.data = {
+                'customer_data': customer_data
+            }
 
         # 热门文章查询
         elif oper_type == 'popula_articles':
@@ -407,7 +417,7 @@ def article_oper(request, oper_type, o_id):
 
     return JsonResponse(response.__dict__)
 
-
+# 点赞/取消点赞
 def give_a_like(request):
     response = Response.ResponseObj()
     form_data = {
