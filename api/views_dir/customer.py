@@ -87,7 +87,7 @@ def customer_oper(request, oper_type, o_id):
                 'appid': weixin_obj.APPID,
                 'redirect_uri': redirect_url,
                 'response_type': 200,
-                'scope': 'snsapi_base',
+                'scope': 'snsapi_userinfo ',
             }
             url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type={response_type}&scope={scope}&state={state}#wechat_redirect".format(
                 appid=params['appid'],
