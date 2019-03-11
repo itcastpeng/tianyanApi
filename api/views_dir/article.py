@@ -6,14 +6,14 @@ from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm
 import json
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-import requests
 import random
 from django.db.models import Q
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc import base64_encryption
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
-from bs4 import BeautifulSoup
+import requests, datetime
+
 
 # token验证 用户展示模块
 # @account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
@@ -58,6 +58,7 @@ def article(request):
                 user_data['name'] = encode_username
                 user_data['openid'] = ret_obj.get('openid')
                 user_data['token'] = get_token()
+                user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
                 print("user_data --->", user_data)
                 models.Userprofile.objects.create(**user_data)
 
