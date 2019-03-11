@@ -1,4 +1,4 @@
-# from django.shortcuts import render
+from django.shortcuts import render, redirect
 from api import models
 from publicFunc import Response
 from publicFunc import account
@@ -243,7 +243,7 @@ def user_login_oper(request, oper_type):
         response.data = {'weixin_url':weixin_url}
         return JsonResponse(response.__dict__)
 
-    # # 判断该用户是否存在 不存在创建 存在更新 返回该用户基本信息
+    # # 判断该用户是否存在
     elif oper_type == 'user_login_get_info':
         code = request.GET.get('code')
         print('code-----code-------code--------code--------code-------> ', code)
@@ -282,10 +282,10 @@ def user_login_oper(request, oper_type):
             print("user_data --->", user_data)
             user_objs = models.Userprofile.objects.create(**user_data)
         timestamp = str(int(time.time()))
-        redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article?timestamp={timestamp}&rand_str={rand_str}&user_id={user_id}&classify_type=1'.format(
+        redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/?timestamp={timestamp}&rand_str={rand_str}&user_id={user_id}&classify_type=1'.format(
             timestamp=timestamp,
             rand_str=str_encrypt(timestamp + user_objs.token),
             user_id=user_objs.id,
         )
-        return redirect_url
+        return redirect(redirect_url)
 
