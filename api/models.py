@@ -103,7 +103,7 @@ class Customer(models.Model):
         default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg',
         max_length=128
     )
-    openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
+    openid = models.CharField(verbose_name="openid", max_length=64)
     subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
 
 
@@ -121,7 +121,7 @@ class customer_information_the_user(models.Model):
     remote = models.TextField(verbose_name="记录信息，存json格式", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-# 用户备注客户信息
+# 用户备注客户信息  所有信息 性别等。。。。
 class user_comments_customer_information(models.Model):
     customer = models.ForeignKey('Customer', verbose_name="客户")
     user = models.ForeignKey(to='Userprofile', verbose_name='用户', null=True, blank=True)

@@ -34,7 +34,8 @@ urlpatterns = [
     url(r'^posters', posters.posters),
 
     # 客户管理  用户的用户称为客户
-    url(r'^customer', customer.customer),
+    url(r'^customer$', customer.customer),
+    url(r'^customer/(?P<oper_type>\w+)/(?P<o_id>\d+)$', customer.customer_oper),
 
     # 品牌管理
     url(r'^brand/(?P<oper_type>\w+)/(?P<o_id>\d+)', brand.brand_oper),
@@ -47,6 +48,7 @@ urlpatterns = [
     # 微店管理
     url(r'^small_shop/(?P<oper_type>\w+)/(?P<o_id>\d+)', small_shop.small_shop_oper),
     url(r'^small_shop', small_shop.small_shop),
+    url(r'^customer_small_shop', small_shop.customer_small_shop), # 客户查看微店
 
     # ---------------------------------图片上传---------------------------------
     url(r'^upload_shard$', upload_file.upload_shard),     # 分片
