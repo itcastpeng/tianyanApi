@@ -6,9 +6,9 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.user import SelectForm
 import json
-# from django.db.models import Q
+from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 import re
-import datetime
+import datetime, requests
 from publicFunc import base64_encryption
 
 # cerf  token验证 用户展示模块
@@ -218,5 +218,18 @@ def user_oper(request, oper_type, o_id):
                 'overdue_date': "有效期至",
                 'remaining_days': "剩余天数"
             }
+
+        # 用户登录
+        elif oper_type == 'user_login':
+            weichat_api_obj = WeChatApi()
+            redirect_uri = 'http://api.zhugeyingxiao.com/tianyan/'
+            weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+            "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+            "&state=STATE#wechat_redirect" \
+                .format(
+                appid=weichat_api_obj.APPID,
+                redirect_uri=redirect_uri,
+            )
+            print('------------>', weixin_url)
 
     return JsonResponse(response.__dict__)

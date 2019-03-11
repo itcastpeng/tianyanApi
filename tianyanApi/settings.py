@@ -178,4 +178,5 @@ NoValidationTokenRoute = [
     "/api/wechat/invite_members",
     "/api/team/invite_members",
     "/api/article/share_article"
+    "/api/user/user_login"
 ]
