@@ -22,8 +22,9 @@ urlpatterns = [
     url(r'^give_a_like$', article.give_a_like), # 点赞
 
     # 用户管理
-    url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)', user.user_oper),
-    url(r'^user', user.user),
+    url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)$', user.user_oper),
+    url(r'^user$', user.user),
+    url(r'^user_login/(?P<oper_type>\w+)$', user.user_login_oper), # 用户登录
 
     # 团队管理
     url(r'^team/(?P<oper_type>\w+)/(?P<o_id>\d+)', team.team_oper),
