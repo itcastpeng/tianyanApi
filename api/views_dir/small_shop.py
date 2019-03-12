@@ -17,7 +17,7 @@ def small_shop(request):
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
-
+            user_id = request.GET.get('user_id')
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             order = request.GET.get('order', '-create_datetime')
@@ -32,7 +32,7 @@ def small_shop(request):
             q = conditionCom(request, field_dict)
 
             print('q -->', q)
-            objs = models.Goods.objects.filter(q).order_by(order)
+            objs = models.Goods.objects.filter(q, goods_classify__oper_user_id=user_id).order_by(order)
             count = objs.count()
 
             if length != 0:

@@ -206,6 +206,14 @@ class WeChatApi(WeixinApiPublic):
 
         print(ret.text)
 
+    # 删除菜单
+    def deleteMenu(self):
+        url = 'https://api.weixin.qq.com/cgi-bin/menu/delete?access_token={access_token}'.format(
+            access_token=self.access_token
+        )
+        ret= requests.get(url)
+        print(ret.text)
+
     # 创建个性化菜单
     def createCustomMenu(self, menu_data):
         url = "https://api.weixin.qq.com/cgi-bin/menu/addconditional?access_token={ACCESS_TOKEN}".format(
@@ -234,7 +242,7 @@ class WeChatApi(WeixinApiPublic):
             ACCESS_TOKEN=self.access_token
         )
         ret = requests.get(url)
-        print(ret.text)
+        print('获取自定义菜单ret.text-----> ', ret.text)
 
     # 创建标签
     def create_tag(self, tag_name):
