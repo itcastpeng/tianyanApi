@@ -12,6 +12,7 @@ import datetime, requests, time
 from publicFunc import base64_encryption
 from publicFunc.account import get_token
 from publicFunc.account import str_encrypt
+from publicFunc.host import host_url
 
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -228,23 +229,39 @@ def user_oper(request, oper_type, o_id):
 def user_login_oper(request, oper_type):
     response = Response.ResponseObj()
     weichat_api_obj = WeChatApi()
-    if oper_type == 'login':
-        redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
-        weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-                     "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base" \
-                     "&state=STATE#wechat_redirect" \
-            .format(
-            appid=weichat_api_obj.APPID,
-            redirect_uri=redirect_uri,
-        )
+    # if oper_type == 'login':  # 创建 模板
+    #     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
+    #     weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+    #                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base" \
+    #                  "&state=STATE#wechat_redirect" \
+    #         .format(
+    #         appid=weichat_api_obj.APPID,
+    #         redirect_uri=redirect_uri,
+    #     )
+        # key = int(time.time())
+        # menu_data = {
+        #     'button':[
+        #         {
+        #             'type':'view',
+        #             'name':'天眼',
+        #             'url': weixin_url,
+        #             'key': key
+        #         }
+        #     ]
+        # }
 
-        response.code = 200
-        response.msg = '登录链接返回'
-        response.data = {'weixin_url':weixin_url}
-        return JsonResponse(response.__dict__)
+        # weichat_api_obj.createMenu(menu_data)
+
+        # weichat_api_obj.deleteMenu()
+        # weichat_api_obj.delMenu()
+        # data = weichat_api_obj.getMenu()
+        # print('data-----> ', data)
+        # print('weixin_url------> ', weixin_url)
+
+
 
     # # 判断该用户是否存在
-    elif oper_type == 'user_login_get_info':
+    if oper_type == 'user_login_get_info':
         code = request.GET.get('code')
         print('code-----code-------code--------code--------code-------> ', code)
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
@@ -282,9 +299,11 @@ def user_login_oper(request, oper_type):
             print("user_data --->", user_data)
             user_objs = models.Userprofile.objects.create(**user_data)
 
-        redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/?user_id={user_id}&token={token}&classify_type=1'.format(
+        redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1'.format(
+            host=host_url,
             token=user_objs.token,
             user_id=user_objs.id,
         )
         return redirect(redirect_url)
 
+    return JsonResponse(response.__dict__)
