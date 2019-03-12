@@ -60,7 +60,7 @@ def article(request):
                 print('article_list----------------> ', article_list)
                 q.add(Q(**{'id__in':article_list}), Q.AND)
 
-
+            print('classify_objs------------> ', classify_objs)
             if classify_objs:
                 classify_id_list = [obj.id for obj in classify_objs]
                 print("classify_id_list -->", classify_id_list)
@@ -68,7 +68,12 @@ def article(request):
                     q.add(Q(**{'classify_id__in': classify_id_list}), Q.AND)
 
             print('q -->', q)
-            objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
+            if q:
+                objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
+            else:
+                objs = models.Article.objects.select_related('classify').filter(
+                    create_datetime__isnull=False
+                ).order_by('like_num')
             count = objs.count()
 
             if length != 0:
