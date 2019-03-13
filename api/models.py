@@ -1,9 +1,6 @@
 from django.db import models
 
 
-# Create your models here.
-
-
 # 微商用户表
 class Userprofile(models.Model):
     name = models.CharField(verbose_name="姓名", max_length=128)
@@ -151,7 +148,11 @@ class SelectClickArticleLog(models.Model):
     is_click = models.BooleanField(verbose_name='是否点赞', default=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-
+# 用户分享文章表
+class users_forward_articles(models.Model):
+    user = models.ForeignKey('Userprofile', verbose_name='分享文章的用户')
+    article = models.ForeignKey('Article', verbose_name='分享的文章')
+    article_url = models.TextField(verbose_name='文章链接')
 
 # 团队表
 class Team(models.Model):
