@@ -162,6 +162,12 @@ class UpdateClassifyForm(forms.Form):
 
 # 查询
 class SelectForm(forms.Form):
+    id = forms.IntegerField(
+        required=False,
+        error_messages={
+            'invalid': "文章ID类型错误"
+        }
+    )
     current_page = forms.IntegerField(
         required=False,
         error_messages={
@@ -205,26 +211,30 @@ class SelectForm(forms.Form):
         return length
 
     def clean_classify_type(self):
+        id = self.data.get('id')
         classify_type = self.data.get('classify_type')
         team_list = self.data.get('team_list')
-        if team_list or classify_type:
-            if team_list:
-                team_list = json.loads(team_list)
-                if len(team_list) >= 1:
-                    print('=======================')
-                    if models.UserprofileTeam.objects.filter(team__in=team_list):
-                        return team_list
-                    else:
-                        self.add_error('team_list', '团队不存在')
-                else:
-                    self.add_error('team_list', '团队ID不能为空')
-            else:
-                if classify_type not in ["1", "2"]:
-                    self.add_error('classify_id', '分类类型传参异常')
-                else:
-                    return int(classify_type)
+        if id:
+            return id
         else:
-            self.add_error('classify_type', '请选择一项分类')
+            if team_list or classify_type:
+                if team_list:
+                    team_list = json.loads(team_list)
+                    if len(team_list) >= 1:
+                        print('=======================')
+                        if models.UserprofileTeam.objects.filter(team__in=team_list):
+                            return team_list
+                        else:
+                            self.add_error('team_list', '团队不存在')
+                    else:
+                        self.add_error('team_list', '团队ID不能为空')
+                else:
+                    if classify_type not in ["1", "2"]:
+                        self.add_error('classify_id', '分类类型传参异常')
+                    else:
+                        return int(classify_type)
+            else:
+                self.add_error('classify_type', '请选择一项分类')
 
 
 # 点赞

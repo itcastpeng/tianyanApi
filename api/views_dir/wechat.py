@@ -19,6 +19,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc import Response
 from publicFunc import account
 from publicFunc import base64_encryption
+from publicFunc.host import host_url
 
 
 # 创建或更新用户信息
@@ -200,6 +201,7 @@ def wechat(request):
 def wechat_oper(request, oper_type):
     # print('oper_type -->', oper_type)
     response = Response.ResponseObj()
+    user_id = request.GET.get('user_id')
     if request.method == "POST":
         pass
 
@@ -207,7 +209,6 @@ def wechat_oper(request, oper_type):
         # 获取用于登录的微信二维码
         weichat_api_obj = WeChatApi()
         if oper_type == "generate_qrcode":
-            user_id = request.GET.get('user_id')
             qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
             print(qc_code_url)
 
@@ -220,7 +221,6 @@ def wechat_oper(request, oper_type):
 
         # 邀请成员页面展示信息
         elif oper_type == "invite_members":
-            user_id = request.GET.get('user_id')
             team_id = request.GET.get('team_id')
 
             redirect_uri = "http://api.zhugeyingxiao.com/tianyan/team/invite_members/{team_id}".format(team_id=team_id)
@@ -247,6 +247,38 @@ def wechat_oper(request, oper_type):
                 "team_name": "团队名称",
                 "user_name": "邀请人名称",
                 "set_avator": "邀请人头像"
+            }
+
+        # 用户分享文章
+        elif oper_type == 'forwarding_article':
+            article_id = request.GET.get('article_id')
+
+            redirect_uri = "{host_url}/api/article/share_article/{article_id}".format(
+                host_url=host_url,
+                article_id=article_id
+            )
+            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                              "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                              "&state={user_id}#wechat_redirect" \
+                .format(
+                appid=weichat_api_obj.APPID,
+                redirect_uri=redirect_uri,
+                user_id=user_id
+            )
+
+            print('open_weixin_url------> ', open_weixin_url)
+
+            # 分享文章 日志记录
+            models.users_forward_articles.objects.create(
+                user_id=user_id,
+                article_id=article_id,
+                article_url=open_weixin_url
+            )
+            print('redirect_uri-> ', redirect_uri)
+            response.code = 200
+            response.msg = '转发成功'
+            response.data = {
+                'open_weixin_url': open_weixin_url
             }
 
     return JsonResponse(response.__dict__)

@@ -13,6 +13,8 @@ from publicFunc import base64_encryption
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
 import requests, datetime
+from django.shortcuts import render, redirect
+from publicFunc.host import host_url
 
 
 # token验证 用户展示模块
@@ -256,52 +258,14 @@ def article_oper(request, oper_type, o_id):
 
     else:
 
-        # 分享文章
+        # 客户打开分享的文章
         if oper_type == "share_article":
             code = request.GET.get('code')
             inviter_user_id = request.GET.get('state')  # 分享文章的用户id
             article_id = o_id              # 分享文章的id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
-            url = "https://api.weixin.qq.com/sns/oauth2/access_token?" \
-                  "appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code"\
-                .format(
-                    APPID=weichat_api_obj.APPID,
-                    SECRET=weichat_api_obj.APPSECRET,
-                    CODE=code,
-                )
-            ret = requests.get(url)
-            ret.encoding = "utf8"
-            print("ret.text -->", ret.text)
-
-            access_token = ret.json().get('access_token')
-            openid = ret.json().get('openid')
-            url = "https://api.weixin.qq.com/sns/userinfo?access_token=" \
-                  "{ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN"\
-                .format(
-                    ACCESS_TOKEN=access_token,
-                    OPENID=openid,
-                )
-            ret = requests.get(url)
-            ret.encoding = "utf8"
-            ret_obj = ret.json()
-            print('ret.text -->', ret.text)
-            print('ret_obj -->', ret_obj)
-            """
-            {
-                "openid":"oX0xv1pJPEv1nnhswmSxr0VyolLE",
-                "nickname":"张聪",
-                "sex":1,
-                "language":"zh_CN",
-                "city":"丰台",
-                "province":"北京",
-                "country":"中国",
-                "headimgurl":"http://thirdwx.qlogo.cn/mmopen/vi_32/Q0j4TwGTfTJWGnNTvluYlHj8qt8HnxMlwbRia
-                                dbv4TNrp4watI2ibPPAp2Hu6Sm1BqYf6IicNWsSrUyaYjIoy2Luw/132",
-                "privilege":[]
-            }
-            """
-            # print("ret.text -->", ret.text)
-            # updateUserInfo(openid, inviter_user_id, ret.json())
+            ret_obj = weichat_api_obj.get_openid(code)
+            openid = ret_obj.get('openid')
 
             user_data = {
                 "sex": ret_obj.get('sex'),
@@ -313,7 +277,8 @@ def article_oper(request, oper_type, o_id):
             if customer_objs:   # 客户已经存在
                 customer_objs.update(**user_data)
                 customer_obj = customer_objs[0]
-            else:   # 不存在，创建用户
+            # 不存在，创建用户
+            else:
                 encode_username = base64_encryption.b64encode(
                     ret_obj['nickname']
                 )
@@ -350,16 +315,8 @@ def article_oper(request, oper_type, o_id):
             }
 
             # 此处跳转到文章页面
-            response.code = 200
-            response.msg = "打开文章关联成功"
-            response.data = {
-                'customer_data': customer_data
-            }
-            response.note = {
-                'id': '用户ID',
-                'name': '用户名称',
-                'token': '用户token',
-            }
+            redirect_url = '{}/articl'.format(host_url)
+            return redirect(redirect_url)
 
         # 热门文章查询
         elif oper_type == 'popula_articles':

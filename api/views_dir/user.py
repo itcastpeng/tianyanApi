@@ -229,7 +229,7 @@ def user_oper(request, oper_type, o_id):
 def user_login_oper(request, oper_type):
     response = Response.ResponseObj()
     weichat_api_obj = WeChatApi()
-    # if oper_type == 'login':  # 创建 模板
+    # if oper_type == 'login':  # 创建 模板 生成跳转页面
     #     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
     #     weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
     #                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base" \
