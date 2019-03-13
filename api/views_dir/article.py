@@ -356,6 +356,7 @@ def give_a_like(request):
 # 客户打开分享的文章
 def share_article(request, o_id):
     code = request.GET.get('code')
+    print('code---------code----------code---> ', code)
     inviter_user_id = request.GET.get('state')  # 分享文章的用户id
     article_id = o_id                           # 分享文章的id
     weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
@@ -403,14 +404,14 @@ def share_article(request, o_id):
 
     objs = models.Customer.objects.filter(openid=openid)
     obj = objs[0]
-    customer_data = {
-        'id': obj.id,
-        'name': obj.name,
-        'token': obj.token,
-    }
 
     # 此处跳转到文章页面
-    redirect_url = '{}/articl'.format(host_url)
+    redirect_url = '{host_url}/article?user_id={user_id}&token={token}&id={article_id}'.format(
+        host_url=host_url,
+        article_id=article_id,
+        user_id=inviter_user_id,
+        token=obj.token,
+    )
     return redirect(redirect_url)
 
 
