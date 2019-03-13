@@ -19,6 +19,7 @@ urlpatterns = [
     # 文章管理
     url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)', article.article_oper),
     url(r'^article$', article.article),
+    url(r'^share_article/(?P<o_id>\d+)$', article.share_article), # 客户打开分享出去的文章 # 微信调用
     url(r'^give_a_like$', article.give_a_like), # 点赞
 
     # 用户管理

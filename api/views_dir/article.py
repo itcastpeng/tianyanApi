@@ -257,69 +257,8 @@ def article_oper(request, oper_type, o_id):
                 response.msg = json.loads(forms_obj.errors.as_json())
 
     else:
-
-        # 客户打开分享的文章
-        if oper_type == "share_article":
-            code = request.GET.get('code')
-            inviter_user_id = request.GET.get('state')  # 分享文章的用户id
-            article_id = o_id              # 分享文章的id
-            weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
-            ret_obj = weichat_api_obj.get_openid(code)
-            openid = ret_obj.get('openid')
-
-            user_data = {
-                "sex": ret_obj.get('sex'),
-                "country": ret_obj.get('country'),
-                "province": ret_obj.get('province'),
-                "city": ret_obj.get('city'),
-            }
-            customer_objs = models.Customer.objects.filter(openid=openid)
-            if customer_objs:   # 客户已经存在
-                customer_objs.update(**user_data)
-                customer_obj = customer_objs[0]
-            # 不存在，创建用户
-            else:
-                encode_username = base64_encryption.b64encode(
-                    ret_obj['nickname']
-                )
-
-                subscribe = ret_obj.get('subscribe')
-
-                # 如果没有关注，获取个人信息判断是否关注
-                if not subscribe:
-                    weichat_api_obj = WeChatApi()
-                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                    subscribe = ret_obj.get('subscribe')
-
-                user_data['set_avator'] = ret_obj.get('headimgurl')
-                user_data['subscribe'] = subscribe
-                user_data['name'] = encode_username
-                user_data['openid'] = ret_obj.get('openid')
-                user_data['token'] = get_token()
-                print("user_data --->", user_data)
-                customer_obj = models.Customer.objects.create(**user_data)
-
-            # 创建浏览文章记录
-            models.SelectArticleLog.objects.create(
-                customer=customer_obj,
-                article_id=article_id,
-                inviter_id=inviter_user_id
-            )
-
-            objs = models.Customer.objects.filter(openid=openid)
-            obj = objs[0]
-            customer_data = {
-                'id': obj.id,
-                'name': obj.name,
-                'token': obj.token,
-            }
-
-            # 此处跳转到文章页面
-            redirect_url = '{}/articl'.format(host_url)
-            return redirect(redirect_url)
-
         # 热门文章查询
-        elif oper_type == 'popula_articles':
+        if oper_type == 'popula_articles':
             form_obj = PopulaSelectForm(request.GET)
             if form_obj.is_valid():
                 current_page = form_obj.cleaned_data['current_page']
@@ -414,6 +353,65 @@ def give_a_like(request):
     return JsonResponse(response.__dict__)
 
 
+# 客户打开分享的文章
+def share_article(request, o_id):
+    code = request.GET.get('code')
+    inviter_user_id = request.GET.get('state')  # 分享文章的用户id
+    article_id = o_id                           # 分享文章的id
+    weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+    ret_obj = weichat_api_obj.get_openid(code)
+    openid = ret_obj.get('openid')
+
+    user_data = {
+        "sex": ret_obj.get('sex'),
+        "country": ret_obj.get('country'),
+        "province": ret_obj.get('province'),
+        "city": ret_obj.get('city'),
+    }
+    customer_objs = models.Customer.objects.filter(openid=openid)
+    if customer_objs:   # 客户已经存在
+        customer_objs.update(**user_data)
+        customer_obj = customer_objs[0]
+    # 不存在，创建用户
+    else:
+        encode_username = base64_encryption.b64encode(
+            ret_obj['nickname']
+        )
+
+        subscribe = ret_obj.get('subscribe')
+
+        # 如果没有关注，获取个人信息判断是否关注
+        if not subscribe:
+            weichat_api_obj = WeChatApi()
+            ret_obj = weichat_api_obj.get_user_info(openid=openid)
+            subscribe = ret_obj.get('subscribe')
+
+        user_data['set_avator'] = ret_obj.get('headimgurl')
+        user_data['subscribe'] = subscribe
+        user_data['name'] = encode_username
+        user_data['openid'] = ret_obj.get('openid')
+        user_data['token'] = get_token()
+        print("user_data --->", user_data)
+        customer_obj = models.Customer.objects.create(**user_data)
+
+    # 创建浏览文章记录
+    models.SelectArticleLog.objects.create(
+        customer=customer_obj,
+        article_id=article_id,
+        inviter_id=inviter_user_id
+    )
+
+    objs = models.Customer.objects.filter(openid=openid)
+    obj = objs[0]
+    customer_data = {
+        'id': obj.id,
+        'name': obj.name,
+        'token': obj.token,
+    }
+
+    # 此处跳转到文章页面
+    redirect_url = '{}/articl'.format(host_url)
+    return redirect(redirect_url)
 
 
 
