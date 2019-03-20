@@ -38,12 +38,14 @@ def get_content_article(article_url):
     p_all_tags = js_content_tag.find_all('p')
     data_list = []
 
-    for p_all_tag in p_all_tags:
-        text = p_all_tag.get_text()
 
-        if p_all_tag.find('img'):
-            text = p_all_tag.find('img').attrs.get('data-src')
-        data_list.append(text)
+    for p_all_tag in p_all_tags:
+        print('p_all_tag-----> ', p_all_tag)
+        # text = p_all_tag.get_text()
+
+        # if p_all_tag.find('img'):
+        #     text = p_all_tag.find('img').attrs.get('data-src')
+        data_list.append(str(p_all_tag))
 
     data_dict = {
         'title': title,
