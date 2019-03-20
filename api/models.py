@@ -125,6 +125,35 @@ class user_comments_customer_information(models.Model):
     customer_info = models.TextField(verbose_name='客户信息', null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
+
+# ---------------------------------文章相关--------
+# 文章管理
+class Article(models.Model):
+    title = models.CharField(verbose_name="文章标题", max_length=256, null=True)
+    content = models.TextField(verbose_name="文章内容", null=True)
+    classify = models.ForeignKey('Classify', verbose_name='所属分类', null=True, blank=True)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="article_create_user")
+    source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
+    look_num = models.IntegerField(verbose_name="查看次数", default=0)
+    like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
+    cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
+
+    top_advertising = models.TextField(verbose_name='顶层广告' ,null=True, blank=True)
+    end_advertising = models.TextField(verbose_name='底层广告' ,null=True, blank=True)
+
+# 分类表
+class Classify(models.Model):
+    name = models.CharField(verbose_name="分类名称", max_length=128)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    create_user = models.ForeignKey(
+        'Userprofile',
+        verbose_name='创建用户',
+        related_name="classify_create_user",
+        null=True,
+        blank=True
+    )  # 该字段为空，表示为默认(推荐)分类，不为空表示品牌分类
+
 # 客户查看文章日志表
 class SelectArticleLog(models.Model):
     customer = models.ForeignKey('Customer', verbose_name="查看人")
@@ -153,57 +182,9 @@ class users_forward_articles(models.Model):
     user = models.ForeignKey('Userprofile', verbose_name='分享文章的用户')
     article = models.ForeignKey('Article', verbose_name='分享的文章')
     article_url = models.TextField(verbose_name='文章链接')
-
-# 团队表
-class Team(models.Model):
-    name = models.CharField(verbose_name="团队名称", max_length=128)
-    create_user = models.ForeignKey('Userprofile', verbose_name="创建人", related_name="team_create_user")
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-
-# 分类表
-class Classify(models.Model):
-    name = models.CharField(verbose_name="分类名称", max_length=128)
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    create_user = models.ForeignKey(
-        'Userprofile',
-        verbose_name='创建用户',
-        related_name="classify_create_user",
-        null=True,
-        blank=True
-    )  # 该字段为空，表示为默认(推荐)分类，不为空表示品牌分类
-
-# 用户分享的文章
-class user_share_article(models.Model):
-    share_user = models.ForeignKey('Userprofile', verbose_name='分享的用户',
-        related_name="user_share_article_share_user", null=True)
-    share_article = models.ForeignKey('Article', verbose_name='分享的文章')
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-
-# 文章管理
-class Article(models.Model):
-    title = models.CharField(verbose_name="文章标题", max_length=256)
-    content = models.TextField(verbose_name="文章内容")
-    classify = models.ForeignKey('Classify', verbose_name='所属分类', null=True, blank=True)
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="article_create_user")
-    source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
-    look_num = models.IntegerField(verbose_name="查看次数", default=0)
-    like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
-    cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
-
-
-# 海报管理
-class Posters(models.Model):
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="posters_create_user")
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    posters_url = models.CharField(verbose_name='海报链接', max_length=256, null=True, blank=True)
-    posters_choices = (
-        (1, '正能量'),
-        (2, '邀请函')
-    )
-    posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
-
+# -----------------------------------商品相关表--------------------------
 
 # 商品分类
 class GoodsClassify(models.Model):
@@ -232,6 +213,17 @@ class Goods(models.Model):
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
 
 
+# 海报管理
+class Posters(models.Model):
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="posters_create_user")
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    posters_url = models.CharField(verbose_name='海报链接', max_length=256, null=True, blank=True)
+    posters_choices = (
+        (1, '正能量'),
+        (2, '邀请函')
+    )
+    posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
+
 # 续费管理
 class renewal_management(models.Model):
     price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
@@ -259,3 +251,8 @@ class renewal_log(models.Model):
     original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
     overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
     isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
+# 团队表
+class Team(models.Model):
+    name = models.CharField(verbose_name="团队名称", max_length=128)
+    create_user = models.ForeignKey('Userprofile', verbose_name="创建人", related_name="team_create_user")
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
