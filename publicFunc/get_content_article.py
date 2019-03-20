@@ -40,9 +40,11 @@ def get_content_article(article_url):
 
     for p_all_tag in p_all_tags:
         text = p_all_tag.get_text()
-        if p_all_tag.find('img') and p_all_tag.find('img').attrs.get('data-type') == 'png':
+
+        if p_all_tag.find('img'):
             text = p_all_tag.find('img').attrs.get('data-src')
         data_list.append(text)
+
     data_dict = {
         'title': title,
         'data_list': data_list
