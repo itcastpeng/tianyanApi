@@ -29,7 +29,7 @@ pcRequestHeader = [
 
 # 发送文章链接获取内容
 def get_content_article(article_url):
-    print('article_url------> ', article_url)
+    # print('article_url------> ', article_url)
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
     soup = BeautifulSoup(ret.text, 'lxml')
@@ -40,7 +40,7 @@ def get_content_article(article_url):
 
 
     for p_all_tag in p_all_tags:
-        print('p_all_tag-----> ', p_all_tag)
+        # print('p_all_tag-----> ', p_all_tag)
         # text = p_all_tag.get_text()
 
         # if p_all_tag.find('img'):
