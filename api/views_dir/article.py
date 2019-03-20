@@ -100,7 +100,7 @@ def article(request):
                 }
                 if id: # 如果查询详情 返回文章内容 否则数据过大
                     try:
-                        result_data['content'] = json.loads(obj.content)
+                        result_data['content'] = eval(obj.content)
                     except Exception:
                         result_data['content'] = obj.content
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
