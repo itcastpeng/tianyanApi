@@ -4,17 +4,15 @@ from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm
-import json
-from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-import random
 from django.db.models import Q
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc import base64_encryption
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
-import requests, datetime
 from django.shortcuts import render, redirect
 from publicFunc.host import host_url
+from publicFunc.get_content_article import get_content_article
+import requests, datetime, random, json
 
 
 # token验证 用户展示模块
@@ -56,7 +54,7 @@ def article(request):
                 for team_obj in team_objs:
                     team_user_list.append(team_obj['user_id'])
                 print('team_user_list--------------> ', team_user_list )
-                team_user_objs = models.user_share_article.objects.filter(share_user_id__in=team_user_list)
+                team_user_objs = models.users_forward_articles.objects.filter(user_id__in=team_user_list)
                 for i in team_user_objs:
                     article_list.append(i.share_article_id)
                 print('article_list----------------> ', article_list)
@@ -68,6 +66,7 @@ def article(request):
                 print("classify_id_list -->", classify_id_list)
                 if len(classify_id_list) > 0:
                     q.add(Q(**{'classify_id__in': classify_id_list}), Q.AND)
+
 
             print('q -->', q)
             if q:
@@ -87,23 +86,43 @@ def article(request):
             # 返回的数据s
             ret_data = []
             for obj in objs:
-                result_data = {
-                    'id': obj.id,
-                    'title': obj.title,
-                    'look_num': obj.look_num,
-                    'like_num': obj.like_num,
-                    'classify_id': obj.classify_id,
-                    'classify_name': obj.classify.name,
-                    'create_user_id': obj.create_user_id,
-                    'cover_img': obj.cover_img,
-                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                }
+                if obj.inheriting_article: # 插入内容的文章
+                    result_data = {
+                        'id': obj.inheriting_article_id,
+                        'title': obj.inheriting_article.title,
+                        'look_num': obj.inheriting_article.look_num,
+                        'like_num': obj.inheriting_article.like_num,
+                        'classify_id': obj.inheriting_article.classify_id,
+                        'classify_name': obj.inheriting_article.classify.name,
+                        'create_user_id': obj.inheriting_article.create_user_id,
+                        'cover_img': obj.inheriting_article.cover_img,
+                        'create_datetime': obj.inheriting_article.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    }
+                else:
+                    result_data = {
+                        'id': obj.id,
+                        'title': obj.title,
+                        'look_num': obj.look_num,
+                        'like_num': obj.like_num,
+                        'classify_id': obj.classify_id,
+                        'classify_name': obj.classify.name,
+                        'create_user_id': obj.create_user_id,
+                        'cover_img': obj.cover_img,
+                        'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    }
                 if id: # 如果查询详情 返回文章内容 否则数据过大
-                    result_data['content'] = eval(json.loads(obj.content))
+                    if obj.inheriting_article:  # 插入内容的文章
+                        result_data['content'] = eval(json.loads(obj.inheriting_article.content))
+                    else:
+                        result_data['content'] = eval(json.loads(obj.content))
 
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
-                    result_data['create_user__name'] = obj.create_user.name
-                    result_data['create_user__set_avator'] = obj.create_user.set_avator
+                    if obj.inheriting_article:  # 插入内容的文章
+                        result_data['create_user__name'] = obj.inheriting_article.create_user.name
+                        result_data['create_user__set_avator'] = obj.inheriting_article.create_user.set_avator
+                    else:
+                        result_data['create_user__name'] = obj.create_user.name
+                        result_data['create_user__set_avator'] = obj.create_user.set_avator
 
                 #  将查询出来的数据 加入列表
                 ret_data.append(result_data)
@@ -146,12 +165,16 @@ def article_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
+
+        # 添加文章
         if oper_type == "add":
             form_data = {
                 'create_user_id': user_id,
                 'title': request.POST.get('title'),
                 'content': request.POST.get('content'),
                 'classify_id': request.POST.get('classify_id'),
+                'top_advertising': request.POST.get('top_advertising'),
+                'end_advertising': request.POST.get('end_advertising'),
             }
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
@@ -181,16 +204,7 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        # elif oper_type == "delete":
-        #     # 删除 ID
-        #     objs = models.company.objects.filter(id=o_id)
-        #     if objs:
-        #         objs.delete()
-        #         response.code = 200
-        #         response.msg = "删除成功"
-        #     else:
-        #         response.code = 302
-        #         response.msg = '删除ID不存在'
+
         # 修改文章
         elif oper_type == "update":
             # 获取需要修改的信息
@@ -256,6 +270,7 @@ def article_oper(request, oper_type, o_id):
                 #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
+
     else:
         # 热门文章查询
         if oper_type == 'popula_articles':
@@ -268,6 +283,7 @@ def article_oper(request, oper_type, o_id):
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
+
 
                 count = objs.count()
                 #  将查询出来的数据 加入列表
@@ -298,7 +314,17 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
-        # 临时转换文章内容为数组
+
+        # 放入文章链接 获取所有内容(添加文章之前调用)
+        elif oper_type == 'get_content_article':
+            article_url = request.GET.get('article_url')
+            data_dict = get_content_article(article_url)
+
+            response.code = 200
+            response.msg = '获取内容成功'
+            response.data = {'data_dict': data_dict}
+
+        # 临时转换文章内容为数组(开发期间更改需求 临时转换)
         # elif oper_type == 'linshi':
         #     objs = models.Article.objects.all()
         #     for obj in objs:
@@ -313,6 +339,7 @@ def article_oper(request, oper_type, o_id):
         #         obj.save()
         #     response.code = 200
 
+        # 放入 文章链接 返回文章 所有内容
 
         else:
             response.code = 402
@@ -353,7 +380,7 @@ def give_a_like(request):
     return JsonResponse(response.__dict__)
 
 
-# 客户打开分享的文章
+# 客户打开 用户分享的文章 (嵌入微信url 获取用户信息 匹配openid 判断数据库是否存在 跳转文章页)
 def share_article(request, o_id):
     code = request.GET.get('code')
     print('code---------code----------code---> ', code)

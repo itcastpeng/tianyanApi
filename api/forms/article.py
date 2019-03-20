@@ -34,7 +34,18 @@ class AddForm(forms.Form):
             'required': "分类id不能为空"
         }
     )
-
+    top_advertising = forms.CharField(
+        required=True,
+        error_messages={
+            'required': "顶部广告类型错误"
+        }
+    )
+    end_advertising = forms.CharField(
+        required=True,
+        error_messages={
+            'required': "底部广告类型错误"
+        }
+    )
     # 查询文章标题是否存在
     def clean_title(self):
         create_user_id = self.data['create_user_id']
@@ -295,3 +306,19 @@ class PopulaSelectForm(forms.Form):
         else:
             length = int(self.data['length'])
         return length
+
+# 插入文章
+class InsertContentForm(forms.Form):
+    article_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "文章ID不能为空"
+        }
+    )
+    def clean_article_id(self):
+        article_id = self.data.get('article_id')
+        objs = models.Article.objects.filter(id=article_id)
+        if objs:
+            return article_id
+        else:
+            self.add_error('article_id', '无此ID')
