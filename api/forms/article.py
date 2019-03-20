@@ -142,20 +142,20 @@ class UpdateForm(forms.Form):
         else:
             return o_id
 
-    # 查询文章标题是否存在
-    def clean_title(self):
-        create_user_id = self.data['create_user_id']
-        title = self.data['title']
-        o_id = self.data['o_id']        # 文章id
-        print('o_id -->', o_id)
-        objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
-            title=title,
-        ).exclude(id=o_id)
-        if objs:
-            self.add_error('title', '标题已存在')
-        else:
-            return title
+    # # 查询文章标题是否存在
+    # def clean_title(self):
+    #     create_user_id = self.data['create_user_id']
+    #     title = self.data['title']
+    #     o_id = self.data['o_id']        # 文章id
+    #     print('o_id -->', o_id)
+    #     objs = models.Article.objects.filter(
+    #         create_user_id=create_user_id,
+    #         title=title,
+    #     ).exclude(id=o_id)
+    #     if objs:
+    #         self.add_error('title', '标题已存在')
+    #     else:
+    #         return title
 
 
 class UpdateClassifyForm(forms.Form):
