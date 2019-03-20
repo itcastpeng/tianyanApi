@@ -86,43 +86,24 @@ def article(request):
             # 返回的数据s
             ret_data = []
             for obj in objs:
-                if obj.inheriting_article: # 插入内容的文章
-                    result_data = {
-                        'id': obj.inheriting_article_id,
-                        'title': obj.inheriting_article.title,
-                        'look_num': obj.inheriting_article.look_num,
-                        'like_num': obj.inheriting_article.like_num,
-                        'classify_id': obj.inheriting_article.classify_id,
-                        'classify_name': obj.inheriting_article.classify.name,
-                        'create_user_id': obj.inheriting_article.create_user_id,
-                        'cover_img': obj.inheriting_article.cover_img,
-                        'create_datetime': obj.inheriting_article.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                    }
-                else:
-                    result_data = {
-                        'id': obj.id,
-                        'title': obj.title,
-                        'look_num': obj.look_num,
-                        'like_num': obj.like_num,
-                        'classify_id': obj.classify_id,
-                        'classify_name': obj.classify.name,
-                        'create_user_id': obj.create_user_id,
-                        'cover_img': obj.cover_img,
-                        'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                    }
+
+                result_data = {
+                    'id': obj.id,
+                    'title': obj.title,
+                    'look_num': obj.look_num,
+                    'like_num': obj.like_num,
+                    'classify_id': obj.classify_id,
+                    'classify_name': obj.classify.name,
+                    'create_user_id': obj.create_user_id,
+                    'cover_img': obj.cover_img,
+                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                }
                 if id: # 如果查询详情 返回文章内容 否则数据过大
-                    if obj.inheriting_article:  # 插入内容的文章
-                        result_data['content'] = eval(json.loads(obj.inheriting_article.content))
-                    else:
-                        result_data['content'] = eval(json.loads(obj.content))
+                    result_data['content'] = eval(json.loads(obj.content))
 
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
-                    if obj.inheriting_article:  # 插入内容的文章
-                        result_data['create_user__name'] = obj.inheriting_article.create_user.name
-                        result_data['create_user__set_avator'] = obj.inheriting_article.create_user.set_avator
-                    else:
-                        result_data['create_user__name'] = obj.create_user.name
-                        result_data['create_user__set_avator'] = obj.create_user.set_avator
+                    result_data['create_user__name'] = obj.create_user.name
+                    result_data['create_user__set_avator'] = obj.create_user.set_avator
 
                 #  将查询出来的数据 加入列表
                 ret_data.append(result_data)
