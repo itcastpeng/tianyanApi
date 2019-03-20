@@ -45,7 +45,7 @@ def get_content_article(article_url):
 
         # if p_all_tag.find('img'):
         #     text = p_all_tag.find('img').attrs.get('data-src')
-        p_all_tag = str(p_all_tag).replace('data-src', 'src').replace('?wx_fmt=png', '')
+        p_all_tag = str(p_all_tag).replace('data-src', 'src').replace('?wx_fmt=png', '').replace('?wx_fmt=gif', '')
         data_list.append(p_all_tag)
 
     data_dict = {
