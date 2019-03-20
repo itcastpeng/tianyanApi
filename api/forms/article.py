@@ -2,11 +2,70 @@ from django import forms
 from bs4 import BeautifulSoup
 from api import models
 import json
-# from publicFunc import account
-# import time
+from publicFunc.get_content_article import get_content_article
 
 
 # 添加
+# class AddForm(forms.Form):
+#     create_user_id = forms.IntegerField(
+#         required=True,
+#         error_messages={
+#             'required': '创建人不能为空'
+#         }
+#     )
+#
+#     title = forms.CharField(
+#         required=True,
+#         error_messages={
+#             'required': "标题不能为空"
+#         }
+#     )
+#     content = forms.CharField(
+#         required=True,
+#         error_messages={
+#             'required': "内容不能为空"
+#         }
+#     )
+#
+#     classify_id = forms.IntegerField(
+#         required=True,
+#         error_messages={
+#             'required': "分类id不能为空"
+#         }
+#     )
+#
+#     # 查询文章标题是否存在
+#     def clean_title(self):
+#         create_user_id = self.data['create_user_id']
+#         title = self.data['title']
+#
+#         objs = models.Article.objects.filter(
+#             create_user_id=create_user_id,
+#             title=title,
+#         )
+#         if objs:
+#             self.add_error('title', '标题已存在')
+#         else:
+#             return title
+#
+#     # 查询分类Id是否存在
+#     def clean_classify_id(self):
+#         classify_id = self.data['classify_id']
+#
+#         objs = models.Classify.objects.filter(
+#             id=classify_id,
+#         )
+#         if not objs:
+#             self.add_error('classify_id', '分类Id不存在')
+#         else:
+#             return classify_id
+#
+#     # P标签分离 数组格式存入
+#     def clean_content(self):
+#         content = self.data.get('content')
+#         return json.dumps(content)
+
+
 class AddForm(forms.Form):
     create_user_id = forms.IntegerField(
         required=True,
@@ -15,50 +74,23 @@ class AddForm(forms.Form):
         }
     )
 
-    title = forms.CharField(
+    article_url = forms.CharField(
         required=True,
         error_messages={
-            'required': "标题不能为空"
-        }
-    )
-    content = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "内容不能为空"
+            'required': '文章链接不能为空'
         }
     )
 
     classify_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "分类id不能为空"
-        }
-    )
-    top_advertising = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "顶部广告类型错误"
-        }
-    )
-    end_advertising = forms.CharField(
-        required=True,
-        error_messages={
-            'required': "底部广告类型错误"
-        }
-    )
-    # 查询文章标题是否存在
-    def clean_title(self):
-        create_user_id = self.data['create_user_id']
-        title = self.data['title']
-
-        objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
-            title=title,
+            required=True,
+            error_messages={
+                'required': "分类id不能为空"
+            }
         )
-        if objs:
-            self.add_error('title', '标题已存在')
-        else:
-            return title
+    def clean_article_url(self):
+        article_url = self.data.get('article_url')
+        data_dict = get_content_article(article_url)
+        return data_dict
 
     # 查询分类Id是否存在
     def clean_classify_id(self):
@@ -72,10 +104,7 @@ class AddForm(forms.Form):
         else:
             return classify_id
 
-    # P标签分离 数组格式存入
-    def clean_content(self):
-        content = self.data.get('content')
-        return json.dumps(content)
+
 
 # 更新
 class UpdateForm(forms.Form):

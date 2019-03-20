@@ -11,7 +11,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
 from django.shortcuts import render, redirect
 from publicFunc.host import host_url
-from publicFunc.get_content_article import get_content_article
+
 import requests, datetime, random, json
 
 
@@ -149,22 +149,28 @@ def article_oper(request, oper_type, o_id):
 
         # 添加文章
         if oper_type == "add":
+            article_url = request.POST.get('article_url')
+            classify_id = request.POST.get('classify_id')
             form_data = {
                 'create_user_id': user_id,
-                'title': request.POST.get('title'),
-                'content': request.POST.get('content'),
-                'classify_id': request.POST.get('classify_id'),
-                'top_advertising': request.POST.get('top_advertising'),
-                'end_advertising': request.POST.get('end_advertising'),
+                'article_url': article_url,
+                'classify_id': classify_id
             }
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-                #  添加数据库
-                print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
+                cleaned_data = forms_obj.cleaned_data
 
-                obj = models.Article.objects.create(**forms_obj.cleaned_data)
+                data_dict = cleaned_data.get('article_url')
+                title = data_dict.get('title')
+                data_list = data_dict.get('data_list')
+
+                obj = models.Article.objects.create(
+                    title=title,
+                    content=data_list,
+                    classify_id=cleaned_data.get('classify_id'),
+                    create_user_id=cleaned_data.get('create_user_id'),
+                )
 
                 cover_img_list = [
                     'http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png',
@@ -185,9 +191,10 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-
         # 修改文章
         elif oper_type == "update":
+            top_advertising = request.POST.get('top_advertising')
+            end_advertising = request.POST.get('end_advertising')
             # 获取需要修改的信息
             form_data = {
                 'o_id': o_id,   # 文章id
@@ -208,6 +215,8 @@ def article_oper(request, oper_type, o_id):
                 models.Article.objects.filter(id=o_id).update(
                     title=title,
                     content=content,
+                    top_advertising=top_advertising,
+                    end_advertising=end_advertising,
                 )
 
                 response.code = 200
@@ -251,7 +260,41 @@ def article_oper(request, oper_type, o_id):
                 #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-
+        # 添加文章
+        # if oper_type == "add":
+        #     form_data = {
+        #         'create_user_id': user_id,
+        #         'title': request.POST.get('title'),
+        #         'content': request.POST.get('content'),
+        #         'classify_id': request.POST.get('classify_id'),
+        #     }
+        #     #  创建 form验证 实例（参数默认转成字典）
+        #     forms_obj = AddForm(form_data)
+        #     if forms_obj.is_valid():
+        #         print("验证通过")
+        #         #  添加数据库
+        #         print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
+        #
+        #         obj = models.Article.objects.create(**forms_obj.cleaned_data)
+        #
+        #         cover_img_list = [
+        #             'http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png',
+        #             'http://tianyan.zhangcong.top/statics/img/ca47a146ff6b6b7f45742742326075cdnews3.png',
+        #             'http://tianyan.zhangcong.top/statics/img/651397a20f5f8fe15b1c12cf150ff3d3news2.png',
+        #             'http://tianyan.zhangcong.top/statics/img/a105a02aff72958b5cfb0fca97e4363anews1.png',
+        #             'http://tianyan.zhangcong.top/statics/img/1f75da72013edbb7fcaae9660ca55cbenews5.png'
+        #                           ]
+        #         cover_img = random.sample(cover_img_list, 1)
+        #
+        #         obj.cover_img = cover_img[0]
+        #         obj.save()
+        #         response.code = 200
+        #         response.msg = "添加成功"
+        #         response.data = {'id': obj.id}
+        #     else:
+        #         print("验证不通过")
+        #         response.code = 301
+        #         response.msg = json.loads(forms_obj.errors.as_json())
     else:
         # 热门文章查询
         if oper_type == 'popula_articles':
@@ -295,15 +338,6 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
-
-        # 放入文章链接 获取所有内容(添加文章之前调用)
-        elif oper_type == 'get_content_article':
-            article_url = request.GET.get('article_url')
-            data_dict = get_content_article(article_url)
-
-            response.code = 200
-            response.msg = '获取内容成功'
-            response.data = {'data_dict': data_dict}
 
         # 临时转换文章内容为数组(开发期间更改需求 临时转换)
         # elif oper_type == 'linshi':
