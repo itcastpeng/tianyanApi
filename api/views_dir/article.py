@@ -164,27 +164,18 @@ def article_oper(request, oper_type, o_id):
                 cleaned_data = forms_obj.cleaned_data
 
                 data_dict = cleaned_data.get('article_url')
+                cover_url = data_dict.get('cover_url') # 封面
                 title = data_dict.get('title')
-                data_list = data_dict.get('data_list')
+                data_list = data_dict.get('content')
 
                 obj = models.Article.objects.create(
                     title=title,
                     content=data_list,
+                    cover_img=cover_url,
                     classify_id=cleaned_data.get('classify_id'),
                     create_user_id=cleaned_data.get('create_user_id'),
                 )
 
-                cover_img_list = [
-                    'http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png',
-                    'http://tianyan.zhangcong.top/statics/img/ca47a146ff6b6b7f45742742326075cdnews3.png',
-                    'http://tianyan.zhangcong.top/statics/img/651397a20f5f8fe15b1c12cf150ff3d3news2.png',
-                    'http://tianyan.zhangcong.top/statics/img/a105a02aff72958b5cfb0fca97e4363anews1.png',
-                    'http://tianyan.zhangcong.top/statics/img/1f75da72013edbb7fcaae9660ca55cbenews5.png'
-                                  ]
-                cover_img = random.sample(cover_img_list, 1)
-
-                obj.cover_img = cover_img[0]
-                obj.save()
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'id': obj.id}
