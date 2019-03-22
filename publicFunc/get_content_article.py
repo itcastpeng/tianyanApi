@@ -159,11 +159,13 @@ def get_article(article_url):
 
         else:
             content = content.replace(key, value)
-    print('title-------> ', title)
-    print('summary------> ', summary)
-    print('cover_url------> ', cover_url)
-    print('content------> ', content)
-    return title, summary, cover_url, content
+    data = {
+        'title': title,
+        'summary':summary,
+        'cover_url':cover_url,
+        'content': content
+    }
+    return data
 
 
 
