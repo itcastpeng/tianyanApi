@@ -2,7 +2,7 @@ from django import forms
 from bs4 import BeautifulSoup
 from api import models
 import json
-from publicFunc.get_content_article import get_content_article
+from publicFunc.get_content_article import get_article
 
 
 # 添加
@@ -89,7 +89,7 @@ class AddForm(forms.Form):
         )
     def clean_article_url(self):
         article_url = self.data.get('article_url')
-        data_dict = get_content_article(article_url)
+        data_dict = get_article(article_url)
         return data_dict
 
     # 查询分类Id是否存在
