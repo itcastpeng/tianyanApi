@@ -57,7 +57,7 @@ def get_content_article(article_url):
 # URL = 'http://127.0.0.1:8001'
 URL = 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
 
-
+# 放入微信文章 获取全部内容
 def get_article(article_url):
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
