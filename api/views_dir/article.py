@@ -99,10 +99,8 @@ def article(request):
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 }
                 if id: # 如果查询详情 返回文章内容 否则数据过大
-                    try:
-                        result_data['content'] = json.loads(obj.content)
-                    except Exception:
-                        result_data['content'] = obj.content
+                    result_data['content'] = json.loads(obj.content)
+
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
                     result_data['create_user__name'] = obj.create_user.name
                     result_data['create_user__set_avator'] = obj.create_user.set_avator
@@ -170,7 +168,7 @@ def article_oper(request, oper_type, o_id):
 
                 obj = models.Article.objects.create(
                     title=title,
-                    content=data_list,
+                    content=json.dumps(data_list),
                     cover_img=cover_url,
                     classify_id=cleaned_data.get('classify_id'),
                     create_user_id=cleaned_data.get('create_user_id'),
