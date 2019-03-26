@@ -3,7 +3,7 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm
+from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle
 from django.db.models import Q
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc import base64_encryption
@@ -196,29 +196,38 @@ def article_oper(request, oper_type, o_id):
 
             forms_obj = UpdateForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-                print(forms_obj.cleaned_data)
                 o_id = forms_obj.cleaned_data['o_id']
                 title = forms_obj.cleaned_data['title']
                 content = forms_obj.cleaned_data['content']
+                objs = models.Article.objects.filter(id=o_id)
 
-                #  查询更新 数据
-                models.Article.objects.filter(id=o_id).update(
-                    title=title,
-                    content=content,
-                    top_advertising=top_advertising,
-                    end_advertising=end_advertising,
-                )
+                if int(objs[0].create_user_id) == int(user_id):
+
+                    #  如果为创建人修改 则修改文章
+                    objs.update(
+                        title=title,
+                        content=content,
+                        top_advertising=top_advertising,
+                        end_advertising=end_advertising,
+                    )
+
+                else : # 如果不是创建人修改 则创建新文章
+
+                    classify_id = request.POST.get('classify_id')
+                    models.Article.objects.create(
+                        title=title,
+                        content=content,
+                        top_advertising=top_advertising,
+                        end_advertising=end_advertising,
+                        create_user_id=user_id,
+                        classify_id=classify_id,
+                    )
 
                 response.code = 200
                 response.msg = "修改成功"
 
             else:
-                print("验证不通过")
-                # print(forms_obj.errors)
                 response.code = 301
-                # print(forms_obj.errors.as_json())
-                #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # 修改文章所属分类
@@ -231,8 +240,6 @@ def article_oper(request, oper_type, o_id):
 
             forms_obj = UpdateClassifyForm(form_data)
             if forms_obj.is_valid():
-                print("验证通过")
-                print(forms_obj.cleaned_data)
                 o_id = forms_obj.cleaned_data['o_id']
                 classify_id = forms_obj.cleaned_data['classify_id']
 
@@ -325,6 +332,22 @@ def article_oper(request, oper_type, o_id):
                     'title': '文章标题',
                     'cover_img': '文章封面'
                 }
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
+
+        # 查询是否为自己的文章
+        elif oper_type == 'decide_if_your_article':
+            form_data = {
+                'o_id': o_id,
+                'user_id': user_id
+            }
+            form_obj = DecideIfYourArticle(form_data)
+            if form_obj.is_valid():
+                o_id = form_obj.cleaned_data.get('o_id')
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {'flag': o_id}
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())

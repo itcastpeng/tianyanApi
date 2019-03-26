@@ -65,7 +65,7 @@ from publicFunc.get_content_article import get_article
 #         content = self.data.get('content')
 #         return json.dumps(content)
 
-
+# 添加文章
 class AddForm(forms.Form):
     create_user_id = forms.IntegerField(
         required=True,
@@ -103,8 +103,6 @@ class AddForm(forms.Form):
             self.add_error('classify_id', '分类Id不存在')
         else:
             return classify_id
-
-
 
 # 更新
 class UpdateForm(forms.Form):
@@ -157,7 +155,7 @@ class UpdateForm(forms.Form):
     #     else:
     #         return title
 
-
+# 修改文章标签
 class UpdateClassifyForm(forms.Form):
     o_id = forms.IntegerField(
         required=True,
@@ -198,7 +196,6 @@ class UpdateClassifyForm(forms.Form):
             self.add_error('classify_id', '分类Id不存在')
         else:
             return classify_id
-
 
 # 查询
 class SelectForm(forms.Form):
@@ -276,7 +273,6 @@ class SelectForm(forms.Form):
             else:
                 self.add_error('classify_type', '请选择一项分类')
 
-
 # 点赞
 class GiveALike(forms.Form):
     article_id = forms.IntegerField(
@@ -351,3 +347,47 @@ class InsertContentForm(forms.Form):
             return article_id
         else:
             self.add_error('article_id', '无此ID')
+
+# 判断是否为自己的文章 (修改文章前 调用)
+class DecideIfYourArticle(forms.Form):
+    o_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "文章ID不能为空"
+        }
+    )
+    user_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "登录异常"
+        }
+    )
+
+    def clean_o_id(self):
+        o_id = self.data.get('o_id')
+        user_id = self.data.get('user_id')
+        objs = models.Article.objects.filter(id=o_id)
+        if not objs:
+            self.add_error('o_id', '该文章已删除')
+        else:
+            obj = objs[0]
+            flag = False
+            if int(obj.create_user_id) == int(user_id):
+                flag = True
+            return flag
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
