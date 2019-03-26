@@ -348,10 +348,12 @@ def article_oper(request, oper_type, o_id):
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {'flag': o_id}
+                response.note = {
+                    'flag': '为True则是自己创建, 为False需要选择标签classify_id'
+                }
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
-
 
         # 临时转换文章内容为数组(开发期间更改需求 临时转换)
         # elif oper_type == 'linshi':
