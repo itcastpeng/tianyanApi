@@ -93,7 +93,7 @@ def get_article(article_url):
     cover_url = os.path.join('statics', 'img') + cover_name
     with open(cover_url, 'wb') as file:
         file.write(html.content)
-    # cover_url = '/statics/img'+ cover_name
+    cover_url = '/statics/img'+ cover_name
     # print('封面 cover_url-----> ', cover_url)
 
     # 获取所有样式
@@ -122,7 +122,7 @@ def get_article(article_url):
             with open(file_dir, 'wb') as file:
                 file.write(html.content)
             img_tag.attrs['data-src'] = URL + file_dir
-            # img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
+            img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
 
     # print('body--->', body)
     ## 处理视频的URL
@@ -148,7 +148,7 @@ def get_article(article_url):
     style_path = os.path.join('statics', 'article_css') + '/{}.css'.format(now)
     with open(style_path, 'w') as e:
         e.write(style)
-    # style = URL + '/statics/article_css/{}.css'.format(now)
+    style_path = URL + '/statics/article_css/{}.css'.format(now)
 
     # 分布标签
     data_list = []
@@ -164,7 +164,7 @@ def get_article(article_url):
         'summary':summary,
         'cover_url':cover_url,
         'content': data_list,
-        'style': style
+        'style': style_path
     }
     return data
 
