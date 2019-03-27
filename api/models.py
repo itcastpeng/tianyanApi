@@ -130,19 +130,21 @@ class user_comments_customer_information(models.Model):
 # 文章管理
 class Article(models.Model):
     title = models.CharField(verbose_name="文章标题", max_length=256, null=True)
+    summary = models.CharField(verbose_name="文章描述", max_length=256, null=True)
     content = models.TextField(verbose_name="文章内容", null=True)
-    classify = models.ForeignKey('Classify', verbose_name='所属分类', null=True, blank=True)
+    classify = models.ManyToManyField('Classify', verbose_name='所属分类')
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="article_create_user")
     source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
     look_num = models.IntegerField(verbose_name="查看次数", default=0)
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
+    style = models.TextField(verbose_name='文章样式', null=True, blank=True)
 
     top_advertising = models.TextField(verbose_name='顶层广告' ,null=True, blank=True)
     end_advertising = models.TextField(verbose_name='底层广告' ,null=True, blank=True)
 
-# 分类表
+# 文章/品牌 分类
 class Classify(models.Model):
     name = models.CharField(verbose_name="分类名称", max_length=128)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
@@ -154,9 +156,9 @@ class Classify(models.Model):
         blank=True
     )  # 该字段为空，表示为默认(推荐)分类，不为空表示品牌分类
 
-# 客户查看文章日志表
+# 客户/用户 查看文章日志表
 class SelectArticleLog(models.Model):
-    customer = models.ForeignKey('Customer', verbose_name="查看人")
+    customer = models.ForeignKey('Customer', verbose_name="查看人", null=True) # 此字段为空 为用户查看文章
     inviter = models.ForeignKey(
         'Userprofile',
         verbose_name="分享人",
@@ -172,9 +174,9 @@ class SelectArticleLog(models.Model):
 
 # 客户点赞文章日志表
 class SelectClickArticleLog(models.Model):
-    customer = models.ForeignKey('Customer', verbose_name="查看人")
+    user = models.ForeignKey('Userprofile', verbose_name='用户点赞', null=True)
+    customer = models.ForeignKey('Customer', verbose_name="查看人", null=True)
     article = models.ForeignKey('Article', verbose_name="点赞文章")
-    is_click = models.BooleanField(verbose_name='是否点赞', default=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 # 用户分享文章表

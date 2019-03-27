@@ -4,15 +4,16 @@ from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle
-from django.db.models import Q
+from django.db.models import Q, F
 from publicFunc.weixin import weixin_gongzhonghao_api
-from publicFunc import base64_encryption
+from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.account import get_token
 from django.shortcuts import render, redirect
 from publicFunc.host import host_url
-
 import requests, datetime, random, json
+from publicFunc.article_oper import give_like
+
 
 
 # token验证 用户展示模块
@@ -31,7 +32,7 @@ def article(request):
             field_dict = {
                 'id': '',
                 'title': '__contains',
-                'classify_id': '__in',
+                'classify': '',
                 'create_user_id': '__in',
                 'create_datetime': '',
                 'source_link': '',
@@ -53,26 +54,24 @@ def article(request):
                 team_user_list = []
                 for team_obj in team_objs:
                     team_user_list.append(team_obj['user_id'])
-                print('team_user_list--------------> ', team_user_list )
+
                 team_user_objs = models.users_forward_articles.objects.filter(user_id__in=team_user_list)
                 for i in team_user_objs:
                     article_list.append(i.share_article_id)
-                print('article_list----------------> ', article_list)
-                q.add(Q(**{'id__in':article_list}), Q.AND)
 
-            print('classify_objs------------> ', classify_objs)
+                q.add(Q(**{'id__in':article_list}), Q.AND)
             if classify_objs:
                 classify_id_list = [obj.id for obj in classify_objs]
-                print("classify_id_list -->", classify_id_list)
                 if len(classify_id_list) > 0:
-                    q.add(Q(**{'classify_id__in': classify_id_list}), Q.AND)
-
+                    q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
 
             print('q -->', q)
             if q:
-                objs = models.Article.objects.select_related('classify').filter(q).order_by(order)
+                objs = models.Article.objects.filter(
+                    q,
+                ).order_by(order)
             else:
-                objs = models.Article.objects.select_related('classify').filter(
+                objs = models.Article.objects.filter(
                     create_datetime__isnull=False
                 ).order_by('like_num')
             count = objs.count()
@@ -83,23 +82,63 @@ def article(request):
                 objs = objs[start_line: stop_line]
 
             id = request.GET.get('id')
-            # 返回的数据s
+            # 返回的数据
             ret_data = []
             for obj in objs:
+
+                classify_id_list = []
+                classify_name_list = []
+                if obj.classify:
+                    classify_id_list = [obj.get('id') for obj in obj.classify.values('id')]
+                    classify_name_list = [obj.get('name') for obj in obj.classify.values('name')]
 
                 result_data = {
                     'id': obj.id,
                     'title': obj.title,
+                    'summary': obj.summary,
                     'look_num': obj.look_num,
                     'like_num': obj.like_num,
-                    'classify_id': obj.classify_id,
-                    'classify_name': obj.classify.name,
+                    'classify_id_list': classify_id_list,
+                    'classify_name_list': classify_name_list,
                     'create_user_id': obj.create_user_id,
                     'cover_img': obj.cover_img,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 }
-                if id: # 如果查询详情 返回文章内容 否则数据过大
+                if id: # 如果查询详情 返回文章内容  查询全部不返回 否则数据过大
                     result_data['content'] = json.loads(obj.content)
+                    result_data['style'] = obj.style
+                    result_data['top_advertising'] = obj.top_advertising
+                    result_data['end_advertising'] = obj.end_advertising
+                    # 个人信息
+                    result_data['name'] = b64decode(user_obj.name)          # 用户名称
+                    result_data['phone_number'] = user_obj.phone_number     # 用户电话
+                    result_data['signature'] = user_obj.signature           # 用户签名
+                    result_data['set_avator'] = user_obj.set_avator         # 用户头像
+                    brand_name_list = []
+                    for i in user_obj.brand_classify.all():
+                        brand_name_list.append(i.name)
+                    result_data['brand_name'] = brand_name_list             # 用户品牌
+                    result_data['qr_code'] = user_obj.qr_code               # 用户微信二维码
+                    action = request.GET.get('action')
+
+                    if action == 'customer':  # 如果是客户查看记录查看次数 创建查看信息
+                        inviter_user_id = request.GET.get('inviter_user_id')
+                        print('=---------')
+                        models.SelectArticleLog.objects.create(
+                            customer=user_id,
+                            article_id=id,
+                            inviter_id=inviter_user_id
+                        )
+                    else:       # 用户查看文章 客户字段为空
+                        models.SelectArticleLog.objects.create(
+                            article_id=id,
+                            inviter_id=user_id
+                        )
+
+                    # 记录查看次数
+                    obj.look_num = F('look_num') + 1
+                    obj.save()
+
 
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
                     result_data['create_user__name'] = obj.create_user.name
@@ -121,13 +160,19 @@ def article(request):
                 'content': "文章内容",
                 'look_num': "查看次数",
                 'like_num': "点赞(喜欢)次数",
-                'classify_id': "所属分类id",
-                'classify_name': "所属分类名称",
+                'classify_id_list': "所属分类id",
+                'classify_name_list': "所属分类名称",
                 'create_datetime': "创建时间",
                 'cover_img': "封面图",
                 'create_user_id': "创建人ID",
                 'create_user__name': "创建人姓名",
                 'create_user__set_avator': "创建人头像",
+                'name': "用户名称",
+                'phone_number': "用户电话",
+                'signature': "用户个性签名",
+                'set_avator': "用户头像",
+                'brand_name': "用户品牌名称",
+                'qr_code': "用户微信二维码",
             }
         else:
             response.code = 301
@@ -164,34 +209,37 @@ def article_oper(request, oper_type, o_id):
                 data_dict = cleaned_data.get('article_url')
                 cover_url = data_dict.get('cover_url') # 封面
                 title = data_dict.get('title')
-                data_list = data_dict.get('content')
-
+                summary = data_dict.get('summary')
+                style = data_dict.get('style')
+                data_list = json.dumps(data_dict.get('content'))
+                # print('len(data_list)------------> ', len(data_list), data_list)
                 obj = models.Article.objects.create(
                     title=title,
-                    content=json.dumps(data_list),
+                    content=data_list,
+                    summary=summary,
                     cover_img=cover_url,
-                    classify_id=cleaned_data.get('classify_id'),
+                    style=style,
                     create_user_id=cleaned_data.get('create_user_id'),
                 )
 
+                obj.classify = cleaned_data.get('classify_id')
+                obj.save()
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'id': obj.id}
             else:
-                print("验证不通过")
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        # 修改文章
+        # 修改文章 修改文章前 调用decide_if_your_article判断flag 是否为自己的文章 不是创建返回ID 直接跳转
         elif oper_type == "update":
-            top_advertising = request.POST.get('top_advertising')
-            end_advertising = request.POST.get('end_advertising')
             # 获取需要修改的信息
             form_data = {
                 'o_id': o_id,   # 文章id
                 'create_user_id': user_id,
                 'title': request.POST.get('title'),
                 'content': request.POST.get('content'),
+                # 'summary': request.POST.get('summary'),
             }
 
             forms_obj = UpdateForm(form_data)
@@ -199,36 +247,53 @@ def article_oper(request, oper_type, o_id):
                 o_id = forms_obj.cleaned_data['o_id']
                 title = forms_obj.cleaned_data['title']
                 content = forms_obj.cleaned_data['content']
+                # summary = forms_obj.cleaned_data['summary']
                 objs = models.Article.objects.filter(id=o_id)
-
-                if int(objs[0].create_user_id) == int(user_id):
-
-                    #  如果为创建人修改 则修改文章
-                    objs.update(
-                        title=title,
-                        content=content,
-                        top_advertising=top_advertising,
-                        end_advertising=end_advertising,
-                    )
-
-                else : # 如果不是创建人修改 则创建新文章
-
-                    classify_id = request.POST.get('classify_id')
-                    models.Article.objects.create(
-                        title=title,
-                        content=content,
-                        top_advertising=top_advertising,
-                        end_advertising=end_advertising,
-                        create_user_id=user_id,
-                        classify_id=classify_id,
-                    )
-
-                response.code = 200
+                #  如果为创建人修改 则修改文章
+                objs.update(
+                    title=title,
+                    # summary=summary,
+                    content=content,
+                )
                 response.msg = "修改成功"
+                response.code = 200
 
             else:
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
+
+        # 插入我的内容  插入内容 判断是否为自己的文章 不是则创建直接跳转
+        elif oper_type == 'insert_content':
+            top_advertising = request.POST.get('top_advertising')  # 顶部内容
+            end_advertising = request.POST.get('end_advertising')  # 底部内容
+            objs = models.Article.objects.filter(id=o_id)
+            obj = objs[0]
+            if int(objs[0].create_user_id) == int(user_id):
+                if top_advertising:
+                    objs.update(
+                        top_advertising = top_advertising,
+                    )
+                else:
+                    objs.update(
+                        end_advertising = end_advertising
+                    )
+                response.msg = '更新成功'
+            else:
+                obj = models.Article.objects.create(
+                    title=obj.title,
+                    content=obj.content,
+                    cover_img=obj.cover_img,
+                    summary=obj.summary,
+                    style=obj.style,
+                    create_user_id=user_id,
+                    top_advertising=top_advertising,
+                    end_advertising=end_advertising,
+                )
+                response.msg = '创建成功'
+                response.data = {
+                    'id':obj.id
+                }
+            response.code = 200
 
         # 修改文章所属分类
         elif oper_type == "update_classify":
@@ -245,54 +310,62 @@ def article_oper(request, oper_type, o_id):
 
                 #  查询更新 数据
                 models.Article.objects.filter(id=o_id).update(
-                    classify_id=classify_id,
+                    classify=classify_id
                 )
                 response.code = 200
                 response.msg = "修改成功"
 
             else:
-                print("验证不通过")
-                # print(forms_obj.errors)
                 response.code = 301
-                # print(forms_obj.errors.as_json())
-                #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        # 添加文章
-        # if oper_type == "add":
-        #     form_data = {
-        #         'create_user_id': user_id,
-        #         'title': request.POST.get('title'),
-        #         'content': request.POST.get('content'),
-        #         'classify_id': request.POST.get('classify_id'),
-        #     }
-        #     #  创建 form验证 实例（参数默认转成字典）
-        #     forms_obj = AddForm(form_data)
-        #     if forms_obj.is_valid():
-        #         print("验证通过")
-        #         #  添加数据库
-        #         print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
-        #
-        #         obj = models.Article.objects.create(**forms_obj.cleaned_data)
-        #
-        #         cover_img_list = [
-        #             'http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png',
-        #             'http://tianyan.zhangcong.top/statics/img/ca47a146ff6b6b7f45742742326075cdnews3.png',
-        #             'http://tianyan.zhangcong.top/statics/img/651397a20f5f8fe15b1c12cf150ff3d3news2.png',
-        #             'http://tianyan.zhangcong.top/statics/img/a105a02aff72958b5cfb0fca97e4363anews1.png',
-        #             'http://tianyan.zhangcong.top/statics/img/1f75da72013edbb7fcaae9660ca55cbenews5.png'
-        #                           ]
-        #         cover_img = random.sample(cover_img_list, 1)
-        #
-        #         obj.cover_img = cover_img[0]
-        #         obj.save()
-        #         response.code = 200
-        #         response.msg = "添加成功"
-        #         response.data = {'id': obj.id}
-        #     else:
-        #         print("验证不通过")
-        #         response.code = 301
-        #         response.msg = json.loads(forms_obj.errors.as_json())
+        # 创建文章 (不是自己的文章)
+        elif oper_type == 'add_article':
+            top_advertising = request.POST.get('top_advertising')
+            end_advertising = request.POST.get('end_advertising')
+            classify_id = json.loads(request.POST.get('classify_id'))
+
+            objs = models.Article.objects.filter(id=o_id)
+            if objs:
+                obj = objs[0]
+
+                obj = models.Article.objects.create(
+                    title=obj.title,
+                    content=obj.content,
+                    cover_img=obj.cover_img,
+                    summary=obj.summary,
+                    create_user_id=user_id,
+                    top_advertising=top_advertising,
+                    end_advertising=end_advertising,
+                )
+                obj.classify = classify_id
+
+                response.msg = '创建成功'
+                response.data = {
+                    'id': obj.id
+                }
+                response.code = 200
+            else:
+                response.code = 301
+                response.msg = '该文章被删除'
+
+        # 用户点赞/取消点赞
+        elif oper_type == 'user_give_like':
+            response = Response.ResponseObj()
+            form_data = {
+                'article_id': o_id,
+                'user_id': request.GET.get('user_id')
+            }
+            form_obj = GiveALike(form_data)
+            if form_obj.is_valid():
+                user_id = form_obj.cleaned_data.get('user_id')
+                article_id = form_obj.cleaned_data.get('article_id')
+                response = give_like(user_id=user_id, article_id=article_id)  # 点赞
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
+
+
     else:
         # 热门文章查询
         if oper_type == 'popula_articles':
@@ -314,6 +387,7 @@ def article_oper(request, oper_type, o_id):
                     ret_data.append({
                         'id': obj.id,
                         'title': obj.title,
+                        'summary': obj.summary,
                         # 'content': obj.content,
                         # 'look_num': obj.look_num,
                         # 'like_num': obj.like_num,
@@ -336,7 +410,7 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
-        # 查询是否为自己的文章
+        # 查询是否为自己的文章  判断flag
         elif oper_type == 'decide_if_your_article':
             form_data = {
                 'o_id': o_id,
@@ -378,36 +452,24 @@ def article_oper(request, oper_type, o_id):
 
     return JsonResponse(response.__dict__)
 
-# 点赞/取消点赞
-def give_a_like(request):
+
+# 客户 点赞/取消点赞
+@account.is_token(models.Customer)
+def customer_give_a_like(request):
     response = Response.ResponseObj()
     form_data = {
         'article_id': request.GET.get('article_id'),
-        'customer_id': request.GET.get('customer_id')
+        'customer_id': request.GET.get('user_id')
     }
 
     form_obj = GiveALike(form_data)
     if form_obj.is_valid():
         customer_id = form_obj.cleaned_data.get('customer_id')
         article_id = form_obj.cleaned_data.get('article_id')
-
-        objs = models.SelectClickArticleLog.objects.filter(customer_id=customer_id, article_id=article_id)
-
-        response.code = 200
-        response.msg = '点赞成功'
-        if objs:
-            if objs[0].is_click:
-                is_click = False
-                response.msg = '取消点赞'
-            else:
-                is_click = True
-            objs.update(is_click=is_click)
-        else:
-            models.SelectClickArticleLog.objects.create(**{
-                'customer_id':customer_id,
-                'article_id':article_id
-            })
-
+        response = give_like(customer_id=customer_id, article_id=article_id) # 点赞
+    else:
+        response.code = 301
+        response.msg = json.loads(form_obj.errors.as_json())
     return JsonResponse(response.__dict__)
 
 
@@ -433,7 +495,7 @@ def share_article(request, o_id):
         customer_obj = customer_objs[0]
     # 不存在，创建用户
     else:
-        encode_username = base64_encryption.b64encode(
+        encode_username = b64encode(
             ret_obj['nickname']
         )
 
@@ -452,23 +514,17 @@ def share_article(request, o_id):
         user_data['token'] = get_token()
         print("user_data --->", user_data)
         customer_obj = models.Customer.objects.create(**user_data)
-
-    # 创建浏览文章记录
-    models.SelectArticleLog.objects.create(
-        customer=customer_obj,
-        article_id=article_id,
-        inviter_id=inviter_user_id
-    )
-
     objs = models.Customer.objects.filter(openid=openid)
     obj = objs[0]
 
     # 此处跳转到文章页面
-    redirect_url = '{host_url}/article?user_id={user_id}&token={token}&id={article_id}'.format(
+    redirect_url = '{host_url}/article?user_id={user_id}&token={token}&id={article_id}&action={action}&inviter_user_id={inviter_user_id}'.format(
         host_url=host_url,
         article_id=article_id,
-        user_id=inviter_user_id,
+        user_id=customer_obj.id,
         token=obj.token,
+        action='customer',
+        inviter_user_id=inviter_user_id,
     )
     return redirect(redirect_url)
 

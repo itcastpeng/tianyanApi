@@ -188,6 +188,8 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = "是否显示产品传参异常"
 
+
+
     else:
         if oper_type == "member_info":
             obj = models.Userprofile.objects.get(id=user_id)

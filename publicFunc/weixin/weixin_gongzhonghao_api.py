@@ -224,7 +224,7 @@ class WeChatApi(WeixinApiPublic):
         print(post_data_json)
         ret = requests.post(url, data=post_data_json)
 
-        print(ret.text)
+        # print(ret.text)
 
     # 删除自定义菜单
     def delMenu(self):
@@ -234,7 +234,7 @@ class WeChatApi(WeixinApiPublic):
         )
 
         ret = requests.get(url)
-        print(ret.text)
+        # print(ret.text)
 
     # 获取自定义菜单
     def getMenu(self):
@@ -242,7 +242,7 @@ class WeChatApi(WeixinApiPublic):
             ACCESS_TOKEN=self.access_token
         )
         ret = requests.get(url)
-        print('获取自定义菜单ret.text-----> ', ret.text)
+        # print('获取自定义菜单ret.text-----> ', ret.text)
 
     # 创建标签
     def create_tag(self, tag_name):
@@ -272,7 +272,7 @@ class WeChatApi(WeixinApiPublic):
         :param tag_id:  公众号标签的id
         :return:
         """
-        print("给用户关联标签")
+        # print("给用户关联标签")
         url = "https://api.weixin.qq.com/cgi-bin/tags/members/batchtagging?access_token={ACCESS_TOKEN}".format(
             ACCESS_TOKEN=self.access_token
         )
@@ -283,7 +283,7 @@ class WeChatApi(WeixinApiPublic):
             ],
             "tagid": tag_id
         }
-        print("post_data -->", post_data)
+        # print("post_data -->", post_data)
 
         ret = requests.post(url, data=json.dumps(post_data, ensure_ascii=False).encode())
         print(ret.text)
@@ -299,7 +299,7 @@ class WeChatApi(WeixinApiPublic):
 
     # 获取jsapi_ticket 签名算法用
     def get_jsapi_ticket(self):
-        print('self.access_token-----------------> ', self.access_token)
+        # print('self.access_token-----------------> ', self.access_token)
         url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket?access_token={}&type=jsapi'.format(self.access_token)
         ret = requests.get(url)
 
@@ -328,11 +328,11 @@ class WeChatApi(WeixinApiPublic):
         #     "url": "http://mp.weixin.qq.com?params=value",
         # }
 
-        print('result_data---> ', result_data)
+        # print('result_data---> ', result_data)
         str1 = self.shengchengsign(result_data)
-        print('str1--------> ', str1)
+        # print('str1--------> ', str1)
         signature = self.sha1(str1)
-        print('signature---------> ', signature)
+        # print('signature---------> ', signature)
         data = {
             'signature': signature,
             'timestamp': timestamp,
@@ -353,7 +353,7 @@ class WeChatApi(WeixinApiPublic):
         )
         ret = requests.get(url)
         ret.encoding = "utf8"
-        print("ret.text -->", ret.text)
+        # print("ret.text -->", ret.text)
 
         access_token = ret.json().get('access_token')
         openid = ret.json().get('openid')
