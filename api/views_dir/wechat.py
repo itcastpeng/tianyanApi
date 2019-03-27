@@ -253,7 +253,7 @@ def wechat_oper(request, oper_type):
         elif oper_type == 'forwarding_article':
             article_id = request.GET.get('article_id')
 
-            redirect_uri = "{host_url}share_article/{article_id}".format(
+            redirect_uri = "{host_url}api/share_article/{article_id}".format(
                 host_url=host_url,
                 article_id=article_id
             )
