@@ -518,7 +518,7 @@ def share_article(request, o_id):
     obj = objs[0]
 
     # 此处跳转到文章页面
-    redirect_url = '{host_url}/article?user_id={user_id}&token={token}&id={article_id}&action={action}&inviter_user_id={inviter_user_id}'.format(
+    redirect_url = '{host_url}#/article?user_id={user_id}&token={token}&id={article_id}&action={action}&inviter_user_id={inviter_user_id}'.format(
         host_url=host_url,
         article_id=article_id,
         user_id=customer_obj.id,
