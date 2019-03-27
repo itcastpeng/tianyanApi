@@ -148,7 +148,7 @@ def get_article(article_url):
     style_path = os.path.join('statics', 'article_css') + '/{}.css'.format(now)
     with open(style_path, 'w') as e:
         e.write(style)
-    # style = URL + '/statics/article_css/{}.css'.format(now)
+    # style_path = URL + '/statics/article_css/{}.css'.format(now)
 
     # 分布标签
     data_list = []
@@ -164,7 +164,7 @@ def get_article(article_url):
         'summary':summary,
         'cover_url':cover_url,
         'content': data_list,
-        'style': style
+        'style': style_path
     }
     return data
 
