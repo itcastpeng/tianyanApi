@@ -25,8 +25,8 @@ pcRequestHeader = [
     'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
 ]
 
-URL = 'http://192.168.10.207:8008'
-# URL = 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
+# URL = 'http://192.168.10.207:8008'
+URL = 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
 
 
 # 替换内容
