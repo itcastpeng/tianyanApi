@@ -5,66 +5,6 @@ import json
 from publicFunc.get_content_article import get_article
 
 
-# 添加
-# class AddForm(forms.Form):
-#     create_user_id = forms.IntegerField(
-#         required=True,
-#         error_messages={
-#             'required': '创建人不能为空'
-#         }
-#     )
-#
-#     title = forms.CharField(
-#         required=True,
-#         error_messages={
-#             'required': "标题不能为空"
-#         }
-#     )
-#     content = forms.CharField(
-#         required=True,
-#         error_messages={
-#             'required': "内容不能为空"
-#         }
-#     )
-#
-#     classify_id = forms.IntegerField(
-#         required=True,
-#         error_messages={
-#             'required': "分类id不能为空"
-#         }
-#     )
-#
-#     # 查询文章标题是否存在
-#     def clean_title(self):
-#         create_user_id = self.data['create_user_id']
-#         title = self.data['title']
-#
-#         objs = models.Article.objects.filter(
-#             create_user_id=create_user_id,
-#             title=title,
-#         )
-#         if objs:
-#             self.add_error('title', '标题已存在')
-#         else:
-#             return title
-#
-#     # 查询分类Id是否存在
-#     def clean_classify_id(self):
-#         classify_id = self.data['classify_id']
-#
-#         objs = models.Classify.objects.filter(
-#             id=classify_id,
-#         )
-#         if not objs:
-#             self.add_error('classify_id', '分类Id不存在')
-#         else:
-#             return classify_id
-#
-#     # P标签分离 数组格式存入
-#     def clean_content(self):
-#         content = self.data.get('content')
-#         return json.dumps(content)
-
 # 添加文章
 class AddForm(forms.Form):
     create_user_id = forms.IntegerField(
@@ -81,7 +21,7 @@ class AddForm(forms.Form):
         }
     )
 
-    classify_id = forms.IntegerField(
+    classify_id = forms.CharField(
             required=True,
             error_messages={
                 'required': "分类id不能为空"
@@ -95,14 +35,19 @@ class AddForm(forms.Form):
     # 查询分类Id是否存在
     def clean_classify_id(self):
         classify_id = self.data['classify_id']
+        classify_id = json.loads(classify_id)
 
         objs = models.Classify.objects.filter(
-            id=classify_id,
+            id__in=classify_id,
         )
         if not objs:
             self.add_error('classify_id', '分类Id不存在')
         else:
-            return classify_id
+            len_classify_id = len(classify_id)
+            if len_classify_id <= 5:
+                return classify_id
+            else:
+                self.add_error('classify_id', '标签最多不超过五个')
 
 # 更新
 class UpdateForm(forms.Form):
@@ -125,12 +70,18 @@ class UpdateForm(forms.Form):
             'required': "内容不能为空"
         }
     )
+    # summary = forms.CharField(
+    #     required=True,
+    #     error_messages={
+    #         'required': "简介不能为空"
+    #     }
+    # )
 
     # 查询文章标题是否存在
     def clean_o_id(self):
         create_user_id = self.data['create_user_id']
         o_id = self.data['o_id']        # 文章id
-
+        print('o_id---------> ', o_id)
         objs = models.Article.objects.filter(
             create_user_id=create_user_id,
             id=o_id,
@@ -164,7 +115,7 @@ class UpdateClassifyForm(forms.Form):
         }
     )
 
-    classify_id = forms.IntegerField(
+    classify_id = forms.CharField(
         required=True,
         error_messages={
             'required': "分类id不能为空"
@@ -177,7 +128,7 @@ class UpdateClassifyForm(forms.Form):
         o_id = self.data['o_id']
 
         objs = models.Article.objects.filter(
-            create_user_id=create_user_id,
+            # create_user_id=create_user_id,
             id=o_id,
         )
         if not objs:
@@ -188,14 +139,12 @@ class UpdateClassifyForm(forms.Form):
     # 查询分类Id是否存在
     def clean_classify_id(self):
         classify_id = self.data['classify_id']
-
-        objs = models.Classify.objects.filter(
-            id=classify_id,
-        )
-        if not objs:
-            self.add_error('classify_id', '分类Id不存在')
-        else:
+        classify_id = json.loads(classify_id)
+        len_classify_id = len(classify_id)
+        if len_classify_id <= 5:
             return classify_id
+        else:
+            self.add_error('classify_id', '标签最多不超过五个')
 
 # 查询
 class SelectForm(forms.Form):
@@ -278,13 +227,19 @@ class GiveALike(forms.Form):
     article_id = forms.IntegerField(
         required=True,
         error_messages={
-            'invalid': "文章ID不能为空"
+            'required': "该文章已被删除",
         }
     )
     customer_id = forms.IntegerField(
-        required=True,
+        required=False,
         error_messages={
-            'invalid': "客户ID不能为空"
+            'required': "登录异常"
+        }
+    )
+    user_id = forms.IntegerField(
+        required=False,
+        error_messages={
+            'required': "登录异常"
         }
     )
 
@@ -297,10 +252,21 @@ class GiveALike(forms.Form):
 
     def clean_customer_id(self):
         customer_id = self.data.get('customer_id')
-        if models.Customer.objects.filter(id=customer_id):
-            return customer_id
-        else:
-            self.add_error('customer_id', '客户ID不存在')
+        if customer_id:
+            if models.Customer.objects.filter(id=customer_id):
+                return customer_id
+            else:
+                self.add_error('customer_id', '请重新登录')
+
+    def clean_user_id(self):
+        user_id = self.data.get('user_id')
+        if user_id:
+            objs = models.Userprofile.objects.filter(id=user_id)
+            if objs:
+                return user_id
+            else:
+                self.add_error('user_id', '非法用户')
+
 
 # 热门查询
 class PopulaSelectForm(forms.Form):

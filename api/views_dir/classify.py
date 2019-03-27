@@ -16,8 +16,8 @@ def classify(request):
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
-            current_page = forms_obj.cleaned_data['current_page']
-            length = forms_obj.cleaned_data['length']
+            # current_page = forms_obj.cleaned_data['current_page']
+            # length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
             order = request.GET.get('order', '-create_datetime')
             field_dict = {
@@ -30,10 +30,10 @@ def classify(request):
             objs = models.Classify.objects.filter(q).order_by(order)
             count = objs.count()
 
-            if length != 0:
-                start_line = (current_page - 1) * length
-                stop_line = start_line + length
-                objs = objs[start_line: stop_line]
+            # if length != 0:
+            #     start_line = (current_page - 1) * length
+            #     stop_line = start_line + length
+            #     objs = objs[start_line: stop_line]
 
             # 返回的数据
             ret_data = []
@@ -81,18 +81,12 @@ def classify_oper(request, oper_type, o_id):
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
                 print("验证通过")
-                # print(forms_obj.cleaned_data)
-                #  添加数据库
-                # print('forms_obj.cleaned_data-->',forms_obj.cleaned_data)
                 obj = models.Classify.objects.create(**forms_obj.cleaned_data)
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'testCase': obj.id}
             else:
-                print("验证不通过")
-                # print(forms_obj.errors)
                 response.code = 301
-                # print(forms_obj.errors.as_json())
                 response.msg = json.loads(forms_obj.errors.as_json())
 
         # elif oper_type == "delete":
@@ -133,13 +127,8 @@ def classify_oper(request, oper_type, o_id):
                 else:
                     response.code = 303
                     response.msg = json.loads(forms_obj.errors.as_json())
-
             else:
-                print("验证不通过")
-                # print(forms_obj.errors)
                 response.code = 301
-                # print(forms_obj.errors.as_json())
-                #  字符串转换 json 字符串
                 response.msg = json.loads(forms_obj.errors.as_json())
 
     else:

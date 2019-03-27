@@ -1,9 +1,8 @@
 
-
-
 import requests, random, time, os, re, json
 from urllib.parse import unquote
 from bs4 import BeautifulSoup
+
 
 
 pcRequestHeader = [
@@ -26,40 +25,53 @@ pcRequestHeader = [
     'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
 ]
 
-
-
-# 发送文章链接获取内容
-# def get_content_article(article_url):
-#     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
-#     ret = requests.get(article_url, headers=headers, timeout=5)
-#     soup = BeautifulSoup(ret.text, 'lxml')
-#     title = soup.find('title').get_text().strip() # 获取标题
-#
-#     js_content_tag = soup.find(id='js_content')
-#     p_all_tags = js_content_tag.find_all('p')
-#     data_list = []
-#
-#     for p_all_tag in p_all_tags:
-#         print('p_all_tag-----> ', p_all_tag)
-#         # text = p_all_tag.get_text()
-#
-#         # if p_all_tag.find('img'):
-#         #     text = p_all_tag.find('img').attrs.get('data-src')
-#         p_all_tag = str(p_all_tag).replace('data-src', 'src').replace('?wx_fmt=png', '').replace('?wx_fmt=gif', '')
-#         data_list.append(p_all_tag)
-#
-#     data_dict = {
-#         'title': title,
-#         'data_list': data_list
-#     }
-#     return data_dict
-
 URL = 'http://192.168.10.207:8008'
 # URL = 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
 
+
+# 替换内容
+def convert_content(s, content):
+    # print('content----> ', type(content), content)
+    dict = {'url': '', 'data-src': 'src', '?wx_fmt=jpg': '', '?wx_fmt=png': '', '?wx_fmt=jpeg': '', '?wx_fmt=gif': ''}
+    for key, value in dict.items():
+        if key == 'url':
+            pattern1 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+\?\w+=\w+', re.I)  # 通过 re.compile 获得一个正则表达式对象
+            pattern2 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+', re.I)
+            results_url_list_1 = pattern1.findall(content)
+            results_url_list_2 = pattern2.findall(content)
+            results_url_list_1.extend(results_url_list_2)
+            for pattern_url in results_url_list_1:
+                # print('pattern_url------> ', pattern_url)
+                now_time = time.time()
+                ## 把图片下载到本地
+                html = s.get(pattern_url)
+                if 'wx_fmt=gif' in pattern_url:
+                    filename = "/article_%s.gif" % (now_time)
+                else:
+                    filename = "/article_%s.jpg" % (now_time)
+
+                file_dir = os.path.join('statics', 'img') + filename
+                with open(file_dir, 'wb') as file:
+                    file.write(html.content)
+                # sub_url = URL + file_dir
+                sub_url = URL + '/statics/img' + filename
+                content = content.replace(pattern_url, sub_url)
+        else:
+            content = content.replace(key, value)
+    return content
+
+# 剔除A标签
+def eliminate_label(i):
+    flag = False
+    soup = BeautifulSoup(str(i), 'lxml')
+    if soup.find_all('a'):
+        flag = True
+    return flag
+
+
 # 放入微信文章 获取全部内容
 def get_article(article_url):
-    print('article_url---> ', article_url   )
+    # print('article_url---> ', article_url   )
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
     ret.encoding = 'utf-8'
@@ -81,6 +93,7 @@ def get_article(article_url):
     cover_url = os.path.join('statics', 'img') + cover_name
     with open(cover_url, 'wb') as file:
         file.write(html.content)
+    # cover_url = '/statics/img'+ cover_name
     # print('封面 cover_url-----> ', cover_url)
 
     # 获取所有样式
@@ -108,8 +121,8 @@ def get_article(article_url):
             file_dir = os.path.join('statics', 'img') + img_name
             with open(file_dir, 'wb') as file:
                 file.write(html.content)
-            # img_tag.attrs['data-src'] = URL + file_dir
-            img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
+            img_tag.attrs['data-src'] = URL + file_dir
+            # img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
 
     # print('body--->', body)
     ## 处理视频的URL
@@ -119,9 +132,6 @@ def get_article(article_url):
         data_cover_url = iframe_tag.get('data-cover')
         if data_cover_url:
             data_cover_url = unquote(data_cover_url, 'utf-8')
-
-        # print('封面URL data_cover_url ------->>', data_cover_url)
-
         if '&' in shipin_url and 'vid=' in shipin_url:
             vid_num = shipin_url.split('vid=')[1]
             _url = shipin_url.split('?')[0]
@@ -131,45 +141,32 @@ def get_article(article_url):
         iframe_tag.attrs['allowfullscreen'] = True
         iframe_tag.attrs['data-cover'] = data_cover_url
 
-    #  拼接内容
-    content = str(style) + str(body)
 
-    dict = {'url': '', 'data-src': 'src', '?wx_fmt=jpg': '', '?wx_fmt=png': '', '?wx_fmt=jpeg': '', '?wx_fmt=gif': ''}
-    for key, value in dict.items():
-        if key == 'url':
-            pattern1 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+\?\w+=\w+', re.I)  # 通过 re.compile 获得一个正则表达式对象
-            pattern2 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+', re.I)
-            results_url_list_1 = pattern1.findall(content)
-            results_url_list_2 = pattern2.findall(content)
-            results_url_list_1.extend(results_url_list_2)
-            for pattern_url in results_url_list_1:
-                # print('pattern_url------> ', pattern_url)
-                now_time = time.time()
-                ## 把图片下载到本地
-                html = s.get(pattern_url)
-                if 'wx_fmt=gif' in pattern_url:
-                    filename = "/article_%s.gif" % (now_time)
-                else:
-                    filename = "/article_%s.jpg" % (now_time)
+    # 生成css 文件
+    now = time.time()
+    style = style.replace('<style>', '').replace('</style>', '')
+    style_path = os.path.join('statics', 'article_css') + '/{}.css'.format(now)
+    with open(style_path, 'w') as e:
+        e.write(style)
+    # style = URL + '/statics/article_css/{}.css'.format(now)
 
-                file_dir = os.path.join('statics', 'img') + filename
-                with open(file_dir, 'wb') as file:
-                    file.write(html.content)
-                # sub_url = URL + file_dir
-                sub_url = URL + '/statics/img' + filename
-                content = content.replace(pattern_url, sub_url)
-        else:
-            content = content.replace(key, value)
+    # 分布标签
+    data_list = []
+    for i in body.children:
+        flag = eliminate_label(str(i))  # 剔除A标签
+        if flag:
+            continue
+        content = convert_content(s, str(i)) # 替换内容
+        data_list.append(content)
+
     data = {
         'title': title,
         'summary':summary,
         'cover_url':cover_url,
-        'content': content
+        'content': data_list,
+        'style': style
     }
-    # with open('./1.html', 'wb') as s:
-    #     s.write(content.encode())
     return data
-
 
 
 
