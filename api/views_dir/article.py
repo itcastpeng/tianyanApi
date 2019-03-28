@@ -17,7 +17,7 @@ from publicFunc.get_content_article import get_article
 from urllib.parse import unquote,quote
 
 # token验证 用户展示模块
-# @account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
+@account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
@@ -119,22 +119,13 @@ def article(request):
                         brand_name_list.append(i.name)
                     result_data['brand_name'] = brand_name_list             # 用户品牌
                     result_data['qr_code'] = user_obj.qr_code               # 用户微信二维码
-                    action = request.GET.get('action')
 
-                    if action == 'customer':  # 如果是客户查看记录查看次数 创建查看信息
-                        inviter_user_id = request.GET.get('inviter_user_id')
-                        print('=---------')
-                        models.SelectArticleLog.objects.create(
-                            customer=user_id,
-                            article_id=id,
-                            inviter_id=inviter_user_id
-                        )
-                    else:       # 用户查看文章 客户字段为空
-                        models.SelectArticleLog.objects.create(
-                            article_id=id,
-                            inviter_id=user_id
-                        )
 
+                     # 用户查看文章 客户字段为空
+                    models.SelectArticleLog.objects.create(
+                        article_id=id,
+                        inviter_id=user_id
+                    )
                     # 记录查看次数
                     obj.look_num = F('look_num') + 1
                     obj.save()
@@ -452,23 +443,79 @@ def article_oper(request, oper_type, o_id):
     return JsonResponse(response.__dict__)
 
 
-# 客户 点赞/取消点赞
+# 客户 操作
 @account.is_token(models.Customer)
-def customer_give_a_like(request):
+def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
-    form_data = {
-        'article_id': request.GET.get('article_id'),
-        'customer_id': request.GET.get('user_id')
-    }
+    if request.method == 'GET':
+        user_id = request.GET.get('user_id')
+        if oper_type == 'give_like':
+            form_data = {
+                'article_id': request.GET.get('article_id'),
+                'customer_id': request.GET.get('user_id')
+            }
 
-    form_obj = GiveALike(form_data)
-    if form_obj.is_valid():
-        customer_id = form_obj.cleaned_data.get('customer_id')
-        article_id = form_obj.cleaned_data.get('article_id')
-        response = give_like(customer_id=customer_id, article_id=article_id) # 点赞
+            form_obj = GiveALike(form_data)
+            if form_obj.is_valid():
+                customer_id = form_obj.cleaned_data.get('customer_id')
+                article_id = form_obj.cleaned_data.get('article_id')
+                response = give_like(customer_id=customer_id, article_id=article_id) # 点赞
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
+
+        # 客户查询文章详情
+        elif oper_type == 'article':
+            id = request.GET.get('id')                          # 文章ID
+            inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
+            obj = models.Article.objects.get(id=id)
+            user_obj = models.Userprofile.objects.get(id=inviter_user_id)
+
+            result_data = {
+                'id': obj.id,
+                'title': obj.title,
+                'summary': obj.summary,
+                'look_num': obj.look_num,
+                'like_num': obj.like_num,
+                'create_user_id': obj.create_user_id,
+                'cover_img': obj.cover_img,
+                'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+            }
+            result_data['content'] = json.loads(obj.content)
+            result_data['style'] = obj.style
+            result_data['top_advertising'] = obj.top_advertising
+            result_data['end_advertising'] = obj.end_advertising
+            # 个人信息
+            result_data['name'] = b64decode(user_obj.name)  # 用户名称
+            result_data['phone_number'] = user_obj.phone_number  # 用户电话
+            result_data['signature'] = user_obj.signature  # 用户签名
+            result_data['set_avator'] = user_obj.set_avator  # 用户头像
+            brand_name_list = []
+            for i in user_obj.brand_classify.all():
+                brand_name_list.append(i.name)
+            result_data['brand_name'] = brand_name_list  # 用户品牌
+            result_data['qr_code'] = user_obj.qr_code  # 用户微信二维码
+
+            print('id, inviter_user_id---------> ',type(user_id),  id, inviter_user_id)
+            # 如果是客户查看记录查看次数 创建查看信息
+            models.SelectArticleLog.objects.create(
+                customer_id=user_id,
+                article_id=id,
+                inviter_id=inviter_user_id
+            )
+            # 记录查看次数
+            obj.look_num = F('look_num') + 1
+            obj.save()
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'result_data': result_data
+            }
+
     else:
-        response.code = 301
-        response.msg = json.loads(form_obj.errors.as_json())
+        response.code = 402
+        response.msg = '请求异常'
+
     return JsonResponse(response.__dict__)
 
 
@@ -517,12 +564,11 @@ def share_article(request, o_id):
     obj = objs[0]
 
     # 此处跳转到文章页面
-    redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&action={action}&inviter_user_id={inviter_user_id}'.format(
+    redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
         host_url=host_url,
         article_id=article_id,
         user_id=customer_obj.id,
         token=obj.token,
-        action='customer',
         inviter_user_id=inviter_user_id,
     )
     return redirect(redirect_url)
