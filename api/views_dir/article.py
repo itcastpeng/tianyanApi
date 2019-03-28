@@ -464,9 +464,9 @@ def article_oper(request, oper_type, o_id):
 @account.is_token(models.Customer)
 def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
+    inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
     if request.method == 'GET':
         user_id = request.GET.get('user_id')
-        inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
 
         # 客户查询文章详情
         if oper_type == 'article':
@@ -538,6 +538,24 @@ def article_customer_oper(request, oper_type):
                 'result_data': result_data
             }
 
+
+    else:
+        # 客户点赞
+        if oper_type == 'give_like':
+            form_data = {
+                'article_id': request.POST.get('article_id'),
+                'customer_id': request.GET.get('user_id')
+            }
+
+            form_obj = GiveALike(form_data)
+            if form_obj.is_valid():
+                customer_id = form_obj.cleaned_data.get('customer_id')
+                article_id = form_obj.cleaned_data.get('article_id')
+                response = give_like(customer_id=customer_id, article_id=article_id)  # 点赞
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
+
         # 客户查询微店分类
         elif oper_type == 'goods_classify':
             objs = models.GoodsClassify.objects.filter(
@@ -571,7 +589,9 @@ def article_customer_oper(request, oper_type):
                 'is_good': '该分类下是否有商品',
             }
 
-        # 客户查询商品
+            # 客户查询商品
+
+        # 查询微店
         elif oper_type == 'small_shop':
             forms_obj = select_form(request.GET)
             if forms_obj.is_valid():
@@ -639,23 +659,6 @@ def article_customer_oper(request, oper_type):
             else:
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
-
-    else:
-        # 客户点赞
-        if oper_type == 'give_like':
-            form_data = {
-                'article_id': request.POST.get('article_id'),
-                'customer_id': request.GET.get('user_id')
-            }
-
-            form_obj = GiveALike(form_data)
-            if form_obj.is_valid():
-                customer_id = form_obj.cleaned_data.get('customer_id')
-                article_id = form_obj.cleaned_data.get('article_id')
-                response = give_like(customer_id=customer_id, article_id=article_id)  # 点赞
-            else:
-                response.code = 301
-                response.msg = json.loads(form_obj.errors.as_json())
 
         else:
             response.code = 402
