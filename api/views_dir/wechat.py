@@ -6,7 +6,7 @@
 
 from django.shortcuts import HttpResponse
 from django.http import JsonResponse
-
+from urllib.parse import unquote,quote
 from api import models
 # import base64
 # import time
@@ -252,23 +252,19 @@ def wechat_oper(request, oper_type):
         # 用户分享文章
         elif oper_type == 'forwarding_article':
             article_id = request.GET.get('article_id')
-
-            # redirect_uri = "{host_url}api/share_article/{article_id}".format(
             redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + article_id
 
-
-            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-                              "appid={appid}&response_type=code&scope={scope}&state={user_id}&redirect_uri={redirect_uri}#wechat_redirect" \
+            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={user_id}#wechat_redirect" \
                 .format(
                 scope='snsapi_userinfo',
                 appid=weichat_api_obj.APPID,
                 redirect_uri=redirect_uri,
                 user_id=user_id
             )
-
-            open_weixin_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/redirect_url?share_url={share_url}'.format(
-                share_url=open_weixin_url
-            )
+            redirect_url = quote(open_weixin_url, 'utf-8')
+            print('redirect_url--------> ', redirect_url)
+            open_weixin_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/redirect_url?share_url=%s' % redirect_url
+            # open_weixin_url = 'http://127.0.0.1:8008/api/redirect_url?share_url=%s' % redirect_url
 
             # 分享文章 日志记录
             models.users_forward_articles.objects.create(

@@ -529,9 +529,10 @@ def share_article(request, o_id):
 
 
 def redirect_url(request):
+    print('request.GET--------------> ', request.GET)
     redirect_url = request.GET.get('share_url')
     # redirect_url = unquote(share_url, 'utf-8')
-    # print('=-------跳转链接--> ', redirect_url)
+    print('=-------跳转链接--> ', redirect_url)
     return redirect(redirect_url)
 
 
