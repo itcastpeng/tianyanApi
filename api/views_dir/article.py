@@ -16,8 +16,8 @@ from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
 from publicFunc.forwarding_article import forwarding_article
 
-# token验证 用户展示模块
-@account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
+# token验证 文章展示模块
+@account.is_token(models.Userprofile)
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
@@ -175,8 +175,8 @@ def article(request):
     return JsonResponse(response.__dict__)
 
 
-# 增删改
-# token验证
+
+# token验证 用户操作文章
 @account.is_token(models.Userprofile)
 def article_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
@@ -443,6 +443,15 @@ def article_oper(request, oper_type, o_id):
     return JsonResponse(response.__dict__)
 
 
+
+
+
+
+
+
+
+
+
 # 客户 操作
 @account.is_token(models.Customer)
 def article_customer_oper(request, oper_type):
@@ -497,7 +506,9 @@ def article_customer_oper(request, oper_type):
             result_data['qr_code'] = user_obj.qr_code  # 用户微信二维码
 
             article_objs = models.Article.objects.filter(
-                title__isnull=False,
+                title__isnull=False
+            ).exclude(
+                id=id
             ).order_by('look_num')[0]
 
             popula_articles_list = []
