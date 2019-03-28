@@ -85,6 +85,13 @@ def article(request):
             # 返回的数据
             ret_data = []
             for obj in objs:
+                is_like = False # 是否点赞
+                log_obj = models.SelectClickArticleLog.objects.filter(
+                    article_id=obj.id,
+                    user_id=user_id
+                )
+                if log_obj:
+                    is_like = True
 
                 classify_id_list = []
                 classify_name_list = []
@@ -102,6 +109,7 @@ def article(request):
                     'classify_name_list': classify_name_list,
                     'create_user_id': obj.create_user_id,
                     'cover_img': obj.cover_img,
+                    'is_like': is_like,                         # 是否点赞
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 }
                 if id: # 如果查询详情 返回文章内容  查询全部不返回 否则数据过大
@@ -458,28 +466,21 @@ def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
     if request.method == 'GET':
         user_id = request.GET.get('user_id')
-        if oper_type == 'give_like':
-            form_data = {
-                'article_id': request.GET.get('article_id'),
-                'customer_id': request.GET.get('user_id')
-            }
-
-            form_obj = GiveALike(form_data)
-            if form_obj.is_valid():
-                customer_id = form_obj.cleaned_data.get('customer_id')
-                article_id = form_obj.cleaned_data.get('article_id')
-                response = give_like(customer_id=customer_id, article_id=article_id) # 点赞
-            else:
-                response.code = 301
-                response.msg = json.loads(form_obj.errors.as_json())
 
         # 客户查询文章详情
-        elif oper_type == 'article':
-            print('=----------------------------')
+        if oper_type == 'article':
             id = request.GET.get('id')                          # 文章ID
             inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
             obj = models.Article.objects.get(id=id)
             user_obj = models.Userprofile.objects.get(id=inviter_user_id)
+
+            is_like = False  # 是否点赞
+            log_obj = models.SelectClickArticleLog.objects.filter(
+                article_id=obj.id,
+                user_id=inviter_user_id
+            )
+            if log_obj:
+                is_like = True
 
             result_data = {
                 'id': obj.id,
@@ -504,7 +505,8 @@ def article_customer_oper(request, oper_type):
             for i in user_obj.brand_classify.all():
                 brand_name_list.append(i.name)
             result_data['brand_name'] = brand_name_list  # 用户品牌
-            result_data['qr_code'] = user_obj.qr_code  # 用户微信二维码
+            result_data['qr_code'] = user_obj.qr_code   # 用户微信二维码
+            result_data['is_like'] = is_like            # 是否点赞
 
             article_objs = models.Article.objects.filter(
                 title__isnull=False
@@ -537,9 +539,24 @@ def article_customer_oper(request, oper_type):
             }
 
     else:
-        response.code = 402
-        response.msg = '请求异常'
 
+        if oper_type == 'give_like':
+            form_data = {
+                'article_id': request.POST.get('article_id'),
+                'customer_id': request.GET.get('user_id')
+            }
+
+            form_obj = GiveALike(form_data)
+            if form_obj.is_valid():
+                customer_id = form_obj.cleaned_data.get('customer_id')
+                article_id = form_obj.cleaned_data.get('article_id')
+                response = give_like(customer_id=customer_id, article_id=article_id)  # 点赞
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
+        else:
+            response.code = 402
+            response.msg = '请求异常'
     return JsonResponse(response.__dict__)
 
 
