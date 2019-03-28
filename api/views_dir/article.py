@@ -475,6 +475,7 @@ def article_customer_oper(request, oper_type):
 
         # 客户查询文章详情
         elif oper_type == 'article':
+            print('=----------------------------')
             id = request.GET.get('id')                          # 文章ID
             inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
             obj = models.Article.objects.get(id=id)
@@ -509,8 +510,8 @@ def article_customer_oper(request, oper_type):
                 title__isnull=False
             ).exclude(
                 id=id
-            ).order_by('look_num')[0]
-
+            ).order_by('look_num')[:3]
+            print('article_objs---> ', article_objs)
             popula_articles_list = []
             for article_obj in article_objs:
                 url = forwarding_article(article_obj.create_user_id, article_obj.id)
