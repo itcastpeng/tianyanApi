@@ -253,10 +253,10 @@ def wechat_oper(request, oper_type):
         elif oper_type == 'forwarding_article':
             article_id = request.GET.get('article_id')
 
-            redirect_uri = "{host_url}api/share_article/{article_id}".format(
-                host_url=host_url,
-                article_id=article_id
-            )
+            # redirect_uri = "{host_url}api/share_article/{article_id}".format(
+            redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + article_id
+
+
             open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                               "appid={appid}&response_type=code&scope=snsapi_userinfo" \
                               "&state={user_id}&redirect_uri='{redirect_uri}'#wechat_redirect" \
@@ -266,7 +266,9 @@ def wechat_oper(request, oper_type):
                 user_id=user_id
             )
 
-            print('open_weixin_url------> ', open_weixin_url)
+            open_weixin_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/redirect_url?share_url={share_url}'.format(
+                share_url=open_weixin_url
+            )
 
             # 分享文章 日志记录
             models.users_forward_articles.objects.create(

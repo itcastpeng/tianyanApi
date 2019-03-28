@@ -21,6 +21,7 @@ urlpatterns = [
     url(r'^article$', article.article),
     url(r'^share_article/(?P<o_id>\d+)$', article.share_article), # 客户打开分享出去的文章 # 微信调用
     url(r'^give_like$', article.customer_give_a_like), # 点赞功能 (没有做token认证)
+    url(r'^redirect_url$', article.redirect_url), #
 
     # 用户管理
     url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)$', user.user_oper),
