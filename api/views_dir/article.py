@@ -3,7 +3,7 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle
+from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle, select_form
 from django.db.models import Q, F
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc.base64_encryption import b64decode, b64encode
@@ -466,11 +466,11 @@ def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
     if request.method == 'GET':
         user_id = request.GET.get('user_id')
+        inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
 
         # 客户查询文章详情
         if oper_type == 'article':
             id = request.GET.get('id')                          # 文章ID
-            inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
             obj = models.Article.objects.get(id=id)
             user_obj = models.Userprofile.objects.get(id=inviter_user_id)
 
@@ -538,8 +538,110 @@ def article_customer_oper(request, oper_type):
                 'result_data': result_data
             }
 
-    else:
+        # 客户查询微店分类
+        elif oper_type == 'goods_classify':
+            objs = models.GoodsClassify.objects.filter(
+                oper_user_id=inviter_user_id
+            ).order_by('-create_datetime')
+            data_list = []
+            for obj in objs:
+                is_good = False
+                if obj.goods_set.all():
+                    is_good = True
+                data_list.append({
+                    'id': obj.id,
+                    'goods_classify': obj.goods_classify,
+                    'oper_user_id': obj.oper_user_id,
+                    'oper_user': b64decode(obj.oper_user.name),
+                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    'is_good': is_good,
+                })
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'ret_data': data_list,
+                'count': objs.count(),
+            }
+            response.note = {
+                'id': '分类ID',
+                'goods_classify': '分类名称',
+                'oper_user_id': '分类归属人ID',
+                'oper_user': '分类归属人姓名',
+                'create_datetime': '创建时间',
+                'is_good': '该分类下是否有商品',
+            }
 
+        # 客户查询商品
+        elif oper_type == 'small_shop':
+            forms_obj = select_form(request.GET)
+            if forms_obj.is_valid():
+                current_page = forms_obj.cleaned_data['current_page']
+                length = forms_obj.cleaned_data['length']
+                field_dict = {
+                    'id': '',
+                    'goods_classify_id': '',
+                    'goods_name': '__contains',
+                }
+                q = conditionCom(request, field_dict)
+
+                objs = models.Goods.objects.filter(
+                    q,
+                    goods_classify__oper_user_id=inviter_user_id
+                )
+                count = objs.count()
+
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+                ret_data = []
+                for obj in objs:
+                    try:
+                        goods_describe = eval(obj.goods_describe)
+                    except Exception:
+                        goods_describe = obj.goods_describe
+
+                        #  将查询出来的数据 加入列表
+                    ret_data.append({
+                        'id': obj.id,
+                        'goods_classify_id': obj.goods_classify_id,  # 分类ID
+                        'goods_classify': obj.goods_classify.goods_classify,  # 分类名称
+                        'goods_name': obj.goods_name,  # 商品名称
+                        'price': obj.price,  # 商品价格
+                        'inventory': obj.inventory,  # 商品库存
+                        'freight': obj.freight,  # 商品运费
+                        'goods_describe': goods_describe,  # 商品描述
+                        'point_origin': obj.point_origin,  # 商品发货地
+                        'goods_status_id': obj.goods_status,  # 商品状态ID
+                        'goods_status': obj.get_goods_status_display(),  # 商品状态
+                        'cover_img': obj.cover_img,  # 商品封面图片
+                        'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    })
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data': ret_data,
+                    'count': count
+                }
+                response.note = {
+                    'id': "文章id",
+                    'goods_classify': '商品分类',
+                    'goods_name': '分类名称',
+                    'price': '商品价格',
+                    'inventory': '商品库存',
+                    'freight': '商品运费',
+                    'goods_describe': '商品描述',
+                    'point_origin': '商品发货地',
+                    'goods_status': '商品状态',
+                    'create_datetime': '商品创建时间',
+                }
+            else:
+                response.code = 301
+                response.msg = json.loads(forms_obj.errors.as_json())
+
+    else:
+        # 客户点赞
         if oper_type == 'give_like':
             form_data = {
                 'article_id': request.POST.get('article_id'),
@@ -554,6 +656,7 @@ def article_customer_oper(request, oper_type):
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
+
         else:
             response.code = 402
             response.msg = '请求异常'
