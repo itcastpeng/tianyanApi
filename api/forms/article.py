@@ -27,10 +27,6 @@ class AddForm(forms.Form):
                 'required': "分类id不能为空"
             }
         )
-    def clean_article_url(self):
-        article_url = self.data.get('article_url')
-        data_dict = get_article(article_url)
-        return data_dict
 
     # 查询分类Id是否存在
     def clean_classify_id(self):

@@ -13,7 +13,7 @@ from django.shortcuts import render, redirect
 from publicFunc.host import host_url
 import requests, datetime, random, json
 from publicFunc.article_oper import give_like
-
+from publicFunc.get_content_article import get_article
 
 
 # token验证 用户展示模块
@@ -204,15 +204,14 @@ def article_oper(request, oper_type, o_id):
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
+                data_dict = get_article(article_url)
                 cleaned_data = forms_obj.cleaned_data
 
-                data_dict = cleaned_data.get('article_url')
                 cover_url = data_dict.get('cover_url') # 封面
                 title = data_dict.get('title')
                 summary = data_dict.get('summary')
                 style = data_dict.get('style')
                 data_list = json.dumps(data_dict.get('content'))
-                # print('len(data_list)------------> ', len(data_list), data_list)
                 obj = models.Article.objects.create(
                     title=title,
                     content=data_list,
