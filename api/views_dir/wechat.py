@@ -6,7 +6,6 @@
 
 from django.shortcuts import HttpResponse
 from django.http import JsonResponse
-from urllib.parse import unquote,quote
 from api import models
 # import base64
 # import time
@@ -19,8 +18,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc import Response
 from publicFunc import account
 from publicFunc import base64_encryption
-from publicFunc.host import host_url
-
+from publicFunc.forwarding_article import forwarding_article
 
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
@@ -197,6 +195,8 @@ def wechat(request):
 #     return JsonResponse(response.__dict__)
 
 
+
+
 @account.is_token(models.Userprofile)
 def wechat_oper(request, oper_type):
     # print('oper_type -->', oper_type)
@@ -252,27 +252,7 @@ def wechat_oper(request, oper_type):
         # 用户分享文章
         elif oper_type == 'forwarding_article':
             article_id = request.GET.get('article_id')
-            redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + article_id
-
-            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={user_id}#wechat_redirect" \
-                .format(
-                scope='snsapi_userinfo',
-                appid=weichat_api_obj.APPID,
-                redirect_uri=redirect_uri,
-                user_id=user_id
-            )
-            redirect_url = quote(open_weixin_url, 'utf-8')
-            print('redirect_url--------> ', redirect_url)
-            open_weixin_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/redirect_url?share_url=%s' % redirect_url
-            # open_weixin_url = 'http://127.0.0.1:8008/api/redirect_url?share_url=%s' % redirect_url
-
-            # 分享文章 日志记录
-            models.users_forward_articles.objects.create(
-                user_id=user_id,
-                article_id=article_id,
-                article_url=open_weixin_url
-            )
-            print('open_weixin_urlopen_weixin_urlopen_weixin_urlopen_weixin_url-> ', open_weixin_url)
+            open_weixin_url = forwarding_article(user_id, article_id)
             response.code = 200
             response.msg = '转发成功'
             response.data = {
