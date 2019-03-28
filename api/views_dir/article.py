@@ -17,7 +17,7 @@ from publicFunc.get_content_article import get_article
 from urllib.parse import unquote,quote
 
 # token验证 用户展示模块
-@account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
+# @account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
