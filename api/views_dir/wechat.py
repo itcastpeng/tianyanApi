@@ -259,7 +259,7 @@ def wechat_oper(request, oper_type):
 
             open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                               "appid={appid}&response_type=code&scope=snsapi_userinfo" \
-                              "&state={user_id}&redirect_uri='{redirect_uri}'#wechat_redirect" \
+                              "&redirect_uri={redirect_uri}/&state={user_id}#wechat_redirect" \
                 .format(
                 appid=weichat_api_obj.APPID,
                 redirect_uri=redirect_uri,
