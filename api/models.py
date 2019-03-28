@@ -158,6 +158,11 @@ class Classify(models.Model):
 
 # 客户/用户 查看文章日志表
 class SelectArticleLog(models.Model):
+    # action_choices = (
+    #     (1, "分享文章"),    # 用户分享出去的
+    #     (2, "热门文章"),    # 系统自动发布热门文章
+    # )
+    # action = models.SmallIntegerField(verbose_name='判断是分享的还是系统发布热门的', choices=action_choices, default=1)
     customer = models.ForeignKey('Customer', verbose_name="查看人", null=True) # 此字段为空 为用户查看文章
     inviter = models.ForeignKey(
         'Userprofile',

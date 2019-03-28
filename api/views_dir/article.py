@@ -14,7 +14,7 @@ from publicFunc.host import host_url
 import requests, datetime, random, json
 from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
-from urllib.parse import unquote,quote
+from publicFunc.forwarding_article import forwarding_article
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
@@ -55,9 +55,9 @@ def article(request):
                 for team_obj in team_objs:
                     team_user_list.append(team_obj['user_id'])
 
-                team_user_objs = models.users_forward_articles.objects.filter(user_id__in=team_user_list)
+                team_user_objs = models.Article.objects.filter(create_user_id__in=team_user_list)   # 查询该团队 所有文章
                 for i in team_user_objs:
-                    article_list.append(i.share_article_id)
+                    article_list.append(i.id)
 
                 q.add(Q(**{'id__in':article_list}), Q.AND)
             if classify_objs:
@@ -496,7 +496,14 @@ def article_customer_oper(request, oper_type):
             result_data['brand_name'] = brand_name_list  # 用户品牌
             result_data['qr_code'] = user_obj.qr_code  # 用户微信二维码
 
-            print('id, inviter_user_id---------> ',type(user_id),  id, inviter_user_id)
+            article_objs = models.Article.objects.filter(
+                title__isnull=False,
+            ).order_by('look_num')[0]
+
+            popula_articles_list = []
+            for article_obj in article_objs:
+                url = forwarding_article(article_obj.create_user_id, article_obj.id)
+                popula_articles_list.append(url)
             # 如果是客户查看记录查看次数 创建查看信息
             models.SelectArticleLog.objects.create(
                 customer_id=user_id,
@@ -509,6 +516,7 @@ def article_customer_oper(request, oper_type):
             response.code = 200
             response.msg = '查询成功'
             response.data = {
+                'popula_articles': popula_articles_list,
                 'result_data': result_data
             }
 
@@ -573,7 +581,7 @@ def share_article(request, o_id):
     )
     return redirect(redirect_url)
 
-
+# 点击分享出去的文章 跳转到这
 def redirect_url(request):
     print('request.GET--------------> ', request.GET)
     redirect_url = request.GET.get('share_url')
