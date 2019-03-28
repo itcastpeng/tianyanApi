@@ -276,7 +276,7 @@ def wechat_oper(request, oper_type):
                 article_id=article_id,
                 article_url=open_weixin_url
             )
-            print('redirect_uri-> ', redirect_uri)
+            print('open_weixin_urlopen_weixin_urlopen_weixin_urlopen_weixin_url-> ', open_weixin_url)
             response.code = 200
             response.msg = '转发成功'
             response.data = {
