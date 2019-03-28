@@ -14,7 +14,7 @@ from publicFunc.host import host_url
 import requests, datetime, random, json
 from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
-
+from urllib.parse import unquote,quote
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)  # 用户登录 直接跳转文章 页面 （判断是否为新用户）
@@ -528,9 +528,10 @@ def share_article(request, o_id):
     return redirect(redirect_url)
 
 
-
-
-
-
+def redirect_url(request):
+    share_url = request.GET.get('share_url')
+    redirect_url = unquote(share_url, 'utf-8')
+    print('=-------跳转链接--> ', redirect_url)
+    return redirect(redirect_url)
 
 
