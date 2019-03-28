@@ -52,7 +52,7 @@ def goods_classify(request):
             length = forms_obj.cleaned_data['length']
             order = request.GET.get('order', '-create_datetime')
             field_dict = {
-                'id': '',
+
             }
             q = conditionCom(request, field_dict)
             objs = models.GoodsClassify.objects.filter(q, oper_user_id=user_id).order_by(order)
