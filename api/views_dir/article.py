@@ -515,7 +515,11 @@ def article_customer_oper(request, oper_type):
             popula_articles_list = []
             for article_obj in article_objs:
                 url = forwarding_article(article_obj.create_user_id, article_obj.id)
-                popula_articles_list.append(url)
+                popula_articles_list.append({
+                    'title': article_obj.title,
+                    'cover_img':article_obj.cover_img,
+                    'url':url
+                })
             # 如果是客户查看记录查看次数 创建查看信息
             models.SelectArticleLog.objects.create(
                 customer_id=user_id,
