@@ -264,7 +264,9 @@ def user_login_oper(request, oper_type):
 
     # # 判断该用户是否存在
     if oper_type == 'user_login_get_info':
+        import random
         code = request.GET.get('code')
+        code = code + str(random.randint(999))
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
         print('code-----code-------code--------code--------code-------> ', code, ret_obj)
         openid = ret_obj.get('openid')
