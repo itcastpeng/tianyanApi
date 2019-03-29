@@ -252,7 +252,17 @@ def wechat_oper(request, oper_type):
         # 用户分享文章
         elif oper_type == 'forwarding_article':
             article_id = request.GET.get('article_id')
-            open_weixin_url = forwarding_article(user_id, article_id)
+            inviter_user_id = request.GET.get('inviter_user_id') # 二级以上文章转发 需要传递用户ID
+            if inviter_user_id:     # 二次转发及以上
+                open_weixin_url = forwarding_article(
+                    article_id=article_id,
+                    inviter_user_id=inviter_user_id
+                )
+            else: # 首次转发
+                open_weixin_url = forwarding_article(
+                    user_id=user_id,
+                    article_id=article_id,
+                )
             response.code = 200
             response.msg = '转发成功'
             response.data = {
