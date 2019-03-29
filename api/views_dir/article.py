@@ -477,7 +477,7 @@ def article_customer_oper(request, oper_type):
             is_like = False  # 是否点赞
             log_obj = models.SelectClickArticleLog.objects.filter(
                 article_id=obj.id,
-                user_id=inviter_user_id
+                customer_id=user_id
             )
             if log_obj:
                 is_like = True
