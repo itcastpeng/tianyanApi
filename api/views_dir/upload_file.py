@@ -17,7 +17,7 @@ sysstr = platform.system()
 
 # 加密名字
 def encryption():
-    string = str(random.randint(10, 99)) + str(int(time.time())) + str(random.randint(10, 99))
+    string = str(random.randint(10, 99)) + str(int(time.time()))
     pwd = str(string)
     hash = hashlib.md5()
     hash.update(pwd.encode())
@@ -265,22 +265,21 @@ def base_merge(request):
                         fileData += f.read()
                     os.remove(file_save_path)  # 删除分片 文件
 
-            video_name = encryption() + img_name
+            video_name = encryption() + '.' + expanded_name
             path = os.path.join(file_dir, video_name)
             try:
                 with open(path, 'ab')as f:
                     f.write(base64.b64decode(fileData))         # 写入
             except Exception as e:
                 print('e--> ', e)
-            print('is_posters------> ', is_posters)
+
             if is_posters: # 海报打水印
                 path_name = encryption() + '.png'
-                print('video_name------> ', video_name)
                 path = upload_poster_watermark(path, path_name)
 
                 os.remove(os.path.join(file_dir, video_name)) # 删除原始上传图片
 
-
+            print('video_name------> ', video_name)
             response.data = {'url': path}
             print('path-> ', path)
             response.code = 200
