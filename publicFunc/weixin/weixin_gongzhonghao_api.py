@@ -344,6 +344,7 @@ class WeChatApi(WeixinApiPublic):
 
     # 通过 code 获取openid/用户信息（公众号）
     def get_openid(self, code):
+        print('self.APPID, self.APPSECRET===========> ', self.APPID, self.APPSECRET)
         url = "https://api.weixin.qq.com/sns/oauth2/access_token?" \
               "appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code" \
             .format(
@@ -353,7 +354,7 @@ class WeChatApi(WeixinApiPublic):
         )
         ret = requests.get(url)
         ret.encoding = "utf8"
-        # print("ret.text -->", ret.text)
+        print("ret.text -->", ret.text)
 
         access_token = ret.json().get('access_token')
         openid = ret.json().get('openid')
