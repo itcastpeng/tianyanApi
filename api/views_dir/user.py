@@ -234,25 +234,25 @@ def user_login_oper(request, oper_type):
     # if oper_type == 'login':  # 创建 模板 生成跳转页面
     #     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
     #     weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-    #                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_base" \
+    #                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
     #                  "&state=STATE#wechat_redirect" \
     #         .format(
     #         appid=weichat_api_obj.APPID,
     #         redirect_uri=redirect_uri,
     #     )
-        # key = int(time.time())
-        # menu_data = {
-        #     'button':[
-        #         {
-        #             'type':'view',
-        #             'name':'天眼',
-        #             'url': weixin_url,
-        #             'key': key
-        #         }
-        #     ]
-        # }
-
-        # weichat_api_obj.createMenu(menu_data)
+    #     key = int(time.time())
+    #     menu_data = {
+    #         'button':[
+    #             {
+    #                 'type':'view',
+    #                 'name':'天眼',
+    #                 'url': weixin_url,
+    #                 'key': key
+    #             }
+    #         ]
+    #     }
+    #
+    #     weichat_api_obj.createMenu(menu_data)
 
         # weichat_api_obj.deleteMenu()
         # weichat_api_obj.delMenu()
@@ -290,16 +290,16 @@ def user_login_oper(request, oper_type):
                     ret_obj['nickname']
                 )
 
-                subscribe = ret_obj.get('subscribe')
-
-                # 如果没有关注，获取个人信息判断是否关注
-                if not subscribe:
-                    weichat_api_obj = WeChatApi()
-                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                    subscribe = ret_obj.get('subscribe')
+                # subscribe = ret_obj.get('subscribe')
+                #
+                # # 如果没有关注，获取个人信息判断是否关注
+                # if not subscribe:
+                #     weichat_api_obj = WeChatApi()
+                #     ret_obj = weichat_api_obj.get_user_info(openid=openid)
+                #     subscribe = ret_obj.get('subscribe')
 
                 user_data['set_avator'] = ret_obj.get('headimgurl')
-                user_data['subscribe'] = subscribe
+                user_data['subscribe'] = True
                 user_data['name'] = encode_username
                 user_data['openid'] = ret_obj.get('openid')
                 user_data['token'] = get_token()
