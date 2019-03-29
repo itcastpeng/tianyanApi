@@ -367,7 +367,7 @@ class WeChatApi(WeixinApiPublic):
         ret = requests.get(url)
         ret.encoding = "utf8"
         ret_obj = ret.json()
-
+        print('ret_obj---------------> ', ret_obj)
         data = {
             'openid':openid,
             'sex':ret_obj.get('sex'),
