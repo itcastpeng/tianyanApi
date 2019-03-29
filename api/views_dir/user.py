@@ -264,50 +264,49 @@ def user_login_oper(request, oper_type):
 
     # # 判断该用户是否存在
     if oper_type == 'user_login_get_info':
-        import random
         code = request.GET.get('code')
-        code_id = code + str(random.randint(111, 999))
-        ret_obj = weichat_api_obj.get_openid(code_id)  # 获取用户信息
-        print('code-----code-------code--------code--------code-------> ', code_id, ret_obj)
-        openid = ret_obj.get('openid')
-        user_data = {
-            "sex": ret_obj.get('sex'),
-            "country": ret_obj.get('country'),
-            "province": ret_obj.get('province'),
-            "city": ret_obj.get('city'),
-        }
-        user_objs = models.Userprofile.objects.filter(openid=openid)
-        if user_objs:  # 客户已经存在
-            user_objs.update(**user_data)
-            user_objs = user_objs[0]
+        if not models.save_code.objects.filter(save_code=code):
+            ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+            print('code-----code-------code--------code--------code-------> ', code, ret_obj)
+            openid = ret_obj.get('openid')
+            user_data = {
+                "sex": ret_obj.get('sex'),
+                "country": ret_obj.get('country'),
+                "province": ret_obj.get('province'),
+                "city": ret_obj.get('city'),
+            }
+            user_objs = models.Userprofile.objects.filter(openid=openid)
+            if user_objs:  # 客户已经存在
+                user_objs.update(**user_data)
+                user_objs = user_objs[0]
 
-        else:  # 不存在，创建用户
-            encode_username = base64_encryption.b64encode(
-                ret_obj['nickname']
-            )
+            else:  # 不存在，创建用户
+                encode_username = base64_encryption.b64encode(
+                    ret_obj['nickname']
+                )
 
-            subscribe = ret_obj.get('subscribe')
-
-            # 如果没有关注，获取个人信息判断是否关注
-            if not subscribe:
-                weichat_api_obj = WeChatApi()
-                ret_obj = weichat_api_obj.get_user_info(openid=openid)
                 subscribe = ret_obj.get('subscribe')
 
-            user_data['set_avator'] = ret_obj.get('headimgurl')
-            user_data['subscribe'] = subscribe
-            user_data['name'] = encode_username
-            user_data['openid'] = ret_obj.get('openid')
-            user_data['token'] = get_token()
-            user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
-            print("user_data --->", user_data)
-            user_objs = models.Userprofile.objects.create(**user_data)
+                # 如果没有关注，获取个人信息判断是否关注
+                if not subscribe:
+                    weichat_api_obj = WeChatApi()
+                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
+                    subscribe = ret_obj.get('subscribe')
 
-        redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1'.format(
-            host=host_url,
-            token=user_objs.token,
-            user_id=user_objs.id,
-        )
-        return redirect(redirect_url)
+                user_data['set_avator'] = ret_obj.get('headimgurl')
+                user_data['subscribe'] = subscribe
+                user_data['name'] = encode_username
+                user_data['openid'] = ret_obj.get('openid')
+                user_data['token'] = get_token()
+                user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
+                print("user_data --->", user_data)
+                user_objs = models.Userprofile.objects.create(**user_data)
+
+            redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1'.format(
+                host=host_url,
+                token=user_objs.token,
+                user_id=user_objs.id,
+            )
+            return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
