@@ -266,7 +266,7 @@ def user_login_oper(request, oper_type):
     if oper_type == 'user_login_get_info':
         import random
         code = request.GET.get('code')
-        code_id = code + str(random.randint(999)) + '54654165416541'
+        code_id = code + str(random.randint(111, 999))
         ret_obj = weichat_api_obj.get_openid(code_id)  # 获取用户信息
         print('code-----code-------code--------code--------code-------> ', code_id, ret_obj)
         openid = ret_obj.get('openid')
