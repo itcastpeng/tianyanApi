@@ -270,7 +270,7 @@ def wechat_oper(request, oper_type):
 # 客户打开 用户分享的文章 (嵌入微信url 获取用户信息 匹配openid 判断数据库是否存在 跳转文章页)③
 def share_article(request, oper_type):
     code = request.GET.get('code')
-    code_objs = models.save_code.objects.filter(code=code)
+    code_objs = models.save_code.objects.filter(save_code=code)
     if not code_objs:
         models.save_code.objects.create(save_code=code)
         inviter_user_id = request.GET.get('state')  # 分享文章的用户id
