@@ -8,7 +8,7 @@ from publicFunc.account import get_token
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc import Response
 from publicFunc import base64_encryption
-from publicFunc.forwarding_article import forwarding_article, share_micro_store
+from publicFunc.forwarding_article import forwarding_article
 from django.shortcuts import render, redirect
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc.base64_encryption import b64decode, b64encode
@@ -318,7 +318,7 @@ def share_article(request, oper_type):
         oid = oper_type.split('_')[1]  # ID
         print('o_id---o_id--o_id--> ', oper_type)
         if _type == 'article':
-            # 此处跳转到文章页面
+            # 此处跳转到文章页面 文章
             redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
                 host_url=host_url,
                 article_id=oid,  # 分享文章的id
@@ -327,7 +327,7 @@ def share_article(request, oper_type):
                 inviter_user_id=inviter_user_id,
             )
         elif _type == 'micro':
-            # 此处跳转到文章页面
+            # 此处跳转到微店宝贝页面
             redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
                 host_url=host_url,
                 article_id=oid,  # 分享文章的id
