@@ -72,10 +72,12 @@ def day_eye(request):
                     customer_id=customer_id,
                     inviter_id=user_id,
                 ).values('article_id').distinct().count()
-
+                customer__name = ''
+                if obj.get('customer__name'):
+                    customer__name = b64decode(obj.get('customer__name'))
                 ret_data.append({
                     'customer_id': customer_id,
-                    'customer__name': b64decode(obj.get('customer__name')),
+                    'customer__name': customer__name,
                     'customer__set_avator': obj.get('customer__set_avator'),
                     'customer_id__count': obj.get('customer_id__count'),    # 总共查看几次
                     'article_count': article_count,                         # 总共查看几篇文章
