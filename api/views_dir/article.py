@@ -514,8 +514,9 @@ def article_customer_oper(request, oper_type):
             print('article_objs---> ', article_objs)
             popula_articles_list = []
             for article_obj in article_objs:
+                pub = 'article_' + str(article_obj.id)
                 url = forwarding_article(
-                    article_id=article_obj.id,
+                    pub=pub,
                     user_id=article_obj.create_user_id,
                 )
                 popula_articles_list.append({
