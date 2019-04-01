@@ -19,9 +19,10 @@ urlpatterns = [
     # 文章管理
     url(r'^article/(?P<oper_type>\w+)/(?P<o_id>\d+)', article.article_oper),
     url(r'^article$', article.article),
-    url(r'^share_article/(?P<o_id>\d+)$', article.share_article), # 客户打开分享出去的文章 # 微信调用
-    url(r'^article_customer/(?P<oper_type>\w+)$', article.article_customer_oper), # 客户操作
-    url(r'^redirect_url$', article.redirect_url), #
+
+    # 客户操作文章
+    url(r'^article_customer/(?P<oper_type>\w+)$', article.article_customer_oper),
+
 
     # 用户管理
     url(r'^user/(?P<oper_type>\w+)/(?P<o_id>\d+)$', user.user_oper),

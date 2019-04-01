@@ -2,7 +2,7 @@
 from PIL import Image,ImageFont,ImageDraw
 from publicFunc.account import randon_str
 import os
-
+from publicFunc.host import host_url
 
 # 图片打水印
 class watermark():
@@ -15,7 +15,10 @@ class watermark():
 
     # 海报水印
     def posters_play_watermark(self):
-        image = Image.open(self.img_path).convert('RGBA')
+        # image = Image.open(self.img_path).convert('RGBA')
+        img_url = self.img_path.split(host_url)[1] # 切除域名
+        img_url = 'statics/1.png'
+        image = Image.open(img_url).convert('RGBA')
 
         # 绘图句柄
         image_draw = ImageDraw.Draw(image)

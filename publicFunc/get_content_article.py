@@ -109,6 +109,8 @@ def get_article(article_url):
     for img_tag in img_tags:
         data_src = img_tag.attrs.get('data-src')
         if data_src:
+            if img_tag.attrs.get('style'):
+                img_tag.attrs['style'] = ''
 
             now_time = time.time()
             html = s.get(data_src)

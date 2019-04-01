@@ -258,12 +258,14 @@ class renewal_log(models.Model):
     original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
     overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
     isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
+
 # 团队表
 class Team(models.Model):
     name = models.CharField(verbose_name="团队名称", max_length=128)
     create_user = models.ForeignKey('Userprofile', verbose_name="创建人", related_name="team_create_user")
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
+# 保存微信回调code用 (获取用户信息 微信会回调多次 code一致 多次请求微信同样code获取不到用户信息)
 class save_code(models.Model):
     save_code = models.CharField(verbose_name='存在的code', max_length=128, null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)

@@ -5,16 +5,14 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle, select_form
 from django.db.models import Q, F
-from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc.base64_encryption import b64decode, b64encode
-from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-from publicFunc.account import get_token
-from django.shortcuts import render, redirect
-from publicFunc.host import host_url
-import requests, datetime, random, json
+# from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
+# from publicFunc.account import get_token
+# from django.shortcuts import render, redirect
 from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
 from publicFunc.forwarding_article import forwarding_article
+import requests, datetime, random, json
 
 # token验证 文章展示模块
 @account.is_token(models.Userprofile)
@@ -646,6 +644,7 @@ def article_customer_oper(request, oper_type):
                 response.msg = json.loads(forms_obj.errors.as_json())
 
     else:
+
         # 客户点赞
         if oper_type == 'give_like':
             form_data = {
@@ -665,69 +664,75 @@ def article_customer_oper(request, oper_type):
         else:
             response.code = 402
             response.msg = '请求异常'
+
     return JsonResponse(response.__dict__)
 
 
 # 客户打开 用户分享的文章 (嵌入微信url 获取用户信息 匹配openid 判断数据库是否存在 跳转文章页)
-def share_article(request, o_id):
-    code = request.GET.get('code')
-    print('code---------code----------code---> ', code)
-    inviter_user_id = request.GET.get('state')  # 分享文章的用户id
-    article_id = o_id                           # 分享文章的id
-    weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
-    ret_obj = weichat_api_obj.get_openid(code)
-    openid = ret_obj.get('openid')
-
-    user_data = {
-        "sex": ret_obj.get('sex'),
-        "country": ret_obj.get('country'),
-        "province": ret_obj.get('province'),
-        "city": ret_obj.get('city'),
-    }
-    customer_objs = models.Customer.objects.filter(openid=openid)
-    if customer_objs:   # 客户已经存在
-        customer_objs.update(**user_data)
-        customer_obj = customer_objs[0]
-    # 不存在，创建用户
-    else:
-        encode_username = b64encode(
-            ret_obj['nickname']
-        )
-
-        subscribe = ret_obj.get('subscribe')
-
-        # 如果没有关注，获取个人信息判断是否关注
-        if not subscribe:
-            weichat_api_obj = WeChatApi()
-            ret_obj = weichat_api_obj.get_user_info(openid=openid)
-            subscribe = ret_obj.get('subscribe')
-
-        user_data['set_avator'] = ret_obj.get('headimgurl')
-        user_data['subscribe'] = subscribe
-        user_data['name'] = encode_username
-        user_data['openid'] = ret_obj.get('openid')
-        user_data['token'] = get_token()
-        print("user_data --->", user_data)
-        customer_obj = models.Customer.objects.create(**user_data)
-    objs = models.Customer.objects.filter(openid=openid)
-    obj = objs[0]
-
-    # 此处跳转到文章页面
-    redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
-        host_url=host_url,
-        article_id=article_id,
-        user_id=customer_obj.id,
-        token=obj.token,
-        inviter_user_id=inviter_user_id,
-    )
-    return redirect(redirect_url)
-
-# 点击分享出去的文章 跳转到这
-def redirect_url(request):
-    print('request.GET--------------> ', request.GET)
-    redirect_url = request.GET.get('share_url')
-    # redirect_url = unquote(share_url, 'utf-8')
-    print('=-------跳转链接--> ', redirect_url)
-    return redirect(redirect_url)
+# def share_article(request, o_id):
+#     code = request.GET.get('code')
+#     code_objs = models.save_code.objects.filter(code=code)
+#     if not code_objs:
+#         models.save_code.objects.create(save_code=code)
+#
+#         _type = o_id.split('_')[0]  # 类型
+#         oid = o_id.split('_')[1]    # ID
+#
+#         inviter_user_id = request.GET.get('state')  # 分享文章的用户id
+#         weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+#         ret_obj = weichat_api_obj.get_openid(code)
+#         openid = ret_obj.get('openid')
+#
+#         user_data = {
+#             "sex": ret_obj.get('sex'),
+#             "country": ret_obj.get('country'),
+#             "province": ret_obj.get('province'),
+#             "city": ret_obj.get('city'),
+#         }
+#         customer_objs = models.Customer.objects.filter(openid=openid)
+#         if customer_objs:   # 客户已经存在
+#             customer_objs.update(**user_data)
+#             customer_obj = customer_objs[0]
+#         # 不存在，创建用户
+#         else:
+#             encode_username = b64encode(
+#                 ret_obj['nickname']
+#             )
+#
+#             subscribe = ret_obj.get('subscribe')
+#
+#             # 如果没有关注，获取个人信息判断是否关注
+#             if not subscribe:
+#                 weichat_api_obj = WeChatApi()
+#                 ret_obj = weichat_api_obj.get_user_info(openid=openid)
+#                 subscribe = ret_obj.get('subscribe')
+#
+#             user_data['set_avator'] = ret_obj.get('headimgurl')
+#             user_data['subscribe'] = subscribe
+#             user_data['name'] = encode_username
+#             user_data['openid'] = ret_obj.get('openid')
+#             user_data['token'] = get_token()
+#             print("user_data --->", user_data)
+#             customer_obj = models.Customer.objects.create(**user_data)
+#         objs = models.Customer.objects.filter(openid=openid)
+#         obj = objs[0]
+#
+#         # 此处跳转到文章页面
+#         redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
+#             host_url=host_url,
+#             article_id=o_id,  # 分享文章的id
+#             user_id=customer_obj.id,
+#             token=obj.token,
+#             inviter_user_id=inviter_user_id,
+#         )
+#         return redirect(redirect_url)
+#
+# # 点击分享出去的文章 跳转到这
+# def redirect_url(request):
+#     print('request.GET--------------> ', request.GET)
+#     redirect_url = request.GET.get('share_url')
+#     # redirect_url = unquote(share_url, 'utf-8')
+#     print('=-------跳转链接--> ', redirect_url)
+#     return redirect(redirect_url)
 
 
