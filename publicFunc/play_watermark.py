@@ -17,7 +17,6 @@ class watermark():
     def posters_play_watermark(self):
         # image = Image.open(self.img_path).convert('RGBA')
         img_url = self.img_path.split(host_url)[1] # 切除域名
-        img_url = 'statics/1.png'
         image = Image.open(img_url).convert('RGBA')
 
         # 绘图句柄
