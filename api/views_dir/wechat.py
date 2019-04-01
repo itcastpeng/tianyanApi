@@ -243,12 +243,12 @@ def wechat_oper(request, oper_type):
             inviter_user_id = request.GET.get('inviter_user_id') # 二级以上微店宝贝转发 需要传递用户ID
             pub = 'micro_' + str(micro_store_baby)
             if inviter_user_id:
-                open_weixin_url = share_micro_store(
+                open_weixin_url = forwarding_article(
                     inviter_user_id=inviter_user_id,
                     pub=pub,
                 )
             else:
-                open_weixin_url = share_micro_store(
+                open_weixin_url = forwarding_article(
                     user_id=user_id,
                     pub=pub,
                 )
