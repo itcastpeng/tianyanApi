@@ -1,24 +1,19 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-# Author:zhangcong
-# Email:zc_92@sina.com
-
-
 from django.shortcuts import HttpResponse
 from django.http import JsonResponse
 from api import models
-# import base64
-# import time
 import datetime
 import json
 import xml.dom.minidom
-
 from publicFunc.account import get_token
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc import Response
-from publicFunc import account
 from publicFunc import base64_encryption
-from publicFunc.forwarding_article import forwarding_article
+from publicFunc.forwarding_article import forwarding_article, share_micro_store
+from django.shortcuts import render, redirect
+from publicFunc.weixin import weixin_gongzhonghao_api
+from publicFunc.base64_encryption import b64decode, b64encode
+from publicFunc.host import host_url
+
 
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
@@ -166,40 +161,12 @@ def wechat(request):
         return HttpResponse(False)
 
 
-# @csrf_exempt
-# def wechat_login(request):
-#     response = ResponseObj()
-#     timestamp = request.POST.get('timestamp')
-#     user_objs = models.zhugedanao_userprofile.objects.select_related('level_name').filter(timestamp=timestamp)
-#     if user_objs:
-#         user_obj = user_objs[0]
-#         response.code = 200
-#         decode_username = base64.b64decode(user_obj.username)
-#         username = str(decode_username, 'utf-8')
-#         role_id = ''
-#         if user_obj.role:
-#             role_id = user_obj.role.id
-#         response.data = {
-#             'token': user_obj.token,
-#             'user_id': user_obj.id,
-#             'set_avator': user_obj.set_avator,
-#             'role_id':role_id,
-#             'username':username,
-#             'level_name': user_obj.level_name.name
-#         }
-#         response.msg = "登录成功"
-#     else:
-#         response.code = 405
-#         response.msg = '扫码登录异常，请重新扫描'
-#
-#     return JsonResponse(response.__dict__)
 
 
 
 
 # @account.is_token(models.Userprofile)
 def wechat_oper(request, oper_type):
-    # print('oper_type -->', oper_type)
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
@@ -249,7 +216,7 @@ def wechat_oper(request, oper_type):
                 "set_avator": "邀请人头像"
             }
 
-        # 用户分享文章
+        # 用户分享文章①
         elif oper_type == 'forwarding_article':
             article_id = request.GET.get('article_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 二级以上文章转发 需要传递用户ID
@@ -269,7 +236,118 @@ def wechat_oper(request, oper_type):
                 'open_weixin_url': open_weixin_url
             }
 
+        # 用户分享微店宝贝①
+        elif oper_type == 'share_micro_store':
+            micro_store_baby = request.GET.get('micro_store_baby') # 宝贝ID
+            inviter_user_id = request.GET.get('inviter_user_id') # 二级以上微店宝贝转发 需要传递用户ID
+            if inviter_user_id:
+                open_weixin_url = share_micro_store(
+                    inviter_user_id=inviter_user_id,
+                    micro_store_baby=micro_store_baby,
+                )
+            else:
+                open_weixin_url = share_micro_store(
+                    user_id=user_id,
+                    micro_store_baby=micro_store_baby,
+                )
+            response.code = 200
+            response.msg = '转发成功'
+            response.data = {
+                'open_weixin_url': open_weixin_url
+            }
+
+        # 分享的链接 跳转②
+        elif oper_type == 'redirect_url':
+            redirect_url = request.GET.get('share_url')
+            return redirect(redirect_url)
+
     return JsonResponse(response.__dict__)
+
+
+
+
+
+# 客户打开 用户分享的文章 (嵌入微信url 获取用户信息 匹配openid 判断数据库是否存在 跳转文章页)③
+def share_article(request, o_id):
+    code = request.GET.get('code')
+    code_objs = models.save_code.objects.filter(code=code)
+    if not code_objs:
+        models.save_code.objects.create(save_code=code)
+        inviter_user_id = request.GET.get('state')  # 分享文章的用户id
+        weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+        ret_obj = weichat_api_obj.get_openid(code)
+        openid = ret_obj.get('openid')
+
+        user_data = {
+            "sex": ret_obj.get('sex'),
+            "country": ret_obj.get('country'),
+            "province": ret_obj.get('province'),
+            "city": ret_obj.get('city'),
+        }
+        customer_objs = models.Customer.objects.filter(openid=openid)
+        if customer_objs:   # 客户已经存在
+            customer_objs.update(**user_data)
+            customer_obj = customer_objs[0]
+        # 不存在，创建用户
+        else:
+            encode_username = b64encode(
+                ret_obj['nickname']
+            )
+
+            subscribe = ret_obj.get('subscribe')
+
+            # 如果没有关注，获取个人信息判断是否关注
+            if not subscribe:
+                weichat_api_obj = WeChatApi()
+                ret_obj = weichat_api_obj.get_user_info(openid=openid)
+                subscribe = ret_obj.get('subscribe')
+
+            user_data['set_avator'] = ret_obj.get('headimgurl')
+            user_data['subscribe'] = subscribe
+            user_data['name'] = encode_username
+            user_data['openid'] = ret_obj.get('openid')
+            user_data['token'] = get_token()
+            print("user_data --->", user_data)
+            customer_obj = models.Customer.objects.create(**user_data)
+        objs = models.Customer.objects.filter(openid=openid)
+        obj = objs[0]
+
+        _type = o_id.split('_')[0]  # 类型
+        oid = o_id.split('_')[1]  # ID
+        print('o_id---o_id--o_id--> ', o_id)
+        if _type == 'article':
+            # 此处跳转到文章页面
+            redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
+                host_url=host_url,
+                article_id=oid,  # 分享文章的id
+                user_id=customer_obj.id,
+                token=obj.token,
+                inviter_user_id=inviter_user_id,
+            )
+        elif _type == 'micro':
+            # 此处跳转到文章页面
+            redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
+                host_url=host_url,
+                article_id=oid,  # 分享文章的id
+                user_id=customer_obj.id,
+                token=obj.token,
+                inviter_user_id=inviter_user_id,
+            )
+        else:
+            redirect_url = ''
+        return redirect(redirect_url)
+
+
+
+
+
+
+
+
+
+
+
+
 
 # # 获取用于登录的微信二维码
 # @account.is_token(models.Userprofile)
@@ -286,5 +364,34 @@ def wechat_oper(request, oper_type):
 #         'qc_code_url': qc_code_url,
 #         'expire_date': expire_date
 #     }
+#
+#     return JsonResponse(response.__dict__)
+
+
+# @csrf_exempt
+# def wechat_login(request):
+#     response = ResponseObj()
+#     timestamp = request.POST.get('timestamp')
+#     user_objs = models.zhugedanao_userprofile.objects.select_related('level_name').filter(timestamp=timestamp)
+#     if user_objs:
+#         user_obj = user_objs[0]
+#         response.code = 200
+#         decode_username = base64.b64decode(user_obj.username)
+#         username = str(decode_username, 'utf-8')
+#         role_id = ''
+#         if user_obj.role:
+#             role_id = user_obj.role.id
+#         response.data = {
+#             'token': user_obj.token,
+#             'user_id': user_obj.id,
+#             'set_avator': user_obj.set_avator,
+#             'role_id':role_id,
+#             'username':username,
+#             'level_name': user_obj.level_name.name
+#         }
+#         response.msg = "登录成功"
+#     else:
+#         response.code = 405
+#         response.msg = '扫码登录异常，请重新扫描'
 #
 #     return JsonResponse(response.__dict__)

@@ -181,7 +181,6 @@ def posters_oper(request, oper_type, o_id):
                 if posters_status == 1:
                     obj = models.Userprofile.objects.get(id=user_id)
                     set_avator = 'statics' + obj.set_avator.split('statics')[1]
-                    # set_avator = 'statics/img/set_avator.png'
                     data = {
                         'posters_status': posters_status,
                         'img_path': img_path,
@@ -207,7 +206,7 @@ def posters_oper(request, oper_type, o_id):
                         'time': time,
                         'place': place,
                     }
-
+                print('data-----------> ', data)
                 watermark_objs = watermark(data)
                 path = watermark_objs.posters_play_watermark()
 
