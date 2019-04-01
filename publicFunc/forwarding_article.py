@@ -5,7 +5,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 
 
-# 分享文章/宝贝 创建跳转链接
+# 分享 (文章/宝贝) 创建跳转链接
 def forwarding_article(pub, user_id=None, inviter_user_id=None):
     weichat_api_obj = WeChatApi()
 
