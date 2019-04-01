@@ -268,7 +268,7 @@ def wechat_oper(request, oper_type):
 
 
 # 客户打开 用户分享的文章 (嵌入微信url 获取用户信息 匹配openid 判断数据库是否存在 跳转文章页)③
-def share_article(request, o_id):
+def share_article(request, oper_type):
     code = request.GET.get('code')
     code_objs = models.save_code.objects.filter(code=code)
     if not code_objs:
@@ -312,9 +312,9 @@ def share_article(request, o_id):
         objs = models.Customer.objects.filter(openid=openid)
         obj = objs[0]
 
-        _type = o_id.split('_')[0]  # 类型
-        oid = o_id.split('_')[1]  # ID
-        print('o_id---o_id--o_id--> ', o_id)
+        _type = oper_type.split('_')[0]  # 类型
+        oid = oper_type.split('_')[1]  # ID
+        print('o_id---o_id--o_id--> ', oper_type)
         if _type == 'article':
             # 此处跳转到文章页面
             redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(

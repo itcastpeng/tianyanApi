@@ -70,7 +70,7 @@ urlpatterns = [
     # ---------------- 公众号操作 ----------------
     url(r'^wechat/(?P<oper_type>\w+)$', wechat.wechat_oper),
     url(r'^wechat$', wechat.wechat),     # 接受微信服务器发送的请求
-    url(r'^share_article/(?P<o_id>\d+)$', wechat.share_article),     # 客户打开 用户分享的文章
+    url(r'^share_article/(?P<oper_type>\w+)$', wechat.share_article),     # 客户打开 用户分享的文章
     # url(r'^weichat_generate_qrcode$', wechat.weichat_generate_qrcode),    # 微信获取带参数的二维码
 
     # ----------------续费管理---------------------
