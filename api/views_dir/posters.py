@@ -148,72 +148,76 @@ def posters_oper(request, oper_type, o_id):
                 response.msg = '删除ID不存在'
 
         # 修改海报信息
-        elif oper_type == 'update_poster_info':
-            form_data = {
-                'title': request.POST.get('title'),  # 正标题
-                'subtitle': request.POST.get('subtitle'),  # 副标题
-                'name': request.POST.get('name'),  # 姓名
-                'phone': request.POST.get('phone'),  # 电话
-                'time': request.POST.get('time'),  # 时间
-                'place': request.POST.get('place'),  # 地点
-            }
-
-            PosterObj = UpdatePosterInfoForm(form_data)
-            if PosterObj.is_valid():
-                objs = models.Userprofile.objects.filter(id=user_id)
-                objs.update(posters_info=PosterObj.data)
-                response.code = 200
-                response.msg = '修改成功'
-            else:
-                response.code = 301
-                response.msg = json.loads(PosterObj.errors.as_json())
+        # elif oper_type == 'update_poster_info':
+        #     form_data = {
+        #         'title': request.POST.get('title'),  # 正标题
+        #         'subtitle': request.POST.get('subtitle'),  # 副标题
+        #         'name': request.POST.get('name'),  # 姓名
+        #         'phone': request.POST.get('phone'),  # 电话
+        #         'time': request.POST.get('time'),  # 时间
+        #         'place': request.POST.get('place'),  # 地点
+        #     }
+        #
+        #     PosterObj = UpdatePosterInfoForm(form_data)
+        #     if PosterObj.is_valid():
+        #         objs = models.Userprofile.objects.filter(id=user_id)
+        #         objs.update(posters_info=PosterObj.data)
+        #         response.code = 200
+        #         response.msg = '修改成功'
+        #     else:
+        #         response.code = 301
+        #         response.msg = json.loads(PosterObj.errors.as_json())
 
     else:
 
         # 海报打水印
         if oper_type == 'play_watermark':
             posters_status = request.GET.get('posters_status')  # 水印类型
-            img_path = request.GET.get('img_path')              # 海报地址
+            posters_objs = models.Posters.objects.filter(id=o_id)
+            if posters_objs:
+                img_path = posters_objs[0].posters_url              # 海报地址
 
-            posters_status = int(posters_status)
-            if posters_status == 1:
-                obj = models.Userprofile.objects.get(id=user_id)
-                set_avator = 'statics' + obj.set_avator.split('statics')[1]
-                # set_avator = 'statics/img/set_avator.png'
-                data = {
-                    'posters_status': posters_status,
-                    'img_path': img_path,
-                    'name': b64decode(obj.name),
-                    'phone': obj.phone_number,
-                    'set_avator': set_avator,
-                }
+                posters_status = int(posters_status)
+                if posters_status == 1:
+                    obj = models.Userprofile.objects.get(id=user_id)
+                    set_avator = 'statics' + obj.set_avator.split('statics')[1]
+                    # set_avator = 'statics/img/set_avator.png'
+                    data = {
+                        'posters_status': posters_status,
+                        'img_path': img_path,
+                        'name': b64decode(obj.name),
+                        'phone': obj.phone_number,
+                        'set_avator': set_avator,
+                    }
 
+                else:
+                    place = request.GET.get('place')                # 地址
+                    time = request.GET.get('time')                  # 时间
+                    fu_title = request.GET.get('subtitle')          # 副标题
+                    zhu_title = request.GET.get('title')            # 主标题
+                    name = request.GET.get('name')                  # 姓名
+                    phone = request.GET.get('phone')                # 电话
+                    data = {
+                        'posters_status': posters_status,
+                        'img_path': img_path,
+                        'name': name,
+                        'phone': phone,
+                        'zhu_title': zhu_title,
+                        'fu_title': fu_title,
+                        'time': time,
+                        'place': place,
+                    }
+
+                watermark_objs = watermark(data)
+                path = watermark_objs.posters_play_watermark()
+
+                response.code = 200
+                response.msg = '生成成功'
+                response.data = {'path':path}
             else:
-                place = request.GET.get('place')                # 地址
-                time = request.GET.get('time')                  # 时间
-                fu_title = request.GET.get('fu_title')          # 副标题
-                zhu_title = request.GET.get('zhu_title')        # 主标题
-                name = request.GET.get('name')                  # 姓名
-                phone = request.GET.get('phone')                # 电话
-                data = {
-                    'posters_status': posters_status,
-                    'img_path': img_path,
-                    'name': name,
-                    'phone': phone,
-                    'zhu_title': zhu_title,
-                    'fu_title': fu_title,
-                    'time': time,
-                    'place': place,
-                }
-
-            watermark_objs = watermark(data)
-            path = watermark_objs.posters_play_watermark()
-
-            response.code = 200
-            response.msg = '生成成功'
-            response.data = {'path':path}
+                response.code = 301
+                response.msg = '海报被删除'
         else:
             response.code = 402
             response.msg = "请求异常"
-
     return JsonResponse(response.__dict__)
