@@ -328,7 +328,7 @@ def share_article(request, oper_type):
             )
         elif _type == 'micro':
             # 此处跳转到微店宝贝页面
-            redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
+            redirect_url = '{host_url}#/share_micro_store?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
                 host_url=host_url,
                 article_id=oid,  # 分享文章的id
                 user_id=customer_obj.id,

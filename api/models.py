@@ -144,6 +144,7 @@ class Article(models.Model):
     top_advertising = models.TextField(verbose_name='顶层广告' ,null=True, blank=True)
     end_advertising = models.TextField(verbose_name='底层广告' ,null=True, blank=True)
 
+
 # 文章/品牌 分类
 class Classify(models.Model):
     name = models.CharField(verbose_name="分类名称", max_length=128)

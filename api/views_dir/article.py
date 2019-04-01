@@ -71,7 +71,7 @@ def article(request):
             else:
                 objs = models.Article.objects.filter(
                     create_datetime__isnull=False
-                ).order_by('like_num')
+                ).order_by('-like_num')
             count = objs.count()
 
             if length != 0:
@@ -451,14 +451,7 @@ def article_oper(request, oper_type, o_id):
 
 
 
-
-
-
-
-
-
-
-# 客户 操作
+# 客户 操作 文章
 @account.is_token(models.Customer)
 def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
