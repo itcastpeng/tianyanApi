@@ -220,15 +220,16 @@ def wechat_oper(request, oper_type):
         elif oper_type == 'forwarding_article':
             article_id = request.GET.get('article_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 二级以上文章转发 需要传递用户ID
+            pub = 'article_' + str(article_id)
             if inviter_user_id:     # 二次转发及以上
                 open_weixin_url = forwarding_article(
-                    article_id=article_id,
+                    pub=pub,
                     inviter_user_id=inviter_user_id
                 )
             else: # 首次转发
                 open_weixin_url = forwarding_article(
                     user_id=user_id,
-                    article_id=article_id,
+                    pub=pub,
                 )
             response.code = 200
             response.msg = '转发成功'
@@ -240,15 +241,16 @@ def wechat_oper(request, oper_type):
         elif oper_type == 'share_micro_store':
             micro_store_baby = request.GET.get('micro_store_baby') # 宝贝ID
             inviter_user_id = request.GET.get('inviter_user_id') # 二级以上微店宝贝转发 需要传递用户ID
+            pub = 'micro_' + str(micro_store_baby)
             if inviter_user_id:
                 open_weixin_url = share_micro_store(
                     inviter_user_id=inviter_user_id,
-                    micro_store_baby=micro_store_baby,
+                    pub=pub,
                 )
             else:
                 open_weixin_url = share_micro_store(
                     user_id=user_id,
-                    micro_store_baby=micro_store_baby,
+                    pub=pub,
                 )
             response.code = 200
             response.msg = '转发成功'
