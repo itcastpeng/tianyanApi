@@ -330,9 +330,9 @@ class WeChatApi(WeixinApiPublic):
 
         print('result_data---> ', result_data)
         str1 = self.shengchengsign(result_data)
-        # print('str1--------> ', str1)
+        print('str1--------> ', str1)
         signature = self.sha1(str1)
-        # print('signature---------> ', signature)
+        print('signature---------> ', signature)
         data = {
             'signature': signature,
             'timestamp': timestamp,
