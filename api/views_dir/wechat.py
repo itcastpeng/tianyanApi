@@ -190,20 +190,23 @@ def wechat_oper(request, oper_type):
         elif oper_type == "invite_members":
             team_id = request.GET.get('team_id')
 
-            redirect_uri = "http://api.zhugeyingxiao.com/tianyan/team/invite_members/{team_id}".format(team_id=team_id)
-            open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-                              "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                              "&state={user_id}#wechat_redirect"\
-                .format(
-                    appid=weichat_api_obj.APPID,
-                    redirect_uri=redirect_uri,
-                    user_id=user_id
-                )
+            redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/team/invite_members/{team_id}".format(team_id=team_id)
+            # open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+            #                   "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope={scope}" \
+            #                   "&state={user_id}#wechat_redirect"\
+            #     .format(
+            #         scope='snsapi_userinfo',
+            #         appid=weichat_api_obj.APPID,
+            #         redirect_uri=redirect_uri,
+            #         user_id=user_id
+            #     )
+            # redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/redirect_url?share_url=%s' % open_weixin_url
 
+            redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri)
             obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
             response.code = 200
             response.data = {
-                "open_weixin_url": open_weixin_url,
+                "open_weixin_url": redirect_url,
                 "team_name": obj.team.name,
                 "user_name": base64_encryption.b64decode(obj.user.name),
                 "set_avator": obj.user.set_avator
