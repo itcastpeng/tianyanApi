@@ -6,12 +6,15 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 
 # 分享 (文章/宝贝) 创建跳转链接
-def forwarding_article(pub, user_id=None, inviter_user_id=None):
+def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=None):
     weichat_api_obj = WeChatApi()
+    if redirect_uri:
+        redirect_uri = redirect_uri
+    else:
+        redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + str(pub)
+        if inviter_user_id:
+            user_id = inviter_user_id
 
-    redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + str(pub)
-    if inviter_user_id:
-        user_id = inviter_user_id
     open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={user_id}#wechat_redirect" \
         .format(
         scope='snsapi_userinfo',

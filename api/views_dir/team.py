@@ -1,21 +1,14 @@
-# from django.shortcuts import render
+from django.shortcuts import render, redirect
 from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
-
 from publicFunc.condition_com import conditionCom
-from api.forms.team import AddForm, UpdateForm, SelectForm, \
-    SelectUserListForm, DeleteMemberForm, SetManagementForm
-import json
-
-# from django.db.models import Q
+from api.forms.team import AddForm, UpdateForm, SelectForm, SelectUserListForm, DeleteMemberForm, SetManagementForm
 from publicFunc import base64_encryption
-
 from publicFunc.weixin import weixin_gongzhonghao_api
-import requests
-
 from api.views_dir.wechat import updateUserInfo
+import requests, json
 
 
 # token验证 用户展示模块
@@ -329,9 +322,14 @@ def team_oper(request, oper_type, o_id):
             if not objs:
                 models.UserprofileTeam.objects.create(team_id=team_id, user_id=user_id)
 
+            obj = models.Userprofile.objects.get(id=user_id)
             # 此处跳转到天眼首页
-
+            url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/?token={token}&user_id={user_id}'.format(
+                token=obj.token,
+                user_id=user_id
+            )
             response.code = 200
             response.msg = "邀请成功"
+            return redirect(url)
 
     return JsonResponse(response.__dict__)
