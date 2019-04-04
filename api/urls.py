@@ -32,6 +32,10 @@ urlpatterns = [
     url(r'^team/(?P<oper_type>\w+)/(?P<o_id>\d+)', team.team_oper),
     url(r'^team', team.team),
 
+    # 邀请成员一级页面 确定邀请页面跳转
+    url(r'^invite_qrcode/(?P<oper_type>\w+)/(?P<o_id>\d+)', team.invite_qrcode),
+
+
     # 海报管理
     url(r'^posters/(?P<oper_type>\w+)/(?P<o_id>\d+)', posters.posters_oper),
     url(r'^posters', posters.posters),

@@ -10,7 +10,7 @@ def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=Non
     weichat_api_obj = WeChatApi()
     if redirect_uri:
         redirect_uri = redirect_uri
-    else:
+    else:  # 文章&微店链接  通用
         redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + str(pub)
         if inviter_user_id:
             user_id = inviter_user_id
