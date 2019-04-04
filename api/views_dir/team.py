@@ -11,6 +11,7 @@ from api.views_dir.wechat import updateUserInfo
 import requests, json
 from publicFunc.host import host_url
 from django.shortcuts import redirect
+from publicFunc.forwarding_article import forwarding_article
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -295,6 +296,10 @@ def customer_invite_members(request, oper_type, o_id):
     # 客户点击确认邀请
     if oper_type == 'invite_members':
         code = request.GET.get('code')
+        code_objs = models.save_code.objects.filter(save_code=code)
+        if not code_objs:
+            models.save_code.objects.create(save_code=code)
+
         team_id = o_id  # 团队id
         inviter_user_id = request.GET.get('state')  # 邀请人id
         weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
@@ -326,13 +331,21 @@ def customer_invite_members(request, oper_type, o_id):
         team_name = obj.team.name  # 团队名称
         user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
         set_avator = obj.user.set_avator  # 客户头像
-        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}'.format(
+
+        url = '{host_url}/api/invite_members/invite_members/{o_id}?'.format(
+            host_url=host_url,
+            o_id=o_id,  # 团队ID
+        )
+
+        redirect_uri = forwarding_article(pub=1, user_id=user_id, redirect_uri=url)
+
+        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&redirect_uri={redirect_uri}'.format(
             host_url=host_url,
             team_name=team_name,
             user_name=user_name,
             set_avator=set_avator,
+            redirect_uri=redirect_uri,
         )
-        redirect_uri = ''
         return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
