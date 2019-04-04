@@ -9,7 +9,8 @@ from publicFunc import base64_encryption
 from publicFunc.weixin import weixin_gongzhonghao_api
 from api.views_dir.wechat import updateUserInfo
 import requests, json
-
+from publicFunc.host import host_url
+from django.shortcuts import redirect
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -279,80 +280,59 @@ def team_oper(request, oper_type, o_id):
                 response.code = 301
                 response.data = json.loads(forms_obj.errors.as_json())
 
-        # 邀请成员确认邀请,微信调用 客户点击确认邀请
-        elif oper_type == "invite_members":
-            code = request.GET.get('code')
-            team_id = o_id  # 团队id
-            inviter_user_id = request.GET.get('state')  # 邀请人id
-            weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
-            ret_obj = weichat_api_obj.get_openid(code)
-            openid = ret_obj.get('openid')
-            user_id = updateUserInfo(openid, inviter_user_id, ret_obj)
-
-            # 添加该成员到团队中
-            objs = models.UserprofileTeam.objects.filter(team_id=team_id, user_id=user_id)
-            if not objs:
-                models.UserprofileTeam.objects.create(team_id=team_id, user_id=user_id)
-
-            obj = models.Userprofile.objects.get(id=user_id)
-            # 此处跳转到天眼首页
-            url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/?token={token}&user_id={user_id}'.format(
-                token=obj.token,
-                user_id=user_id
-            )
-            response.code = 200
-            response.msg = "邀请成功"
-            return redirect(url)
-
-        # 邀请成员页面跳转 显示确认邀请页面
-
-
 
     return JsonResponse(response.__dict__)
 
 
-            #
-            # url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code=" \
-            #       "{CODE}&grant_type=authorization_code"\
-            #     .format(
-            #         APPID=weichat_api_obj.APPID,
-            #         SECRET=weichat_api_obj.APPSECRET,
-            #         CODE=code,
-            #     )
-            # ret = requests.get(url)
-            # ret.encoding = "utf8"
-            # print("ret.text -->", ret.text)
-
-            # data = {
-            #     "access_token": "18_8XaQg2pCSFY5e_oehj9OdBUaoiD1N-di6upPRAOT5OLZuLAZLQYzac4fYroEehQcZ8
-            #                       fT3wOoZ3xXniYyqdxJy9jgtUXNpPsPfWKzU4up-OY",
-            #     "expires_in": 7200,
-            #     "refresh_token": "18_Qdr4Y-on6K3T9Q4VcLw1rK9eGJX5OmRboyejrJWeWOxYJEPbMdehrhWNdppqZsLjnhtKqJY2
-            #           u4kGN7D47OIjrTtOeWXf7AY-6nYyMmmikb4",
-            #     "openid": "oX0xv1pJPEv1nnhswmSxr0VyolLE",
-            #     "scope": "snsapi_userinfo"
-            # }
-
-            # access_token = ret_obj.get('access_token')
-
-
-            # url = "https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN".format(
-            #     ACCESS_TOKEN=access_token,
-            #     OPENID=openid,
-            # )
-            # ret = requests.get(url)
-            # ret.encoding = "utf8"
-            # # print("ret.text -->", ret.text)
-
-
-
-# 邀请成员 一级页面 显示接受邀请
-def invite_members(request, oper_type, o_id):
+# 邀请成员 客户操作
+def customer_invite_members(request, oper_type, o_id):
+    response = Response.ResponseObj()
     print('rinvite_qrcodeequest.GET-----------> ', request.GET)
     print('rinvite_qrcodeequest.GET-----------> ', oper_type)
     print('reinvite_qrcodequest.POST-----------> ', o_id)
 
-    # inviter_user_id = request.GET.get
-    # oper_type
 
-    return 21111
+    # 客户点击确认邀请
+    if oper_type == 'invite_members':
+        code = request.GET.get('code')
+        team_id = o_id  # 团队id
+        inviter_user_id = request.GET.get('state')  # 邀请人id
+        weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+        ret_obj = weichat_api_obj.get_openid(code)
+        openid = ret_obj.get('openid')
+        user_id = updateUserInfo(openid, inviter_user_id, ret_obj)
+
+        # 添加该成员到团队中
+        objs = models.UserprofileTeam.objects.filter(team_id=team_id, user_id=user_id)
+        if not objs:
+            models.UserprofileTeam.objects.create(team_id=team_id, user_id=user_id)
+
+        obj = models.Userprofile.objects.get(id=user_id)
+        # 此处跳转到天眼首页
+        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/?token={token}&user_id={user_id}'.format(
+            token=obj.token,
+            user_id=user_id
+        )
+        response.code = 200
+        response.msg = "邀请成功"
+        return redirect(url)
+
+
+    # 邀请成员页面跳转 显示确认邀请页面
+    elif oper_type == 'invitation_page':
+        user_id = request.GET.get('state')
+        obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=o_id, user_id=user_id)
+
+        team_name = obj.team.name  # 团队名称
+        user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
+        set_avator = obj.user.set_avator  # 客户头像
+        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}'.format(
+            host_url=host_url,
+            team_name=team_name,
+            user_name=user_name,
+            set_avator=set_avator,
+        )
+        redirect_uri = ''
+        return redirect(redirect_url)
+
+    return JsonResponse(response.__dict__)
