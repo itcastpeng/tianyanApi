@@ -354,3 +354,5 @@ def invite_members(request, oper_type, o_id):
 
     # inviter_user_id = request.GET.get
     # oper_type
+
+    return 21111
