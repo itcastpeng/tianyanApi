@@ -203,7 +203,7 @@ def wechat_oper(request, oper_type):
                 set_avator = obj.user.set_avator # 客户头像
                 text = 'url' + '_' + team_name + '_' + user_name + '_' + set_avator
                 redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/invite_members/{oper_type}/{o_id}".format(
-                    oper_type=text,
+                    oper_type='oper_y',
                     o_id=team_id
                 )
                 redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri, user_id=user_id)
