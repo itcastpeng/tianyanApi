@@ -347,7 +347,7 @@ def team_oper(request, oper_type, o_id):
 
 
 # 邀请成员 一级页面 显示接受邀请
-def invite_qrcode(request, oper_type, o_id):
+def invite_members(request, oper_type, o_id):
     print('rinvite_qrcodeequest.GET-----------> ', request.GET)
     print('reinvite_qrcodequest.POST-----------> ', request.POST)
 
