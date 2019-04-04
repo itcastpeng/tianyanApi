@@ -191,24 +191,22 @@ def wechat_oper(request, oper_type):
         elif oper_type == "invite_members":
             team_id = request.GET.get('team_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
+            obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
+            team_name = obj.team.name  # 团队名称
+            user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
+            set_avator = obj.user.set_avator  # 客户头像
 
             if inviter_user_id:  # 多次转发
                 pass
             else: # 首次转发
 
                 # 第一次链接 接收邀请页面
-                obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
-                team_name = obj.team.name  # 团队名称
-                user_name = base64_encryption.b64decode(obj.user.name) # 客户名称
-                set_avator = obj.user.set_avator # 客户头像
-                text = 'url' + '_' + team_name + '_' + str(user_name) + '_' + str(set_avator)
+
                 redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/invite_members/{oper_type}/{o_id}".format(
-                    oper_type=text,
+                    oper_type='invitation_page',
                     o_id=team_id
                 )
                 redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri, user_id=user_id)
-
-
 
                 response.code = 200
                 response.data = {
@@ -219,7 +217,7 @@ def wechat_oper(request, oper_type):
                 }
 
                 response.note = {
-                    "open_weixin_url": "点击接受邀请后请求的url",
+                    "open_weixin_url": "分享邀请成员URL",
                     "team_name": "团队名称",
                     "user_name": "邀请人名称",
                     "set_avator": "邀请人头像"
