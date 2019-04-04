@@ -165,6 +165,7 @@ def wechat(request):
 
 
 
+
 # @account.is_token(models.Userprofile)
 def wechat_oper(request, oper_type):
     response = Response.ResponseObj()
@@ -190,26 +191,27 @@ def wechat_oper(request, oper_type):
         elif oper_type == "invite_members":
             team_id = request.GET.get('team_id')
 
-            redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/team/invite_members/{team_id}".format(team_id=team_id)
-            # open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-            #                   "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope={scope}" \
-            #                   "&state={user_id}#wechat_redirect"\
-            #     .format(
-            #         scope='snsapi_userinfo',
-            #         appid=weichat_api_obj.APPID,
-            #         redirect_uri=redirect_uri,
-            #         user_id=user_id
-            #     )
-            # redirect_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/redirect_url?share_url=%s' % open_weixin_url
 
-            redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri)
+            # 第一次链接 接收邀请页面
             obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
+            team_name = obj.team.name  # 团队名称
+            user_name = base64_encryption.b64decode(obj.user.name) # 客户名称
+            set_avator = obj.user.set_avator # 客户头像
+            text = 'url' + '_' + team_name + '_' + user_name + '_' + set_avator
+            redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/invite_members/{oper_type}/{o_id}".format(
+                oper_type=text,
+                o_id=team_id
+            )
+            redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri, user_id=user_id)
+
+
+
             response.code = 200
             response.data = {
                 "open_weixin_url": redirect_url,
-                "team_name": obj.team.name,
-                "user_name": base64_encryption.b64decode(obj.user.name),
-                "set_avator": obj.user.set_avator
+                "team_name": team_name,
+                "user_name": user_name,
+                "set_avator":set_avator
             }
 
             response.note = {

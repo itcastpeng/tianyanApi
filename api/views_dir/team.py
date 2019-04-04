@@ -279,43 +279,15 @@ def team_oper(request, oper_type, o_id):
                 response.code = 301
                 response.data = json.loads(forms_obj.errors.as_json())
 
-        # 邀请成员确认邀请,微信调用
+        # 邀请成员确认邀请,微信调用 客户点击确认邀请
         elif oper_type == "invite_members":
             code = request.GET.get('code')
             team_id = o_id  # 团队id
             inviter_user_id = request.GET.get('state')  # 邀请人id
             weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
-            url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code=" \
-                  "{CODE}&grant_type=authorization_code"\
-                .format(
-                    APPID=weichat_api_obj.APPID,
-                    SECRET=weichat_api_obj.APPSECRET,
-                    CODE=code,
-                )
-            ret = requests.get(url)
-            ret.encoding = "utf8"
-            print("ret.text -->", ret.text)
-
-            # data = {
-            #     "access_token": "18_8XaQg2pCSFY5e_oehj9OdBUaoiD1N-di6upPRAOT5OLZuLAZLQYzac4fYroEehQcZ8
-            #                       fT3wOoZ3xXniYyqdxJy9jgtUXNpPsPfWKzU4up-OY",
-            #     "expires_in": 7200,
-            #     "refresh_token": "18_Qdr4Y-on6K3T9Q4VcLw1rK9eGJX5OmRboyejrJWeWOxYJEPbMdehrhWNdppqZsLjnhtKqJY2
-            #           u4kGN7D47OIjrTtOeWXf7AY-6nYyMmmikb4",
-            #     "openid": "oX0xv1pJPEv1nnhswmSxr0VyolLE",
-            #     "scope": "snsapi_userinfo"
-            # }
-
-            access_token = ret.json().get('access_token')
-            openid = ret.json().get('openid')
-            url = "https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN".format(
-                ACCESS_TOKEN=access_token,
-                OPENID=openid,
-            )
-            ret = requests.get(url)
-            ret.encoding = "utf8"
-            # print("ret.text -->", ret.text)
-            user_id = updateUserInfo(openid, inviter_user_id, ret.json())
+            ret_obj = weichat_api_obj.get_openid(code)
+            openid = ret_obj.get('openid')
+            user_id = updateUserInfo(openid, inviter_user_id, ret_obj)
 
             # 添加该成员到团队中
             objs = models.UserprofileTeam.objects.filter(team_id=team_id, user_id=user_id)
@@ -332,4 +304,52 @@ def team_oper(request, oper_type, o_id):
             response.msg = "邀请成功"
             return redirect(url)
 
+        # 邀请成员页面跳转 显示确认邀请页面
+
+
+
     return JsonResponse(response.__dict__)
+
+
+            #
+            # url = "https://api.weixin.qq.com/sns/oauth2/access_token?appid={APPID}&secret={SECRET}&code=" \
+            #       "{CODE}&grant_type=authorization_code"\
+            #     .format(
+            #         APPID=weichat_api_obj.APPID,
+            #         SECRET=weichat_api_obj.APPSECRET,
+            #         CODE=code,
+            #     )
+            # ret = requests.get(url)
+            # ret.encoding = "utf8"
+            # print("ret.text -->", ret.text)
+
+            # data = {
+            #     "access_token": "18_8XaQg2pCSFY5e_oehj9OdBUaoiD1N-di6upPRAOT5OLZuLAZLQYzac4fYroEehQcZ8
+            #                       fT3wOoZ3xXniYyqdxJy9jgtUXNpPsPfWKzU4up-OY",
+            #     "expires_in": 7200,
+            #     "refresh_token": "18_Qdr4Y-on6K3T9Q4VcLw1rK9eGJX5OmRboyejrJWeWOxYJEPbMdehrhWNdppqZsLjnhtKqJY2
+            #           u4kGN7D47OIjrTtOeWXf7AY-6nYyMmmikb4",
+            #     "openid": "oX0xv1pJPEv1nnhswmSxr0VyolLE",
+            #     "scope": "snsapi_userinfo"
+            # }
+
+            # access_token = ret_obj.get('access_token')
+
+
+            # url = "https://api.weixin.qq.com/sns/userinfo?access_token={ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN".format(
+            #     ACCESS_TOKEN=access_token,
+            #     OPENID=openid,
+            # )
+            # ret = requests.get(url)
+            # ret.encoding = "utf8"
+            # # print("ret.text -->", ret.text)
+
+
+
+# 邀请成员 一级页面 显示接受邀请
+def invite_qrcode(request, oper_type, o_id):
+    print('rinvite_qrcodeequest.GET-----------> ', request.GET)
+    print('reinvite_qrcodequest.POST-----------> ', request.POST)
+
+    # inviter_user_id = request.GET.get
+    # oper_type
