@@ -33,7 +33,7 @@ urlpatterns = [
     url(r'^team', team.team),
 
     # 邀请成员一级页面 确定邀请页面跳转
-    url(r'^invite_qrcode/(?P<oper_type>\w+)/(?P<o_id>\d+)', team.invite_qrcode),
+    url(r'^invite_members/(?P<oper_type>\w+)/(?P<o_id>\d+)', team.invite_members),
 
 
     # 海报管理
