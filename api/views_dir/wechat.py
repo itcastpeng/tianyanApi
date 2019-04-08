@@ -14,7 +14,6 @@ from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.host import host_url
 
-
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
     """
