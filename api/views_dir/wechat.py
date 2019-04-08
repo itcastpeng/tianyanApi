@@ -194,33 +194,32 @@ def wechat_oper(request, oper_type):
             team_name = obj.team.name  # 团队名称
             user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
             set_avator = obj.user.set_avator  # 客户头像
+            redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/invite_members/{oper_type}/{o_id}".format(
+                oper_type='invitation_page',
+                o_id=team_id
+            )
 
             if inviter_user_id:  # 多次转发
-                pass
+                redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri, inviter_user_id=inviter_user_id)
+
             else: # 首次转发
-
                 # 第一次链接 接收邀请页面
-
-                redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/invite_members/{oper_type}/{o_id}".format(
-                    oper_type='invitation_page',
-                    o_id=team_id
-                )
                 redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri, user_id=user_id)
 
-                response.code = 200
-                response.data = {
-                    "open_weixin_url": redirect_url,
-                    "team_name": team_name,
-                    "user_name": user_name,
-                    "set_avator":set_avator
-                }
+            response.code = 200
+            response.data = {
+                "open_weixin_url": redirect_url,
+                "team_name": team_name,
+                "user_name": user_name,
+                "set_avator":set_avator
+            }
 
-                response.note = {
-                    "open_weixin_url": "分享邀请成员URL",
-                    "team_name": "团队名称",
-                    "user_name": "邀请人名称",
-                    "set_avator": "邀请人头像"
-                }
+            response.note = {
+                "open_weixin_url": "分享邀请成员URL",
+                "team_name": "团队名称",
+                "user_name": "邀请人名称",
+                "set_avator": "邀请人头像"
+            }
 
         # 用户分享文章①
         elif oper_type == 'forwarding_article':
