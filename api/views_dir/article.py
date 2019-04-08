@@ -19,7 +19,7 @@ import requests, datetime, random, json
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
-    team_list = request.GET.get('team_list')
+    team_list = request.GET.get('team_list', [])
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
