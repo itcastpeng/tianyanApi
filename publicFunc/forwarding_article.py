@@ -7,6 +7,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 # 分享 (文章/宝贝) 创建跳转链接
 def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=None):
+    print('-********************************************-------------> ', user_id, inviter_user_id)
     weichat_api_obj = WeChatApi()
     if redirect_uri:
         redirect_uri = redirect_uri
