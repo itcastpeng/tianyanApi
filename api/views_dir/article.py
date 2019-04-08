@@ -56,7 +56,7 @@ def article(request):
                     team_list.append(i.team_id)
 
                 # 查询出该团队所有用户 去重
-                team_objs = models.UserprofileTeam.objects.filter(team_id__in=json.loads(team_list)).values('user_id').distinct()
+                team_objs = models.UserprofileTeam.objects.filter(team_id__in=team_list).values('user_id').distinct()
                 team_user_list = []
                 for team_obj in team_objs:
                     team_user_list.append(team_obj['user_id'])
