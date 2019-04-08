@@ -202,8 +202,8 @@ class SelectForm(forms.Form):
             if team_list or classify_type:
                 if team_list:
                     team_list = json.loads(team_list)
+                    print('=======================', team_list, type(team_list))
                     if len(team_list) >= 1:
-                        print('=======================')
                         if models.UserprofileTeam.objects.filter(team__in=team_list):
                             return team_list
                         else:
