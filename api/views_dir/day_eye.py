@@ -451,7 +451,7 @@ def day_eye_oper(request, oper_type, o_id):
 
                 objs = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id
-                ).values('article_id', 'article__title').distinct().annotate(Count('id'))
+                ).values('article_id', 'article__title').distinct().annotate(Count('id')).exclude(customer_id__isnull=True)
 
                 if length != 0:
                     start_line = (current_page - 1) * length
