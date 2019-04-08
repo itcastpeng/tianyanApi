@@ -195,13 +195,13 @@ class SelectForm(forms.Form):
     def clean_classify_type(self):
         id = self.data.get('id')
         classify_type = self.data.get('classify_type')
-        # team_list = self.data.get('team_list')
+        team_list = self.data.get('team_list')
         if id:
             return id
         else:
-            if classify_type:
-            # if team_list or classify_type:
-                # if team_list:
+            # if classify_type:
+            if team_list or classify_type:
+                if not team_list:
                 #     team_list = json.loads(team_list)
                 #     print('=======================', team_list, type(team_list))
                 #     if len(team_list) >= 1:
@@ -212,10 +212,10 @@ class SelectForm(forms.Form):
                 #     else:
                 #         self.add_error('team_list', '团队ID不能为空')
                 # else:
-                if classify_type not in ["1", "2"]:
-                    self.add_error('classify_id', '分类类型传参异常')
-                else:
-                    return int(classify_type)
+                    if classify_type not in ["1", "2"]:
+                        self.add_error('classify_id', '分类类型传参异常')
+                    else:
+                        return int(classify_type)
             else:
                 self.add_error('classify_type', '请选择一项分类')
 
