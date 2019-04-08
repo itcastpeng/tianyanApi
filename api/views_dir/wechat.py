@@ -209,6 +209,7 @@ def wechat_oper(request, oper_type):
             response.code = 200
             response.data = {
                 "open_weixin_url": redirect_url,
+                "team_id": team_id,
                 "team_name": team_name,
                 "user_name": user_name,
                 "set_avator":set_avator
