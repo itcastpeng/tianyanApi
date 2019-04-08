@@ -13,8 +13,8 @@ def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=Non
         redirect_uri = redirect_uri
     else:  # 文章&微店链接  通用
         redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + str(pub)
-        if inviter_user_id:
-            user_id = inviter_user_id
+    if inviter_user_id:
+        user_id = inviter_user_id
 
     open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={user_id}#wechat_redirect" \
         .format(
