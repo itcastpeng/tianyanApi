@@ -15,6 +15,7 @@ def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=Non
         if inviter_user_id:
             user_id = inviter_user_id
 
+    redirect_uri = quote(redirect_uri, 'utf-8')
     open_weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope={scope}&state={user_id}#wechat_redirect" \
         .format(
         scope='snsapi_userinfo',
@@ -22,8 +23,7 @@ def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=Non
         redirect_uri=redirect_uri,
         user_id=user_id
     )
-    redirect_url = quote(open_weixin_url, 'utf-8')
-    open_weixin_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/redirect_url?share_url=%s' % redirect_url
+    open_weixin_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/redirect_url?share_url=%s' % open_weixin_url
     return open_weixin_url
 
 
