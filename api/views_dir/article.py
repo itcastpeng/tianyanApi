@@ -19,7 +19,7 @@ import requests, datetime, random, json
 def article(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
-    team_list = request.GET.get('team_list', [])
+    team_list = request.GET.get('team_list')
     if request.method == "GET":
         print('request.GET-----------> ', request.GET)
         forms_obj = SelectForm(request.GET)
@@ -49,11 +49,19 @@ def article(request):
             article_list = []
             # 团队
             if team_list and len(team_list) >= 1:
+
+                team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)  # 查询出该用户所有团队
+                team_list = []
+                for i in team_objs:
+                    team_list.append(i.team_id)
+
+                # 查询出该团队所有用户 去重
                 team_objs = models.UserprofileTeam.objects.filter(team_id__in=json.loads(team_list)).values('user_id').distinct()
                 team_user_list = []
                 for team_obj in team_objs:
                     team_user_list.append(team_obj['user_id'])
 
+                # 查询 该团队所有用户文章
                 team_user_objs = models.Article.objects.filter(create_user_id__in=team_user_list)   # 查询该团队 所有文章
                 for i in team_user_objs:
                     article_list.append(i.id)
