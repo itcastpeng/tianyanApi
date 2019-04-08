@@ -267,6 +267,7 @@ def wechat_oper(request, oper_type):
         # 分享的链接 跳转②
         elif oper_type == 'redirect_url':
             redirect_url = request.GET.get('share_url')
+            print('request.GET----------> ', request.GET)
             print('跳转链接-------------> ', redirect_url)
             print('跳转链接-----unquote--------> ', unquote(redirect_url))
             return redirect(redirect_url)
