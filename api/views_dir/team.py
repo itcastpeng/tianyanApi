@@ -340,12 +340,12 @@ def customer_invite_members(request, oper_type, o_id):
         url = forwarding_article(pub=1, user_id=user_id, redirect_uri=url)
         print('redirect_uri-url--------=====url=====---------url-> ', url)
         print('redirect_uri-url--------=====url=====---------url-> ', unquote(url))
-        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&redirect_uri={url}'.format(
+        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&redirect_uri={open_weixin_url}'.format(
             host_url=host_url,
             team_name=team_name,
             user_name=user_name,
             set_avator=set_avator,
-            url=quote(url),
+            open_weixin_url=url,
             inviter_user_id=user_id,
         )
         return redirect(redirect_url)
