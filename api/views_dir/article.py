@@ -21,6 +21,7 @@ def article(request):
     user_id = request.GET.get('user_id')
     team_list = request.GET.get('team_list', [])
     if request.method == "GET":
+        print('request.GET-----------> ', request.GET)
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
             current_page = forms_obj.cleaned_data['current_page']
