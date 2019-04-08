@@ -70,7 +70,7 @@ def article(request):
                 ).order_by(order)
             else:
                 objs = models.Article.objects.filter(
-                    create_user__isnull=True
+                    classify__create_user__isnull=True
                 ).order_by('-like_num')
             count = objs.count()
 
