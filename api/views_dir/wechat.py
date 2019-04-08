@@ -276,7 +276,9 @@ def wechat_oper(request, oper_type):
                 redirect_url = str(share_url) + str(redirect_uri) + str(response_type) + str(scope) + str(state)
             else:
                 redirect_url = share_url
-
+            print('==================跳转链接========================================')
+            print('request.GET========> ', request.GET)
+            print('redirect_url-------------------> ', redirect_url)
             return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
