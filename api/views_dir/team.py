@@ -338,14 +338,13 @@ def customer_invite_members(request, oper_type, o_id):
         )
 
         url = forwarding_article(pub=1, user_id=user_id, redirect_uri=url)
-        print('redirect_uri-url--------=====url=====---------url-> ', url)
-        print('redirect_uri-url--------=====url=====---------url-> ', unquote(url))
-        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&redirect_uri={open_weixin_url}'.format(
+        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&open_weixin_url={open_weixin_url}&inviter_user_id={inviter_user_id}&team_id={team_id}'.format(
             host_url=host_url,
             team_name=team_name,
             user_name=user_name,
             set_avator=set_avator,
             open_weixin_url=url,
+            team_id=o_id,
             inviter_user_id=user_id,
         )
         return redirect(redirect_url)
