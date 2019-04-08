@@ -44,7 +44,7 @@ def article(request):
                 classify_objs = user_obj.recommend_classify.all()
             elif classify_type == 2:    # 品牌分类
                 classify_objs = user_obj.brand_classify.all()
-
+            print('classify_objs-----------> ', classify_objs)
             article_list = []
             # 团队
             if team_list and len(team_list) >= 1:
