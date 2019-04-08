@@ -12,7 +12,7 @@ import requests, json
 from publicFunc.host import host_url
 from django.shortcuts import redirect
 from publicFunc.forwarding_article import forwarding_article
-
+from urllib.parse import unquote,quote
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def team(request):
@@ -337,14 +337,15 @@ def customer_invite_members(request, oper_type, o_id):
             o_id=o_id,  # 团队ID
         )
 
-        redirect_uri = forwarding_article(pub=1, user_id=user_id, redirect_uri=url)
-        print('redirect_uri---------==========----------> ', redirect_uri)
-        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&redirect_uri={redirect_uri}'.format(
+        url = forwarding_article(pub=1, user_id=user_id, redirect_uri=url)
+        print('redirect_uri-url--------=====url=====---------url-> ', url)
+        print('redirect_uri-url--------=====url=====---------url-> ', unquote(url))
+        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&redirect_uri={url}'.format(
             host_url=host_url,
             team_name=team_name,
             user_name=user_name,
             set_avator=set_avator,
-            redirect_uri=redirect_uri,
+            url=url,
             inviter_user_id=user_id,
         )
         return redirect(redirect_url)
