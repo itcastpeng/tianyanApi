@@ -347,6 +347,7 @@ def customer_invite_members(request, oper_type, o_id):
             team_id=o_id,
             inviter_user_id=user_id,
         )
+        print('redirect_url============================> ', redirect_url)
         return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
