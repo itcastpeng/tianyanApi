@@ -338,7 +338,7 @@ def customer_invite_members(request, oper_type, o_id):
         )
 
         url = forwarding_article(pub=1, user_id=user_id, redirect_uri=url)
-        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&open_weixin_url={open_weixin_url}&inviter_user_id={inviter_user_id}&team_id={team_id}'.format(
+        redirect_url = '{host_url}#/share_invited_member?team_name={team_name}&user_name={user_name}&set_avator={set_avator}&inviter_user_id={inviter_user_id}&team_id={team_id}&open_weixin_url={open_weixin_url}'.format(
             host_url=host_url,
             team_name=team_name,
             user_name=user_name,
@@ -348,6 +348,7 @@ def customer_invite_members(request, oper_type, o_id):
             inviter_user_id=user_id,
         )
         print('redirect_url============================> ', redirect_url)
+        print('redirect_url============================> ', unquote(redirect_url))
         return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
