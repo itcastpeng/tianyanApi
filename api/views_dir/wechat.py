@@ -194,7 +194,7 @@ def wechat_oper(request, oper_type):
             team_name = obj.team.name  # 团队名称
             user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
             set_avator = obj.user.set_avator  # 客户头像
-            redirect_uri = '{host_url}api/invite_members/invite_members/{o_id}'.format(
+            redirect_uri = '{host_url}api/invite_members/invitation_page/{o_id}'.format(
                 host_url=host_url,
                 o_id=team_id,  # 团队ID
             )
