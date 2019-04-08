@@ -191,10 +191,7 @@ def wechat_oper(request, oper_type):
             print('request.GET=====invite_members------------invite_members------------invite_members====', request.GET)
             team_id = request.GET.get('team_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
-            obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
-            team_name = obj.team.name  # 团队名称
-            user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
-            set_avator = obj.user.set_avator  # 客户头像
+
             redirect_uri = '{host_url}api/invite_members/invitation_page/{o_id}'.format(
                 host_url=host_url,
                 o_id=team_id,  # 团队ID
@@ -202,11 +199,16 @@ def wechat_oper(request, oper_type):
 
             if inviter_user_id:  # 多次转发
                 redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri, inviter_user_id=inviter_user_id)
+                user_id = inviter_user_id
 
             else: # 首次转发
                 # 第一次链接 接收邀请页面
                 redirect_url = forwarding_article(pub=1, redirect_uri=redirect_uri, user_id=user_id)
 
+            obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
+            team_name = obj.team.name  # 团队名称
+            user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
+            set_avator = obj.user.set_avator  # 客户头像
             response.code = 200
             response.data = {
                 "open_weixin_url": redirect_url,
