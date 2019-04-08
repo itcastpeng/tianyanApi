@@ -69,9 +69,14 @@ def article(request):
                     q,
                 ).order_by(order)
             else:
-                objs = models.Article.objects.filter(
-                    classify__create_user__isnull=True
-                ).order_by('-like_num')
+                if classify_type and classify_type == 1: # 推荐
+                    objs = models.Article.objects.filter(
+                        classify__create_user__isnull=True
+                    ).order_by('-like_num')
+                else:
+                    objs = models.Article.objects.filter(
+                        create_datetime__isnull=True
+                    ).order_by('-like_num')
             count = objs.count()
 
             if length != 0:
