@@ -56,7 +56,7 @@ def day_eye(request):
                 'customer'
             ).values(
                 'customer_id', 'customer__name', 'customer__set_avator'
-            ).distinct().annotate(Count('customer_id'))
+            ).distinct().annotate(Count('customer_id')).exclude(customer_id__isnull=True)
 
             if length != 0:
                 start_line = (current_page - 1) * length
