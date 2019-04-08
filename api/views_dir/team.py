@@ -343,7 +343,7 @@ def customer_invite_members(request, oper_type, o_id):
             team_name=team_name,
             user_name=user_name,
             set_avator=set_avator,
-            open_weixin_url=url,
+            open_weixin_url=quote(url),
             team_id=o_id,
             inviter_user_id=user_id,
         )
