@@ -188,6 +188,7 @@ def wechat_oper(request, oper_type):
 
         # 邀请成员页面展示信息
         elif oper_type == "invite_members":
+            print('request.GET=====invite_members------------invite_members------------invite_members====', request.GET)
             team_id = request.GET.get('team_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
             obj = models.UserprofileTeam.objects.select_related('team', 'user').get(team_id=team_id, user_id=user_id)
