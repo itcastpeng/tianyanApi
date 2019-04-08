@@ -13,7 +13,7 @@ from django.shortcuts import render, redirect
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.host import host_url
-
+from urllib.parse import unquote,quote
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
     """
@@ -267,6 +267,8 @@ def wechat_oper(request, oper_type):
         # 分享的链接 跳转②
         elif oper_type == 'redirect_url':
             redirect_url = request.GET.get('share_url')
+            print('跳转链接-------------> ', redirect_url)
+            print('跳转链接-----unquote--------> ', unquote(redirect_url))
             return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
