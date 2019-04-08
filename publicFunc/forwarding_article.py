@@ -22,7 +22,7 @@ def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=Non
         redirect_uri=redirect_uri,
         user_id=user_id
     )
-
+    print('open_weixin_url================> ', open_weixin_url)
     open_weixin_uri = quote(open_weixin_url, 'utf-8')
     open_weixin_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/redirect_url?share_url=%s' % open_weixin_uri
     return open_weixin_url
