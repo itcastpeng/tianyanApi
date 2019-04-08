@@ -332,7 +332,7 @@ def customer_invite_members(request, oper_type, o_id):
         user_name = base64_encryption.b64decode(obj.user.name)  # 客户名称
         set_avator = obj.user.set_avator  # 客户头像
 
-        url = '{host_url}api/invite_members/invite_members/{o_id}'.format(
+        url = '{host_url}api/invite_members/invite_members/{o_id}/'.format(
             host_url=host_url,
             o_id=o_id,  # 团队ID
         )
