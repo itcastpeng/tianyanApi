@@ -44,10 +44,14 @@ def article(request):
             elif classify_type == 2:    # 品牌分类
                 classify_objs = user_obj.brand_classify.all()
             print('classify_objs-----------> ', classify_objs)
-            article_list = []
+            if classify_objs:
+                classify_id_list = [obj.id for obj in classify_objs]
+                if len(classify_id_list) > 0:
+                    q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
+
             # 团队
             if team_list and len(team_list) >= 1:
-
+                article_list = []
                 team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)  # 查询出该用户所有团队
                 team_list = []
                 for i in team_objs:
@@ -65,23 +69,23 @@ def article(request):
                     article_list.append(i.id)
 
                 q.add(Q(**{'id__in':article_list}), Q.AND)
-            if classify_objs:
-                classify_id_list = [obj.id for obj in classify_objs]
-                if len(classify_id_list) > 0:
-                    q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
+
 
             print('q -->', q)
-            if q:
+
+
+            objs = models.Article.objects.filter(q).order_by(order)
+
+            if classify_type and classify_type == 2:  # 我的品牌
                 objs = models.Article.objects.filter(
                     q,
+                    create_user_id=user_id
                 ).order_by(order)
-            else:
-                if classify_type and classify_type == 1: # 推荐
-                    objs = models.Article.objects.all().order_by('-like_num')
-                else:
-                    objs = models.Article.objects.filter(
-                        create_datetime__isnull=True
-                    ).order_by('-like_num')
+
+            if classify_type and classify_type == 1: # 推荐
+                objs = models.Article.objects.all().order_by('-like_num')
+
+
             count = objs.count()
 
             if length != 0:
@@ -381,10 +385,11 @@ def article_oper(request, oper_type, o_id):
 
         # 删除文章 （临时调用 接口）
         elif oper_type == 'delete_article':
-            users_forward_objs = models.users_forward_articles.objects.filter(article_id=o_id) # 查询用户分享文章表
-            click_article_objs = models.SelectClickArticleLog.objects.filter(article_id=o_id) # 客户点赞
-            select_article_objs = models.SelectArticleLog.objects.filter(article_id=o_id) # 查询文章
-            article_objs = models.Article.objects.filter(id=o_id)
+            id = o_id
+            users_forward_objs = models.users_forward_articles.objects.filter(article_id=id) # 查询用户分享文章表
+            click_article_objs = models.SelectClickArticleLog.objects.filter(article_id=id) # 客户点赞
+            select_article_objs = models.SelectArticleLog.objects.filter(article_id=id) # 查询文章
+            article_objs = models.Article.objects.filter(id=id)
             users_forward_objs.delete()
             click_article_objs.delete()
             select_article_objs.delete()
