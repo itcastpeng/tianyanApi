@@ -6,13 +6,11 @@ from publicFunc.condition_com import conditionCom
 from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle, select_form
 from django.db.models import Q, F
 from publicFunc.base64_encryption import b64decode, b64encode
-# from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-# from publicFunc.account import get_token
-# from django.shortcuts import render, redirect
 from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
 from publicFunc.forwarding_article import forwarding_article
 import requests, datetime, random, json
+
 
 # token验证 文章展示模块
 @account.is_token(models.Userprofile)
@@ -79,9 +77,7 @@ def article(request):
                 ).order_by(order)
             else:
                 if classify_type and classify_type == 1: # 推荐
-                    objs = models.Article.objects.filter(
-                        classify__create_user__isnull=True
-                    ).order_by('-like_num')
+                    objs = models.Article.objects.all().order_by('-like_num')
                 else:
                     objs = models.Article.objects.filter(
                         create_datetime__isnull=True
@@ -141,14 +137,22 @@ def article(request):
                     result_data['qr_code'] = user_obj.qr_code               # 用户微信二维码
 
 
-                     # 用户查看文章 客户字段为空
-                    models.SelectArticleLog.objects.create(
+                     # 用户查看文章 客户字段为空 判断今天是否看过此文章 看过不记录
+                    now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
+                    log_objs = models.SelectArticleLog.objects.filter(
                         article_id=id,
-                        inviter_id=user_id
+                        inviter_id=user_id,
+                        create_datetime__gte=now
                     )
-                    # 记录查看次数
-                    obj.look_num = F('look_num') + 1
-                    obj.save()
+                    print('log_objs-------. ', log_objs)
+                    if not log_objs:
+                        models.SelectArticleLog.objects.create(
+                            article_id=id,
+                            inviter_id=user_id
+                        )
+                        # 记录查看次数
+                        obj.look_num = F('look_num') + 1
+                        obj.save()
 
 
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
@@ -531,15 +535,23 @@ def article_customer_oper(request, oper_type):
                     'cover_img':article_obj.cover_img,
                     'url':url
                 })
-            # 如果是客户查看记录查看次数 创建查看信息
-            models.SelectArticleLog.objects.create(
+
+            # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
+            now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
+            log_objs = models.SelectArticleLog.objects.filter(
                 customer_id=user_id,
-                article_id=id,
-                inviter_id=inviter_user_id
+                inviter_id=user_id,
+                create_datetime__gte=now
             )
-            # 记录查看次数
-            obj.look_num = F('look_num') + 1
-            obj.save()
+            if not log_objs:
+                models.SelectArticleLog.objects.create(
+                    customer_id=user_id,
+                    article_id=id,
+                    inviter_id=inviter_user_id
+                )
+                # 记录查看次数
+                obj.look_num = F('look_num') + 1
+                obj.save()
             response.code = 200
             response.msg = '查询成功'
             response.data = {
