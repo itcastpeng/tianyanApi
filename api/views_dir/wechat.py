@@ -98,7 +98,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
     return user_id
 
 
-# 微信服务器调用的接口
+# 有人(关注/取关)公众号 微信服务器调用的接口
 def wechat(request):
     weichat_api_obj = WeChatApi()
 
@@ -135,9 +135,12 @@ def wechat(request):
 
             # 扫描带参数的二维码
             if event in ["subscribe", "SCAN"]:
+
                 # subscribe = 首次关注
                 # SCAN = 已关注
                 # 事件 Key 值
+                print('collection.getElementsByTagName("EventKey")[0]------> ', collection.getElementsByTagName("EventKey")[0])
+                print('collection.getElementsByTagName("EventKey")[0]------> ', collection.getElementsByTagName("EventKey")[0].childNodes)
                 event_key = collection.getElementsByTagName("EventKey")[0].childNodes[0].data
                 if event == "subscribe":
                     event_key = event_key.split("qrscene_")[-1]
@@ -149,8 +152,8 @@ def wechat(request):
                 updateUserInfo(openid, inviter_user_id, ret_obj)
 
             # 取消关注
-            elif event == "unsubscribe":
-                models.Userprofile.objects.filter(openid=openid).update(openid=None)
+            # elif event == "unsubscribe":
+            #     models.Userprofile.objects.filter(openid=openid).update(openid=None)
 
                 # we_chat_public_send_msg_obj.sendTempMsg(post_data)
 
