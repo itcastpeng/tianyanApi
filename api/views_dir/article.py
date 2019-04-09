@@ -492,84 +492,91 @@ def article_customer_oper(request, oper_type):
         # 客户查询文章详情
         if oper_type == 'article':
             id = request.GET.get('id')                          # 文章ID
-            obj = models.Article.objects.get(id=id)
-            user_obj = models.Userprofile.objects.get(id=inviter_user_id)
+            objs = models.Article.objects.filter(id=id)
+            if objs:
+                obj = objs
+                user_obj = models.Userprofile.objects.get(id=inviter_user_id)
 
-            is_like = False  # 是否点赞
-            log_obj = models.SelectClickArticleLog.objects.filter(
-                article_id=obj.id,
-                customer_id=user_id
-            )
-            if log_obj:
-                is_like = True
-
-            result_data = {
-                'id': obj.id,
-                'title': obj.title,
-                'summary': obj.summary,
-                'look_num': obj.look_num,
-                'like_num': obj.like_num,
-                'create_user_id': obj.create_user_id,
-                'cover_img': obj.cover_img,
-                'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-            }
-            result_data['content'] = json.loads(obj.content)
-            result_data['style'] = obj.style
-            result_data['top_advertising'] = obj.top_advertising
-            result_data['end_advertising'] = obj.end_advertising
-            # 个人信息
-            result_data['name'] = b64decode(user_obj.name)  # 用户名称
-            result_data['phone_number'] = user_obj.phone_number  # 用户电话
-            result_data['signature'] = user_obj.signature  # 用户签名
-            result_data['set_avator'] = user_obj.set_avator  # 用户头像
-            brand_name_list = []
-            for i in user_obj.brand_classify.all():
-                brand_name_list.append(i.name)
-            result_data['brand_name'] = brand_name_list  # 用户品牌
-            result_data['qr_code'] = user_obj.qr_code   # 用户微信二维码
-            result_data['is_like'] = is_like            # 是否点赞
-
-            article_objs = models.Article.objects.filter(
-                title__isnull=False
-            ).exclude(
-                id=id
-            ).order_by('look_num')[:3]
-            print('article_objs---> ', article_objs)
-            popula_articles_list = []
-            for article_obj in article_objs:
-                pub = 'article_' + str(article_obj.id)
-                url = forwarding_article(
-                    pub=pub,
-                    user_id=article_obj.create_user_id,
+                is_like = False  # 是否点赞
+                log_obj = models.SelectClickArticleLog.objects.filter(
+                    article_id=obj.id,
+                    customer_id=user_id
                 )
-                popula_articles_list.append({
-                    'title': article_obj.title,
-                    'cover_img':article_obj.cover_img,
-                    'url':url
-                })
+                if log_obj:
+                    is_like = True
 
-            # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
-            now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
-            log_objs = models.SelectArticleLog.objects.filter(
-                customer_id=user_id,
-                inviter_id=user_id,
-                create_datetime__gte=now
-            )
-            if not log_objs:
-                models.SelectArticleLog.objects.create(
+                result_data = {
+                    'id': obj.id,
+                    'title': obj.title,
+                    'summary': obj.summary,
+                    'look_num': obj.look_num,
+                    'like_num': obj.like_num,
+                    'create_user_id': obj.create_user_id,
+                    'cover_img': obj.cover_img,
+                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                }
+                result_data['content'] = json.loads(obj.content)
+                result_data['style'] = obj.style
+                result_data['top_advertising'] = obj.top_advertising
+                result_data['end_advertising'] = obj.end_advertising
+                # 个人信息
+                result_data['name'] = b64decode(user_obj.name)  # 用户名称
+                result_data['phone_number'] = user_obj.phone_number  # 用户电话
+                result_data['signature'] = user_obj.signature  # 用户签名
+                result_data['set_avator'] = user_obj.set_avator  # 用户头像
+                brand_name_list = []
+                for i in user_obj.brand_classify.all():
+                    brand_name_list.append(i.name)
+                result_data['brand_name'] = brand_name_list  # 用户品牌
+                result_data['qr_code'] = user_obj.qr_code   # 用户微信二维码
+                result_data['is_like'] = is_like            # 是否点赞
+
+                article_objs = models.Article.objects.filter(
+                    title__isnull=False
+                ).exclude(
+                    id=id
+                ).order_by('look_num')[:3]
+                print('article_objs---> ', article_objs)
+                popula_articles_list = []
+                for article_obj in article_objs:
+                    pub = 'article_' + str(article_obj.id)
+                    url = forwarding_article(
+                        pub=pub,
+                        user_id=article_obj.create_user_id,
+                    )
+                    popula_articles_list.append({
+                        'title': article_obj.title,
+                        'cover_img':article_obj.cover_img,
+                        'url':url
+                    })
+
+                # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
+                now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
+                log_objs = models.SelectArticleLog.objects.filter(
                     customer_id=user_id,
-                    article_id=id,
-                    inviter_id=inviter_user_id
+                    inviter_id=user_id,
+                    create_datetime__gte=now
                 )
-                # 记录查看次数
-                obj.look_num = F('look_num') + 1
-                obj.save()
-            response.code = 200
-            response.msg = '查询成功'
-            response.data = {
-                'popula_articles': popula_articles_list,
-                'result_data': result_data
-            }
+                if not log_objs:
+                    models.SelectArticleLog.objects.create(
+                        customer_id=user_id,
+                        article_id=id,
+                        inviter_id=inviter_user_id
+                    )
+                    # 记录查看次数
+                    obj.look_num = F('look_num') + 1
+                    obj.save()
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'popula_articles': popula_articles_list,
+                    'result_data': result_data
+                }
+
+
+            else:
+                response.code = 500
+                response.msg = '页面丢失'
 
         # 客户查询微店分类
         elif oper_type == 'goods_classify':
