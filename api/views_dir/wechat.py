@@ -304,11 +304,16 @@ def share_article(request, oper_type):
         ret_obj = weichat_api_obj.get_openid(code)
         openid = ret_obj.get('openid')
 
+        encode_username = b64encode(
+            ret_obj['nickname']
+        )
         user_data = {
             "sex": ret_obj.get('sex'),
             "country": ret_obj.get('country'),
             "province": ret_obj.get('province'),
             "city": ret_obj.get('city'),
+            'name': encode_username,
+            'set_avator': ret_obj.get('headimgurl')
         }
         customer_objs = models.Customer.objects.filter(openid=openid)
         if customer_objs:   # 客户已经存在
@@ -316,10 +321,6 @@ def share_article(request, oper_type):
             customer_obj = customer_objs[0]
         # 不存在，创建用户
         else:
-            encode_username = b64encode(
-                ret_obj['nickname']
-            )
-
             subscribe = ret_obj.get('subscribe')
 
             user_data['set_avator'] = ret_obj.get('headimgurl')
