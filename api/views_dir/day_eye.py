@@ -492,7 +492,8 @@ def day_eye_oper(request, oper_type, o_id):
             elif oper_type == 'view_by_article_detail':
                 article_obj = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id,
-                    article_id=o_id
+                    article_id=o_id,
+                    customer_id__isnull=False
                 )
                 objs = article_obj.values('customer_id', 'customer__name', 'customer__set_avator').distinct().annotate(Count('id'))
 
