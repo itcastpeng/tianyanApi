@@ -319,13 +319,15 @@ def share_article(request, oper_type):
 
             subscribe = ret_obj.get('subscribe')
 
-            # 如果没有关注，获取个人信息判断是否关注
-            if not subscribe:
-                weichat_api_obj = WeChatApi()
-                ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                subscribe = ret_obj.get('subscribe')
-            print('ret_objret_obj--ret_obj---> ', ret_obj)
             user_data['set_avator'] = ret_obj.get('headimgurl')
+            # 如果没有关注，获取个人信息判断是否关注
+            # if not subscribe:
+            #     weichat_api_obj = WeChatApi()
+            #     ret_obj = weichat_api_obj.get_user_info(openid=openid)
+            #     subscribe = ret_obj.get('subscribe')
+            #     user_data['set_avator'] = ret_obj.get('set_avator')
+
+            print('ret_objret_obj--ret_obj---> ', ret_obj)
             user_data['subscribe'] = subscribe
             user_data['name'] = encode_username
             user_data['openid'] = ret_obj.get('openid')
