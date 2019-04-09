@@ -121,10 +121,11 @@ def article(request):
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 }
                 if id: # 如果查询详情 返回文章内容  查询全部不返回 否则数据过大
+                    if user_id == obj.create_user_id:
+                        result_data['top_advertising'] = obj.top_advertising
+                        result_data['end_advertising'] = obj.end_advertising
                     result_data['content'] = json.loads(obj.content)
                     result_data['style'] = obj.style
-                    result_data['top_advertising'] = obj.top_advertising
-                    result_data['end_advertising'] = obj.end_advertising
                     # 个人信息
                     result_data['name'] = b64decode(user_obj.name)          # 用户名称
                     result_data['phone_number'] = user_obj.phone_number     # 用户电话
@@ -144,7 +145,6 @@ def article(request):
                         inviter_id=user_id,
                         create_datetime__gte=now
                     )
-                    print('log_objs-------. ', log_objs)
                     if not log_objs:
                         models.SelectArticleLog.objects.create(
                             article_id=id,
