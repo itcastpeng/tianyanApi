@@ -307,6 +307,7 @@ def share_article(request, oper_type):
         encode_username = b64encode(
             ret_obj['nickname']
         )
+        print("ret_obj.get('headimgurl')--------------------------------------------> ", ret_obj.get('headimgurl'))
         user_data = {
             "sex": ret_obj.get('sex'),
             "country": ret_obj.get('country'),
