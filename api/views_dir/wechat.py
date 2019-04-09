@@ -139,14 +139,14 @@ def wechat(request):
                 # subscribe = 首次关注
                 # SCAN = 已关注
                 # 事件 Key 值
-                print('collection.getElementsByTagName("EventKey")[0]------> ', collection.getElementsByTagName("EventKey")[0])
-                print('collection.getElementsByTagName("EventKey")[0]------> ', collection.getElementsByTagName("EventKey")[0].childNodes)
-                event_key = collection.getElementsByTagName("EventKey")[0].childNodes[0].data
-                if event == "subscribe":
-                    event_key = event_key.split("qrscene_")[-1]
-                event_key = json.loads(event_key)
-                inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
-                print('event_key -->', event_key)
+                inviter_user_id = ''
+                if collection.getElementsByTagName("EventKey")[0].childNodes:
+                    event_key = collection.getElementsByTagName("EventKey")[0].childNodes[0].data
+                    if event == "subscribe":
+                        event_key = event_key.split("qrscene_")[-1]
+                    event_key = json.loads(event_key)
+                    inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
+                    print('event_key -->', event_key)
 
                 ret_obj = weichat_api_obj.get_user_info(openid=openid)
                 updateUserInfo(openid, inviter_user_id, ret_obj)
