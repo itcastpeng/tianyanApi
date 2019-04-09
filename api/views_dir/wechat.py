@@ -324,7 +324,7 @@ def share_article(request, oper_type):
                 weichat_api_obj = WeChatApi()
                 ret_obj = weichat_api_obj.get_user_info(openid=openid)
                 subscribe = ret_obj.get('subscribe')
-
+            print('ret_objret_obj--ret_obj---> ', ret_obj)
             user_data['set_avator'] = ret_obj.get('headimgurl')
             user_data['subscribe'] = subscribe
             user_data['name'] = encode_username
