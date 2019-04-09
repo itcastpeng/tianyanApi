@@ -499,7 +499,7 @@ def article_customer_oper(request, oper_type):
             id = request.GET.get('id')                          # 文章ID
             objs = models.Article.objects.filter(id=id)
             if objs:
-                obj = objs
+                obj = objs[0]
                 user_obj = models.Userprofile.objects.get(id=inviter_user_id)
 
                 is_like = False  # 是否点赞
