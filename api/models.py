@@ -98,7 +98,7 @@ class Customer(models.Model):
     set_avator = models.CharField(
         verbose_name='头像',
         default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg',
-        max_length=128
+        max_length=256
     )
     openid = models.CharField(verbose_name="openid", max_length=64)
     subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
