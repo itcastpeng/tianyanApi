@@ -186,11 +186,11 @@ class SelectClickArticleLog(models.Model):
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 # 用户分享文章表
-class users_forward_articles(models.Model):
-    user = models.ForeignKey('Userprofile', verbose_name='分享文章的用户')
-    article = models.ForeignKey('Article', verbose_name='分享的文章')
-    article_url = models.TextField(verbose_name='文章链接')
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+# class users_forward_articles(models.Model):
+#     user = models.ForeignKey('Userprofile', verbose_name='分享文章的用户')
+#     article = models.ForeignKey('Article', verbose_name='分享的文章')
+#     article_url = models.TextField(verbose_name='文章链接')
+#     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 # -----------------------------------商品相关表--------------------------
 
