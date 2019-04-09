@@ -504,7 +504,6 @@ def day_eye_oper(request, oper_type, o_id):
                 count = objs.count()
                 ret_data = []
                 for obj in objs:
-                    print("obj['customer__name']--------------> ", obj['customer__name'])
                     objs = article_obj.filter(customer_id=obj['customer_id'])[:1]
                     create_datetime = objs[0].create_datetime
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
