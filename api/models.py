@@ -181,7 +181,7 @@ class SelectArticleLog(models.Model):
 # 客户点赞文章日志表
 class SelectClickArticleLog(models.Model):
     user = models.ForeignKey('Userprofile', verbose_name='用户点赞', null=True)
-    customer = models.ForeignKey('Customer', verbose_name="查看人", null=True)
+    customer = models.ForeignKey('Customer', verbose_name="客户点赞", null=True)
     article = models.ForeignKey('Article', verbose_name="点赞文章")
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 

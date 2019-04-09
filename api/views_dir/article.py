@@ -379,6 +379,18 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
+        # 删除文章 （临时调用 接口）
+        elif oper_type == 'delete_article':
+            users_forward_objs = models.users_forward_articles.objects.filter(article_id=o_id) # 查询用户分享文章表
+            click_article_objs = models.SelectClickArticleLog.objects.filter(article_id=o_id) # 客户点赞
+            select_article_objs = models.SelectArticleLog.objects.filter(article_id=o_id) # 查询文章
+            article_objs = models.Article.objects.filter(id=o_id)
+            users_forward_objs.delete()
+            click_article_objs.delete()
+            select_article_objs.delete()
+            article_objs.delete()
+            response.code = 200
+            response.msg = '删除成功'
 
     else:
         # 热门文章查询
