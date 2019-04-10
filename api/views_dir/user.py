@@ -188,6 +188,9 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = "是否显示产品传参异常"
 
+        # 设置推荐文章类别(文章页面显示的分类)
+        elif oper_type == '':
+            pass
 
 
     else:
@@ -223,6 +226,31 @@ def user_oper(request, oper_type, o_id):
                 'overdue_date': "有效期至",
                 'remaining_days': "剩余天数"
             }
+
+        # 查询推荐文章类别 (文章页面)
+        elif oper_type == 'get_article_category':
+            objs = models.Classify.objects.filter(create_user__isnull=True).order_by('-create_datetime')
+            data_list = []
+            for i in objs:
+                data_list.append({
+                    'id':i.id,
+                    'name':i.name,
+                })
+            count = objs.count()
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'data_list': data_list,
+                'count': count
+            }
+
+        # 查询自定义文章类别(文章页面 团队后面自定义菜单)
+        elif oper_type == '':
+            pass
+
+        else:
+            response.code = 402
+            response.msg = '请求异常'
 
     return JsonResponse(response.__dict__)
 

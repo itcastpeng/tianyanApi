@@ -374,8 +374,18 @@ class select_form(forms.Form):
         return length
 
 
+class add_article(forms.Form):
+    classify_id = forms.CharField(
+        required=True,
+        error_messages={
+            'invalid': "分类类别不能为空"
+        }
+    )
 
+    def clean_classify_id(self):
+        classify_id = self.data.get('classify_id')
 
+        return json.loads(classify_id)
 
 
 

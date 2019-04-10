@@ -3,7 +3,7 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle, select_form
+from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle, select_form, add_article
 from django.db.models import Q, F
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.article_oper import give_like
@@ -39,9 +39,7 @@ def article(request):
             user_obj = models.Userprofile.objects.get(id=user_id)
 
             classify_objs = None
-            if classify_type == 1:  # 推荐分类
-                classify_objs = user_obj.recommend_classify.all()
-            elif classify_type == 2:    # 品牌分类
+            if classify_type == 2:    # 品牌分类
                 classify_objs = user_obj.brand_classify.all()
             print('classify_objs-----------> ', classify_objs)
             if classify_objs:
@@ -94,8 +92,9 @@ def article(request):
                 objs = objs[start_line: stop_line]
 
             id = request.GET.get('id')
-            # 返回的数据
+
             ret_data = []
+            # 返回的数据
             for obj in objs:
                 is_like = False # 是否点赞
                 log_obj = models.SelectClickArticleLog.objects.filter(
@@ -125,13 +124,13 @@ def article(request):
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 }
                 if id: # 如果查询详情 返回文章内容  查询全部不返回 否则数据过大
+                    result_data['top_advertising'] = user_obj.top_advertising # 头部广告
+                    result_data['end_advertising'] = user_obj.end_advertising # 底部广告
                     is_oneself_article = False
                     if user_id == obj.create_user_id:
                         is_oneself_article = True
 
                     result_data['is_oneself_article'] = is_oneself_article
-                    result_data['top_advertising'] = obj.top_advertising
-                    result_data['end_advertising'] = obj.end_advertising
                     result_data['content'] = json.loads(obj.content)
                     result_data['style'] = obj.style
                     # 个人信息
@@ -289,7 +288,8 @@ def article_oper(request, oper_type, o_id):
         elif oper_type == 'insert_content':
             top_advertising = request.POST.get('top_advertising')  # 顶部内容
             end_advertising = request.POST.get('end_advertising')  # 底部内容
-            objs = models.Article.objects.filter(id=o_id)
+
+            objs = models.Userprofile.objects.filter(id=o_id)
             obj = objs[0]
             if int(objs[0].create_user_id) == int(user_id):
                 if top_advertising:
@@ -309,8 +309,6 @@ def article_oper(request, oper_type, o_id):
                     summary=obj.summary,
                     style=obj.style,
                     create_user_id=user_id,
-                    top_advertising=top_advertising,
-                    end_advertising=end_advertising,
                 )
                 response.msg = '创建成功'
                 response.data = {
@@ -346,22 +344,22 @@ def article_oper(request, oper_type, o_id):
         elif oper_type == 'add_article':
             top_advertising = request.POST.get('top_advertising')
             end_advertising = request.POST.get('end_advertising')
-            classify_id = json.loads(request.POST.get('classify_id'))
+            models.Userprofile.objects.filter(id=user_id).update(
+                top_advertising=top_advertising,
+                end_advertising=end_advertising
+            )
 
             objs = models.Article.objects.filter(id=o_id)
             if objs:
                 obj = objs[0]
-
                 obj = models.Article.objects.create(
                     title=obj.title,
                     content=obj.content,
                     cover_img=obj.cover_img,
                     summary=obj.summary,
                     create_user_id=user_id,
-                    top_advertising=top_advertising,
-                    end_advertising=end_advertising,
                 )
-                obj.classify = classify_id
+                obj.classify = obj.classify.all()
 
                 response.msg = '创建成功'
                 response.data = {
