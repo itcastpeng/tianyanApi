@@ -106,9 +106,9 @@ def user_oper(request, oper_type, o_id):
     if request.method == "POST":
         # 设置推荐分类
         if oper_type == "update_recommend_classify":
-            classify_id = request.POST.getlist('classify_id[]')
+            classify_id = request.POST.get('classify_id[]')
             if classify_id:
-                recommend_classify_list = [int(i) for i in classify_id]
+                recommend_classify_list = [int(i) for i in json.loads(classify_id)]
                 print("recommend_classify_list -->", recommend_classify_list)
                 user_obj = models.Userprofile.objects.get(id=user_id)
                 user_obj.recommend_classify = recommend_classify_list
