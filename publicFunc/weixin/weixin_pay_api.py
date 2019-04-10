@@ -1,6 +1,6 @@
 
 import time
-import random
+import random, uuid
 import requests
 import xml.dom.minidom as xmldom
 from publicFunc import xmldom_parsing
@@ -75,3 +75,6 @@ class weixin_pay_api(WeixinApiPublic):
         return_code = collection.getElementsByTagName("return_code")[0].childNodes[0].data
 
         return return_code
+
+    def generateRandomStamping(self):
+        return str(uuid.uuid4()).replace('-', '')
