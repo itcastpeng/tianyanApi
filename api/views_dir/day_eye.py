@@ -104,7 +104,6 @@ def day_eye(request):
             response.data = json.loads(forms_obj.errors.as_json())
     return JsonResponse(response.__dict__)
 
-
 # 增删改
 # token验证
 @account.is_token(models.Userprofile)
