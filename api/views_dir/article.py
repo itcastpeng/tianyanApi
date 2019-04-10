@@ -39,9 +39,11 @@ def article(request):
             user_obj = models.Userprofile.objects.get(id=user_id)
 
             classify_objs = None
-            if classify_type == 2:    # 品牌分类
+            if classify_type == 1:  # 推荐分类
+                classify_objs = user_obj.recommend_classify.all()
+            elif classify_type == 2:    # 品牌分类
                 classify_objs = user_obj.brand_classify.all()
-            print('classify_objs-----------> ', classify_objs)
+
             if classify_objs:
                 classify_id_list = [obj.id for obj in classify_objs]
                 if len(classify_id_list) > 0:
@@ -72,16 +74,21 @@ def article(request):
             print('q -->', q)
 
 
-            objs = models.Article.objects.filter(q).order_by(order)
-
             if classify_type and classify_type == 2:  # 我的品牌
                 objs = models.Article.objects.filter(
                     q,
                     create_user_id=user_id
                 ).order_by(order)
 
-            if classify_type and classify_type == 1: # 推荐
-                objs = models.Article.objects.all().order_by('-like_num')
+            elif classify_objs and classify_type and classify_type == 1: # 推荐
+                objs = models.Article.objects.filter(
+                    q
+                ).order_by(order)
+
+            else: # 没有推荐 默认查询最火 / 团队查询
+                objs = models.Article.objects.filter(
+                    q
+                ).order_by('-like_num')
 
 
             count = objs.count()
@@ -342,7 +349,7 @@ def article_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        # 创建文章 (不是自己的文章)
+        # 创建文章 (不是自己的文章)修改他人文章时调用
         elif oper_type == 'add_article':
             top_advertising = request.POST.get('top_advertising')
             end_advertising = request.POST.get('end_advertising')
