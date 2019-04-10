@@ -107,6 +107,7 @@ def user_oper(request, oper_type, o_id):
         # 设置推荐分类
         if oper_type == "update_recommend_classify":
             classify_id = request.POST.getlist('classify_id[]')
+            print('classify_id------> ', classify_id)
             if classify_id:
                 recommend_classify_list = [int(i) for i in classify_id]
                 print("recommend_classify_list -->", recommend_classify_list)
