@@ -19,6 +19,7 @@ def classify(request):
             # current_page = forms_obj.cleaned_data['current_page']
             # length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
+            recommended_classifiy = request.GET.get('recommended_classifiy') # 是否选择默认分类 create_user 为空
             order = request.GET.get('order', '-create_datetime')
             field_dict = {
                 'id': '',
@@ -27,7 +28,11 @@ def classify(request):
             }
             q = conditionCom(request, field_dict)
             print('q -->', q)
-            objs = models.Classify.objects.filter(q).order_by(order)
+            if recommended_classifiy:
+                objs = models.Classify.objects.filter(q, create_user__isnull=True).order_by(order)
+            else:
+                objs = models.Classify.objects.filter(q).order_by(order)
+
             count = objs.count()
 
             # if length != 0:
