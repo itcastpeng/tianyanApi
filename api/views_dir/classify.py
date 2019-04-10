@@ -19,6 +19,7 @@ def classify(request):
             # current_page = forms_obj.cleaned_data['current_page']
             # length = forms_obj.cleaned_data['length']
             print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
+            user_id = request.GET.get('user_id')
             recommended_classifiy = request.GET.get('recommended_classifiy') # 是否选择默认分类 create_user 为空
             order = request.GET.get('order', '-create_datetime')
             field_dict = {
@@ -42,13 +43,20 @@ def classify(request):
 
             # 返回的数据
             ret_data = []
-
+            user_obj = models.Userprofile.objects.get(id=user_id)
+            recommend_classify_obj = [i.id for i in user_obj.recommend_classify.all()]
+            print('recommend_classify_obj------> ', recommend_classify_obj)
             for obj in objs:
+                # 查询推荐分类是否打钩
+                is_check_whether = False
+                if obj.id in recommend_classify_obj:
+                    is_check_whether = True
 
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
                     'name': obj.name,
+                    'is_check_whether': is_check_whether,
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
             #  查询成功 返回200 状态码
