@@ -289,15 +289,17 @@ def article_oper(request, oper_type, o_id):
             top_advertising = request.POST.get('top_advertising')  # 顶部内容
             end_advertising = request.POST.get('end_advertising')  # 底部内容
 
-            objs = models.Userprofile.objects.filter(id=o_id)
+            user_objs = models.Userprofile.objects.filter(id=user_id)
+
+            objs = models.Article.objects.filter(id=o_id)
             obj = objs[0]
             if int(objs[0].create_user_id) == int(user_id):
                 if top_advertising:
-                    objs.update(
+                    user_objs.update(
                         top_advertising = top_advertising,
                     )
                 else:
-                    objs.update(
+                    user_objs.update(
                         end_advertising = end_advertising
                     )
                 response.msg = '更新成功'
