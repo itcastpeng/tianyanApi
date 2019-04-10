@@ -583,7 +583,7 @@ def article_customer_oper(request, oper_type):
 
 
             else:
-                response.code = 500
+                response.code = 402
                 response.msg = '页面丢失'
 
         # 客户查询微店分类
