@@ -28,10 +28,10 @@ def classify(request):
             }
             q = conditionCom(request, field_dict)
             print('q -->', q)
-            if recommended_classifiy:
+            if recommended_classifiy: # 默认分类
                 objs = models.Classify.objects.filter(q, create_user__isnull=True).order_by(order)
-            else:
-                objs = models.Classify.objects.filter(q).order_by(order)
+            else: # 品牌分类
+                objs = models.Classify.objects.filter(q, create_user__isnull=False).order_by(order)
 
             count = objs.count()
 
