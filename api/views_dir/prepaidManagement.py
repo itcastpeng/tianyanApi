@@ -1,6 +1,5 @@
 import xml.dom.minidom as xmldom
-import datetime
-
+import datetime, time
 from api import models
 from publicFunc import Response
 from publicFunc import account, xmldom_parsing
@@ -35,7 +34,7 @@ def weixin_pay(request, oper_type, o_id):
             return_code = result.get('return_code')
             return_msg = result.get('return_msg')
             dingdanhao = result.get('dingdanhao')
-            prepay_id = result.get('prepay_id')
+            prepay_id = result.get('prepay_id')['prepay_id']
 
             if return_code == 'SUCCESS':  # 判断预支付返回参数 是否正确
                 order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 创建订单日志
@@ -52,7 +51,19 @@ def weixin_pay(request, oper_type, o_id):
                         original_price=fee_obj.original_price,  # 原价
                         overdue_date=overdue_date,
                     )
-                response.data = {'prepay_id': prepay_id}
+                print('prepay_id--------> ', prepay_id)
+                data_dict = {
+                    'appId': appid,
+                    'timeStamp': int(time.time()),
+                    'nonceStr': weixin_pay_api_obj.generateRandomStamping(),
+                    'package': 'prepay_id=' + prepay_id,
+                    'signType': 'MD5'
+                }
+                SHANGHUKEY = weixin_pay_api_obj.SHANGHUKEY
+                stringSignTemp = weixin_pay_api_obj.shengchengsign(data_dict, SHANGHUKEY)
+                data_dict['paySign'] = weixin_pay_api_obj.md5(stringSignTemp).upper()  # upper转换为大写
+
+                response.data = data_dict
                 response.code = 200
                 response.msg = '预支付请求成功'
             else:
