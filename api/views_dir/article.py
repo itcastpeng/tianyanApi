@@ -125,9 +125,13 @@ def article(request):
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 }
                 if id: # 如果查询详情 返回文章内容  查询全部不返回 否则数据过大
+                    is_oneself_article = False
                     if user_id == obj.create_user_id:
-                        result_data['top_advertising'] = obj.top_advertising
-                        result_data['end_advertising'] = obj.end_advertising
+                        is_oneself_article = True
+
+                    result_data['is_oneself_article'] = is_oneself_article
+                    result_data['top_advertising'] = obj.top_advertising
+                    result_data['end_advertising'] = obj.end_advertising
                     result_data['content'] = json.loads(obj.content)
                     result_data['style'] = obj.style
                     # 个人信息
@@ -192,6 +196,7 @@ def article(request):
                 'set_avator': "用户头像",
                 'brand_name': "用户品牌名称",
                 'qr_code': "用户微信二维码",
+                'is_oneself_article': "是否是自己的文章",
             }
         else:
             response.code = 301
