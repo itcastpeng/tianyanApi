@@ -65,6 +65,8 @@ class Userprofile(models.Model):
     small_shop_avator = models.CharField(verbose_name='微店头像', max_length=256, default='http://tianyan.zhangcong.top/statics/img/f4578f133cd9fc4b88449b1e373c5d4cnews4.png')
     small_shop_image = models.CharField(verbose_name='微店顶部静态横图', max_length=256, null=True, blank=True)
 
+    top_advertising = models.TextField(verbose_name='顶层广告' ,null=True, blank=True)
+    end_advertising = models.TextField(verbose_name='底层广告' ,null=True, blank=True)
 
 # 微商用户和团队关系表
 class UserprofileTeam(models.Model):
@@ -140,9 +142,6 @@ class Article(models.Model):
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
     style = models.TextField(verbose_name='文章样式', null=True, blank=True)
-
-    top_advertising = models.TextField(verbose_name='顶层广告' ,null=True, blank=True)
-    end_advertising = models.TextField(verbose_name='底层广告' ,null=True, blank=True)
 
 
 # 文章/品牌 分类
