@@ -527,8 +527,8 @@ def article_customer_oper(request, oper_type):
                 }
                 result_data['content'] = json.loads(obj.content)
                 result_data['style'] = obj.style
-                result_data['top_advertising'] = obj.top_advertising
-                result_data['end_advertising'] = obj.end_advertising
+                result_data['top_advertising'] = user_obj.top_advertising
+                result_data['end_advertising'] = user_obj.end_advertising
                 # 个人信息
                 result_data['name'] = b64decode(user_obj.name)  # 用户名称
                 result_data['phone_number'] = user_obj.phone_number  # 用户电话
