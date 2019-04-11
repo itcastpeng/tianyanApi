@@ -23,10 +23,11 @@ def article_oper(request, oper_type):
         )
         ret_data = {}
         if objs:
-            objs.update(last_update_time=now)
             obj = objs[0]
             ret_data['id'] = obj.id
             ret_data['name'] = obj.name
+            obj.last_update_time=now
+            obj.save()
         response.code = 200
         response.data = ret_data
 
