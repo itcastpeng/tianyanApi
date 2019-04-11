@@ -180,7 +180,7 @@ def posters_oper(request, oper_type, o_id):
                 posters_status = int(posters_status)
                 if posters_status == 1:
                     obj = models.Userprofile.objects.get(id=user_id)
-                    set_avator = 'statics' + obj.set_avator.split('statics')[1]
+                    set_avator = obj.set_avator
                     data = {
                         'posters_status': posters_status,
                         'img_path': img_path,
