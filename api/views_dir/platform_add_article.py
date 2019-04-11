@@ -22,13 +22,24 @@ def article_oper(request, oper_type):
         )
         ret_data = {}
         if objs:
-
-            # objs.update(last_update_time=now)
+            objs.update(last_update_time=now)
             obj = objs[0]
             ret_data['id'] = obj.id
             ret_data['name'] = obj.name
         response.code = 200
         response.data = ret_data
+
+    # 判断库里是否有该文章
+    elif oper_type == 'is_there_article':
+        title = request.GET.get('title')
+        q = Q()
+        q.add(Q(title=title) & Q(create_user__isnull=True), Q.AND)
+        objs = models.Article.objects.filter(q)
+        print('objs-----> ', objs, title)
+        flag = True
+        if objs:
+            flag = False
+        response.data = flag
 
     # 获取链接 加入文章
     elif oper_type == 'get_url_add_article':
