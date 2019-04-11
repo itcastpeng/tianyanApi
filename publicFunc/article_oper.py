@@ -41,12 +41,20 @@ def give_like(article_id, customer_id=None, user_id=None):
 
 # 创建文章
 def add_article_public(data, classify_id=None):
+    article_objs = models.Article.objects.filter(
+        title=data.get('title'),
+        create_user_id=data.get('user_id'),
+        style=data.get('style')
+    )
+    if not article_objs:
+        obj = models.Article.objects.create(**data)
+        obj.classify = classify_id
+        obj.save()
+        id = obj.id
+    else:
+        id = article_objs[0].id
 
-    obj = models.Article.objects.create(**data)
-    obj.classify = classify_id
-    obj.save()
-
-    return obj.id
+    return id
 
 
 
