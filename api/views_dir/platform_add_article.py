@@ -46,7 +46,7 @@ def article_oper(request, oper_type):
         if not objs:
             models.Article.objects.create(
                 title=title,
-                content=data_list,
+                content=content,
                 summary=summary,
                 cover_img=cover_url,
                 style=style,
