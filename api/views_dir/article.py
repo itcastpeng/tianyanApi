@@ -239,23 +239,7 @@ def article_oper(request, oper_type, o_id):
                 data_dict = get_article(article_url)
                 cleaned_data = forms_obj.cleaned_data
                 classify_id = cleaned_data.get('classify_id')
-                id = add_article_public(data_dict, classify_id)
-                # cover_url = data_dict.get('cover_url') # 封面
-                # title = data_dict.get('title')
-                # summary = data_dict.get('summary')
-                # style = data_dict.get('style')
-                # data_list = json.dumps(data_dict.get('content'))
-                # obj = models.Article.objects.create(
-                #     title=title,
-                #     content=data_list,
-                #     summary=summary,
-                #     cover_img=cover_url,
-                #     style=style,
-                #     create_user_id=cleaned_data.get('create_user_id'),
-                # )
-                #
-                # obj.classify =
-                # obj.save()
+                id = add_article_public(data_dict, classify_id) # 创建文章
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'id': id}
@@ -271,7 +255,6 @@ def article_oper(request, oper_type, o_id):
                 'create_user_id': user_id,
                 'title': request.POST.get('title'),
                 'content': request.POST.get('content'),
-                # 'summary': request.POST.get('summary'),
             }
 
             forms_obj = UpdateForm(form_data)
@@ -300,6 +283,7 @@ def article_oper(request, oper_type, o_id):
             end_advertising = request.POST.get('end_advertising')  # 底部内容
 
             user_objs = models.Userprofile.objects.filter(id=user_id)
+
             if top_advertising:
                 user_objs.update(
                     top_advertising=top_advertising,
@@ -320,7 +304,7 @@ def article_oper(request, oper_type, o_id):
                 'create_user_id': user_id,
             }
             print('user_id-> ', user_id)
-            id = add_article_public(data)        # 未加分类
+            id = add_article_public(data)     # 添加文章
 
             response.msg = '创建成功'
             response.data = {
@@ -365,7 +349,6 @@ def article_oper(request, oper_type, o_id):
             objs = models.Article.objects.filter(id=o_id)
             if objs:
                 obj = objs[0]
-
                 data = {
                     'title': obj.title,
                     'content': obj.content,
@@ -377,7 +360,6 @@ def article_oper(request, oper_type, o_id):
                 add_article_public(data) # 创建文章
 
                 response.msg = '创建成功'
-
 
                 response.data = {
                     'id': obj.id
