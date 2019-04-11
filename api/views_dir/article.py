@@ -301,41 +301,47 @@ def article_oper(request, oper_type, o_id):
             user_objs = models.Userprofile.objects.filter(id=user_id)
 
             objs = models.Article.objects.filter(id=o_id)
-            obj = objs[0]
-            if int(objs[0].create_user_id) == int(user_id):
-                if top_advertising:
-                    user_objs.update(
-                        top_advertising = top_advertising,
-                    )
-                else:
-                    user_objs.update(
-                        end_advertising = end_advertising
-                    )
-                response.msg = '更新成功'
-            else:
-                article_objs = models.Article.objects.filter(
-                    title=obj.title,
-                    create_user_id=user_id,
-                    style=obj.style
-                )
-                if not article_objs:
-                    obj = models.Article.objects.create(
-                        title=obj.title,
-                        content=obj.content,
-                        cover_img=obj.cover_img,
-                        summary=obj.summary,
-                        style=obj.style,
-                        create_user_id=user_id,
-                    )
-                    response.msg = '创建成功'
-                else:
-                    obj = article_objs[0]
-                    response.msg = '查询成功'
+            if objs:
 
-                response.data = {
-                    'id':obj.id
-                }
-            response.code = 200
+                obj = objs[0]
+
+                if obj.create_user_id and int(objs[0].create_user_id) == int(user_id):
+                    if top_advertising:
+                        user_objs.update(
+                            top_advertising = top_advertising,
+                        )
+                    else:
+                        user_objs.update(
+                            end_advertising = end_advertising
+                        )
+                    response.msg = '更新成功'
+                else:
+                    article_objs = models.Article.objects.filter(
+                        title=obj.title,
+                        create_user_id=user_id,
+                        style=obj.style
+                    )
+                    if not article_objs:
+                        obj = models.Article.objects.create(
+                            title=obj.title,
+                            content=obj.content,
+                            cover_img=obj.cover_img,
+                            summary=obj.summary,
+                            style=obj.style,
+                            create_user_id=user_id,
+                        )
+                        response.msg = '创建成功'
+                    else:
+                        obj = article_objs[0]
+                        response.msg = '查询成功'
+
+                    response.data = {
+                        'id':obj.id
+                    }
+                response.code = 200
+            else:
+                response.code = 301
+                response.msg = '文章不存在'
 
         # 修改文章所属分类
         elif oper_type == "update_classify":

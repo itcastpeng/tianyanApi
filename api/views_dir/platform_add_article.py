@@ -57,15 +57,16 @@ def article_oper(request, oper_type):
         print('summary-=-=-> ', summary)
         objs = models.Article.objects.filter(title=title)
         if not objs:
-            obj = models.Article.objects.create(
-                title=title,
-                content=content,
-                summary=summary,
-                cover_img=cover_url,
-                style=style,
-            )
-            obj.classify = classify_id
-            obj.save()
+            if len(content) > 0 and title:
+                obj = models.Article.objects.create(
+                    title=title,
+                    content=content,
+                    summary=summary,
+                    cover_img=cover_url,
+                    style=style,
+                )
+                obj.classify = classify_id
+                obj.save()
 
     return JsonResponse(response.__dict__)
 
