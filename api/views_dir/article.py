@@ -75,19 +75,21 @@ def article(request):
 
             if classify_type and classify_type == 2:  # 我的品牌
                 q.add(Q(create_user_id=user_id), Q.OR)
+                order_by = '-like_num'
 
             elif classify_type and classify_type == 1 and len(classify_id_list) <= 0: # 推荐为空
                 q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False), Q.AND) # 没有选择推荐的用户默认 推荐系统标签的
+                order_by = '-like_num'
 
+            if team_list and len(team_list) >= 1 :  # 团队
+                order_by = '-like_num'
 
-            if team_list and len(team_list) >= 1:
-                objs = models.Article.objects.filter(
-                    q
-                ).order_by('-like_num')
             else:
-                objs = models.Article.objects.filter(
-                    q
-                ).order_by('?')
+                order_by = '?'
+
+            objs = models.Article.objects.filter(
+                q
+            ).order_by(order_by)
 
             print('q -->', q)
 
