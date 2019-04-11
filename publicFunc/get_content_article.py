@@ -2,7 +2,7 @@
 import requests, random, time, os, re, json
 from urllib.parse import unquote
 from bs4 import BeautifulSoup
-
+from publicFunc.base64_encryption import b64encode
 
 
 pcRequestHeader = [
@@ -163,9 +163,9 @@ def get_article(article_url):
 
     data = {
         'title': title,
-        'summary':summary,
-        'cover_url':cover_url,
-        'content': data_list,
+        'summary':b64encode(summary),
+        'cover_img':cover_url,
+        'content': json.dumps(data_list),
         'style': style_path
     }
     return data

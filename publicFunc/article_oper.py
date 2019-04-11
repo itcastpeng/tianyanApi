@@ -39,8 +39,14 @@ def give_like(article_id, customer_id=None, user_id=None):
     return response
 
 
+# 创建文章
+def add_article_public(data, classify_id=None):
 
+    obj = models.Article.objects.create(**data)
+    obj.classify = classify_id
+    obj.save()
 
+    return obj.id
 
 
 

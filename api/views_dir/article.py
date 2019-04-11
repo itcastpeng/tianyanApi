@@ -10,7 +10,7 @@ from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
 from publicFunc.forwarding_article import forwarding_article
 import requests, datetime, random, json
-
+from publicFunc.article_oper import add_article_public
 
 # token验证 文章展示模块
 @account.is_token(models.Userprofile)
@@ -122,7 +122,7 @@ def article(request):
                 result_data = {
                     'id': obj.id,
                     'title': obj.title,
-                    'summary': obj.summary,
+                    'summary': b64decode(obj.summary),
                     'look_num': obj.look_num,
                     'like_num': obj.like_num,
                     'classify_id_list': classify_id_list,
@@ -238,26 +238,27 @@ def article_oper(request, oper_type, o_id):
             if forms_obj.is_valid():
                 data_dict = get_article(article_url)
                 cleaned_data = forms_obj.cleaned_data
-
-                cover_url = data_dict.get('cover_url') # 封面
-                title = data_dict.get('title')
-                summary = data_dict.get('summary')
-                style = data_dict.get('style')
-                data_list = json.dumps(data_dict.get('content'))
-                obj = models.Article.objects.create(
-                    title=title,
-                    content=data_list,
-                    summary=summary,
-                    cover_img=cover_url,
-                    style=style,
-                    create_user_id=cleaned_data.get('create_user_id'),
-                )
-
-                obj.classify = cleaned_data.get('classify_id')
-                obj.save()
+                classify_id = cleaned_data.get('classify_id')
+                id = add_article_public(data_dict, classify_id)
+                # cover_url = data_dict.get('cover_url') # 封面
+                # title = data_dict.get('title')
+                # summary = data_dict.get('summary')
+                # style = data_dict.get('style')
+                # data_list = json.dumps(data_dict.get('content'))
+                # obj = models.Article.objects.create(
+                #     title=title,
+                #     content=data_list,
+                #     summary=summary,
+                #     cover_img=cover_url,
+                #     style=style,
+                #     create_user_id=cleaned_data.get('create_user_id'),
+                # )
+                #
+                # obj.classify =
+                # obj.save()
                 response.code = 200
                 response.msg = "添加成功"
-                response.data = {'id': obj.id}
+                response.data = {'id': id}
             else:
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
@@ -299,49 +300,45 @@ def article_oper(request, oper_type, o_id):
             end_advertising = request.POST.get('end_advertising')  # 底部内容
 
             user_objs = models.Userprofile.objects.filter(id=user_id)
+            if top_advertising:
+                user_objs.update(
+                    top_advertising=top_advertising,
+                )
+            else:
+                user_objs.update(
+                    end_advertising=end_advertising
+                )
+
 
             objs = models.Article.objects.filter(id=o_id)
-            if objs:
+            obj = objs[0]
 
-                obj = objs[0]
+            article_objs = models.Article.objects.filter(
+                title=obj.title,
+                create_user_id=user_id,
+                style=obj.style
+            )
+            if not article_objs:
+                data = {
+                    'title': obj.title,
+                    'content': obj.content,
+                    'cover_img': obj.cover_img,
+                    'summary': obj.summary,
+                    'style': obj.style,
+                    'create_user_id': user_id,
+                }
+                id = add_article_public(data)        # 未加分类
 
-                if obj.create_user_id and int(objs[0].create_user_id) == int(user_id):
-                    if top_advertising:
-                        user_objs.update(
-                            top_advertising = top_advertising,
-                        )
-                    else:
-                        user_objs.update(
-                            end_advertising = end_advertising
-                        )
-                    response.msg = '更新成功'
-                else:
-                    article_objs = models.Article.objects.filter(
-                        title=obj.title,
-                        create_user_id=user_id,
-                        style=obj.style
-                    )
-                    if not article_objs:
-                        obj = models.Article.objects.create(
-                            title=obj.title,
-                            content=obj.content,
-                            cover_img=obj.cover_img,
-                            summary=obj.summary,
-                            style=obj.style,
-                            create_user_id=user_id,
-                        )
-                        response.msg = '创建成功'
-                    else:
-                        obj = article_objs[0]
-                        response.msg = '查询成功'
-
-                    response.data = {
-                        'id':obj.id
-                    }
-                response.code = 200
+                response.msg = '创建成功'
             else:
-                response.code = 301
-                response.msg = '文章不存在'
+                obj = article_objs[0]
+                response.msg = '查询成功'
+
+            response.data = {
+                'id':id
+            }
+            response.code = 200
+
 
         # 修改文章所属分类
         elif oper_type == "update_classify":
@@ -387,15 +384,16 @@ def article_oper(request, oper_type, o_id):
                 )
 
                 if not article_objs:
-                    obj = models.Article.objects.create(
-                        title=obj.title,
-                        content=obj.content,
-                        cover_img=obj.cover_img,
-                        summary=obj.summary,
-                        style=obj.style,
-                        create_user_id=user_id,
-                    )
-                    obj.classify = obj.classify.all()
+                    data = {
+                        'title': obj.title,
+                        'content': obj.content,
+                        'cover_img': obj.cover_img,
+                        'summary': obj.summary,
+                        'style': obj.style,
+                        'create_user_id': user_id,
+                    }
+                    add_article_public(data)
+
                     response.msg = '创建成功'
                 else:
                     obj = article_objs[0]
