@@ -43,7 +43,7 @@ def article(request):
                 classify_objs = user_obj.recommend_classify.all()
             elif classify_type == 2:    # 品牌分类
                 classify_objs = user_obj.brand_classify.all()
-
+            classify_id_list = []
             if classify_objs:
                 classify_id_list = [obj.id for obj in classify_objs]
                 if len(classify_id_list) > 0:
@@ -71,21 +71,18 @@ def article(request):
                 q.add(Q(**{'id__in':article_list}), Q.AND)
 
 
-            print('q -->', q)
 
 
             if classify_type and classify_type == 2:  # 我的品牌
                 q.add(Q(create_user_id=user_id), Q.OR)
 
             elif classify_type and classify_type == 1 and len(classify_id_list) <= 0: # 推荐为空
-                objs = models.Article.objects.filter(
-                    classify__create_user__isnull=True
-                ).order_by('-like_num')
+                q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False), Q.AND) # 没有选择推荐的用户默认 推荐系统标签的
 
-            else:
-                objs = models.Article.objects.filter(
-                    q
-                ).order_by('-like_num')
+            print('q -->', q)
+            objs = models.Article.objects.filter(
+                q
+            ).order_by('-like_num')
 
 
             count = objs.count()
