@@ -39,7 +39,7 @@ def article_oper(request, oper_type):
         title = data.get('title')  # 标题
         summary = data.get('summary') # 摘要
         cover_url = data.get('cover_url') # 封面
-        style_path = data.get('style_path') # style
+        style = data.get('style') # style
         content = json.dumps(data.get('content')) # 内容
 
         objs = models.Article.objects.filter(title=title)
