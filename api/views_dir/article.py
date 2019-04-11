@@ -77,13 +77,15 @@ def article(request):
             if classify_type and classify_type == 2:  # 我的品牌
                 q.add(Q(create_user_id=user_id), Q.OR)
 
-            # if classify_type and classify_type == 1: # 推荐
-            #     if not classify_objs:
+            elif classify_type and classify_type == 1 and len(classify_id_list) <= 0: # 推荐为空
+                objs = models.Article.objects.filter(
+                    classify__create_user__isnull=True
+                ).order_by('-like_num')
 
-
-            objs = models.Article.objects.filter(
-                q
-            ).order_by('-like_num')
+            else:
+                objs = models.Article.objects.filter(
+                    q
+                ).order_by('-like_num')
 
 
             count = objs.count()
