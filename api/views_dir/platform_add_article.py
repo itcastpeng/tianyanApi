@@ -26,8 +26,8 @@ def article_oper(request, oper_type):
             obj = objs[0]
             ret_data['id'] = obj.id
             ret_data['name'] = obj.name
-            obj.last_update_time=now
-            obj.save()
+            models.Classify.objects.filter(id=obj.id).update(last_update_time=now)
+
         response.code = 200
         response.data = ret_data
 
