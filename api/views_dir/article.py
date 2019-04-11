@@ -309,31 +309,19 @@ def article_oper(request, oper_type, o_id):
                     end_advertising=end_advertising
                 )
 
-
             objs = models.Article.objects.filter(id=o_id)
             obj = objs[0]
+            data = {
+                'title': obj.title,
+                'content': obj.content,
+                'cover_img': obj.cover_img,
+                'summary': obj.summary,
+                'style': obj.style,
+                'create_user_id': user_id,
+            }
+            id = add_article_public(data)        # 未加分类
 
-            article_objs = models.Article.objects.filter(
-                title=obj.title,
-                create_user_id=user_id,
-                style=obj.style
-            )
-            if not article_objs:
-                data = {
-                    'title': obj.title,
-                    'content': obj.content,
-                    'cover_img': obj.cover_img,
-                    'summary': obj.summary,
-                    'style': obj.style,
-                    'create_user_id': user_id,
-                }
-                id = add_article_public(data)        # 未加分类
-
-                response.msg = '创建成功'
-            else:
-                obj = article_objs[0]
-                response.msg = '查询成功'
-
+            response.msg = '创建成功'
             response.data = {
                 'id':id
             }
@@ -377,27 +365,18 @@ def article_oper(request, oper_type, o_id):
             if objs:
                 obj = objs[0]
 
-                article_objs = models.Article.objects.filter(
-                    title=obj.title,
-                    create_user_id=user_id,
-                    style=obj.style
-                )
+                data = {
+                    'title': obj.title,
+                    'content': obj.content,
+                    'cover_img': obj.cover_img,
+                    'summary': obj.summary,
+                    'style': obj.style,
+                    'create_user_id': user_id,
+                }
+                add_article_public(data) # 创建文章
 
-                if not article_objs:
-                    data = {
-                        'title': obj.title,
-                        'content': obj.content,
-                        'cover_img': obj.cover_img,
-                        'summary': obj.summary,
-                        'style': obj.style,
-                        'create_user_id': user_id,
-                    }
-                    add_article_public(data)
+                response.msg = '创建成功'
 
-                    response.msg = '创建成功'
-                else:
-                    obj = article_objs[0]
-                    response.msg = '查询成功'
 
                 response.data = {
                     'id': obj.id
