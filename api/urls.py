@@ -3,10 +3,13 @@ from django.conf.urls import url
 
 
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
-    upload_file, renewal, prepaidManagement, day_eye, letter_operation
+    upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article
 
 
 urlpatterns = [
+
+    # 平台加入文章
+    url(r'^platform_add_article/(?P<oper_type>\w+)', platform_add_article.article_oper),
 
     # 客户打开 用户分享的文章/微店宝贝
     url(r'^share_article/(?P<oper_type>\w+)$', wechat.share_article),

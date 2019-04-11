@@ -146,6 +146,7 @@ class Article(models.Model):
 
 # 文章/品牌 分类
 class Classify(models.Model):
+    last_update_time = models.DateField(verbose_name='最后更新时间', null=True) # 爬取数据最后一次时间 只限创建人为空的
     name = models.CharField(verbose_name="分类名称", max_length=128)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     create_user = models.ForeignKey(
