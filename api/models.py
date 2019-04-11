@@ -136,7 +136,7 @@ class Article(models.Model):
     content = models.TextField(verbose_name="文章内容", null=True)
     classify = models.ManyToManyField('Classify', verbose_name='所属分类')
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="article_create_user")
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="article_create_user", null=True)
     source_link = models.CharField(verbose_name="微信文章链接", max_length=256, null=True, blank=True)
     look_num = models.IntegerField(verbose_name="查看次数", default=0)
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
