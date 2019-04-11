@@ -335,7 +335,7 @@ class DecideIfYourArticle(forms.Form):
         else:
             obj = objs[0]
             flag = False
-            if int(obj.create_user_id) == int(user_id):
+            if obj.create_user and int(obj.create_user_id) == int(user_id):
                 flag = True
             return flag
 
