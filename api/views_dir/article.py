@@ -305,15 +305,25 @@ def article_oper(request, oper_type, o_id):
                     )
                 response.msg = '更新成功'
             else:
-                obj = models.Article.objects.create(
+                article_objs = models.Article.objects.filter(
                     title=obj.title,
-                    content=obj.content,
-                    cover_img=obj.cover_img,
-                    summary=obj.summary,
-                    style=obj.style,
                     create_user_id=user_id,
+                    style=obj.style
                 )
-                response.msg = '创建成功'
+                if not article_objs:
+                    obj = models.Article.objects.create(
+                        title=obj.title,
+                        content=obj.content,
+                        cover_img=obj.cover_img,
+                        summary=obj.summary,
+                        style=obj.style,
+                        create_user_id=user_id,
+                    )
+                    response.msg = '创建成功'
+                else:
+                    obj = article_objs[0]
+                    response.msg = '查询成功'
+
                 response.data = {
                     'id':obj.id
                 }
@@ -355,16 +365,28 @@ def article_oper(request, oper_type, o_id):
             objs = models.Article.objects.filter(id=o_id)
             if objs:
                 obj = objs[0]
-                obj = models.Article.objects.create(
-                    title=obj.title,
-                    content=obj.content,
-                    cover_img=obj.cover_img,
-                    summary=obj.summary,
-                    create_user_id=user_id,
-                )
-                obj.classify = obj.classify.all()
 
-                response.msg = '创建成功'
+                article_objs = models.Article.objects.filter(
+                    title=obj.title,
+                    create_user_id=user_id,
+                    style=obj.style
+                )
+
+                if not article_objs:
+                    obj = models.Article.objects.create(
+                        title=obj.title,
+                        content=obj.content,
+                        cover_img=obj.cover_img,
+                        summary=obj.summary,
+                        style=obj.style,
+                        create_user_id=user_id,
+                    )
+                    obj.classify = obj.classify.all()
+                    response.msg = '创建成功'
+                else:
+                    obj = article_objs[0]
+                    response.msg = '查询成功'
+
                 response.data = {
                     'id': obj.id
                 }
