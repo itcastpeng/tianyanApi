@@ -319,6 +319,7 @@ def article_oper(request, oper_type, o_id):
                 'style': obj.style,
                 'create_user_id': user_id,
             }
+            print('user_id-> ', user_id)
             id = add_article_public(data)        # 未加分类
 
             response.msg = '创建成功'
