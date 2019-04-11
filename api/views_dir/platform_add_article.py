@@ -18,6 +18,7 @@ def article_oper(request, oper_type):
         q = Q()
         q.add(Q(last_update_time__isnull=True) | Q(last_update_time__lt=now), Q.AND)
         objs = models.Classify.objects.filter(
+            q,
             create_user__isnull=True
         )
         ret_data = {}
