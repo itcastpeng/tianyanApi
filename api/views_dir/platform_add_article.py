@@ -6,7 +6,7 @@ from publicFunc.base64_encryption import b64decode, b64encode
 import requests, datetime, random, json
 from django.db.models import Q
 from publicFunc.get_content_article import get_article
-
+from publicFunc.article_oper import add_article_public
 
 # token验证 用户操作文章
 def article_oper(request, oper_type):
@@ -49,24 +49,11 @@ def article_oper(request, oper_type):
 
         data = get_article(url)
         title = data.get('title')  # 标题
-        summary = data.get('summary') # 摘要
-        cover_url = data.get('cover_url') # 封面
-        style = data.get('style') # style
-        content = json.dumps(data.get('content')) # 内容
-
-        print('summary-=-=-> ', summary)
+        content = json.dumps(data.get('content'))  # 标题
         objs = models.Article.objects.filter(title=title)
         if not objs:
             if len(content) > 0 and title:
-                obj = models.Article.objects.create(
-                    title=title,
-                    content=content,
-                    summary=summary,
-                    cover_img=cover_url,
-                    style=style,
-                )
-                obj.classify = classify_id
-                obj.save()
+                add_article_public(data, classify_id)
 
     return JsonResponse(response.__dict__)
 
