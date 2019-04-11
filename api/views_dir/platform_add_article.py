@@ -44,14 +44,15 @@ def article_oper(request, oper_type):
 
         objs = models.Article.objects.filter(title=title)
         if not objs:
-            models.Article.objects.create(
+            obj = models.Article.objects.create(
                 title=title,
                 content=content,
                 summary=summary,
                 cover_img=cover_url,
                 style=style,
             )
-
+            obj.classify = classify_id
+            obj.save()
 
     return JsonResponse(response.__dict__)
 
