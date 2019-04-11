@@ -53,6 +53,7 @@ def article_oper(request, oper_type):
         style = data.get('style') # style
         content = json.dumps(data.get('content')) # 内容
 
+        print('summary-=-=-> ', summary)
         objs = models.Article.objects.filter(title=title)
         if not objs:
             obj = models.Article.objects.create(
