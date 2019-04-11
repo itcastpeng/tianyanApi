@@ -357,12 +357,12 @@ def article_oper(request, oper_type, o_id):
                     'style': obj.style,
                     'create_user_id': user_id,
                 }
-                add_article_public(data) # 创建文章
+                id = add_article_public(data) # 创建文章
 
                 response.msg = '创建成功'
 
                 response.data = {
-                    'id': obj.id
+                    'id': id
                 }
                 response.code = 200
             else:
