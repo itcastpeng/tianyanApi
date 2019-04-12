@@ -34,7 +34,7 @@ class watermark():
         if posters_status == 1:
             # print('color-----------> ', color)
             # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 60)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 50)  # 使用自定义的字体，第二个参数表示字符大小
 
             set_avator = self.data.get('set_avator')  # 头像
             # set_avator = '2.jpeg'
@@ -50,14 +50,14 @@ class watermark():
             phone_y = int(image.size[1] - phone_size_y - 20)  # 文字距底20像素
 
             # 设置文本位置及颜色和透明度
-            image_draw.text((name_x - 50, name_y), self.name, font=font, fill=color)
-            image_draw.text((phone_x - 50, phone_y), self.phone, font=font, fill=color)
+            image_draw.text((name_x, name_y), self.name, font=font, fill=color)
+            image_draw.text((phone_x, phone_y), self.phone, font=font, fill=color)
 
             # -------------------头像--------------------------
             set_avator_image = Image.open(set_avator).convert('RGBA')
             set_avator_image.thumbnail((150, 150)) # 原比例缩放图片
             set_avator_x = int((image.size[0] - name_size_x) / 2)
-            image.paste(set_avator_image, (set_avator_x - 80, int(phone_y - (150 / 2) - 20)))
+            image.paste(set_avator_image, (set_avator_x - 20, int(phone_y - (150 / 2) - 20)))
 
         # 邀请函海报水印
         else:
