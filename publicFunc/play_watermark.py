@@ -45,19 +45,17 @@ class watermark():
             # 获取文字位置
             name_x = int((image.size[0] - name_size_x) / 2 + int(name_size_x/2))  # 名字文字左右放在居中位置
             name_y = int(image.size[1] - name_size_y - (50 + phone_size_y))  # 文字距底20像素
-
-            phone_x = int((image.size[0] - phone_size_x) / 2 + int(name_size_x / 2))  # 电话文字左右放在居中位置
             phone_y = int(image.size[1] - phone_size_y - 20)  # 文字距底20像素
 
             # 设置文本位置及颜色和透明度
             image_draw.text((name_x, name_y), self.name, font=font, fill=color)
-            image_draw.text((phone_x, phone_y), self.phone, font=font, fill=color)
+            image_draw.text((name_x, phone_y), self.phone, font=font, fill=color)
 
             # -------------------头像--------------------------
-            # set_avator_image = Image.open(set_avator).convert('RGBA')
-            # set_avator_image.thumbnail((130, 150)) # 原比例缩放图片
-            # set_avator_x = int((image.size[0] - name_size_x) / 2)
-            # image.paste(set_avator_image, (set_avator_x, int(phone_y - (150 / 2))))
+            set_avator_image = Image.open(set_avator).convert('RGBA')
+            set_avator_image.thumbnail((130, 150)) # 原比例缩放图片
+            set_avator_x = int((image.size[0] - name_size_x) / 2)
+            image.paste(set_avator_image, (set_avator_x + 10, int(phone_y - (150 / 2))))
 
         # 邀请函海报水印
         else:
