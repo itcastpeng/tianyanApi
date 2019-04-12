@@ -3,6 +3,7 @@ from PIL import Image,ImageFont,ImageDraw
 from publicFunc.account import randon_str
 import os
 from publicFunc.host import host_url
+from skimage import io,transform
 
 # 图片打水印
 class watermark():
@@ -21,38 +22,39 @@ class watermark():
 
         # 绘图句柄
         image_draw = ImageDraw.Draw(image)
-
         posters_status = int(self.data.get('posters_status'))  # 水印类型
-
         text = str(self.name) + ' ' + str(self.phone)
+
+        # 文字rgb颜色
+        color = (248,248,242)
 
         # 正能量海报水印
         if posters_status == 1:
-            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMSUN.TTC', 15)  # 使用自定义的字体，第二个参数表示字符大小
-            # 文字rgb颜色
-            rgb_color = (0, 0, 0)
-            set_avator = self.data.get('set_avator')
+            # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 15)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            set_avator = self.data.get('set_avator')  # 头像
+
             # 获取文本大小
-            text_size_x, text_size_y = image_draw.textsize(text, font=font)
+            name_size_x, name_size_y = image_draw.textsize(self.name, font=font)
+            phone_size_x, phone_size_y = image_draw.textsize(self.phone, font=font)
 
             # 获取文字位置
-            x = int((image.size[0] - text_size_x) / 2)  # 文字左右放在居中位置
-            y = int(image.size[1] - text_size_y - 20)  # 文字距底20像素
+            name_x = int((image.size[0] - name_size_x) / 2 + int(name_size_x/2))  # 名字文字左右放在居中位置
+            name_y = int(image.size[1] - name_size_y - (30 + phone_size_y))  # 文字距底20像素
+
+            phone_x = int((image.size[0] - phone_size_x) / 2 + int(name_size_x / 2))  # 电话文字左右放在居中位置
+            phone_y = int(image.size[1] - phone_size_y - 20)  # 文字距底20像素
 
             # 设置文本位置及颜色和透明度
-            image_draw.text((x, y), text, font=font, fill=rgb_color)
+            image_draw.text((name_x, name_y), self.name, font=font, fill=color)
+            image_draw.text((phone_x, phone_y), self.phone, font=font, fill=color)
 
             # -------------------头像--------------------------
-            set_avator = Image.open(set_avator)
+            set_avator_image = Image.open(set_avator).convert('RGBA')
+            set_avator_image.thumbnail((90, 90)) # 原比例缩放图片
 
-            left = int(set_avator.size[0] / 2 - 15)
-            right = int(set_avator.size[0] / 2 + 15)
-            top = int(set_avator.size[1] / 2 - 15)
-            end = int(set_avator.size[1] / 2 + 15)
-            cropped = set_avator.crop((left, top, right, end))  # 截取该图片
-
-            # 头像右侧减去左侧 剩下的值为头像宽 x轴减去图片宽 减五距右侧五像素
-            image.paste(cropped, (x - (right - left) - 2, y - (int((end - top - text_size_y) / 2))))
+            set_avator_x = int((image.size[0] - name_size_x) / 2)
+            image.paste(set_avator_image, (set_avator_x, int(name_y + 5)))
 
         # 邀请函海报水印
         else:
@@ -61,12 +63,11 @@ class watermark():
             time = self.data.get('time')
             place = self.data.get('place')
 
-            gbk_color = (0, 0, 0)
 
             text = '详询:' + text
 
-            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 20)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 15)
+            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
 
             zhu_title_x, zhu_title_y = image_draw.textsize(zhu_title, font=zhu_title_font)
             fu_title_x, fu_title_y = image_draw.textsize(fu_title, font=font)
@@ -81,14 +82,16 @@ class watermark():
             text_width = int(image.size[0] / 2 - (text_x / 2))
 
             img_hight = image.size[1]
-            image_draw.text((zhu_title_width, img_hight-180), zhu_title, font=zhu_title_font, fill=gbk_color)
-            image_draw.text((fu_title_width, img_hight-140), fu_title, font=font, fill=gbk_color)
-            image_draw.text((time_width, img_hight-110), time, font=font, fill=gbk_color)
-            image_draw.text((place_width, img_hight-80), place, font=font, fill=gbk_color)
-            image_draw.text((text_width, img_hight-40), text, font=font, fill=gbk_color)
+            image_draw.text((zhu_title_width, img_hight-180), zhu_title, font=zhu_title_font, fill=color)
+            image_draw.text((fu_title_width, img_hight-140), fu_title, font=font, fill=color)
+            image_draw.text((time_width, img_hight-110), time, font=font, fill=color)
+            image_draw.text((place_width, img_hight-80), place, font=font, fill=color)
+            image_draw.text((text_width, img_hight-40), text, font=font, fill=color)
 
-        path = os.path.join('statics', 'img', randon_str() + '.png')
+        rand = randon_str()
+        path = os.path.join('statics', 'img', rand + '.png')
         image.save(path)
+        path = '/statics/img/' + rand + '.png'
         return path
 
 if __name__ == '__main__':
