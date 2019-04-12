@@ -34,7 +34,7 @@ class watermark():
         if posters_status == 1:
             # print('color-----------> ', color)
             # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 60)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTC', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
 
             image_draw.text((50, 50), 'sdaasdasd', font=font, fill=color)
             image_draw.text((50, 100), 'sadasfsadfsxcvxz', font=font, fill=color)
