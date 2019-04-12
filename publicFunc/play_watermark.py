@@ -32,7 +32,7 @@ class watermark():
         # 正能量海报水印
         if posters_status == 1:
             # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 15)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/MSYH.TTC', 40)  # 使用自定义的字体，第二个参数表示字符大小
             set_avator = self.data.get('set_avator')  # 头像
 
             # 获取文本大小
