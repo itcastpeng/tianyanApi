@@ -220,9 +220,6 @@ def posters_oper(request, oper_type, o_id):
                 print('data-----------> ', data)
                 watermark_objs = watermark(data) # 实例化
                 path = watermark_objs.posters_play_watermark()
-
-                path = 'http://127.0.0.1:8008' + str(path)
-
                 print(path)
                 response.code = 200
                 response.msg = '生成成功'
