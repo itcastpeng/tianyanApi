@@ -30,7 +30,9 @@ class Userprofile(models.Model):
         verbose_name='头像',
         default='http://api.zhugeyingxiao.com/statics/imgs/setAvator.jpg',
         max_length=256
-    )
+    )  # 首次进入 为微信头像 可修改
+
+    headimgurl = models.CharField(verbose_name='记录微信头像', max_length=256, null=True)
 
     qr_code = models.CharField(verbose_name="微信二维码", max_length=256, null=True, blank=True)
 
