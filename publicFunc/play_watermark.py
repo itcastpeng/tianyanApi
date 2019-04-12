@@ -3,7 +3,8 @@ from PIL import Image,ImageFont,ImageDraw
 from publicFunc.account import randon_str
 import os
 from publicFunc.host import host_url
-from skimage import io,transform
+from publicFunc.image_color_recognition import image_color_recognition
+
 
 # 图片打水印
 class watermark():
@@ -16,17 +17,17 @@ class watermark():
 
     # 海报水印
     def posters_play_watermark(self):
-        # image = Image.open(self.img_path).convert('RGBA')
         img_url = self.img_path.split(host_url)[1] # 切除域名
         image = Image.open(img_url).convert('RGBA')
+
+        color = image_color_recognition(img_url) # 识别图片颜色 给出对应文字颜色
+        # color = (0, 0, 0)
 
         # 绘图句柄
         image_draw = ImageDraw.Draw(image)
         posters_status = int(self.data.get('posters_status'))  # 水印类型
         text = str(self.name) + ' ' + str(self.phone)
 
-        # 文字rgb颜色
-        color = (248,248,242)
 
         # 正能量海报水印
         if posters_status == 1:
@@ -117,7 +118,7 @@ if __name__ == '__main__':
         'place': place,
     }
     obj = watermark(data)
-    poster_path = '1.jpg'
+    poster_path = 'f045e386af4261567e8fe04169b58f82.jpg'
     logo_path = 'tianyan_logo.png'
     # obj.test(poster_path)
     obj.posters_play_watermark()
