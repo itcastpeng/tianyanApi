@@ -61,18 +61,20 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
     # 保证1个微信只能够关联1个账号
     user_objs = models.Userprofile.objects.filter(openid=openid)
 
+    encode_username = base64_encryption.b64encode(ret_obj['nickname'])
     user_data = {
         "sex": ret_obj.get('sex'),
         "country": ret_obj.get('country'),
         "province": ret_obj.get('province'),
         "city": ret_obj.get('city'),
+        "headimgurl": ret_obj.get('headimgurl'),
+        "wechat_name": encode_username,
     }
 
     if user_objs:
         user_id = user_objs[0].id
         user_objs.update(**user_data)
     else:
-        encode_username = base64_encryption.b64encode(ret_obj['nickname'])
         # encodestr = base64.b64encode(ret_obj['nickname'].encode('utf8'))
         # encode_username = str(encodestr, encoding='utf8')
         overdue_date = datetime.datetime.now() + datetime.timedelta(days=30)
@@ -85,6 +87,8 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
             ret_obj = weichat_api_obj.get_user_info(openid=openid)
             subscribe = ret_obj.get('subscribe')
 
+        user_data['wechat_name'] = encode_username
+        user_data['headimgurl'] = ret_obj.get('headimgurl')
         user_data['inviter_id'] = inviter_user_id
         user_data['set_avator'] = ret_obj.get('headimgurl')
         user_data['subscribe'] = subscribe
@@ -303,11 +307,10 @@ def share_article(request, oper_type):
         weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
         ret_obj = weichat_api_obj.get_openid(code)
         openid = ret_obj.get('openid')
-
+        print('ret_obj-----------> ', ret_obj)
         encode_username = b64encode(
             ret_obj['nickname']
         )
-        print("ret_obj.get('headimgurl')--------------------------------------------> ", ret_obj.get('headimgurl'))
         user_data = {
             "sex": ret_obj.get('sex'),
             "country": ret_obj.get('country'),
