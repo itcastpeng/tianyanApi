@@ -26,7 +26,7 @@ class watermark():
         text = str(self.name) + ' ' + str(self.phone)
 
         # 文字rgb颜色
-        color = (0, 0, 0)
+        color = (248,248,242)
 
         # 正能量海报水印
         if posters_status == 1:
