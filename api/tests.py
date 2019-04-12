@@ -138,45 +138,54 @@ import time
 import requests
 import re, os
 from urllib.parse import unquote
-def deal_gzh_picture_url(leixing, url):
-    '''
-    ata-src 替换为src，将微信尾部?wx_fmt=jpeg去除
-    http://mmbiz.qpic.cn/mmbiz_jpg/icg7bNmmiaWLhUcPY7I4r6wvBFRLSTJ6L7lBRILWoKKVuvdHe4BmVxhiclQnYo2F1TDU7CcibXawl9E2n1MOicTkt6w/0?wx_fmt=jpeg
+# def deal_gzh_picture_url(leixing, url):
+#     '''
+#     ata-src 替换为src，将微信尾部?wx_fmt=jpeg去除
+#     http://mmbiz.qpic.cn/mmbiz_jpg/icg7bNmmiaWLhUcPY7I4r6wvBFRLSTJ6L7lBRILWoKKVuvdHe4BmVxhiclQnYo2F1TDU7CcibXawl9E2n1MOicTkt6w/0?wx_fmt=jpeg
 
-    '''
-    # content = 'data-src="111?wx_fmt=png data-src="222?wx_fmt=jpg'
-    # phone = "2004-959-559#这是一个电话号码"
-    # # 删除注释
-    # num = re.sub(r'#.*$', "", phone)
-    # print("电话号码 : ", num)
+#     '''
+#     # content = 'data-src="111?wx_fmt=png data-src="222?wx_fmt=jpg'
+#     # phone = "2004-959-559#这是一个电话号码"
+#     # # 删除注释
+#     # num = re.sub(r'#.*$', "", phone)
+#     # print("电话号码 : ", num)
+#
+#     # 移除非数字的内容
+#     # url = 'https://mp.weixin.qq.com/s?__biz=MzA5NzQxODgzNw==&mid=502884331&idx=1&sn=863da48ef5bd01f5ba8ac30d45fea912&chksm=08acecd13fdb65c72e407f973c4db69a988a93a169234d2c4a95c0ca6c97054adff54c48a24f#rd'
+#
+# #     ret = requests.get(url)
+# #
+# #     ret.encoding = 'utf8'
+# #
+# #     soup = BeautifulSoup(ret.text, 'lxml')
+# #
+# #     img_tags = soup.find_all('img')
+# #     for img_tag in img_tags:
+# #         if img_tag.attrs.get('style'):
+# #             style_list = img_tag.attrs.get('style').split(';')
+# #             style_tag = ''
+# #             for i in style_list:
+# #                 if i and i.split(':')[0] == 'width':
+# #                     style_tag = i.split(':')[1]
+# #
+# #             img_tag.attrs['style'] = style_tag
+# #
+# #         data_src = img_tag.attrs.get('data-src')
+# #
+# #
+# #
+# #
+# # if __name__ == '__main__':
+# #     deal_gzh_picture_url('only_url', 'https://mp.weixin.qq.com/s/dQdgO3OAIvzIOi8lmtoAog')
 
-    # 移除非数字的内容
-    # url = 'https://mp.weixin.qq.com/s?__biz=MzA5NzQxODgzNw==&mid=502884331&idx=1&sn=863da48ef5bd01f5ba8ac30d45fea912&chksm=08acecd13fdb65c72e407f973c4db69a988a93a169234d2c4a95c0ca6c97054adff54c48a24f#rd'
-
-    ret = requests.get(url)
-
-    ret.encoding = 'utf8'
-
-    soup = BeautifulSoup(ret.text, 'lxml')
-
-    img_tags = soup.find_all('img')
-    for img_tag in img_tags:
-        if img_tag.attrs.get('style'):
-            style_list = img_tag.attrs.get('style').split(';')
-            style_tag = ''
-            for i in style_list:
-                if i and i.split(':')[0] == 'width':
-                    style_tag = i.split(':')[1]
-
-            img_tag.attrs['style'] = style_tag
-
-        data_src = img_tag.attrs.get('data-src')
 
 
 
 
-if __name__ == '__main__':
-    deal_gzh_picture_url('only_url', 'https://mp.weixin.qq.com/s/dQdgO3OAIvzIOi8lmtoAog')
+
+
+
+
 
 
 
