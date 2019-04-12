@@ -89,10 +89,8 @@ class watermark():
             image_draw.text((place_width, img_hight-80), place, font=font, fill=color)
             image_draw.text((text_width, img_hight-40), text, font=font, fill=color)
 
-        rand = randon_str()
-        path = os.path.join('statics', 'img', rand + '.png')
+        path = os.path.join('statics', 'img', randon_str() + '.png')
         image.save(path)
-        path = '/statics/img/' + rand + '.png'
         return path
 
 if __name__ == '__main__':
