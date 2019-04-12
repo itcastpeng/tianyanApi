@@ -34,34 +34,34 @@ class watermark():
         if posters_status == 1:
             # print('color-----------> ', color)
             # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 60)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/MSYH.TTC', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTC', 40)  # 使用自定义的字体，第二个参数表示字符大小
 
             image_draw.text((50, 50), 'sdaasdasd', font=font, fill=color)
             image_draw.text((50, 100), 'sadasfsadfsxcvxz', font=font, fill=color)
 
-            # set_avator = self.data.get('set_avator')  # 头像
+            set_avator = self.data.get('set_avator')  # 头像
             # set_avator = '2.jpeg'
             # 获取文本大小
-            # name_size_x, name_size_y = image_draw.textsize(self.name, font=font)
-            # phone_size_x, phone_size_y = image_draw.textsize(self.phone, font=font)
+            name_size_x, name_size_y = image_draw.textsize(self.name, font=font)
+            phone_size_x, phone_size_y = image_draw.textsize(self.phone, font=font)
 
             # 获取文字位置
-            # name_x = int((image.size[0] - name_size_x) / 2 + int(name_size_x/2))  # 名字文字左右放在居中位置
-            # name_y = int(image.size[1] - name_size_y - (30 + phone_size_y))  # 文字距底20像素
+            name_x = int((image.size[0] - name_size_x) / 2 + int(name_size_x/2))  # 名字文字左右放在居中位置
+            name_y = int(image.size[1] - name_size_y - (30 + phone_size_y))  # 文字距底20像素
 
-            # phone_x = int((image.size[0] - phone_size_x) / 2 + int(name_size_x / 2))  # 电话文字左右放在居中位置
-            # phone_y = int(image.size[1] - phone_size_y - 20)  # 文字距底20像素
+            phone_x = int((image.size[0] - phone_size_x) / 2 + int(name_size_x / 2))  # 电话文字左右放在居中位置
+            phone_y = int(image.size[1] - phone_size_y - 20)  # 文字距底20像素
 
             # 设置文本位置及颜色和透明度
-            # image_draw.text((name_x - 50, name_y), self.name, font=font, fill=color)
-            # image_draw.text((phone_x - 50, phone_y), self.phone, font=font, fill=color)
+            image_draw.text((name_x - 50, name_y), self.name, font=font, fill=color)
+            image_draw.text((phone_x - 50, phone_y), self.phone, font=font, fill=color)
 
             # -------------------头像--------------------------
-            # set_avator_image = Image.open(set_avator).convert('RGBA')
-            # set_avator_image.thumbnail((150, 150)) # 原比例缩放图片
+            set_avator_image = Image.open(set_avator).convert('RGBA')
+            set_avator_image.thumbnail((150, 150)) # 原比例缩放图片
 
-            # set_avator_x = int((image.size[0] - name_size_x) / 2)
-            # image.paste(set_avator_image, (set_avator_x - 50, int(name_y)))
+            set_avator_x = int((image.size[0] - name_size_x) / 2)
+            image.paste(set_avator_image, (set_avator_x - 50, int(name_y)))
 
         # 邀请函海报水印
         else:
