@@ -60,7 +60,8 @@ class watermark():
             set_avator_image.thumbnail((150, 150)) # 原比例缩放图片
 
             set_avator_x = int((image.size[0] - name_size_x) / 2)
-            image.paste(set_avator_image, (set_avator_x - 50, int(name_y)))
+            # image.paste(set_avator_image, (set_avator_x - 50, int(name_y)))
+            image.paste(set_avator_image, (50, int(name_y)))
 
         # 邀请函海报水印
         else:
