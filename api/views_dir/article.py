@@ -81,7 +81,7 @@ def article(request):
                 q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False), Q.AND) # 没有选择推荐的用户默认 推荐系统标签的
                 order_by = '-like_num'
 
-            if team_list and len(team_list) >= 1 :  # 团队
+            elif team_list and len(team_list) >= 1 :  # 团队
                 order_by = '-like_num'
 
             else:
@@ -119,10 +119,14 @@ def article(request):
                     classify_id_list = [obj.get('id') for obj in obj.classify.values('id')]
                     classify_name_list = [obj.get('name') for obj in obj.classify.values('name')]
 
+                summary = obj.summary
+                if obj.summary:
+                    summary = b64decode(obj.summary)
+
                 result_data = {
                     'id': obj.id,
                     'title': obj.title,
-                    'summary': b64decode(obj.summary),
+                    'summary': summary,
                     'look_num': obj.look_num,
                     'like_num': obj.like_num,
                     'classify_id_list': classify_id_list,
