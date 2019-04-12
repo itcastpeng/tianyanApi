@@ -33,6 +33,7 @@ class Userprofile(models.Model):
     )  # 首次进入 为微信头像 可修改
 
     headimgurl = models.CharField(verbose_name='记录微信头像', max_length=256, null=True)
+    wechat_name = models.CharField(verbose_name='微信名称', max_length=64, null=True)
 
     qr_code = models.CharField(verbose_name="微信二维码", max_length=256, null=True, blank=True)
 

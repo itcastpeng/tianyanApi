@@ -283,6 +283,9 @@ def user_login_oper(request, oper_type):
             )
 
             ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+            encode_username = base64_encryption.b64encode(
+                ret_obj['nickname']
+            )
             print('code-----code-------code--------code--------code-------> ', code, ret_obj)
             openid = ret_obj.get('openid')
             user_data = {
@@ -290,17 +293,15 @@ def user_login_oper(request, oper_type):
                 "country": ret_obj.get('country'),
                 "province": ret_obj.get('province'),
                 "city": ret_obj.get('city'),
+                "headimgurl": ret_obj.get('headimgurl'), # 更新微信头像
+                "wechat_name": encode_username,
             }
             user_objs = models.Userprofile.objects.filter(openid=openid)
             if user_objs:  # 客户已经存在
                 user_objs.update(**user_data)
-                user_objs.update(headimgurl=ret_obj.get('headimgurl')) # 更新微信头像
                 user_objs = user_objs[0]
 
             else:  # 不存在，创建用户
-                encode_username = base64_encryption.b64encode(
-                    ret_obj['nickname']
-                )
 
                 # subscribe = ret_obj.get('subscribe')
                 #
@@ -310,6 +311,7 @@ def user_login_oper(request, oper_type):
                 #     ret_obj = weichat_api_obj.get_user_info(openid=openid)
                 #     subscribe = ret_obj.get('subscribe')
 
+                user_data['wechat_name'] = ret_obj.get('headimgurl')
                 user_data['set_avator'] = ret_obj.get('headimgurl')
                 user_data['headimgurl'] = ret_obj.get('headimgurl')
                 user_data['subscribe'] = True
