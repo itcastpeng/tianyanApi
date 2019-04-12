@@ -224,6 +224,13 @@ def user_oper(request, oper_type, o_id):
                 'remaining_days': "剩余天数"
             }
 
+        # 使用微信头像
+        elif oper_type == 'use_wechat_avatar':
+            objs = models.Userprofile.objects.filter(id=user_id)
+            objs.update(set_avator=objs[0].headimgurl)
+            response.code = 200
+            response.msg = '修改成功'
+
         else:
             response.code = 402
             response.msg = '请求异常'
@@ -287,6 +294,7 @@ def user_login_oper(request, oper_type):
             user_objs = models.Userprofile.objects.filter(openid=openid)
             if user_objs:  # 客户已经存在
                 user_objs.update(**user_data)
+                user_objs.update(headimgurl=ret_obj.get('headimgurl')) # 更新微信头像
                 user_objs = user_objs[0]
 
             else:  # 不存在，创建用户
@@ -303,6 +311,7 @@ def user_login_oper(request, oper_type):
                 #     subscribe = ret_obj.get('subscribe')
 
                 user_data['set_avator'] = ret_obj.get('headimgurl')
+                user_data['headimgurl'] = ret_obj.get('headimgurl')
                 user_data['subscribe'] = True
                 user_data['name'] = encode_username
                 user_data['openid'] = ret_obj.get('openid')
