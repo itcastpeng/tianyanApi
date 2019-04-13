@@ -209,7 +209,7 @@ def upload_base_shard(request):
                 response.code = 301
                 response.msg = '请上传正确格式'
                 return JsonResponse(response.__dict__)
-            print('img_data--------> ', img_data)
+            # print('img_data--------> ', img_data)
             img_name = timestamp + "_" + str(chunk) + '.' + expanded_name
             img_save_path = os.path.join('statics', 'tmp', img_name)
             with open(img_save_path, "w", encoding='utf8') as f:

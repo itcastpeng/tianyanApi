@@ -54,8 +54,8 @@ class watermark():
             # -------------------头像--------------------------
             set_avator_image = Image.open(set_avator).convert('RGBA')
             set_avator_image.thumbnail((130, 150)) # 原比例缩放图片
-            set_avator_x = int((image.size[0] - name_size_x) / 2)
-            image.paste(set_avator_image, (set_avator_x - 70, int(phone_y - (150 / 2) - 60)))
+            # set_avator_x = int((image.size[0] - name_size_x) / 2)
+            image.paste(set_avator_image, (name_x - 20, int(phone_y - (150 / 2) - 60)))
 
         # 邀请函海报水印
         else:
