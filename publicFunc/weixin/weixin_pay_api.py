@@ -45,6 +45,7 @@ class weixin_pay_api(WeixinApiPublic):
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
         result_data['sign'] = self.md5(string_sign_temp).upper()
         xml_data = self.toXml(result_data)
+        print('xml_data=-xml_data-----------xml_data---------------------------> ', xml_data)
         ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
         ret.encoding = 'utf8'
 
