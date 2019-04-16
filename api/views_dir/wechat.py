@@ -303,7 +303,7 @@ def share_article(request, oper_type):
     code_objs = models.save_code.objects.filter(save_code=code)
     if not code_objs:
         models.save_code.objects.create(save_code=code)
-        inviter_user_id = request.GET.get('state')  # 分享文章的用户id
+        state = request.GET.get('state')  # 分享文章的用户id
         weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
         ret_obj = weichat_api_obj.get_openid(code)
         openid = ret_obj.get('openid')
@@ -354,7 +354,7 @@ def share_article(request, oper_type):
                 article_id=oid,  # 分享文章的id
                 user_id=customer_obj.id,
                 token=obj.token,
-                inviter_user_id=inviter_user_id,
+                inviter_user_id=state,
             )
         elif _type == 'micro':
             # 此处跳转到微店宝贝页面
@@ -363,7 +363,7 @@ def share_article(request, oper_type):
                 article_id=oid,  # 分享文章的id
                 user_id=customer_obj.id,
                 token=obj.token,
-                inviter_user_id=inviter_user_id,
+                inviter_user_id=state,
             )
         else:
             redirect_url = ''

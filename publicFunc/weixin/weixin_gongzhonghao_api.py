@@ -115,7 +115,7 @@ class WeChatApi(WeixinApiPublic):
             access_token=self.access_token
         )
         post_data = {
-            "expire_seconds": 2592000,
+            "expire_seconds": 2592000,  # 二维码过期时间 30天 S
             "action_name": "QR_STR_SCENE",
             "action_info": {
                 "scene": {
