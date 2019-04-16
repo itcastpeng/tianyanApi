@@ -22,7 +22,7 @@ def weixin_pay(request, oper_type, o_id):
             userObjs = models.Userprofile.objects.filter(id=user_id)
             user_obj = userObjs[0]
             fee_obj = fee_objs[0]
-            total_fee = int(fee_obj.price) * 100
+            total_fee = int(fee_obj.price)
             weixin_obj = WeChatApi()
             appid = weixin_obj.APPID
             data = {

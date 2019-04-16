@@ -39,7 +39,7 @@ class weixin_pay_api(WeixinApiPublic):
             'spbill_create_ip': '0.0.0.0',              # 终端IP
 
             # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
-            'notify_url': 'http://api.zhugeyingxiao.com/tianyan/wxpay',
+            'notify_url': 'http://api.zhugeyingxiao.com/tianyan/api/wxpay',
             'trade_type': 'JSAPI'
         }
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
