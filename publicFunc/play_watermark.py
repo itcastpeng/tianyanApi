@@ -1,7 +1,7 @@
 
 from PIL import Image,ImageFont,ImageDraw
 from publicFunc.account import randon_str
-import os, emoji
+import os
 from publicFunc.host import host_url
 from publicFunc.image_color_recognition import image_color_recognition
 
@@ -32,8 +32,7 @@ class watermark():
         print('text------> ', text)
         # 正能量海报水印
         if posters_status == 1:
-            name = emoji.demojize(self.name)
-            name = emoji.emojize(name)
+            name = self.name
             phone = self.phone
 
             # font = ImageFont.truetype('/usr/share/fonts/chinese/Gabriola.ttf', 30)  # 使用自定义的字体，第二个参数表示字符大小
