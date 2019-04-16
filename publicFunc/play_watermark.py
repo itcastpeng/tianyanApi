@@ -37,7 +37,7 @@ class watermark():
             phone = self.phone
 
             # font = ImageFont.truetype('/usr/share/fonts/chinese/Gabriola.ttf', 30)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/GABRIOLA.TTF', 30)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/GABRIOLA.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
 
             set_avator = self.data.get('set_avator')  # 头像
             # set_avator = '2.jpeg'
@@ -58,7 +58,7 @@ class watermark():
 
             # -------------------头像--------------------------
             set_avator_image = Image.open(set_avator).convert('RGBA')
-            set_avator_image.thumbnail((30, 30)) # 原比例缩放图片
+            set_avator_image.thumbnail((40, 40)) # 原比例缩放图片
 
             image.paste(set_avator_image, (name_x - 40, phone_y))
 
