@@ -48,7 +48,7 @@ class weixin_pay_api(WeixinApiPublic):
         print('xml_data=-xml_data-----------xml_data---------------------------> ', xml_data)
         ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
         ret.encoding = 'utf8'
-
+        print('ret.text---------------ret.text----------------ret.text------------------> ', ret.text)
         dom_tree = xmldom.parseString(ret.text)
         collection = dom_tree.documentElement
         data = ['return_code', 'return_msg']
