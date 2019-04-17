@@ -1,5 +1,13 @@
 from django.db import models
 
+# 企业
+class Enterprise(models.Model):
+    name = models.CharField(verbose_name='企业名称', max_length=64)
+    appid = models.CharField(verbose_name='公众号APPID', max_length=128)
+    appsecret = models.CharField(verbose_name='公众号APPSECRET', max_length=256)
+    access_token = models.CharField(verbose_name='公众号access_token', max_length=256)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
 
 # 微商用户表
 class Userprofile(models.Model):
@@ -70,6 +78,8 @@ class Userprofile(models.Model):
 
     top_advertising = models.TextField(verbose_name='顶层广告' ,null=True, blank=True)
     end_advertising = models.TextField(verbose_name='底层广告' ,null=True, blank=True)
+
+    enterprise = models.ForeignKey('Enterprise', verbose_name='企业', null=True, blank=True)
 
 # 微商用户和团队关系表
 class UserprofileTeam(models.Model):
