@@ -13,6 +13,8 @@ from publicFunc.host import host_url
 from django.shortcuts import redirect
 from publicFunc.forwarding_article import forwarding_article
 from urllib.parse import unquote,quote
+from publicFunc.article_oper import get_ent_info
+
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def team(request):
@@ -302,7 +304,8 @@ def customer_invite_members(request, oper_type, o_id):
 
         team_id = o_id  # 团队id
         inviter_user_id = request.GET.get('state')  # 邀请人id
-        weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+        data = get_ent_info(inviter_user_id)
+        weichat_api_obj = weixin_gongzhonghao_api.WeChatApi(data)
         ret_obj = weichat_api_obj.get_openid(code)
         openid = ret_obj.get('openid')
         user_id = updateUserInfo(openid, inviter_user_id, ret_obj)

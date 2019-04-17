@@ -13,7 +13,7 @@ from publicFunc import base64_encryption
 from publicFunc.account import get_token
 from publicFunc.account import str_encrypt
 from publicFunc.host import host_url
-
+from publicFunc.article_oper import get_ent_info
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def user(request):
@@ -241,7 +241,6 @@ def user_oper(request, oper_type, o_id):
 # 用户登录
 def user_login_oper(request, oper_type):
     response = Response.ResponseObj()
-    weichat_api_obj = WeChatApi()
     # if oper_type == 'login':  # 创建 模板 生成跳转页面
     #     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
     #     weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
@@ -281,7 +280,8 @@ def user_login_oper(request, oper_type):
             models.save_code.objects.create(
                 save_code=code
             )
-
+            data = get_ent_info(1)
+            weichat_api_obj = WeChatApi(data)
             ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
             encode_username = base64_encryption.b64encode(
                 ret_obj['nickname']

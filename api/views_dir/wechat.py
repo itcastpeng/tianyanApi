@@ -13,7 +13,9 @@ from django.shortcuts import render, redirect
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.host import host_url
-from urllib.parse import unquote,quote
+from publicFunc.article_oper import get_ent_info
+from publicFunc.weixin.weixin_gongzhonghao_api import checkSignature
+from publicFunc.article_oper import get_ent_info
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
     """
@@ -83,7 +85,8 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
 
         # 如果没有关注，获取个人信息判断是否关注
         if not subscribe:
-            weichat_api_obj = WeChatApi()
+            data = get_ent_info(inviter_user_id)
+            weichat_api_obj = WeChatApi(data)
             ret_obj = weichat_api_obj.get_user_info(openid=openid)
             subscribe = ret_obj.get('subscribe')
 
@@ -104,8 +107,6 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
 
 # 有人(关注/取关)公众号 微信服务器调用的接口
 def wechat(request):
-    weichat_api_obj = WeChatApi()
-
     signature = request.GET.get("signature")
     timestamp = request.GET.get("timestamp")
     nonce = request.GET.get("nonce")
@@ -114,7 +115,7 @@ def wechat(request):
     # 该值做消息解密使用，当前未使用加密模式，参考微信开发文档 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319
     # EncodingAESKey = 'LFYzOBp42g5kwgSUWhGC9uRugSmpyetKfAsJa5FdFHX'
 
-    check_result = weichat_api_obj.checkSignature(timestamp, nonce, signature)
+    check_result = checkSignature(timestamp, nonce, signature)
     print('check_result -->', check_result)
 
     if check_result:
@@ -152,6 +153,8 @@ def wechat(request):
                     inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
                     print('event_key -->', event_key)
 
+                data = get_ent_info(inviter_user_id)
+                weichat_api_obj = WeChatApi(data)
                 ret_obj = weichat_api_obj.get_user_info(openid=openid)
                 updateUserInfo(openid, inviter_user_id, ret_obj)
 
@@ -181,7 +184,8 @@ def wechat_oper(request, oper_type):
 
     else:
         # 获取用于登录的微信二维码
-        weichat_api_obj = WeChatApi()
+        data = get_ent_info(user_id)
+        weichat_api_obj = WeChatApi(data)
         if oper_type == "generate_qrcode":
             qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
             print(qc_code_url)
@@ -304,7 +308,8 @@ def share_article(request, oper_type):
     if not code_objs:
         models.save_code.objects.create(save_code=code)
         state = request.GET.get('state')  # 分享文章的用户id
-        weichat_api_obj = weixin_gongzhonghao_api.WeChatApi()
+        data = get_ent_info(state)
+        weichat_api_obj = weixin_gongzhonghao_api.WeChatApi(data)
         ret_obj = weichat_api_obj.get_openid(code)
         openid = ret_obj.get('openid')
         print('ret_obj-----------> ', ret_obj)
@@ -330,7 +335,6 @@ def share_article(request, oper_type):
             user_data['set_avator'] = ret_obj.get('headimgurl')
             # 如果没有关注，获取个人信息判断是否关注
             if not subscribe:
-                weichat_api_obj = WeChatApi()
                 ret_obj_subscribe = weichat_api_obj.get_user_info(openid=openid)
                 subscribe = ret_obj_subscribe.get('subscribe')
 
