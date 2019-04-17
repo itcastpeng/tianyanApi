@@ -4,6 +4,10 @@ from publicFunc.account import randon_str
 import os
 from publicFunc.host import host_url
 from publicFunc.image_color_recognition import image_color_recognition
+import sys
+from selenium import webdriver
+from tianyanApi import settings
+import requests
 
 
 # 图片打水印
@@ -13,56 +17,89 @@ class watermark():
         self.img_path = data.get('img_path')
         self.name = data.get('name')
         self.phone = data.get('phone')
-
+        self.user_id = data.get('user_id')
+        self.posters = data.get('posters')
 
     # 海报水印
     def posters_play_watermark(self):
-        img_url = self.img_path.split(host_url)[1] # 切除域名
-        # img_url = '1.jpg'
-        image = Image.open(img_url).convert('RGBA')
-
-        color = image_color_recognition(img_url) # 识别图片颜色 给出对应文字颜色
-        # color = (0, 0, 0)
+        path = os.path.join('statics', 'poster_img', randon_str() + '.png')
 
         # 绘图句柄
-        image_draw = ImageDraw.Draw(image)
         posters_status = int(self.data.get('posters_status'))  # 水印类型
-        text = str(self.name) + ' ' + str(self.phone)
+        # color = image_color_recognition(host_url) # 识别图片颜色 给出对应文字颜色
+        color = (0, 0, 0)
 
-        print('text------> ', text)
         # 正能量海报水印
         if posters_status == 1:
-            name = self.name
-            phone = self.phone
 
-            # font = ImageFont.truetype('/usr/share/fonts/chinese/Gabriola.ttf', 30)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/GABRIOLA.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            platform = sys.platform  # 获取平台
+            # base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
+            base_dir_path = 'api/views_dir/tools'
+            if 'linux' in platform:
+                phantomjs_path = base_dir_path + '/phantomjs'
+            else:
+                phantomjs_path = base_dir_path + '/phantomjs.exe'
+            # poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
+            poster_url = 'http://zhugeleida.zhugeyingxiao.com/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
+            driver = webdriver.PhantomJS(executable_path=phantomjs_path)
+            driver.implicitly_wait(10)
+            driver.maximize_window()
+            driver.get(poster_url)
+            element = driver.find_element_by_id("jietu")
+            locations = element.location
+            sizes = element.size
+            rangle = (int(locations['x']), int(locations['y']), int(locations['x'] + sizes['width']),
+                      int(locations['y'] + sizes['height']))
+            driver.save_screenshot(path)  # 截图
+            img = Image.open(path)
+            jpg = img.crop(rangle)
+            jpg.save(path)
+            driver.quit()
 
-            set_avator = self.data.get('set_avator')  # 头像
-            # set_avator = '2.jpeg'
-            # 获取文本大小
 
-            name_size_x, name_size_y = image_draw.textsize(name, font=font)
-            # phone_size_x, phone_size_y = image_draw.textsize(phone, font=font)
 
-            # 获取文字位置
-            name_x = int((image.size[0] - name_size_x) / 2)  # 名字文字左右放在居中位置
 
-            phone_x = int(name_x + name_size_x + 10)  # 电话文字左右放在居中位置
-            phone_y = int(image.size[1] - 80)
 
-            # 设置文本位置及颜色和透明度
-            image_draw.text((name_x, phone_y), name, font=font, fill=color)
-            image_draw.text((phone_x, phone_y), phone, font=font, fill=color)
 
-            # -------------------头像--------------------------
-            set_avator_image = Image.open(set_avator).convert('RGBA')
-            set_avator_image.thumbnail((40, 40)) # 原比例缩放图片
 
-            image.paste(set_avator_image, (name_x - 40, phone_y))
+
+            # name = self.name
+            # phone = self.phone
+            #
+            # # font = ImageFont.truetype('/usr/share/fonts/chinese/Gabriola.ttf', 30)  # 使用自定义的字体，第二个参数表示字符大小
+            # font = ImageFont.truetype('/usr/share/fonts/chinese/GABRIOLA.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            #
+            # set_avator = self.data.get('set_avator')  # 头像
+            # # set_avator = '2.jpeg'
+            # # 获取文本大小
+            #
+            # name_size_x, name_size_y = image_draw.textsize(name, font=font)
+            # # phone_size_x, phone_size_y = image_draw.textsize(phone, font=font)
+            #
+            # # 获取文字位置
+            # name_x = int((image.size[0] - name_size_x) / 2)  # 名字文字左右放在居中位置
+            #
+            # phone_x = int(name_x + name_size_x + 10)  # 电话文字左右放在居中位置
+            # phone_y = int(image.size[1] - 80)
+            #
+            # # 设置文本位置及颜色和透明度
+            # image_draw.text((name_x, phone_y), name, font=font, fill=color)
+            # image_draw.text((phone_x, phone_y), phone, font=font, fill=color)
+            #
+            # # -------------------头像--------------------------
+            # set_avator_image = Image.open(set_avator).convert('RGBA')
+            # set_avator_image.thumbnail((40, 40)) # 原比例缩放图片
+            #
+            # image.paste(set_avator_image, (name_x - 40, phone_y))
 
         # 邀请函海报水印
         else:
+            img_url = self.img_path.split(host_url)[1]  # 切除域名
+            image = Image.open(img_url).convert('RGBA')
+            image_draw = ImageDraw.Draw(image)
+            text = str(self.name) + ' ' + str(self.phone)
+
+
             zhu_title = self.data.get('zhu_title')
             fu_title = self.data.get('fu_title')
             time = self.data.get('time')
@@ -92,9 +129,8 @@ class watermark():
             image_draw.text((time_width, img_hight-110), time, font=font, fill=color)
             image_draw.text((place_width, img_hight-80), place, font=font, fill=color)
             image_draw.text((text_width, img_hight-40), text, font=font, fill=color)
+            image.save(path)
 
-        path = os.path.join('statics', 'img', randon_str() + '.png')
-        image.save(path)
         return path
 
 if __name__ == '__main__':
