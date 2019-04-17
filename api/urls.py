@@ -3,7 +3,7 @@ from django.conf.urls import url
 
 
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
-    upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article
+    upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article, html_oper
 
 
 urlpatterns = [
@@ -91,5 +91,8 @@ urlpatterns = [
 
     # ----------------转发朋友圈等(微信操作)-----------
     url(r'^letter_operation/(?P<oper_type>\w+)$', letter_operation.letter_operation),
+
+    # 页面 截图
+    url(r'^html_oper/(?P<oper_type>\w+)$', html_oper.html_oper),
 
 ]

@@ -180,26 +180,28 @@ def posters_oper(request, oper_type, o_id):
 
                 posters_status = int(posters_status)
                 if posters_status == 1:
-                    obj = models.Userprofile.objects.get(id=user_id)
-                    set_avator = obj.set_avator
+                    # obj = models.Userprofile.objects.get(id=user_id)
+                    # set_avator = obj.set_avator
 
-                    if 'statics/img' not in set_avator:  # 如果不是自己服务器的图片 则保存在咱们的服务器
-                        ret = requests.get(set_avator)
-                        set_avator = os.path.join('statics', 'img') + randon_str() + '.png'
-                        with open(set_avator, 'wb') as e:
-                            e.write(ret.content)
-                        obj.set_avator = set_avator # 更改该人头像地址
-                        obj.save()
+                    # if 'statics/img' not in set_avator:  # 如果不是自己服务器的图片 则保存在咱们的服务器
+                    #     ret = requests.get(set_avator)
+                    #     set_avator = os.path.join('statics', 'img') + randon_str() + '.png'
+                    #     with open(set_avator, 'wb') as e:
+                    #         e.write(ret.content)
+                    #     obj.set_avator = set_avator # 更改该人头像地址
+                    #     obj.save()
 
-                    set_avator = 'statics' + set_avator.split('statics')[1]
-
-
+                    # data = {
+                    #     'posters_status': posters_status,
+                    #     'img_path': img_path,
+                    #     'name': b64decode(obj.name),
+                    #     'phone': obj.phone_number,
+                    #     'set_avator': set_avator,
+                    # }
                     data = {
-                        'posters_status': posters_status,
-                        'img_path': img_path,
-                        'name': b64decode(obj.name),
-                        'phone': obj.phone_number,
-                        'set_avator': set_avator,
+                        'user_id': user_id,
+                        'posters':o_id,
+                        'posters_status':posters_status
                     }
 
                 else:
@@ -219,12 +221,12 @@ def posters_oper(request, oper_type, o_id):
                         'time': time,
                         'place': place,
                     }
-                print('data-----------> ', data)
+                # print('data-----------> ', data)
                 watermark_objs = watermark(data) # 实例化
                 path = watermark_objs.posters_play_watermark()
-                print(path)
                 response.code = 200
                 response.msg = '生成成功'
+                print('-------生成海报路径-------> ', path)
                 response.data = {'path':path}
             else:
                 response.code = 301
