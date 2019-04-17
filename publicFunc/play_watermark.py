@@ -33,7 +33,7 @@ class watermark():
         if posters_status == 1:
 
             platform = sys.platform  # 获取平台
-            base_dir_path = os.path.join(settings.BASE_DIR, 'tianyanApi', 'api', 'views_dir', 'tools')
+            base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
             print('base_dir_path--------------------base_dir_path---------------> ', base_dir_path)
             # base_dir_path = 'api/views_dir/tools'
             if 'linux' in platform:
