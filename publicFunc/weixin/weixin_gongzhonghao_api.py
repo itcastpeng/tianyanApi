@@ -15,32 +15,62 @@ import hashlib
 # import uuid
 # from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_api_public import WeixinApiPublic
+from api import models
+
+
+# 验证收到的消息是否来自微信服务器
+def checkSignature(self, timestamp, nonce, signature):
+    """
+    参考微信开发文档 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319
+    :param timestamp:
+    :param nonce:
+    :param signature:
+    :return:
+    """
+    token = 'hfdjsahjklfdhjklhfdkljsa'
+
+    tmp_str = "".join(sorted([timestamp, nonce, token]))
+    hash_obj = hashlib.sha1()
+    hash_obj.update(tmp_str.encode('utf-8'))
+    if hash_obj.hexdigest() == signature:
+        return True
+    else:
+        return False
+
 
 
 class WeChatApi(WeixinApiPublic):
 
-    def __init__(self, wechat_data_path=None):
-        if wechat_data_path:
-            self.wechat_data_path = wechat_data_path
-        else:
-            self.wechat_data_path = os.path.join(os.getcwd(), "publicFunc", "weixin", "wechat_data.json")
+    def __init__(self, data):
+        self.id = data["id"]
+        self.APPID = data["APPID"]
+        self.APPSECRET = data["APPSECRET"]
+        self.access_token = data["access_token"]
+        self.create_datetime = data["create_datetime"]
+        if not self.create_datetime or (int(time.time()) - self.create_datetime) > 7000:
+            self.get_access_token()
 
-        # print(wechat_data_path)
-        with open(self.wechat_data_path, "r", encoding="utf8") as f:
-            data = json.loads(f.read())
-
-            self.APPID = data["APPID"]
-            self.APPSECRET = data["APPSECRET"]
-            self.access_token = data["access_token"]
-            self.create_datetime = data["create_datetime"]
-
-            # 如果access_token快要过期，则更新access_token，默认过期时间为7200秒
-            if not self.create_datetime or (int(time.time()) - self.create_datetime) > 7000:
-                # print(type(self.create_datetime), self.create_datetime)
-                # print(time.time())
-                # print((int(time.time()) - self.create_datetime))
-
-                self.get_access_token()
+        # if wechat_data_path:
+        #     self.wechat_data_path = wechat_data_path
+        # else:
+        #     self.wechat_data_path = os.path.join(os.getcwd(), "publicFunc", "weixin", "wechat_data.json")
+        #
+        # # print(wechat_data_path)
+        # with open(self.wechat_data_path, "r", encoding="utf8") as f:
+        #     data = json.loads(f.read())
+        #
+        #     self.APPID = data["APPID"]
+        #     self.APPSECRET = data["APPSECRET"]
+        #     self.access_token = data["access_token"]
+        #     self.create_datetime = data["create_datetime"]
+        #
+        #     # 如果access_token快要过期，则更新access_token，默认过期时间为7200秒
+        #     if not self.create_datetime or (int(time.time()) - self.create_datetime) > 7000:
+        #         # print(type(self.create_datetime), self.create_datetime)
+        #         # print(time.time())
+        #         # print((int(time.time()) - self.create_datetime))
+        #
+        #         self.get_access_token()
 
         # self.get_users()
 
@@ -58,35 +88,18 @@ class WeChatApi(WeixinApiPublic):
         print(self.access_token)
 
         data = {
-            "APPID": self.APPID,
-            "APPSECRET": self.APPSECRET,
+            "appid": self.APPID,
+            "appsecret": self.APPSECRET,
             "access_token": self.access_token,
             "create_datetime": int(time.time())
         }
-        print(data)
-        with open(self.wechat_data_path, "w", encoding="utf8") as f:
-            f.write(json.dumps(data))
-
+        # print(data)
+        # with open(self.wechat_data_path, "w", encoding="utf8") as f:
+        #     f.write(json.dumps(data))
+        objs = models.Enterprise.objects.filter(id=self.id)
+        objs.update(**data)
         print("\n" * 3)
 
-    # 验证收到的消息是否来自微信服务器
-    def checkSignature(self, timestamp, nonce, signature):
-        """
-        参考微信开发文档 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319
-        :param timestamp:
-        :param nonce:
-        :param signature:
-        :return:
-        """
-        token = 'hfdjsahjklfdhjklhfdkljsa'
-
-        tmp_str = "".join(sorted([timestamp, nonce, token]))
-        hash_obj = hashlib.sha1()
-        hash_obj.update(tmp_str.encode('utf-8'))
-        if hash_obj.hexdigest() == signature:
-            return True
-        else:
-            return False
 
     # 获取所有用户的 openid
     def get_users(self):

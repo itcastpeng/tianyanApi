@@ -7,7 +7,7 @@ from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-
+from publicFunc.article_oper import get_ent_info
 
 @csrf_exempt
 @account.is_token(models.Userprofile)
@@ -23,7 +23,8 @@ def weixin_pay(request, oper_type, o_id):
             user_obj = userObjs[0]
             fee_obj = fee_objs[0]
             total_fee = int(fee_obj.price)
-            weixin_obj = WeChatApi()
+            data = get_ent_info(user_id)
+            weixin_obj = WeChatApi(data)
             appid = weixin_obj.APPID
             data = {
                 'total_fee': total_fee,  # 金额(分 为单位)

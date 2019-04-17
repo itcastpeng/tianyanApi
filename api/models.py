@@ -79,7 +79,7 @@ class Userprofile(models.Model):
     top_advertising = models.TextField(verbose_name='顶层广告' ,null=True, blank=True)
     end_advertising = models.TextField(verbose_name='底层广告' ,null=True, blank=True)
 
-    enterprise = models.ForeignKey('Enterprise', verbose_name='企业', null=True, blank=True)
+    enterprise = models.ForeignKey('Enterprise', verbose_name='企业', default=1)
 
 # 微商用户和团队关系表
 class UserprofileTeam(models.Model):

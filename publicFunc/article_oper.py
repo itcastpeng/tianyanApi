@@ -63,9 +63,20 @@ def add_article_public(data, classify_id=None):
     return id
 
 
-
-
-
+# 获取用户 企业的 appid等信息
+def get_ent_info(user_id):
+    if not user_id:
+        user_id = 1
+    user_obj = models.Userprofile.objects.get(id=user_id)
+    ent_obj = models.Enterprise.objects.get(id=user_obj.enterprise_id)
+    data = {
+        'id': ent_obj.id,
+        'APPID': ent_obj.appid,
+        'APPSECRET': ent_obj.appsecret,
+        'access_token': ent_obj.access_token,
+        'create_datetime': ent_obj.create_datetime,
+    }
+    return data
 
 
 
