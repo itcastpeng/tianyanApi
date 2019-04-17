@@ -6,7 +6,7 @@ class Enterprise(models.Model):
     appid = models.CharField(verbose_name='公众号APPID', max_length=128)
     appsecret = models.CharField(verbose_name='公众号APPSECRET', max_length=256)
     access_token = models.CharField(verbose_name='公众号access_token', max_length=256)
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    create_datetime = models.CharField(verbose_name="创建时间", max_length=32)
 
 
 # 微商用户表
