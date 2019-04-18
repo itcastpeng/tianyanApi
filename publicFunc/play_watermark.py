@@ -34,20 +34,19 @@ class watermark():
             if 'linux' in sys.platform:  # 获取平台
                 base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
                 phantomjs_path = base_dir_path + '/phantomjs'
-                chromedriver_path = base_dir_path + '/chromedriver'
                 poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
             else:
                 base_dir_path = 'api/views_dir/tools'
                 phantomjs_path = base_dir_path + '/phantomjs.exe'
-                chromedriver_path = base_dir_path + '/chromedriver.exe'
                 poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
 
-            # driver = webdriver.PhantomJS(executable_path=phantomjs_path)
-            _chrome_options = Options()
-            _chrome_options.add_argument("--headless")
-            _chrome_options.add_argument("--disable-gpu")
-            _chrome_options.add_argument("--no-sandbox")
-            driver = webdriver.Chrome(chrome_options=_chrome_options, executable_path=chromedriver_path)
+            driver = webdriver.PhantomJS(executable_path=phantomjs_path)
+            # _chrome_options = Options()
+            # _chrome_options.add_argument("--headless")
+            # _chrome_options.add_argument("--disable-gpu")
+            # _chrome_options.add_argument("--no-sandbox")
+            # _chrome_options.add_argument("--user-data-dir")
+            # driver = webdriver.Chrome(chrome_options=_chrome_options, executable_path=chromedriver_path)
             driver.implicitly_wait(10)
             driver.maximize_window()
             print('poster_url------------>', poster_url)
