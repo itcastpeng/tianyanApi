@@ -34,12 +34,10 @@ class watermark():
             if 'linux' in sys.platform:  # 获取平台
                 base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
                 phantomjs_path = base_dir_path + '/phantomjs'
-                chromedriver_path = base_dir_path + '/chromedriver'
                 poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
             else:
                 base_dir_path = 'api/views_dir/tools'
                 phantomjs_path = base_dir_path + '/phantomjs.exe'
-                chromedriver_path = base_dir_path + '/chromedriver.exe'
                 poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
 
             driver = webdriver.PhantomJS(executable_path=phantomjs_path)
