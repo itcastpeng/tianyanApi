@@ -41,7 +41,7 @@ class watermark():
             else:
                 phantomjs_path = base_dir_path + '/phantomjs.exe'
             # poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
-            poster_url = 'http://zhugeleida.zhugeyingxiao.com/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
+            poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
             driver = webdriver.PhantomJS(executable_path=phantomjs_path)
             driver.implicitly_wait(10)
             driver.maximize_window()
