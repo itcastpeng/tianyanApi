@@ -19,7 +19,7 @@ from api import models
 
 
 # 验证收到的消息是否来自微信服务器
-def checkSignature(self, timestamp, nonce, signature):
+def checkSignature(timestamp, nonce, signature):
     """
     参考微信开发文档 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319
     :param timestamp:
