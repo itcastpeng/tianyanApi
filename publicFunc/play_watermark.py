@@ -45,6 +45,7 @@ class watermark():
             driver = webdriver.PhantomJS(executable_path=phantomjs_path)
             driver.implicitly_wait(10)
             driver.maximize_window()
+            print('poster_url------------>', poster_url)
             driver.get(poster_url)
             element = driver.find_element_by_id("jietu")
             locations = element.location
