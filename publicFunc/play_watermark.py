@@ -41,12 +41,6 @@ class watermark():
                 poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
 
             driver = webdriver.PhantomJS(executable_path=phantomjs_path)
-            # _chrome_options = Options()
-            # _chrome_options.add_argument("--headless")
-            # _chrome_options.add_argument("--disable-gpu")
-            # _chrome_options.add_argument("--no-sandbox")
-            # _chrome_options.add_argument("--user-data-dir")
-            # driver = webdriver.Chrome(chrome_options=_chrome_options, executable_path=chromedriver_path)
             driver.implicitly_wait(10)
             driver.maximize_window()
             print('poster_url------------>', poster_url)
@@ -56,12 +50,15 @@ class watermark():
             sizes = element.size
             print('locations---------> ', locations)
             print('sizes---------> ', sizes)
-            rangle = (int(locations['x']), int(locations['y']), int(locations['x'] + sizes['width']), int(locations['y'] + sizes['height']))
+            # rangle = (int(locations['x']), int(locations['y']), int(locations['x'] + sizes['width']), int(locations['y'] + sizes['height']))
+            print(int(locations['x'] + sizes['width']))
+            print(int(locations['y'] + sizes['height']))
+            rangle = (locations['x'], locations['y'], int(locations['x'] + sizes['width']), sizes['height'])
             driver.save_screenshot(path)  # 截图
-            # img = Image.open(path)
-            # jpg = img.crop(rangle)
-            # jpg.save(path)
-            # driver.quit()
+            img = Image.open(path)
+            jpg = img.crop(rangle) # 左上右下
+            jpg.save('./1.png')
+            driver.quit()
 
 
 
