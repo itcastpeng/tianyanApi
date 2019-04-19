@@ -105,6 +105,7 @@ def article(request):
             ret_data = []
             # 返回的数据
             for obj in objs:
+                print('--------------> ', obj.id)
                 is_like = False # 是否点赞
                 log_obj = models.SelectClickArticleLog.objects.filter(
                     article_id=obj.id,
