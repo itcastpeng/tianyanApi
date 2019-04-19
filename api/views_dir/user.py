@@ -14,6 +14,9 @@ from publicFunc.account import get_token
 from publicFunc.account import str_encrypt
 from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
+from django.db.models import Count
+
+
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def user(request):
@@ -246,28 +249,44 @@ def user_oper(request, oper_type, o_id):
             response_data['cumulative_amount'] = int(user_obj.cumulative_amount)
             response_data['make_money'] = int(user_obj.make_money)
 
-            invite_objs = invite_objs.values('id')
-            for invite_obj in invite_objs:
-                print('invite_obj.id-------> ', invite_obj.get('id'))
+            invite_friend_list = [i.get('id') for i in invite_objs.values('id')] # 该邀请人 邀请的好友ID
+            print('invite_friend_list--> ', invite_friend_list)
+            number_clinch_deal_objs = models.renewal_log.objects.filter(
+                create_user_id__in=invite_friend_list,
+                isSuccess=1
+            ).values(
+                'create_user__name'
+            ).distinct()
+            response_data['number_clinch_count'] = number_clinch_deal_objs.count()  # 成交人数
 
-            if o_id == 1:  # 邀请人数详情
+            if o_id and int(o_id) == 1:  # 邀请人数详情
                 invite_number_list = []
                 for invite_number_obj in invite_objs:
                     invite_number_list.append({
-                        'name':base64_encryption.b64decode(invite_number_obj.wechat_name)
+                        'name':base64_encryption.b64decode(invite_number_obj.name)
                     })
                 response_data['invite_number_list'] = invite_number_list
 
-            # elif o_id == 2:
-
-
-
-
+            elif o_id and int(o_id) == 2: # 成交人数
+                number_clinch_deal_list = []
+                for number_clinch_deal_obj in number_clinch_deal_objs:
+                    number_clinch_deal_list.append({
+                        'name': base64_encryption.b64decode(number_clinch_deal_obj.get('create_user__name')),
+                    })
+                response_data['number_clinch_deal_list'] = number_clinch_deal_list
 
 
             response.code = 200
             response.msg = '查询成功'
             response.data = response_data
+            response.note = {
+                "invite_number_count": '邀请人数量',
+                "cumulative_amount": '累计钱数',
+                "make_money": '待提钱数',
+                "number_clinch_count": '成交人数',
+                "invite_number_list": '邀请人详情',
+                "number_clinch_deal_list": '成交人详情',
+            }
 
         else:
             response.code = 402

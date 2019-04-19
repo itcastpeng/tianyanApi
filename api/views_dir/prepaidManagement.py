@@ -8,6 +8,7 @@ from django.views.decorators.csrf import csrf_exempt
 from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.article_oper import get_ent_info
+from django.db.models import F
 
 @csrf_exempt
 @account.is_token(models.Userprofile)
@@ -38,8 +39,8 @@ def weixin_pay(request, oper_type, o_id):
             prepay_id = result.get('prepay_id')['prepay_id']
 
             if return_code == 'SUCCESS':  # 判断预支付返回参数 是否正确
-                order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 创建订单日志
 
+                order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 创建订单日志
                 renewal_number_days = fee_obj.renewal_number_days  # 续费天数
                 overdue_date = (user_obj.overdue_date + datetime.timedelta(days=renewal_number_days))  # 续费后 到期时间
                 if not order_objs:
@@ -52,6 +53,7 @@ def weixin_pay(request, oper_type, o_id):
                         original_price=fee_obj.original_price,  # 原价
                         overdue_date=overdue_date,
                     )
+
                 print('prepay_id--------> ', prepay_id)
                 data_dict = {
                     'appId': appid,
@@ -97,9 +99,28 @@ def weixin_pay(request, oper_type, o_id):
             return_code = weixin_pay_api_obj.weixin_back_pay(result_data)
 
             if return_code == 'SUCCESS':
-                isSuccess = 1
-                user_objs = models.Userprofile.objects.filter(id=renewal_log_obj.create_user_id)
+                isSuccess = 1 # 支付状态
+                pay_user_id = renewal_log_obj.create_user_id  # 充值人  ID
+
+                # 修改会员到期时间
+                user_objs = models.Userprofile.objects.filter(id=pay_user_id)
                 user_objs.update(overdue_date=renewal_log_obj.overdue_date)
+
+                # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增钱
+                renewal_objs = models.renewal_log.objects.filter(create_user_id=pay_user_id)
+                inviter_id = user_objs[0].inviter_id
+                if renewal_objs.count() == 1 and inviter_id:
+                    inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
+                    inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + 50  # 累计钱数 + 50
+                    inviter_id_user_obj.make_money = F('make_money') + 50                   # 待提钱数 + 50
+                    inviter_id_user_obj.save()
+
+            else:
+                objs = models.renewal_log.objects.filter(pay_order_no=result_data.get('out_trade_no'))
+                if objs:
+                    objs.delete()
+                print('------支付失败 ----------删除订单')
+
 
         renewal_log_objs.update(isSuccess=isSuccess)  # 修改订单状态
     return JsonResponse(response.__dict__)
