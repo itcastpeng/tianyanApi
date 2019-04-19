@@ -26,15 +26,15 @@ class watermark():
 
         # 绘图句柄
         posters_status = int(self.data.get('posters_status'))  # 水印类型
-        # color = image_color_recognition(host_url) # 识别图片颜色 给出对应文字颜色
-        color = (0, 0, 0)
+        color = image_color_recognition(host_url) # 识别图片颜色 给出对应文字颜色
+        # color = (0, 0, 0)
 
         # 正能量海报水印
         if posters_status == 1:
             if 'linux' in sys.platform:  # 获取平台
                 base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
                 phantomjs_path = base_dir_path + '/phantomjs'
-                poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
+                poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}color={}'.format(self.user_id, self.posters, color)
             else:
                 base_dir_path = 'api/views_dir/tools'
                 phantomjs_path = base_dir_path + '/phantomjs.exe'
@@ -43,17 +43,11 @@ class watermark():
             driver = webdriver.PhantomJS(executable_path=phantomjs_path)
             driver.implicitly_wait(10)
             driver.maximize_window()
-            print('poster_url------------>', poster_url)
             driver.get(poster_url)
             element = driver.find_element_by_id("jietu")
             locations = element.location
             sizes = element.size
-            print('locations---------> ', locations)
-            print('sizes---------> ', sizes)
-            # rangle = (int(locations['x']), int(locations['y']), int(locations['x'] + sizes['width']), int(locations['y'] + sizes['height']))
-            print(int(locations['x'] + sizes['width']))
-            print(int(locations['y'] + sizes['height']))
-            rangle = (locations['x'], locations['y'], int(locations['x'] + sizes['width']), sizes['height'])
+            rangle = (locations['x'], locations['y'], int(locations['x'] + sizes['width']), int(locations['y'] + sizes['height']))
             driver.save_screenshot(path)  # 截图
             img = Image.open(path)
             jpg = img.crop(rangle) # 左上右下

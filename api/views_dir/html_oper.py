@@ -12,6 +12,7 @@ def html_oper(request, oper_type):
     if oper_type == 'zhengnengliang':
         posters = request.GET.get('posters')  # 海报ID
         user_id = request.GET.get('user_id')  # 用户ID
+        color = request.GET.get('color')  # 用户ID
         posters_objs = models.Posters.objects.get(id=posters)
         img_path = posters_objs.posters_url
 
@@ -22,6 +23,7 @@ def html_oper(request, oper_type):
             'name': b64decode(user_obj.name),
             'phone': user_obj.phone_number,
             'set_avator': user_obj.set_avator,
+            'color': color,
         }
         print('data====----> ', data)
         return render(request, 'zhengnengliang.html', locals())
