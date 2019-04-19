@@ -181,8 +181,11 @@ from urllib.parse import unquote
 
 
 
+# string = 'M+aciDE15pel77yM5Li65byY5oms5rOV5rK757K+56We44CB5YCh5a+85L6d5rOV57u05p2D77yM4oCc6K+a5L+h5Yy7576Owrfms5XmsrvljLvnvo7Ct+aUvuW/g+WMu+e+juKAneKAlOKAnOe+juS4veaciee6puS+neazlee7tOadg+KAneS4reWbveihjOWkp+Wei+WFrOebiua0u+WKqOWxseS4nOermeWQr+WKqOS7quW8j+WcqOa3hOWN'
+string = 'M+aciDE15pel77yM5Li65byY5oms5rOV5rK757K+56We44CB5YCh5a+85L6d5rOV57u05p2D77yMIuivmuS/oeWMu+e+jsK35rOV5rK75Yy7576OwrfmlL7lv4PljLvnvo4i4oCUIue+juS4veaciee6puS+neazlee7tOadgyLkuK3lm73ooYzlpKflnovlhaznm4rmtLvliqjlsbHkuJznq5nlkK/liqjku6rlvI/lnKjmt4TljYA='
+# string = '5L2g6L+Y'
 
-
+print(base64.b64decode(string.encode('utf8')).decode('utf8'))
 
 
 
