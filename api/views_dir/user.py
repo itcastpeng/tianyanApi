@@ -5,9 +5,7 @@ from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.user import SelectForm
-import json
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-import re
 import datetime, requests, time
 from publicFunc import base64_encryption
 from publicFunc.account import get_token
@@ -15,6 +13,9 @@ from publicFunc.account import str_encrypt
 from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
 from django.db.models import Count
+from publicFunc.account import randon_str
+import re, os, json
+from publicFunc.screenshots import screenshots
 
 
 # cerf  token验证 用户展示模块
@@ -286,6 +287,17 @@ def user_oper(request, oper_type, o_id):
                 "number_clinch_count": '成交人数',
                 "invite_number_list": '邀请人详情',
                 "number_clinch_deal_list": '成交人详情',
+            }
+
+        # 推广赚钱 二维码截图
+        elif oper_type == 'affiliate_screenshots':
+            path = os.path.join('statics', 'poster_img', randon_str() + '.png')
+            img_url = request.GET.get('img_url')
+            img_path = screenshots(img_url, path)
+            response.code = 200
+            response.msg = '生成成功'
+            response.data = {
+                'path': img_path
             }
 
         else:
