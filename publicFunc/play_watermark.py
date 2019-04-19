@@ -57,7 +57,7 @@ class watermark():
             driver.save_screenshot(path)  # 截图
             img = Image.open(path)
             jpg = img.crop(rangle) # 左上右下
-            jpg.save('./1.png')
+            jpg.save(path)
             driver.quit()
 
 
