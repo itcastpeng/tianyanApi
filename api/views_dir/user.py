@@ -235,6 +235,40 @@ def user_oper(request, oper_type, o_id):
             response.code = 200
             response.msg = '修改成功'
 
+        # 推广赚钱 展示数据
+        elif oper_type == 'affiliate':
+            user_pub_objs = models.Userprofile.objects
+            response_data = {}
+            user_obj = user_pub_objs.get(id=user_id)
+
+            invite_objs = user_pub_objs.filter(inviter_id=user_id)
+            response_data['invite_number_count'] = invite_objs.count() # 邀请人数量
+            response_data['cumulative_amount'] = int(user_obj.cumulative_amount)
+            response_data['make_money'] = int(user_obj.make_money)
+
+            invite_objs = invite_objs.values('id')
+            for invite_obj in invite_objs:
+                print('invite_obj.id-------> ', invite_obj.get('id'))
+
+            if o_id == 1:  # 邀请人数详情
+                invite_number_list = []
+                for invite_number_obj in invite_objs:
+                    invite_number_list.append({
+                        'name':base64_encryption.b64decode(invite_number_obj.wechat_name)
+                    })
+                response_data['invite_number_list'] = invite_number_list
+
+            # elif o_id == 2:
+
+
+
+
+
+
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = response_data
+
         else:
             response.code = 402
             response.msg = '请求异常'
