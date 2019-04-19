@@ -46,7 +46,7 @@ class watermark():
             element = driver.find_element_by_id("jietu")
             locations = element.location
             sizes = element.size
-            rangle = (locations['x'], locations['y'], int(locations['x'] + sizes['width']), int(locations['y'] + sizes['height']))
+            rangle = (locations['x'], locations['y'], int(locations['x'] + sizes['width']), sizes['height'])
             driver.save_screenshot(path)  # 截图
             img = Image.open(path)
             jpg = img.crop(rangle) # 左上右下
