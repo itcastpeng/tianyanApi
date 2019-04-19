@@ -26,15 +26,15 @@ class watermark():
 
         # 绘图句柄
         posters_status = int(self.data.get('posters_status'))  # 水印类型
-        color = image_color_recognition(host_url) # 识别图片颜色 给出对应文字颜色
-        # color = (0, 0, 0)
+        print(self.img_path)
 
+        # color = (0, 0, 0)
         # 正能量海报水印
         if posters_status == 1:
             if 'linux' in sys.platform:  # 获取平台
                 base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
                 phantomjs_path = base_dir_path + '/phantomjs'
-                poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}color={}'.format(self.user_id, self.posters, color)
+                poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
             else:
                 base_dir_path = 'api/views_dir/tools'
                 phantomjs_path = base_dir_path + '/phantomjs.exe'
@@ -94,6 +94,7 @@ class watermark():
         else:
             img_url = self.img_path.split(host_url)[1]  # 切除域名
             image = Image.open(img_url).convert('RGBA')
+            color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
             image_draw = ImageDraw.Draw(image)
             text = str(self.name) + ' ' + str(self.phone)
 
