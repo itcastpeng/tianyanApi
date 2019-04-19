@@ -132,7 +132,7 @@ def wechat(request):
 
             # 事件类型
             # event = collection.getElementsByTagName("Event")[0].childNodes[0].data
-            event = collection.getElementsByTagName("Event")[0]
+            event = collection.getElementsByTagName("Event")
             print("event -->", event)
 
             # 扫描带参数的二维码
