@@ -3,6 +3,8 @@ import colorsys
 
 # 识别图片颜色
 def image_color_recognition(img_url):
+    if 'http://zhugeleida.zhugeyingxiao.com/tianyan/' in img_url:
+        img_url = img_url.replace('http://zhugeleida.zhugeyingxiao.com/tianyan/', '')
     image = Image.open(img_url).convert('RGBA')
     image.thumbnail((50, 50))
     max_score = 0
