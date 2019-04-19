@@ -133,10 +133,14 @@ def user_oper(request, oper_type, o_id):
         elif oper_type == "update_name":
             name = request.POST.get('name')
             if name:
-                name = base64_encryption.b64encode(name)
-                models.Userprofile.objects.filter(id=user_id).update(name=name)
-                response.code = 200
-                response.msg = "修改成功"
+                if len(name) <= 9:
+                    name = base64_encryption.b64encode(name)
+                    models.Userprofile.objects.filter(id=user_id).update(name=name)
+                    response.code = 200
+                    response.msg = "修改成功"
+                else:
+                    response.code = 301
+                    response.msg = '名字最大长度为8'
             else:
                 response.code = 301
                 response.msg = "姓名传参异常"
