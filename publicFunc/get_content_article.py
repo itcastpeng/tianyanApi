@@ -3,7 +3,7 @@ import requests, random, time, os, re, json
 from urllib.parse import unquote
 from bs4 import BeautifulSoup
 from publicFunc.base64_encryption import b64encode
-
+from publicFunc.replace_chinese_character import replace_chinese_character
 
 pcRequestHeader = [
     'Mozilla/5.0 (Windows NT 5.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2',
@@ -81,7 +81,9 @@ def get_article(article_url):
     title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
     summary = re.compile(r'var msg_desc = (.*);').findall(ret.text)[0].replace('"', '')  # 摘要
     cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
-    # print('title--> ', title)
+    if summary:
+        summary = replace_chinese_character(summary) # 替换中文符号
+
     ## 把封面图片下载到本地
     now_time = time.time()
     html = s.get(cover_url)
