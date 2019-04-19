@@ -22,6 +22,8 @@ def html_oper(request, oper_type):
         img_url = img_path.split(host_url)[1]  # 切除域名
         image = Image.open(img_url).convert('RGBA')
         color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
+        print('b64decode(user_obj.name)----------> ', b64decode(user_obj.name))
+        # color = (0,0,0)
         data = {
             'img_path': img_path,
             'name': b64decode(user_obj.name),
