@@ -131,37 +131,43 @@ def wechat(request):
             collection = DOMTree.documentElement
 
             # 事件类型
-            # event = collection.getElementsByTagName("Event")[0].childNodes[0].data
-            event = collection.getElementsByTagName("Event")
-            print("event -->", event)
+            msg_type = collection.getElementsByTagName("MsgType")[0].childNodes[0].data
 
-            # 扫描带参数的二维码
-            if event in ["subscribe", "SCAN"]:
-                # 用户的 openid
-                openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
+            # 关注/取关
+            if msg_type == 'event':
+                event = collection.getElementsByTagName("Event")[0].childNodes[0].data
+                # 扫描带参数的二维码
+                if event in ["subscribe", "SCAN"]:
+                    # 用户的 openid
+                    openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
 
-                # subscribe = 首次关注
-                # SCAN = 已关注
-                # 事件 Key 值
-                inviter_user_id = ''
-                if collection.getElementsByTagName("EventKey")[0].childNodes:
-                    event_key = collection.getElementsByTagName("EventKey")[0].childNodes[0].data
-                    if event == "subscribe":
-                        event_key = event_key.split("qrscene_")[-1]
-                    event_key = json.loads(event_key)
-                    inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
-                    print('event_key -->', event_key)
+                    # subscribe = 首次关注
+                    # SCAN = 已关注
+                    # 事件 Key 值
+                    inviter_user_id = ''
+                    if collection.getElementsByTagName("EventKey")[0].childNodes:
+                        event_key = collection.getElementsByTagName("EventKey")[0].childNodes[0].data
+                        if event == "subscribe":
+                            event_key = event_key.split("qrscene_")[-1]
+                        event_key = json.loads(event_key)
+                        inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
+                        print('event_key -->', event_key)
 
-                data = get_ent_info(inviter_user_id)
-                weichat_api_obj = WeChatApi(data)
-                ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                updateUserInfo(openid, inviter_user_id, ret_obj)
+                    data = get_ent_info(inviter_user_id)
+                    weichat_api_obj = WeChatApi(data)
+                    ret_obj = weichat_api_obj.get_user_info(openid=openid)
+                    updateUserInfo(openid, inviter_user_id, ret_obj)
 
-            # 取消关注
-            # elif event == "unsubscribe":
-            #     models.Userprofile.objects.filter(openid=openid).update(openid=None)
+                # 取消关注
+                elif event == "unsubscribe":
+                    print('-------------取关')
+                    # models.Userprofile.objects.filter(openid=openid).update(openid=None)
+                    # we_chat_public_send_msg_obj.sendTempMsg(post_data)
+            elif msg_type == 'text':
+                print('---------用户发送消息')
+                Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
 
-                # we_chat_public_send_msg_obj.sendTempMsg(post_data)
+
 
             return HttpResponse("")
 
