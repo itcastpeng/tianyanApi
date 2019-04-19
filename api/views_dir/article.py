@@ -91,7 +91,7 @@ def article(request):
                 q
             ).order_by(order_by)
 
-            print('q -->', q)
+            print('q -->', q, order_by)
 
             count = objs.count()
 
