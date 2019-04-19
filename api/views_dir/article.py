@@ -77,7 +77,7 @@ def article(request):
                 q.add(Q(create_user_id=user_id), Q.OR)
                 order_by = '-like_num'
 
-            elif classify_type and classify_type == 1 and len(classify_id_list) <= 0: # 推荐为空
+            elif classify_type and classify_type == 1 and len(classify_id_list) > 0: # 推荐为空
                 q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False), Q.AND) # 没有选择推荐的用户默认 推荐系统标签的
                 order_by = '-like_num'
 
