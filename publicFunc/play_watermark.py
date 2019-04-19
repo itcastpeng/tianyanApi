@@ -26,7 +26,6 @@ class watermark():
 
         # 绘图句柄
         posters_status = int(self.data.get('posters_status'))  # 水印类型
-        print(self.img_path)
 
         # color = (0, 0, 0)
         # 正能量海报水印
