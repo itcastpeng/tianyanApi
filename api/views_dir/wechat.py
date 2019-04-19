@@ -129,17 +129,16 @@ def wechat(request):
             # 使用minidom解析器打开 XML 文档
             DOMTree = xml.dom.minidom.parseString(body_text)
             collection = DOMTree.documentElement
-            print('collection -->', collection)
 
             # 事件类型
-            event = collection.getElementsByTagName("Event")[0].childNodes[0].data
+            # event = collection.getElementsByTagName("Event")[0].childNodes[0].data
+            event = collection.getElementsByTagName("Event")[0]
             print("event -->", event)
-
-            # 用户的 openid
-            openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
 
             # 扫描带参数的二维码
             if event in ["subscribe", "SCAN"]:
+                # 用户的 openid
+                openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
 
                 # subscribe = 首次关注
                 # SCAN = 已关注

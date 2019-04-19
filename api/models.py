@@ -81,6 +81,9 @@ class Userprofile(models.Model):
 
     enterprise = models.ForeignKey('Enterprise', verbose_name='企业', default=1)
 
+    # cumulative_amount = models.CharField(verbose_name='累计钱数', max_length=64, default=0)
+    # make_money = models.CharField(verbose_name='待提钱数', max_length=64, default=0)
+
 # 微商用户和团队关系表
 class UserprofileTeam(models.Model):
     user = models.ForeignKey('Userprofile', verbose_name="微商用户")
