@@ -191,6 +191,7 @@ def wechat_oper(request, oper_type):
         # 获取用于登录的微信二维码
         data = get_ent_info(user_id)
         weichat_api_obj = WeChatApi(data)
+        # 推广赚钱 生成二维码
         if oper_type == "generate_qrcode":
             qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
             print(qc_code_url)
