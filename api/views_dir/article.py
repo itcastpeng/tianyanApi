@@ -89,7 +89,6 @@ def article(request):
 
             objs = models.Article.objects.filter(
                 q,
-                id=1726
             ).order_by(order_by)
 
             print('q -->', q, order_by)
