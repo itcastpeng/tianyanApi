@@ -14,7 +14,7 @@ from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
 from django.db.models import Count
 from publicFunc.account import randon_str
-import re, os, json
+import re, os, json, sys
 from publicFunc.screenshots import screenshots
 
 
@@ -292,8 +292,11 @@ def user_oper(request, oper_type, o_id):
         # 推广赚钱 二维码截图
         elif oper_type == 'affiliate_screenshots':
             path = os.path.join('statics', 'poster_img', randon_str() + '.png')
-            # img_url = request.GET.get('img_url')
-            img_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/User/Promote_Page?user_id={}'.format(user_id)
+            if 'linux' in sys.platform:  # 获取平台
+                img_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/tuiguang?user_id={}'.format(user_id)
+            else:
+                img_url = 'http://127.0.0.1:8008/api/html_oper/tuiguang?user_id={}'.format(user_id)
+
             img_path = screenshots(img_url, path)
             response.code = 200
             response.msg = '生成成功'

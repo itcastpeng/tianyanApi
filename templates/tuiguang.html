@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>微商天眼-客户追踪神器</title>
+    <meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=0">
+    <style>
+        *{
+            margin: 0;
+            padding: 0;
+        }
+        .warp{
+            width: 375px;
+            height: 657px;
+            background: #1AAD19;
+            padding-top: 10px;
+        }
+        .container{
+            width: 90%;
+            padding: 2%;
+            height: 96%;
+            background: #1AAD19;
+            border: 2px solid #fff;
+            margin: 0 auto;
+            padding-top: 1%;
+        }
+        .content{
+            width: 100%;
+            margin-top: 1%;
+            height: 99%;
+            border: 1px solid #fff;
+            position: relative;
+        }
+        .user_box{
+            width: 100%;
+            height: 90px;
+            margin: 0 auto;
+            margin-top: 20px;
+            text-align: center;
+        }
+        .user_box img{
+            width: 64px;
+            height: 64px;
+            border-radius: 32px;
+        }
+        .user_box p{
+            font-size: 15px;
+            color: #fff;
+            letter-spacing: 1px;
+        }
+        .user_text{
+            width: 80%;
+            padding: 2% 2% 40% 2%;
+            text-align: left;
+            font-size: 20px;
+            line-height: 30px;
+            margin: 0 auto;
+            color: #fff;
+            margin-top: 10px;
+            margin-bottom: 10px;
+            background: url("../../statics/img/promote_eye.png") center bottom no-repeat;
+            background-size: 30%;
+            overflow: hidden;
+        }
+        .user_qrcode{
+            width: 92%;
+            position: absolute;
+            bottom: 0;
+            padding: 4%;
+        }
+        .user_qrcode_l{
+            width: 55%;
+            float: left;
+            overflow: hidden;
+            background: url("../../statics/img/promote_r.png") right bottom no-repeat;
+            background-size: 28px;
+        }
+        .user_qrcode_l h2{
+            font-size: 22px;
+            color: #fff;
+        }
+        .user_qrcode_l p{
+            font-size: 14px;
+            color: #fff;
+        }
+        .user_qrcode_r{
+            width: 40%;
+            float: right;
+            background: #fff;
+            overflow: hidden;
+        }
+        .user_qrcode_r img{
+            width: 100%;
+        }
+        .btn{
+            width: 80%;
+            padding: 2% 10% 2% 10%;
+            background: #fff;
+            position: fixed;
+            bottom: 0;
+        }
+        .btn_l{
+            font-size: 12px;
+            color: #666;
+            float: left;
+        }
+        .btn_r{
+            float: right;
+        }
+        .btn_r_l{
+            font-size: 14px;
+            padding: 0 8px 0 30px;
+            border-radius: 5px;
+            border: 1px solid #1AAD19;
+            background-color: #fff;
+            line-height: 30px;
+            text-align: right;
+            color: #1AAD19;
+            background: url("../statics/img/promote_btn_l.png") center left 5px no-repeat;
+            background-size: 22px;
+        }
+        .btn_r_r{
+            font-size: 14px;
+            padding: 0 8px 0 30px;
+            border-radius: 5px;
+            border: 1px solid #1AAD19;
+            background-color: #fff;
+            line-height: 30px;
+            text-align: right;
+            color: #1AAD19;
+            background: url("../statics/img/promote_btn_r.png") center left 5px no-repeat;
+            background-size: 22px;
+            margin-left: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="warp" id="jietu">
+        <div class="container">
+            <div class="content">
+                <div class="user_box">
+                    <img src="{{ data.user_set_avator }}" />
+                    <p>{{ data.user_name }}</p>
+                </div>
+                <div class="user_text">
+                    我正在使用「微商天眼」进行<br><strong>客户追踪、分享事业机会</strong><br>伙伴们一起来吧
+                </div>
+                <div class="user_qrcode">
+                    <div class="user_qrcode_l">
+                        <h2>客户追踪神器</h2>
+                        <p>关注微商天眼公众号</p>
+                    </div>
+                    <div class="user_qrcode_r">
+                        <img src="{{ data.qc_code_url }}" />
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
