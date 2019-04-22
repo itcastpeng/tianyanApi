@@ -195,3 +195,8 @@ print(base64.b64decode(string.encode('utf8')).decode('utf8'))
 # t = u'中国，中文，标点符号！你好？１２３４５＠＃【】+=-（）“'
 # t2 = t.translate(table)
 # print(t2 )
+
+p = [1]
+print(type(p))
+if type(p) == list:
+    print('-----')

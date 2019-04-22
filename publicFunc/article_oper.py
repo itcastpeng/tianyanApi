@@ -53,10 +53,9 @@ def add_article_public(data, classify_id=None):
         print('-------***不存在 创建文章*****-----')
         obj = models.Article.objects.create(**data)
         if classify_id:
-            try:
-                classify_id = eval(classify_id)
+            if type(classify_id) == list:
                 obj.classify = classify_id
-            except Exception:
+            else:
                 obj.classify = [classify_id]
 
             obj.save()
