@@ -35,7 +35,7 @@ class watermark():
         # 邀请函海报水印
         else:
             img_url = self.img_path
-            if 'api.zhugeyingxiao' in self.img_path:
+            if 'zhugeyingxiao.com/tianyan' in self.img_path:
                 img_url = self.img_path.split(host_url)[1]  # 切除域名
             image = Image.open(img_url).convert('RGBA')
             color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
