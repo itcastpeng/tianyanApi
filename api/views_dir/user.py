@@ -292,7 +292,8 @@ def user_oper(request, oper_type, o_id):
         # 推广赚钱 二维码截图
         elif oper_type == 'affiliate_screenshots':
             path = os.path.join('statics', 'poster_img', randon_str() + '.png')
-            img_url = request.GET.get('img_url')
+            # img_url = request.GET.get('img_url')
+            img_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/generate_qrcode?user_id={}'.format(user_id)
             img_path = screenshots(img_url, path)
             response.code = 200
             response.msg = '生成成功'
