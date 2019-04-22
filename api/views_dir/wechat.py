@@ -218,7 +218,7 @@ def wechat(request):
                     data = get_ent_info(user_obj.id)
                     weichat_api_obj = WeChatApi(data)
                     post_data = {
-                        "touser":"\"%s\"".format(openid),
+                        "touser":openid,
                         "msgtype": "text",
                         "text": {
                             # "url":'http://www.baidu.com',
@@ -226,7 +226,7 @@ def wechat(request):
                         }
                     }
 
-
+                    post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
                     print('post_data--------> ', post_data)
                     weichat_api_obj.news_service(post_data)
                     print('------------sha', share_url)
