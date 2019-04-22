@@ -10,8 +10,8 @@ def qiniu_get_token():
     token = q.upload_token(bucket_name)  # 可以指定key 图片名称
     return token
 
-
-def upload_qiniu(img_path, token):
+# 上传七牛云
+def update_qiniu(img_path, token):
     url = 'https://up-z1.qiniup.com/'
     data = {
         'token': token,
@@ -20,7 +20,8 @@ def upload_qiniu(img_path, token):
         'file': open(img_path, 'rb')
     }
     ret = requests.post(url, data=data, files=files)
-    os.remove(img_path)  # 删除本地图片
+
+    if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
+        os.remove(img_path)  # 删除本地图片
     img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')
     return img_path
-

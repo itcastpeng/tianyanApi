@@ -4,6 +4,8 @@ from urllib.parse import unquote
 from bs4 import BeautifulSoup
 from publicFunc.base64_encryption import b64encode
 from publicFunc.replace_chinese_character import replace_chinese_character
+from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu
+from tianyanApi import settings
 
 pcRequestHeader = [
     'Mozilla/5.0 (Windows NT 5.1; rv:6.0.2) Gecko/20100101 Firefox/6.0.2',
@@ -69,9 +71,11 @@ def eliminate_label(i):
     return flag
 
 
+
 # 放入微信文章 获取全部内容
 def get_article(article_url):
-    # print('article_url---> ', article_url   )
+    token = qiniu_get_token() # 获取七牛云token
+
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
     ret.encoding = 'utf-8'
@@ -91,12 +95,10 @@ def get_article(article_url):
         cover_name = "/cover_%s.gif" % (now_time)
     else:
         cover_name = "/cover_%s.jpg" % (now_time)
-
     cover_url = os.path.join('statics', 'img') + cover_name
     with open(cover_url, 'wb') as file:
         file.write(html.content)
-    # cover_url = '/statics/img'+ cover_name
-    # print('封面 cover_url-----> ', cover_url)
+    cover_url = update_qiniu(cover_url, token)
 
     # 获取所有样式
     style = ""
@@ -125,7 +127,8 @@ def get_article(article_url):
             file_dir = os.path.join('statics', 'img') + img_name
             with open(file_dir, 'wb') as file:
                 file.write(html.content)
-            img_tag.attrs['data-src'] = URL + file_dir
+            cover_url = update_qiniu(file_dir, token)
+            img_tag.attrs['data-src'] = cover_url
             # img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
 
     # print('body--->', body)
@@ -174,6 +177,9 @@ def get_article(article_url):
 
 
 
+if __name__ == '__main__':
+    url = 'https://mp.weixin.qq.com/s/m5PqgqF7neEUJ_6ROeJQbQ'
+    get_article(url)
 
 
 

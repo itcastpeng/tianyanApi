@@ -2,7 +2,7 @@ import os, sys
 from selenium import webdriver
 from tianyanApi import settings
 from PIL import Image,ImageFont,ImageDraw
-from publicFunc.qiniu_oper import qiniu_get_token, upload_qiniu
+from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu
 
 
 # 截图
@@ -15,7 +15,7 @@ def screenshots(poster_url, path):
 
     else:
         base_dir_path = 'api/views_dir/tools'
-        base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
+        # base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
         phantomjs_path = base_dir_path + '/phantomjs.exe'
     print('phantomjs_path----------> ', phantomjs_path)
 
@@ -34,7 +34,7 @@ def screenshots(poster_url, path):
     jpg.save(path)
     driver.quit()
     token = qiniu_get_token()  # 获取七牛云token
-    img_path = upload_qiniu(path, token)  # 上传七牛云
+    img_path = update_qiniu(path, token)  # 上传七牛云
     return img_path
 
 if __name__ == '__main__':
