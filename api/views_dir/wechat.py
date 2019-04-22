@@ -155,7 +155,7 @@ def wechat(request):
                         inviter_user_id = event_key.get('inviter_user_id')      # 邀请人id
                         print('event_key -->', event_key)
 
-                    data = get_ent_info(inviter_user_id)
+                    data = get_ent_info(inviter_user_id) # 获取该用户 token appid等
                     weichat_api_obj = WeChatApi(data)
                     ret_obj = weichat_api_obj.get_user_info(openid=openid)
                     updateUserInfo(openid, inviter_user_id, ret_obj)
@@ -215,6 +215,17 @@ def wechat(request):
                         timestamp,
                         user_obj.id,
                     )
+                    data = get_ent_info(user_obj.id)
+                    weichat_api_obj = WeChatApi(data)
+                    post_data = {
+                        "touser":openid,
+                        "msgtype": "text",
+                        "text": {
+                            "url":'http://www.baidu.com',
+                            "content":'百度'
+                        }
+                    }
+                    weichat_api_obj.news_service(post_data)
                     print('------------sha', share_url)
 
             return HttpResponse("")

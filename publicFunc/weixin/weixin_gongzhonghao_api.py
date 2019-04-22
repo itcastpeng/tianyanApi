@@ -395,6 +395,16 @@ class WeChatApi(WeixinApiPublic):
         }
 
         return data
+
+
+    # 客服消息
+    def  news_service(self, data):
+        url = 'https://api.weixin.qq.com/customservice/kfaccount/add?access_token={}'.format(self.access_token)
+        ret = requests.post(url, data=data)
+        print('ret.text--客服消息--------->', ret.text)
+
+
+
 # if __name__ == '__main__':
 #
 #     obj = WeChatApi("wechat_data.json")
