@@ -109,11 +109,22 @@ def weixin_pay(request, oper_type, o_id):
                 # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增钱
                 renewal_objs = models.renewal_log.objects.filter(create_user_id=pay_user_id)
                 inviter_id = user_objs[0].inviter_id
+
                 if renewal_objs.count() == 1 and inviter_id:
+                    price = renewal_objs[0].price  #充值钱数
+                    cumulative_amount = int(price * 0.3)  # 一级分享人应加钱数  30%
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
-                    inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + 50  # 累计钱数 + 50
-                    inviter_id_user_obj.make_money = F('make_money') + 50                   # 待提钱数 + 50
+                    inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
+                    inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
                     inviter_id_user_obj.save()
+
+                    two_inviter_id = inviter_id_user_obj.inviter # 二级分享人  15%
+                    if two_inviter_id:
+                        cumulative_amount = int(price * 0.15)  # 二级分享人应加钱数
+                        two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
+                        two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
+                        two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
+                        two_user_obj.save()
 
             else:
                 objs = models.renewal_log.objects.filter(pay_order_no=result_data.get('out_trade_no'))
