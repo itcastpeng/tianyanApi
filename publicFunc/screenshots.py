@@ -8,6 +8,7 @@ from publicFunc.qiniu_oper import qiniu_get_token, upload_qiniu
 # 截图
 
 def screenshots(poster_url, path):
+    print('--------------------------截图===========截图------>', poster_url)
     if 'linux' in sys.platform:  # 获取平台
         base_dir_path = os.path.join(settings.BASE_DIR, 'api', 'views_dir', 'tools')
         phantomjs_path = base_dir_path + '/phantomjs'
