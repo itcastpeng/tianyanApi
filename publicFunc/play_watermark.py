@@ -34,9 +34,13 @@ class watermark():
 
         # 邀请函海报水印
         else:
-            img_url = self.img_path.split(host_url)[1]  # 切除域名
+            img_url = self.img_path
+            if 'api.zhugeyingxiao' in self.img_path:
+                img_url = self.img_path.split(host_url)[1]  # 切除域名
             image = Image.open(img_url).convert('RGBA')
             color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
+
+            image = Image.open(img_url).convert('RGBA')
             image_draw = ImageDraw.Draw(image)
             text = str(self.name) + ' ' + str(self.phone)
 
@@ -46,8 +50,9 @@ class watermark():
             time = self.data.get('time')
             place = self.data.get('place')
 
-
             text = '详询:' + text
+            # zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
+            # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
 
             zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
             font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
@@ -71,7 +76,6 @@ class watermark():
             image_draw.text((place_width, img_hight-80), place, font=font, fill=color)
             image_draw.text((text_width, img_hight-40), text, font=font, fill=color)
             image.save(path)
-
         return path
 
 if __name__ == '__main__':

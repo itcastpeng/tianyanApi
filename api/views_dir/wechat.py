@@ -133,7 +133,7 @@ def wechat(request):
             # 事件类型
             msg_type = collection.getElementsByTagName("MsgType")[0].childNodes[0].data
 
-            # 关注/取关
+            # 事件类型 关注/取关
             if msg_type == 'event':
                 event = collection.getElementsByTagName("Event")[0].childNodes[0].data
                 # 扫描带参数的二维码
