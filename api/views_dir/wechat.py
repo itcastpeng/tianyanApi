@@ -221,8 +221,8 @@ def wechat(request):
                         "touser":openid,
                         "msgtype": "text",
                         "text": {
-                            "url":'http://www.baidu.com',
-                            "content":'百度'
+                            # "content":'百度'
+                            "content":'<a href="http://www.baidu.com">百度</a>'
                         }
                     }
 
