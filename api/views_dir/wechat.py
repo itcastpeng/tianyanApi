@@ -158,6 +158,29 @@ def wechat(request):
                     ret_obj = weichat_api_obj.get_user_info(openid=openid)
                     updateUserInfo(openid, inviter_user_id, ret_obj)
 
+                    if event == 'subscribe':  # 首次关注
+                        nickname = ret_obj.get('nickname')  # 关注人名称
+                        post_data = {
+                            "touser": "o7Xw_0YmQrxqcYsRhFR2y7yQPBMU",
+                            "template_id": "REblvLGT0dVxwzyrp28mBaXKF6XnHhP2_b7hXjUyI2A",
+                            "url": "http://wenda.zhugeyingxiao.com/",
+                            "data": {
+                                "first": {
+                                    "value": "问答任务异常！",
+                                    "color": "#173177"
+                                },
+                                "keyword2": {
+                                    "value": datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S"),
+                                    "color": "#173177"
+                                },
+                                "remark": {
+                                    "value": "问题:嘻嘻嘻\n答案:嘻嘻嘻",
+                                    "color": "#173177"
+                                }
+                            }
+                        }
+                        # weichat_api_obj.sendTempMsg(post_data)
+
                 # 取消关注
                 elif event == "unsubscribe":
                     print('-------------取关')
