@@ -257,6 +257,7 @@ def user_oper(request, oper_type, o_id):
                 isSuccess=1
             ).values(
                 'create_user__name'
+                'create_user__set_avator'
             ).distinct()
             response_data['number_clinch_count'] = number_clinch_deal_objs.count()  # 成交人数
 
@@ -264,6 +265,7 @@ def user_oper(request, oper_type, o_id):
                 invite_number_list = []
                 for invite_number_obj in invite_objs:
                     invite_number_list.append({
+                        'create_user__set_avator': invite_number_obj.set_avator,
                         'name':base64_encryption.b64decode(invite_number_obj.name)
                     })
                 response_data['invite_number_list'] = invite_number_list
@@ -272,6 +274,7 @@ def user_oper(request, oper_type, o_id):
                 number_clinch_deal_list = []
                 for number_clinch_deal_obj in number_clinch_deal_objs:
                     number_clinch_deal_list.append({
+                        'create_user__set_avator': number_clinch_deal_obj.get('create_user__set_avator'),
                         'name': base64_encryption.b64decode(number_clinch_deal_obj.get('create_user__name')),
                     })
                 response_data['number_clinch_deal_list'] = number_clinch_deal_list
