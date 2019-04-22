@@ -15,8 +15,8 @@ from publicFunc.weixin.weixin_gongzhonghao_api import checkSignature
 from publicFunc.article_oper import get_ent_info
 from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
-import json, xml.dom.minidom, datetime
-
+from publicFunc.account import str_encrypt
+import json, xml.dom.minidom, datetime, time
 
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
@@ -135,14 +135,14 @@ def wechat(request):
             # 事件类型
             msg_type = collection.getElementsByTagName("MsgType")[0].childNodes[0].data
 
+            # 用户的 openid
+            openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
+
             # 事件类型 关注/取关
             if msg_type == 'event':
                 event = collection.getElementsByTagName("Event")[0].childNodes[0].data
                 # 扫描带参数的二维码
                 if event in ["subscribe", "SCAN"]:
-                    # 用户的 openid
-                    openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
-
                     # subscribe = 首次关注
                     # SCAN = 已关注
                     # 事件 Key 值
@@ -168,7 +168,7 @@ def wechat(request):
                             # "url": "http://wenda.zhugeyingxiao.com/",
                             "data": {
                                 "first": {
-                                    "value": "欢迎关注微商天眼公众号,!",
+                                    "value": "      欢迎关注微商天眼公众号!",
                                     "color": "#173177"
                                 },
                                 "keyword1": {
@@ -180,7 +180,7 @@ def wechat(request):
                                     "color": "#173177"
                                 },
                                 "remark": {
-                                    "value": "感谢使用,请注意账号安全!\n 进入天眼请点击最下方↓↓↓",
+                                    "value": "    感谢使用,请注意账号安全!\n    进入天眼请点击最下方↓↓↓",
                                     "color": "#173177"
                                 }
                             }
@@ -192,14 +192,31 @@ def wechat(request):
                     print('-------------取关')
                     # models.Userprofile.objects.filter(openid=openid).update(openid=None)
                     # we_chat_public_send_msg_obj.sendTempMsg(post_data)
+
             elif msg_type == 'text':
                 print('---------用户发送消息')
                 Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
-                print('Content-------------> ', Content)
-                # data_dict = get_article(article_url)
-                # id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
-                url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/forwarding_article?article_id={}&user_id={}'
-                print('url-----> ', url)
+                user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
+                if 'http' in Content:  # 获取文章内容 返回文章
+                    print('Content=-===========》', Content)
+                    data_dict = get_article(Content)    # 获取文章
+                    id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
+                    url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/forwarding_article?article_id={}&user_id={}'.format(
+                        id,
+                        user_obj.id
+                    )
+                    print('url-----> ', url)
+
+                else: # 其他文字
+                    timestamp = int(time.time())
+                    rand_str = str_encrypt(timestamp + user_obj.token)
+                    share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=3&rand_str={}&timestamp={}&user_id={}'.format(
+                        rand_str,
+                        timestamp,
+                        user_obj.id,
+                    )
+                    print('------------sha', share_url)
+
             return HttpResponse("")
 
     else:
