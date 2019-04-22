@@ -218,7 +218,7 @@ def wechat(request):
                     data = get_ent_info(user_obj.id)
                     weichat_api_obj = WeChatApi(data)
                     post_data = {
-                        "touser":"".format(openid),
+                        "touser":"%s" % openid,
                         "msgtype": "text",
                         "text": {
                             # "url":'http://www.baidu.com',
