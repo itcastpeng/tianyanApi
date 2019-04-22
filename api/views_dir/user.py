@@ -256,7 +256,7 @@ def user_oper(request, oper_type, o_id):
                 create_user_id__in=invite_friend_list,
                 isSuccess=1
             ).values(
-                'create_user__name'
+                'create_user__name',
                 'create_user__set_avator'
             ).distinct()
             response_data['number_clinch_count'] = number_clinch_deal_objs.count()  # 成交人数
