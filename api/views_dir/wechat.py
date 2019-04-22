@@ -1,9 +1,6 @@
 from django.shortcuts import HttpResponse
 from django.http import JsonResponse
 from api import models
-import datetime
-import json
-import xml.dom.minidom
 from publicFunc.account import get_token
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc import Response
@@ -16,6 +13,11 @@ from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
 from publicFunc.weixin.weixin_gongzhonghao_api import checkSignature
 from publicFunc.article_oper import get_ent_info
+from publicFunc.get_content_article import get_article
+from publicFunc.article_oper import add_article_public
+import json, xml.dom.minidom, datetime
+
+
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
     """
@@ -193,9 +195,11 @@ def wechat(request):
             elif msg_type == 'text':
                 print('---------用户发送消息')
                 Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
-
-
-
+                print('Content-------------> ', Content)
+                # data_dict = get_article(article_url)
+                # id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
+                url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/forwarding_article?article_id={}&user_id={}'
+                print('url-----> ', url)
             return HttpResponse("")
 
     else:
