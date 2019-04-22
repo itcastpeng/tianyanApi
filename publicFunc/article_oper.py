@@ -41,7 +41,7 @@ def give_like(article_id, customer_id=None, user_id=None):
 
 # 创建文章
 def add_article_public(data, classify_id=None):
-    print('data--------------data-------创建文章-----》 ', data.get('create_user_id'),  data.get('title'), classify_id)
+    print('data--------------data-------创建文章-----》 ', data.get('create_user_id'),  data.get('title'), classify_id, type(classify_id))
     article_objs = models.Article.objects.filter(
         title=data.get('title'),
         create_user_id=data.get('create_user_id'),
@@ -54,7 +54,7 @@ def add_article_public(data, classify_id=None):
         obj = models.Article.objects.create(**data)
         if classify_id:
             try:
-                classify_id = json.loads(classify_id)
+                classify_id = eval(classify_id)
                 obj.classify = classify_id
             except Exception:
                 obj.classify = [classify_id]
