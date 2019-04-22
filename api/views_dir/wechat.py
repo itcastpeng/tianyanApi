@@ -208,7 +208,7 @@ def wechat(request):
                     print('url-----> ', url)
 
                 else: # 其他文字
-                    timestamp = int(time.time())
+                    timestamp = str(int(time.time()))
                     rand_str = str_encrypt(timestamp + user_obj.token)
                     share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=3&rand_str={}&timestamp={}&user_id={}'.format(
                         rand_str,
