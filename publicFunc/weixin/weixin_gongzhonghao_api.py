@@ -98,6 +98,7 @@ class WeChatApi(WeixinApiPublic):
         #     f.write(json.dumps(data))
         objs = models.Enterprise.objects.filter(id=self.id)
         objs.update(**data)
+        self.access_token = objs[0].access_token
         print("\n" * 3)
 
 
