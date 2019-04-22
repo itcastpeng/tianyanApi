@@ -6,14 +6,18 @@ from django.http import JsonResponse
 from publicFunc.base64_encryption import b64decode
 from publicFunc.host import host_url
 from PIL import Image,ImageFont,ImageDraw
-
+from api.views_dir.wechat import wechat_oper
 from publicFunc.image_color_recognition import image_color_recognition
+from publicFunc.article_oper import get_ent_info
+from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
+import datetime
+
 
 def html_oper(request, oper_type):
     response = Response.ResponseObj()
+    user_id = request.GET.get('user_id')  # 用户ID
     if oper_type == 'zhengnengliang':
         posters = request.GET.get('posters')  # 海报ID
-        user_id = request.GET.get('user_id')  # 用户ID
         posters_objs = models.Posters.objects.get(id=posters)
         img_path = posters_objs.posters_url
 
@@ -33,7 +37,21 @@ def html_oper(request, oper_type):
         }
         print('data====----> ', data)
         return render(request, 'zhengnengliang.html', locals())
+    elif oper_type == 'tuiguang':
+        data = get_ent_info(user_id)
+        weichat_api_obj = WeChatApi(data)
+        qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
+        print(qc_code_url)
 
+        expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
+        data = {
+            'qc_code_url': qc_code_url,
+            'expire_date': expire_date,
+            'user_name': data.get('user_name'),  # 用户名称
+            'user_set_avator': data.get('user_set_avator'),  # 头像
+        }
+
+        return render(request, 'tuiguang.html', locals())
 
 
     return JsonResponse(response.__dict__)

@@ -2,7 +2,7 @@ from django.db.models import Q, F
 from api import models
 from django.http import JsonResponse
 from publicFunc import Response
-
+from publicFunc.base64_encryption import b64decode
 
 # 文章点赞增加/减少 数量
 def give_like(article_id, customer_id=None, user_id=None):
@@ -75,6 +75,8 @@ def get_ent_info(user_id):
         'APPSECRET': ent_obj.appsecret,
         'access_token': ent_obj.access_token,
         'create_datetime': ent_obj.create_datetime,
+        'user_name': b64decode(user_obj.name),
+        'user_set_avator': user_obj.set_avator,
     }
     return data
 

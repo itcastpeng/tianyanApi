@@ -192,19 +192,11 @@ def wechat_oper(request, oper_type):
         data = get_ent_info(user_id)
         weichat_api_obj = WeChatApi(data)
         # 推广赚钱 生成二维码
-        if oper_type == "generate_qrcode":
-            qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id})
-            print(qc_code_url)
+        # if oper_type == "generate_qrcode":
 
-            expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
-            response.code = 200
-            response.data = {
-                'qc_code_url': qc_code_url,
-                'expire_date': expire_date
-            }
 
         # 邀请成员页面展示信息
-        elif oper_type == "invite_members":
+        if oper_type == "invite_members":
             print('request.GET=====invite_members------------invite_members------------invite_members====', request.GET)
             team_id = request.GET.get('team_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
