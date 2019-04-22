@@ -161,12 +161,16 @@ def wechat(request):
                     if event == 'subscribe':  # 首次关注
                         nickname = ret_obj.get('nickname')  # 关注人名称
                         post_data = {
-                            "touser": "o7Xw_0YmQrxqcYsRhFR2y7yQPBMU",
-                            "template_id": "REblvLGT0dVxwzyrp28mBaXKF6XnHhP2_b7hXjUyI2A",
-                            "url": "http://wenda.zhugeyingxiao.com/",
+                            "touser": openid,
+                            "template_id": "gwB4lxYzpWhtyFSFs3Pj0ZrMweHY0-GCTvS4b0ZeTmI",  # 登录提醒模板
+                            # "url": "http://wenda.zhugeyingxiao.com/",
                             "data": {
                                 "first": {
-                                    "value": "问答任务异常！",
+                                    "value": "欢迎关注微商天眼公众号,进入天眼请点击最下方↓↓↓!",
+                                    "color": "#173177"
+                                },
+                                "keyword1": {
+                                    "value": nickname,
                                     "color": "#173177"
                                 },
                                 "keyword2": {
@@ -174,12 +178,12 @@ def wechat(request):
                                     "color": "#173177"
                                 },
                                 "remark": {
-                                    "value": "问题:嘻嘻嘻\n答案:嘻嘻嘻",
+                                    "value": "感谢使用,请注意账号安全!",
                                     "color": "#173177"
                                 }
                             }
                         }
-                        # weichat_api_obj.sendTempMsg(post_data)
+                        weichat_api_obj.sendTempMsg(post_data)
 
                 # 取消关注
                 elif event == "unsubscribe":
