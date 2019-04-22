@@ -3,7 +3,7 @@ from api import models
 from django.http import JsonResponse
 from publicFunc import Response
 from publicFunc.base64_encryption import b64decode
-
+import json
 # 文章点赞增加/减少 数量
 def give_like(article_id, customer_id=None, user_id=None):
     response = Response.ResponseObj()
@@ -53,10 +53,12 @@ def add_article_public(data, classify_id=None):
         print('-------***不存在 创建文章*****-----')
         obj = models.Article.objects.create(**data)
         if classify_id:
-            if type(classify_id) == 'list':
+            try:
+                classify_id = json.loads(classify_id)
                 obj.classify = classify_id
-            else:
+            except Exception:
                 obj.classify = [classify_id]
+
             obj.save()
         id = obj.id
     else:
