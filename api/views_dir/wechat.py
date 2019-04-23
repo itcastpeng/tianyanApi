@@ -209,7 +209,7 @@ def wechat(request):
 
                 else: # 收到其他文字 发送随机五篇文章
                     timestamp = str(int(time.time()))
-                    rand_str = str_encrypt(timestamp + user_obj.token),
+                    rand_str = str_encrypt(timestamp + user_obj.token)
                     share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=5&rand_str={}&timestamp={}&user_id={}'.format(
                         rand_str,
                         timestamp,
