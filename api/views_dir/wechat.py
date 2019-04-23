@@ -168,7 +168,7 @@ def wechat(request):
                             # "url": "http://wenda.zhugeyingxiao.com/",
                             "data": {
                                 "first": {
-                                    "value": "      欢迎关注微商天眼公众号!",
+                                    "value": "欢迎关注微商天眼公众号!",
                                     "color": "#173177"
                                 },
                                 "keyword1": {
@@ -180,7 +180,7 @@ def wechat(request):
                                     "color": "#173177"
                                 },
                                 "remark": {
-                                    "value": "    感谢使用,请注意账号安全!\n    进入天眼请点击最下方↓↓↓",
+                                    "value": "感谢使用,请注意账号安全!\n进入天眼请点击最下方↓↓↓",
                                     "color": "#173177"
                                 }
                             }
