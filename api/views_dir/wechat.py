@@ -232,8 +232,21 @@ def wechat(request):
                         }
                     }
                     weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')) # 发送客服消息
-                    ret = requests.get(Content)
-                    status_code = ret.status_code
+                    try:
+                        ret = requests.get(Content)
+                        status_code = ret.status_code
+                    except Exception:
+                        post_data = {
+                            "touser": openid,
+                            "msgtype": "text",
+                            "text": {
+                                "content": '链接请求不到了······{}'.format(b64decode('4p2V4p2X'))
+                            }
+                        }
+                        weichat_api_obj.news_service(
+                            bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
+                        return HttpResponse('')
+
                     if status_code != 200:
                         post_data = {
                             "touser": openid,
