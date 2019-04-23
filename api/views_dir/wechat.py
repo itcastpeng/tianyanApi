@@ -140,6 +140,9 @@ def wechat(request):
             # 用户的 openid
             openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
 
+            # 发送消息时候时间戳
+            CreateTime = collection.getElementsByTagName("CreateTime")[0].childNodes[0].data
+
             # 事件类型 关注/取关
             if msg_type == 'event':
                 event = collection.getElementsByTagName("Event")[0].childNodes[0].data
@@ -198,13 +201,26 @@ def wechat(request):
             # 客户发送消息
             elif msg_type == 'text':
                 print('---------用户发送消息')
-                Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
                 user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
                 user_id = user_obj.id
                 token = user_obj.token
                 data = get_ent_info(user_id)  # 获取该用户appid等
                 weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
 
+                # 判断该人在同一时刻 发送多条只接受一条
+                send_msg_duplicate_obj = models.send_msg_duplicate.objects.filter(
+                    user_id=user_id,
+                    create_date_time=CreateTime
+                )
+                if not send_msg_duplicate_obj:
+                    models.send_msg_duplicate.objects.create(
+                        user_id=user_id,
+                        create_date_time=CreateTime
+                    )
+                else:
+                    return HttpResponse('')
+
+                Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
                 if 'http' in Content:  # 获取文章内容 返回文章
                     print('Content=-===========》', Content)
                     # 判断 链接是否正常
