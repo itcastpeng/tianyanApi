@@ -218,6 +218,7 @@ def wechat(request):
                     ret = requests.get(share_url)
                     ret.encoding = 'utf8'
                     ret_json = ret.json().get('data')
+                    print('ret_json--------> ', ret_json)
                     data = get_ent_info(user_obj.id)  # 获取该用户appid等
                     weichat_api_obj = WeChatApi(data) # 实例化公众号操作
                     content = ''
