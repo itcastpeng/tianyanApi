@@ -264,7 +264,7 @@ def wechat(request):
                                 "touser": openid,
                                 "msgtype": "text",
                                 "text": {
-                                    "content": '这个链接没有文章{}--{}'.format(b64decode('4p2X'), b64decode('7aC97bil'))
+                                    "content": '这个链接没有文章{}'.format(b64decode('4p2X'))
                                 }
                             }
                             weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息

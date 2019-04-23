@@ -180,51 +180,57 @@ from urllib.parse import unquote
 
 
 
-ret_data = {
-    "note":{
-        "title":"文章标题",
-        "cover_img":"文章封面"
-    },
-    "msg":"查询成功",
-    "data":{
-        "ret_data":[
-            {
-                "summary":"4oCL572R5LiK55qE5Z+L57q/5a+55q+U5Zu+5pWI5p6c5aW95Yiw5b+D5Yqo77yM5Yiw5bqV6IO95LiN6IO95YGa5ZGi77yf",
-                "id":1285,
-                "cover_img":"statics/img/cover_1555035227.7503235.jpg",
-                "title":"医美经|揭开线雕的秘密"
-            },
-            {
-                "summary":"6ZiF6K+75pys5paH5YmN77yM6K+35oKo5YWI54K55Ye75LiK6Z2i55qE6JOd6Imy5a2X5L2T4oCc6K+05oOF5oSf5LqL4oCd77yM5YaN54K55Ye74oCc5YWz5rOo4oCd77yM6L+Z5qC35oKo5bCx5Y+v5Lul57un57ut5YWN6LS55pS25Yiw5pyA5paw5paH56ug5LqG44CC5q+P5aSp6YO9",
-                "id":1541,
-                "cover_img":"statics/img/cover_1555293009.808119.jpg",
-                "title":"情感故事：算了吧！放弃这段你自己所谓的“情”吧！"
-            },
-            {
-                "summary":"44CK56ys5LqU5Lq65qC844CL5pys5ZGo5pu05paw6aKE6KeI",
-                "id":1030,
-                "cover_img":"statics/img/cover_1555032853.8592942.jpg",
-                "title":"【新情报】“深渊的呼唤”主题时装终于要和大家见面啦"
-            }
-        ],
-        "count":3
-    },
-    "code":200
-}
+# ret_data = {
+#     "note":{
+#         "title":"文章标题",
+#         "cover_img":"文章封面"
+#     },
+#     "msg":"查询成功",
+#     "data":{
+#         "ret_data":[
+#             {
+#                 "summary":"4oCL572R5LiK55qE5Z+L57q/5a+55q+U5Zu+5pWI5p6c5aW95Yiw5b+D5Yqo77yM5Yiw5bqV6IO95LiN6IO95YGa5ZGi77yf",
+#                 "id":1285,
+#                 "cover_img":"statics/img/cover_1555035227.7503235.jpg",
+#                 "title":"医美经|揭开线雕的秘密"
+#             },
+#             {
+#                 "summary":"6ZiF6K+75pys5paH5YmN77yM6K+35oKo5YWI54K55Ye75LiK6Z2i55qE6JOd6Imy5a2X5L2T4oCc6K+05oOF5oSf5LqL4oCd77yM5YaN54K55Ye74oCc5YWz5rOo4oCd77yM6L+Z5qC35oKo5bCx5Y+v5Lul57un57ut5YWN6LS55pS25Yiw5pyA5paw5paH56ug5LqG44CC5q+P5aSp6YO9",
+#                 "id":1541,
+#                 "cover_img":"statics/img/cover_1555293009.808119.jpg",
+#                 "title":"情感故事：算了吧！放弃这段你自己所谓的“情”吧！"
+#             },
+#             {
+#                 "summary":"44CK56ys5LqU5Lq65qC844CL5pys5ZGo5pu05paw6aKE6KeI",
+#                 "id":1030,
+#                 "cover_img":"statics/img/cover_1555032853.8592942.jpg",
+#                 "title":"【新情报】“深渊的呼唤”主题时装终于要和大家见面啦"
+#             }
+#         ],
+#         "count":3
+#     },
+#     "code":200
+# }
+#
+# ret_json = ret_data.get('data')
+# for i in ret_json.get('ret_data'):
+#     print(i)
+# print(ret_json)
+#
 
-ret_json = ret_data.get('data')
-for i in ret_json.get('ret_data'):
-    print(i)
-print(ret_json)
 
 
+string = '7aC97bi2'
 
 
-string = '4p6h'
+print(base64.b16decode(string))
+
+
 print(base64.b64decode(string.encode('utf8')).decode('utf8'))
 
 
-
+# print(b64decode('4p2X'), )
+# b64decode('7aC97bil')
 
 
 
