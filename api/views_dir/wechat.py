@@ -212,12 +212,12 @@ def wechat(request):
                         "touser": openid,
                         "msgtype": "text",
                         "text": {
-                            "content": '正在解码请稍等······'
+                            "content": '解码中,请稍等······'
                         }
                     }
                     weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')) # 发送客服消息
-                    data_dict = get_article(Content)        # 获取文章
-                    status_code = data_dict.get('status_code') # 请求文章返回的状态码
+                    ret = requests.get(Content)
+                    status_code = ret.status_code
                     if status_code != 200:
                         post_data = {
                             "touser": openid,
@@ -228,6 +228,7 @@ def wechat(request):
                         }
 
                     else:
+                        data_dict = get_article(Content)        # 获取文章
                         title = data_dict.get('title')
                         article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
 
