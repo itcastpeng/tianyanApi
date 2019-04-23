@@ -220,7 +220,7 @@ def wechat(request):
                             "articles": [
                              {
                                  "title":data_dict.get('title'),
-                                 "description":data_dict.get('summary'),
+                                 "description":b64decode(data_dict.get('summary')),
                                  "url":url,
                                  "picurl":data_dict.get('cover_img')
                              }
