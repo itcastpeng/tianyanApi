@@ -79,6 +79,7 @@ def get_article(article_url):
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
     ret.encoding = 'utf-8'
+    status_code = ret.status_code
     s = requests.session()
 
     soup = BeautifulSoup(ret.text, 'lxml')
@@ -171,7 +172,8 @@ def get_article(article_url):
         'summary':b64encode(summary),
         'cover_img':cover_url,
         'content': json.dumps(data_list),
-        'style': style_path
+        'style': style_path,
+        'status_code': status_code,
     }
     return data
 

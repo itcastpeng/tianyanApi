@@ -202,45 +202,67 @@ def wechat(request):
                 user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
                 user_id = user_obj.id
                 token = user_obj.token
+                data = get_ent_info(user_id)  # 获取该用户appid等
+                weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
 
                 if 'http' in Content:  # 获取文章内容 返回文章
                     print('Content=-===========》', Content)
-                    data_dict = get_article(Content)        # 获取文章
-                    title = data_dict.get('title')
-                    article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
-
-                    if not article_objs:  # 判断数据库是否有 该文章
-                        summary = data_dict.get('summary')              # 摘要
-                        data_dict['create_user_id'] = user_id           # 增加创建人
-                        id = add_article_public(data_dict, 39)          # 创建文章 第二个参数为 classify_id 默认为其他
-                        cover_img = data_dict.get('cover_img')          # 封面
-
-                    else:
-                        article_obj = article_objs[0]
-                        id = article_obj.id
-                        summary = article_obj.summary
-                        cover_img = article_obj.cover_img
-
-                    url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
-                        id,
-                        token,
-                        user_id
-                    )
-
+                    # 判断 链接是否正常
                     post_data = {
-                        "touser":openid,
-                        "msgtype":"news", # 图文消息 图文消息条数限制在1条以内，注意，如果图文数超过1，则将会返回错误码45008。
-                        "news":{
-                            "articles": [
-                             {
-                                 "title":title,
-                                 "description":b64decode(summary),
-                                 "url":url,
-                                 "picurl":cover_img
-                             }
-                             ]
+                        "touser": openid,
+                        "msgtype": "text",
+                        "text": {
+                            "content": '正在解码请稍等······'
                         }
                     }
+                    weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')) # 发送客服消息
+                    data_dict = get_article(Content)        # 获取文章
+                    status_code = data_dict.get('status_code') # 请求文章返回的状态码
+                    if status_code != 200:
+                        post_data = {
+                            "touser": openid,
+                            "msgtype": "text",
+                            "text": {
+                                "content": '该链接存在异常请求状态码>{}'.format(status_code)
+                            }
+                        }
+
+                    else:
+                        title = data_dict.get('title')
+                        article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
+
+                        if not article_objs:  # 判断数据库是否有 该文章
+                            summary = data_dict.get('summary')              # 摘要
+                            data_dict['create_user_id'] = user_id           # 增加创建人
+                            id = add_article_public(data_dict, 39)          # 创建文章 第二个参数为 classify_id 默认为其他
+                            cover_img = data_dict.get('cover_img')          # 封面
+
+                        else:
+                            article_obj = article_objs[0]
+                            id = article_obj.id
+                            summary = article_obj.summary
+                            cover_img = article_obj.cover_img
+
+                        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
+                            id,
+                            token,
+                            user_id
+                        )
+
+                        post_data = {
+                            "touser":openid,
+                            "msgtype":"news", # 图文消息 图文消息条数限制在1条以内，注意，如果图文数超过1，则将会返回错误码45008。
+                            "news":{
+                                "articles": [
+                                 {
+                                     "title":title,
+                                     "description":b64decode(summary),
+                                     "url":url,
+                                     "picurl":cover_img
+                                 }
+                                 ]
+                            }
+                        }
 
                 else: # 收到其他文字 发送随机五篇文章
                     timestamp = str(int(time.time()))
@@ -276,10 +298,7 @@ def wechat(request):
                             )
                         }
                     }
-
                 post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-                data = get_ent_info(user_id)  # 获取该用户appid等
-                weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
                 weichat_api_obj.news_service(post_data)
 
             return HttpResponse("")
