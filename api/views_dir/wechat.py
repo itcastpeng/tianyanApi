@@ -201,24 +201,28 @@ def wechat(request):
                 Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
                 user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
                 if 'http' in Content:  # 获取文章内容 返回文章
+
                     print('Content=-===========》', Content)
-                    # data_dict = get_article(Content)    # 获取文章
-                    # id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
-                    # url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/forwarding_article?article_id={}&user_id={}'.format(
-                    #     id,
-                    #     user_obj.id
-                    # )
-                    # print('url-----> ', url)
+                    data_dict = get_article(Content)    # 获取文章
+                    data_dict['create_user_id'] = user_obj.id  # 增加创建人
+                    id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
+
+                    url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
+                        id,
+                        user_obj.token,
+                        user_obj.id
+                    )
+
                     post_data = {
-                        "touser":"OPENID",
-                        "msgtype":"news",
+                        "touser":openid,
+                        "msgtype":"news", # 图文消息 图文消息条数限制在1条以内，注意，如果图文数超过1，则将会返回错误码45008。
                         "news":{
                             "articles": [
                              {
-                                 "title":"Happy Day",
-                                 "description":"Is Really A Happy Day",
-                                 "url":"URL",
-                                 "picurl":"PIC_URL"
+                                 "title":data_dict.get('title'),
+                                 "description":data_dict.get('summary'),
+                                 "url":url,
+                                 "picurl":data_dict.get('cover_img')
                              }
                              ]
                         }
@@ -232,14 +236,11 @@ def wechat(request):
                         timestamp,
                         user_obj.id,
                     )
-                    ret = requests.get(share_url)
-                    print('share_url-------> ', share_url)
-                    print('ret.text-------> ', ret.text)
+                    ret = requests.get(share_url) # 请求随机文章五篇
                     ret.encoding = 'utf8'
                     ret_json = ret.json().get('data')
-                    print('ret_json--------> ', ret_json)
                     content = ''
-                    for i in ret_json.get('ret_data'):
+                    for i in ret_json.get('ret_data'): # 循环出推荐文章 链接为文章详情链接
                         url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
                             i.get('id'),
                             user_obj.token,
@@ -250,7 +251,7 @@ def wechat(request):
                             title=i.get('title'),
                             url=url
                         )
-                        content += ' \n{} \n'.format(pinjie_content)
+                        content += ' \n{} \n'.format(pinjie_content)  # 拼接A标签 跳转链接
 
                     post_data = {
                         "touser":openid,
