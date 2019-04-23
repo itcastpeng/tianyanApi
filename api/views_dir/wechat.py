@@ -237,7 +237,7 @@ def wechat(request):
                         "touser":openid,
                         "msgtype": "text",
                         "text": {
-                            "content":'天眼将一直为您推送消息!\n \n{} \n \n{} \n \n{}'.format(
+                            "content":'天眼将一直为您推送消息!\n \n{} \n \n{} \n \n{} \n \n点击下方天眼,更多内容等你哦!'.format(
                                 data_list[0],
                                 data_list[1],
                                 data_list[2],
