@@ -195,19 +195,34 @@ def wechat(request):
                     # models.Userprofile.objects.filter(openid=openid).update(openid=None)
                     # we_chat_public_send_msg_obj.sendTempMsg(post_data)
 
+            # 客户发送消息
             elif msg_type == 'text':
                 print('---------用户发送消息')
                 Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
                 user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
                 if 'http' in Content:  # 获取文章内容 返回文章
                     print('Content=-===========》', Content)
-                    data_dict = get_article(Content)    # 获取文章
-                    id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
-                    url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/forwarding_article?article_id={}&user_id={}'.format(
-                        id,
-                        user_obj.id
-                    )
-                    print('url-----> ', url)
+                    # data_dict = get_article(Content)    # 获取文章
+                    # id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
+                    # url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wechat/forwarding_article?article_id={}&user_id={}'.format(
+                    #     id,
+                    #     user_obj.id
+                    # )
+                    # print('url-----> ', url)
+                    post_data = {
+                        "touser":"OPENID",
+                        "msgtype":"news",
+                        "news":{
+                            "articles": [
+                             {
+                                 "title":"Happy Day",
+                                 "description":"Is Really A Happy Day",
+                                 "url":"URL",
+                                 "picurl":"PIC_URL"
+                             }
+                             ]
+                        }
+                    }
 
                 else: # 收到其他文字 发送随机五篇文章
                     timestamp = str(int(time.time()))
@@ -246,12 +261,11 @@ def wechat(request):
                             )
                         }
                     }
-                    post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-                    print('post_data--------> ', post_data)
 
-                    data = get_ent_info(user_obj.id)  # 获取该用户appid等
-                    weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
-                    weichat_api_obj.news_service(post_data)
+                post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+                data = get_ent_info(user_obj.id)  # 获取该用户appid等
+                weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
+                weichat_api_obj.news_service(post_data)
 
             return HttpResponse("")
 
