@@ -200,17 +200,31 @@ def wechat(request):
                 print('---------用户发送消息')
                 Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
                 user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
-                if 'http' in Content:  # 获取文章内容 返回文章
+                user_id = user_obj.id
+                token = user_obj.token
 
+                if 'http' in Content:  # 获取文章内容 返回文章
                     print('Content=-===========》', Content)
-                    data_dict = get_article(Content)    # 获取文章
-                    data_dict['create_user_id'] = user_obj.id  # 增加创建人
-                    id = add_article_public(data_dict, 39)  # 创建文章 第二个参数为 classify_id 默认为其他
+                    data_dict = get_article(Content)        # 获取文章
+                    title = data_dict.get('title')
+                    article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
+
+                    if not article_objs:  # 判断数据库是否有 该文章
+                        summary = data_dict.get('summary')              # 摘要
+                        data_dict['create_user_id'] = user_id           # 增加创建人
+                        id = add_article_public(data_dict, 39)          # 创建文章 第二个参数为 classify_id 默认为其他
+                        cover_img = data_dict.get('cover_img')          # 封面
+
+                    else:
+                        article_obj = article_objs[0]
+                        id = article_obj.id
+                        summary = article_obj.summary
+                        cover_img = article_obj.cover_img
 
                     url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
                         id,
-                        user_obj.token,
-                        user_obj.id
+                        token,
+                        user_id
                     )
 
                     post_data = {
@@ -219,10 +233,10 @@ def wechat(request):
                         "news":{
                             "articles": [
                              {
-                                 "title":data_dict.get('title'),
-                                 "description":b64decode(data_dict.get('summary')),
+                                 "title":title,
+                                 "description":b64decode(summary),
                                  "url":url,
-                                 "picurl":data_dict.get('cover_img')
+                                 "picurl":cover_img
                              }
                              ]
                         }
@@ -230,11 +244,11 @@ def wechat(request):
 
                 else: # 收到其他文字 发送随机五篇文章
                     timestamp = str(int(time.time()))
-                    rand_str = str_encrypt(timestamp + user_obj.token)
+                    rand_str = str_encrypt(timestamp + token)
                     share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=5&rand_str={}&timestamp={}&user_id={}'.format(
                         rand_str,
                         timestamp,
-                        user_obj.id,
+                        user_id
                     )
                     ret = requests.get(share_url) # 请求随机文章五篇
                     ret.encoding = 'utf8'
@@ -243,8 +257,8 @@ def wechat(request):
                     for i in ret_json.get('ret_data'): # 循环出推荐文章 链接为文章详情链接
                         url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
                             i.get('id'),
-                            user_obj.token,
-                            user_obj.id
+                            token,
+                            user_id
                         )
                         pinjie_content = '{}<a href="{url}">{title}</a>'.format(
                             b64decode('4p6h'),  # emoji解码  →箭头
@@ -264,7 +278,7 @@ def wechat(request):
                     }
 
                 post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-                data = get_ent_info(user_obj.id)  # 获取该用户appid等
+                data = get_ent_info(user_id)  # 获取该用户appid等
                 weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
                 weichat_api_obj.news_service(post_data)
 
