@@ -127,8 +127,8 @@ def get_article(article_url):
             file_dir = os.path.join('statics', 'img') + img_name
             with open(file_dir, 'wb') as file:
                 file.write(html.content)
-            cover_url = update_qiniu(file_dir, token)
-            img_tag.attrs['data-src'] = cover_url
+            img_url = update_qiniu(file_dir, token)
+            img_tag.attrs['data-src'] = img_url
             # img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
 
     # print('body--->', body)
