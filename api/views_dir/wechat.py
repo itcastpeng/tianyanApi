@@ -216,11 +216,11 @@ def wechat(request):
                         user_obj.id,
                     )
                     ret = requests.get(share_url)
+                    print('share_url-------> ', share_url)
+                    print('ret.text-------> ', ret.text)
                     ret.encoding = 'utf8'
                     ret_json = ret.json().get('data')
                     print('ret_json--------> ', ret_json)
-                    data = get_ent_info(user_obj.id)  # 获取该用户appid等
-                    weichat_api_obj = WeChatApi(data) # 实例化公众号操作
                     content = ''
                     for i in ret_json.get('ret_data'):
                         url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article?id={}&rand_str={}&timestamp={}&user_id={}'.format(
@@ -244,9 +244,11 @@ def wechat(request):
                             )
                         }
                     }
-
                     post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
                     print('post_data--------> ', post_data)
+
+                    data = get_ent_info(user_obj.id)  # 获取该用户appid等
+                    weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
                     weichat_api_obj.news_service(post_data)
 
             return HttpResponse("")
