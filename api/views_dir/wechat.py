@@ -16,7 +16,7 @@ from publicFunc.article_oper import get_ent_info
 from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
 from publicFunc.account import str_encrypt
-import json, xml.dom.minidom, datetime, time
+import json, xml.dom.minidom, datetime, time, requests
 
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
@@ -207,29 +207,33 @@ def wechat(request):
                     )
                     print('url-----> ', url)
 
-                else: # 其他文字
+                else: # 收到其他文字 发送随机五篇文章
                     timestamp = str(int(time.time()))
                     rand_str = str_encrypt(timestamp + user_obj.token)
-                    share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=3&rand_str={}&timestamp={}&user_id={}'.format(
+                    share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=5&rand_str={}&timestamp={}&user_id={}'.format(
                         rand_str,
                         timestamp,
                         user_obj.id,
                     )
+                    ret = requests.get(share_url)
+                    ret.encoding = 'utf8'
+                    ret_json = ret.json().get('data')
                     data = get_ent_info(user_obj.id)
                     weichat_api_obj = WeChatApi(data)
+
+                    for i in ret_json.get('ret_data'):
+                        print('i==========> ', i)
                     post_data = {
                         "touser":openid,
                         "msgtype": "text",
                         "text": {
-                            # "content":'百度'
-                            "content":'<a href="http://www.baidu.com">百度</a>'
+                            "content":'天眼将一直为您推送消息!\n \n<a href="http://www.baidu.com">百度</a>'
                         }
                     }
 
                     post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
                     print('post_data--------> ', post_data)
                     weichat_api_obj.news_service(post_data)
-                    print('------------sha', share_url)
 
             return HttpResponse("")
 
