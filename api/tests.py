@@ -220,6 +220,8 @@ print(ret_json)
 
 
 
+string = '4p6h'
+print(base64.b64decode(string.encode('utf8')).decode('utf8'))
 
 
 

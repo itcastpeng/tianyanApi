@@ -18,6 +18,8 @@ from publicFunc.article_oper import add_article_public
 from publicFunc.account import str_encrypt
 import json, xml.dom.minidom, datetime, time, requests
 
+
+
 # 创建或更新用户信息
 def updateUserInfo(openid, inviter_user_id, ret_obj):
     """
@@ -229,7 +231,8 @@ def wechat(request):
                             timestamp,
                             user_obj.id
                         )
-                        pinjie_content = '→<a href="{url}">{title}</a>'.format(
+                        pinjie_content = '{}<a href="{url}">{title}</a>'.format(
+                            b64decode('4p6h'),  # emoji解码  →箭头
                             title=i.get('title'),
                             url=url
                         )
