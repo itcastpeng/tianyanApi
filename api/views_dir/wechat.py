@@ -220,7 +220,7 @@ def wechat(request):
                     ret_json = ret.json().get('data')
                     data = get_ent_info(user_obj.id)  # 获取该用户appid等
                     weichat_api_obj = WeChatApi(data) # 实例化公众号操作
-                    data_list = []
+                    content = ''
                     for i in ret_json.get('ret_data'):
                         url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article?id={}&rand_str={}&timestamp={}&user_id={}'.format(
                             i.get('id'),
@@ -228,19 +228,18 @@ def wechat(request):
                             timestamp,
                             user_obj.id
                         )
-                        data_list.append('→<a href="{url}">{title}</a>'.format(
+                        pinjie_content = '→<a href="{url}">{title}</a>'.format(
                             title=i.get('title'),
                             url=url
-                        ))
+                        )
+                        content += ' \n{} \n'.format(pinjie_content)
 
                     post_data = {
                         "touser":openid,
                         "msgtype": "text",
                         "text": {
-                            "content":'天眼将一直为您推送消息!\n \n{} \n \n{} \n \n{} \n \n点击下方天眼,更多内容等你哦!'.format(
-                                data_list[0],
-                                data_list[1],
-                                data_list[2],
+                            "content":'天眼将一直为您推送消息{}点击下方天眼,更多内容等你哦!'.format(
+                                content
                             )
                         }
                     }
