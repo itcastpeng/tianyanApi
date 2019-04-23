@@ -239,7 +239,7 @@ def wechat(request):
                         "touser":openid,
                         "msgtype": "text",
                         "text": {
-                            "content":'天眼将一直为您推送消息{}点击下方天眼,更多内容等你哦!'.format(
+                            "content":'天眼将一直为您推送消息{}点击下方天眼\n,\n更多内容等你哦!'.format(
                                 content
                             )
                         }
