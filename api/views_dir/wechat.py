@@ -257,7 +257,19 @@ def wechat(request):
                         }
 
                     else:
-                        data_dict = get_article(Content)        # 获取文章
+                        try:
+                            data_dict = get_article(Content)        # 获取文章
+                        except Exception:
+                            post_data = {
+                                "touser": openid,
+                                "msgtype": "text",
+                                "text": {
+                                    "content": '链接不正确{}'.format('4p2X')
+                                }
+                            }
+                            weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
+                            return HttpResponse('')
+
                         title = data_dict.get('title')
                         article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
 
