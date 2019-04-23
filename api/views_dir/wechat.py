@@ -225,10 +225,9 @@ def wechat(request):
                     print('ret_json--------> ', ret_json)
                     content = ''
                     for i in ret_json.get('ret_data'):
-                        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&rand_str={}&timestamp={}&user_id={}'.format(
+                        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}%classify_type=1'.format(
                             i.get('id'),
-                            rand_str,
-                            timestamp,
+                            user_obj.token,
                             user_obj.id
                         )
                         pinjie_content = '{}<a href="{url}">{title}</a>'.format(
