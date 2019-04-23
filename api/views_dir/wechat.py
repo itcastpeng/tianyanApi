@@ -315,6 +315,8 @@ def wechat(request):
                             )
                         }
                     }
+                print('--------------------post_data-----> ', post_data)
+                # 发送客服消息
                 post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
                 weichat_api_obj.news_service(post_data)
 
