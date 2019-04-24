@@ -40,7 +40,7 @@ class weixin_pay_api(WeixinApiPublic):
 
             # 指向--> http://127.0.0.1:8008/api/weixin_pay/wxpay
             'notify_url': 'http://api.zhugeyingxiao.com/tianyan/api/wxpay',
-            'trade_type': 'JSAPI'
+            'trade_type': 'MWEB'                    # 支付方式  NATIVE--Native支付、APP--app支付，MWEB--H5支付
         }
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
         result_data['sign'] = self.md5(string_sign_temp).upper()

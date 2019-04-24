@@ -210,27 +210,34 @@ from urllib.parse import unquote
 #         "count":3
 #     },
 #     "code":200
-# }
-#
-# ret_json = ret_data.get('data')
-# for i in ret_json.get('ret_data'):
-#     print(i)
-# print(ret_json)
-#
 
 
 
-string = '7aC97bi2'
+
+p = 'article_id_241|pid_|level_1|uid_|company_id_15'
 
 
-print(base64.b16decode(string))
+
+print(p.split('|')[0].split('_')[1])
 
 
-print(base64.b64decode(string.encode('utf8')).decode('utf8'))
 
 
-# print(b64decode('4p2X'), )
-# b64decode('7aC97bil')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
