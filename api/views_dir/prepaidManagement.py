@@ -148,7 +148,7 @@ def payback(request):
                                 round(cumulative_amount, 2) # 保留小数点后两位
                                 print('============================================支付钱数', cumulative_amount)
                                 two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
-                                two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
+                                two_user_obj.make_money = F('make_money') + cumulative_amount
                                 two_user_obj.save()
 
                 print('--------------------支付成功-------------')
