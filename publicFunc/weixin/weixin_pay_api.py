@@ -30,10 +30,10 @@ class weixin_pay_api(WeixinApiPublic):
         dingdanhao = self.shengcheng_dingdanhao()       # 生成订单号
         result_data = {
             'appid': appid,                             # appid
-            'mch_id': self.mch_id,                           # 商户号
-            'nonce_str': self.generateRandomStamping(),     # 32位随机值a
+            'mch_id': self.mch_id,                      # 商户号
+            'nonce_str': self.generateRandomStamping(), # 32位随机值a
             'openid': openid,                           # 微信用户唯一标识
-            'body': '天眼-会员续费',                      # 描述
+            'body': '天眼-会员续费'.encode('iso-8859-1'), # 描述
             'out_trade_no': dingdanhao,                 # 订单号
             'total_fee': total_fee * 100,          # 金额(分 为单位)
             'spbill_create_ip': '0.0.0.0',              # 终端IP
