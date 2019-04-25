@@ -218,7 +218,7 @@ from urllib.parse import unquote
 
 p = '天眼高级会员'
 
-print(p.encode('utf8').decode('utf8'))
+print(p.encode('utf8').decode('ISO-8859-1'))
 
 
 

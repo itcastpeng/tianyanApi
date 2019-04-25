@@ -54,7 +54,6 @@ def weixin_pay(request, oper_type, o_id):
                         overdue_date=overdue_date,
                     )
 
-                print('prepay_id--------> ', prepay_id)
                 data_dict = {
                     'appId': appid,
                     'timeStamp': int(time.time()),
@@ -71,8 +70,8 @@ def weixin_pay(request, oper_type, o_id):
                 response.msg = '预支付请求成功'
             else:
                 response.code = 301
-                print('-=-------------------------支付失败-------------------------------------')
                 response.msg = '支付失败, 原因:{}'.format(return_msg)
+
         else:
             response.code = 301
             response.msg = '请选择一项会员'

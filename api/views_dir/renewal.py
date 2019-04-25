@@ -62,7 +62,7 @@ def renewal(request):
                 'data_count': count,
             }
             response.note = {
-                'id': "用户id",
+                'id': "id",
                 'price': '钱数',
                 'the_length_id': '时长ID(一个月， 一年....)',
                 'the_length': '时长',
