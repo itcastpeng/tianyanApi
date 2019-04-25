@@ -34,7 +34,7 @@ class weixin_pay_api(WeixinApiPublic):
             'mch_id': self.mch_id,                      # 商户号
             'nonce_str': self.generateRandomStamping(), # 32位随机值a
             'openid': openid,                           # 微信用户唯一标识
-            'body': '天眼高级会员',                       # 描述
+            'body': '天眼高级会员'.encode('gbk'),                       # 描述
             'out_trade_no': dingdanhao,                 # 订单号
             'total_fee': total_fee * 100,               # 金额(分 为单位)
             'spbill_create_ip': '0.0.0.0',              # 终端IP
