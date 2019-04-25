@@ -251,8 +251,8 @@ def user_oper(request, oper_type, o_id):
 
             invite_objs = user_pub_objs.filter(inviter_id=user_id)
             response_data['invite_number_count'] = invite_objs.count() # 邀请人数量
-            response_data['cumulative_amount'] = int(user_obj.cumulative_amount) # 累计钱数
-            response_data['make_money'] = int(user_obj.make_money)                  # 待提钱数
+            response_data['cumulative_amount'] = user_obj.cumulative_amount # 累计钱数
+            response_data['make_money'] = user_obj.make_money                  # 待提钱数
 
             invite_friend_list = [i.get('id') for i in invite_objs.values('id')] # 该邀请人 邀请的好友ID
             print('invite_friend_list--> ', invite_friend_list)
