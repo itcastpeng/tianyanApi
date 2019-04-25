@@ -284,10 +284,16 @@ def article_oper(request, oper_type, o_id):
 
         # 插入我的内容  插入内容 判断是否为自己的文章 不是则创建直接跳转
         elif oper_type == 'insert_content':
+            user_objs = models.Userprofile.objects.filter(id=user_id)
+            delete_advertising = request.POST.get('delete_advertising')  # 删除内容
+            if delete_advertising and delete_advertising == 'top':
+                user_objs.update(top_advertising=None)
+            if delete_advertising and delete_advertising == 'end':
+                user_objs.update(end_advertising=None)
+
             top_advertising = request.POST.get('top_advertising')  # 顶部内容
             end_advertising = request.POST.get('end_advertising')  # 底部内容
 
-            user_objs = models.Userprofile.objects.filter(id=user_id)
 
             if top_advertising:
                 user_objs.update(

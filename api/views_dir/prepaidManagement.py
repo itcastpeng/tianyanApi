@@ -15,6 +15,7 @@ from django.db.models import F
 def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
     weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
+
     # 预支付
     if oper_type == 'yuZhiFu':
         user_id = request.GET.get('user_id')
@@ -77,9 +78,14 @@ def weixin_pay(request, oper_type, o_id):
             response.code = 301
             response.msg = '请选择一项会员'
 
+
+    # 提现功能
+    elif oper_type == 'withdrawal':
+        pass
+
     return JsonResponse(response.__dict__)
 
-    # 微信回调
+# 微信回调
 def payback(request):
     print('------------------微信回调000000000000000000000000000000000000000000000000', request.body)
     weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
@@ -160,3 +166,13 @@ def payback(request):
 
             renewal_log_objs.update(isSuccess=isSuccess)  # 修改订单状态
     return JsonResponse(response.__dict__)
+
+
+
+
+
+
+
+
+
+

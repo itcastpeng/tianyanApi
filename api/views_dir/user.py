@@ -258,7 +258,7 @@ def user_oper(request, oper_type, o_id):
             print('invite_friend_list--> ', invite_friend_list)
 
             q = Q()
-            q.add(Q(create_user_id__in=invite_friend_list) | Q(create_user_id__inviter_id__in=invite_friend_list), Q.AND)
+            q.add(Q(create_user_id__in=invite_friend_list) | Q(create_user__inviter_id__in=invite_friend_list), Q.AND)
             number_clinch_deal_objs = models.renewal_log.objects.filter(
                 q,
                 isSuccess=1
