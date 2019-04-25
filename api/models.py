@@ -48,6 +48,7 @@ class Userprofile(models.Model):
     openid = models.CharField(verbose_name="微信公众号openid", max_length=64)
 
     vip_type_choices = (
+        (0, "vip已过期"),
         (1, "试用会员"),
         (2, "高级会员"),
     )

@@ -108,13 +108,20 @@ def payback(request):
             if return_code == 'SUCCESS':
                 isSuccess = 1 # 支付状态
                 pay_user_id = renewal_log_obj.create_user_id  # 充值人  ID
+                renewal_log_objs.update(isSuccess=isSuccess)  # 修改充值成功
 
-                # 修改会员到期时间
+                # 修改会员到期时间 和高级会员
                 user_objs = models.Userprofile.objects.filter(id=pay_user_id)
-                user_objs.update(overdue_date=renewal_log_obj.overdue_date)
+                user_objs.update(
+                    overdue_date=renewal_log_obj.overdue_date,
+                    vip_type=2, # 更改为高级会员
+                )
 
                 # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增钱
-                renewal_objs = models.renewal_log.objects.filter(create_user_id=pay_user_id)
+                renewal_objs = models.renewal_log.objects.filter(
+                    create_user_id=pay_user_id,
+                    isSuccess=1
+                ) # 充值人为自己 且充值成功
                 inviter_id = user_objs[0].inviter_id
 
                 if renewal_objs.count() == 1 and inviter_id:
