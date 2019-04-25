@@ -133,7 +133,7 @@ def payback(request):
                     if inviter_id_user_obj.vip_type == 2: # 推广人当前为 高级会员
                         print('=-----------------上线人充值 -->', renewal_objs[0].price)
                         cumulative_amount = float(price) * 0.3  # 一级分享人应加钱数  30%
-                        print('-----------一级推广人 应给钱数')
+                        round(cumulative_amount, 2)  # 保留小数点后两位
                         inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
                         inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
                         inviter_id_user_obj.save()
@@ -145,6 +145,7 @@ def payback(request):
                             two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
                             if two_user_obj.vip_type == 2:
                                 cumulative_amount = float(price) * 0.15  # 二级分享人应加钱数
+                                round(cumulative_amount, 2) # 保留小数点后两位
                                 print('============================================支付钱数', cumulative_amount)
                                 two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
                                 two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
