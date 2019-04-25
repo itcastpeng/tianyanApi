@@ -16,7 +16,7 @@ from django.db.models import Count
 from publicFunc.account import randon_str
 import re, os, json, sys
 from publicFunc.screenshots import screenshots
-
+from django.db.models import Q
 
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -256,14 +256,18 @@ def user_oper(request, oper_type, o_id):
 
             invite_friend_list = [i.get('id') for i in invite_objs.values('id')] # 该邀请人 邀请的好友ID
             print('invite_friend_list--> ', invite_friend_list)
+
+            q = Q()
+            q.add(Q(create_user_id__in=invite_friend_list) | Q(create_user_id__inviter_id__in=invite_friend_list), Q.AND)
             number_clinch_deal_objs = models.renewal_log.objects.filter(
-                create_user_id__in=invite_friend_list,
                 isSuccess=1
             ).values(
                 'create_user__name',
                 'create_user__set_avator'
             ).distinct()
             response_data['number_clinch_count'] = number_clinch_deal_objs.count()  # 成交人数
+
+
 
             if o_id and int(o_id) == 1:  # 邀请人数详情
                 invite_number_list = []
