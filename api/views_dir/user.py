@@ -255,10 +255,14 @@ def user_oper(request, oper_type, o_id):
             response_data['make_money'] = user_obj.make_money                  # 待提钱数
 
             invite_friend_list = [i.get('id') for i in invite_objs.values('id')] # 该邀请人 邀请的好友ID
-            print('invite_friend_list--> ', invite_friend_list)
+            data_list = []
+            for i in invite_friend_list:
+                data_list.insert(0, i.get('id'))
+                data_list.extend([i.get('id') for i in models.Userprofile.objects.filter(inviter_id=i.get(id)).values('id')])
+
 
             q = Q()
-            q.add(Q(create_user_id__in=invite_friend_list) | Q(create_user__inviter_id__in=invite_friend_list), Q.AND)
+            q.add(Q(create_user_id__in=data_list) | Q(create_user__inviter_id__in=data_list), Q.AND)
             print('=-000000000000000000000---------------> ', q)
             number_clinch_deal_objs = models.renewal_log.objects.filter(
                 q,
