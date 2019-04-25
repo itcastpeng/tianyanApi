@@ -286,42 +286,46 @@ def article_oper(request, oper_type, o_id):
         elif oper_type == 'insert_content':
             user_objs = models.Userprofile.objects.filter(id=user_id)
             delete_advertising = request.POST.get('delete_advertising')  # 删除内容
-            if delete_advertising and delete_advertising == 'top':
-                user_objs.update(top_advertising=None)
-            if delete_advertising and delete_advertising == 'end':
-                user_objs.update(end_advertising=None)
+            if delete_advertising:
+                if delete_advertising == 'top':
+                    user_objs.update(top_advertising=None)
+                if delete_advertising == 'end':
+                    user_objs.update(end_advertising=None)
+                response.code = 200
+                response.msg = '删除成功'
 
-            top_advertising = request.POST.get('top_advertising')  # 顶部内容
-            end_advertising = request.POST.get('end_advertising')  # 底部内容
-
-
-            if top_advertising:
-                user_objs.update(
-                    top_advertising=top_advertising,
-                )
             else:
-                user_objs.update(
-                    end_advertising=end_advertising
-                )
+                top_advertising = request.POST.get('top_advertising')  # 顶部内容
+                end_advertising = request.POST.get('end_advertising')  # 底部内容
 
-            objs = models.Article.objects.filter(id=o_id)
-            obj = objs[0]
-            data = {
-                'title': obj.title,
-                'content': obj.content,
-                'cover_img': obj.cover_img,
-                'summary': obj.summary,
-                'style': obj.style,
-                'create_user_id': user_id,
-            }
-            print('user_id-> ', user_id)
-            id = add_article_public(data)     # 添加文章
 
-            response.msg = '创建成功'
-            response.data = {
-                'id':id
-            }
-            response.code = 200
+                if top_advertising:
+                    user_objs.update(
+                        top_advertising=top_advertising,
+                    )
+                else:
+                    user_objs.update(
+                        end_advertising=end_advertising
+                    )
+
+                objs = models.Article.objects.filter(id=o_id)
+                obj = objs[0]
+                data = {
+                    'title': obj.title,
+                    'content': obj.content,
+                    'cover_img': obj.cover_img,
+                    'summary': obj.summary,
+                    'style': obj.style,
+                    'create_user_id': user_id,
+                }
+                print('user_id-> ', user_id)
+                id = add_article_public(data)     # 添加文章
+
+                response.msg = '修改成功'
+                response.data = {
+                    'id':id
+                }
+                response.code = 200
 
 
         # 修改文章所属分类

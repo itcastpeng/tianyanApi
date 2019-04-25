@@ -257,8 +257,8 @@ def user_oper(request, oper_type, o_id):
             invite_friend_list = [i.get('id') for i in invite_objs.values('id')] # 该邀请人 邀请的好友ID
             data_list = []
             for i in invite_friend_list:
-                data_list.insert(0, i.get('id'))
-                data_list.extend([i.get('id') for i in models.Userprofile.objects.filter(inviter_id=i.get(id)).values('id')])
+                data_list.insert(0, i)
+                data_list.extend([i.get('id') for i in models.Userprofile.objects.filter(inviter_id=i).values('id')])
 
 
             q = Q()
