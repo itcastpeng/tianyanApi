@@ -89,51 +89,51 @@ def weixin_pay(request, oper_type, o_id):
         renewal_log_objs = models.renewal_log.objects.filter(pay_order_no=resultData['out_trade_no'])
         if resultData['return_code'] == 'SUCCESS':
             renewal_log_obj = renewal_log_objs[0]
+            if not renewal_log_obj.isSuccess:
+                # 查询订单是否付款成功
+                result_data = {
+                    'appid': resultData['appid'],  # appid
+                    'mch_id': resultData['mch_id'],  # 商户号
+                    'out_trade_no': resultData['out_trade_no'],  # 订单号
+                    'nonce_str': weixin_pay_api_obj.generateRandomStamping(),  # 32位随机值
+                }
+                return_code = weixin_pay_api_obj.weixin_back_pay(result_data)
 
-            # 查询订单是否付款成功
-            result_data = {
-                'appid': resultData['appid'],  # appid
-                'mch_id': resultData['mch_id'],  # 商户号
-                'out_trade_no': resultData['out_trade_no'],  # 订单号
-                'nonce_str': weixin_pay_api_obj.generateRandomStamping(),  # 32位随机值
-            }
-            return_code = weixin_pay_api_obj.weixin_back_pay(result_data)
+                if return_code == 'SUCCESS':
+                    isSuccess = 1 # 支付状态
+                    pay_user_id = renewal_log_obj.create_user_id  # 充值人  ID
 
-            if return_code == 'SUCCESS':
-                isSuccess = 1 # 支付状态
-                pay_user_id = renewal_log_obj.create_user_id  # 充值人  ID
+                    # 修改会员到期时间
+                    user_objs = models.Userprofile.objects.filter(id=pay_user_id)
+                    user_objs.update(overdue_date=renewal_log_obj.overdue_date)
 
-                # 修改会员到期时间
-                user_objs = models.Userprofile.objects.filter(id=pay_user_id)
-                user_objs.update(overdue_date=renewal_log_obj.overdue_date)
+                    # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增钱
+                    renewal_objs = models.renewal_log.objects.filter(create_user_id=pay_user_id)
+                    inviter_id = user_objs[0].inviter_id
 
-                # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增钱
-                renewal_objs = models.renewal_log.objects.filter(create_user_id=pay_user_id)
-                inviter_id = user_objs[0].inviter_id
+                    if renewal_objs.count() == 1 and inviter_id:
+                        price = renewal_objs[0].price  #充值钱数
+                        cumulative_amount = price * 0.3  # 一级分享人应加钱数  30%
+                        inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
+                        inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
+                        inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
+                        inviter_id_user_obj.save()
 
-                if renewal_objs.count() == 1 and inviter_id:
-                    price = renewal_objs[0].price  #充值钱数
-                    cumulative_amount = price * 0.3  # 一级分享人应加钱数  30%
-                    inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
-                    inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
-                    inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
-                    inviter_id_user_obj.save()
+                        two_inviter_id = inviter_id_user_obj.inviter # 二级分享人  15%
+                        if two_inviter_id:
+                            cumulative_amount = price * 0.15  # 二级分享人应加钱数
+                            two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
+                            two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
+                            two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
+                            two_user_obj.save()
 
-                    two_inviter_id = inviter_id_user_obj.inviter # 二级分享人  15%
-                    if two_inviter_id:
-                        cumulative_amount = price * 0.15  # 二级分享人应加钱数
-                        two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
-                        two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
-                        two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
-                        two_user_obj.save()
-
-                models.renewal_log.objects.filter(create_user_id=pay_user_id, isSuccess=0).delete()  # 删除该人原有 未成功 订单
-            else:
-                objs = models.renewal_log.objects.filter(pay_order_no=result_data.get('out_trade_no'))
-                if objs:
-                    objs.delete()
-                print('------支付失败 ----------删除订单')
+                    models.renewal_log.objects.filter(create_user_id=pay_user_id, isSuccess=0).delete()  # 删除该人原有 未成功 订单
+                else:
+                    objs = models.renewal_log.objects.filter(pay_order_no=result_data.get('out_trade_no'))
+                    if objs:
+                        objs.delete()
+                    print('------支付失败 ----------删除订单')
 
 
-        renewal_log_objs.update(isSuccess=isSuccess)  # 修改订单状态
+                renewal_log_objs.update(isSuccess=isSuccess)  # 修改订单状态
     return JsonResponse(response.__dict__)

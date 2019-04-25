@@ -44,6 +44,13 @@ class AddForm(forms.Form):
         the_length, renewal_number_days = length_the_days(the_length)
         return the_length, renewal_number_days
 
+    def clean_price(self):
+        price = self.data.get('price')
+        if '.' in price:
+            self.add_error('price', '价钱必须为整数')
+        else:
+            return price
+
 
 # 更新
 class UpdateForm(forms.Form):
@@ -87,6 +94,12 @@ class UpdateForm(forms.Form):
         the_length, renewal_number_days = length_the_days(the_length)
         return the_length, renewal_number_days
 
+    def clean_price(self):
+        price = self.data.get('price')
+        if '.' in price:
+            self.add_error('price', '价钱必须为整数')
+        else:
+            return price
 
 # 删除
 class DeleteForm(forms.Form):
