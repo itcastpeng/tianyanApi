@@ -36,7 +36,7 @@ class weixin_pay_api(WeixinApiPublic):
             'openid': openid,                           # 微信用户唯一标识
             'body': '天眼高级会员'.encode('utf8').decode('ISO-8859-1'),                       # 描述
             'out_trade_no': dingdanhao,                 # 订单号
-            'total_fee': total_fee * 100,               # 金额(分 为单位)
+            'total_fee': total_fee,                     # 金额(分 为单位)
             'spbill_create_ip': '0.0.0.0',              # 终端IP
             'notify_url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/wxpay',
             'trade_type': 'JSAPI'                    # 支付方式  NATIVE--Native支付、APP--app支付，MWEB--H5支付

@@ -23,12 +23,12 @@ def weixin_pay(request, oper_type, o_id):
             userObjs = models.Userprofile.objects.filter(id=user_id)
             user_obj = userObjs[0]
             fee_obj = fee_objs[0]
-            total_fee = int(fee_obj.price)
+            price = fee_obj.price * 100
             data = get_ent_info(user_id)
             weixin_obj = WeChatApi(data)
             appid = weixin_obj.APPID
             data = {
-                'total_fee': total_fee,  # 金额(分 为单位)
+                'total_fee': price,  # 金额(分 为单位)
                 'openid': user_obj.openid,  # 微信用户唯一标识
                 'appid': appid,  # appid
             }
@@ -49,7 +49,7 @@ def weixin_pay(request, oper_type, o_id):
                         the_length=fee_obj.get_the_length_display(),  # 续费时长
                         renewal_number_days=renewal_number_days,
                         create_user_id=user_id,
-                        price=total_fee,
+                        price=price,
                         original_price=fee_obj.original_price,  # 原价
                         overdue_date=overdue_date,
                     )
