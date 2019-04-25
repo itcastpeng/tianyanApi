@@ -92,6 +92,7 @@ def team_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
+        print('--------')
 
         # 添加团队
         if oper_type == "add":
@@ -217,10 +218,9 @@ def team_oper(request, oper_type, o_id):
 
         # 删除团队
         elif oper_type == 'delete':
-            member_objs = models.UserprofileTeam.objects.filter(team_id=o_id)
-            member_objs.delete()
-            team_objs = models.Team.objects.filter(id=o_id)
-            team_objs.delete()
+            print('-----------')
+            member_objs = models.UserprofileTeam.objects.filter(team_id=o_id).delete()
+            team_objs = models.Team.objects.filter(id=o_id).delete()
             response.code = 200
             response.msg = '删除团队成功'
 
