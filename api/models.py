@@ -254,10 +254,9 @@ class renewal_management(models.Model):
     price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
     original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
     the_length_choices = (
-        (1, '一个月'),
-        (2, '半年'),
-        (3, '一年'),
-        (4, '两年'),
+        (1, '三个月'),
+        (2, '一年'),
+        (3, '三年'),
     )
     the_length = models.SmallIntegerField(verbose_name='时长', choices=the_length_choices, default=1)
     renewal_number_days = models.IntegerField(verbose_name='续费天数', default=30)
