@@ -221,6 +221,9 @@ two = float(one) * 0.15
 
 print(one, two )
 
+test = '3'
+
+print(float(test) / 100)
 
 
 

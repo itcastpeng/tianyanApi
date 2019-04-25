@@ -127,7 +127,7 @@ def payback(request):
                 print('----------------------判断是否首次充值 和 是否有 上线人')
                 if renewal_objs.count() == 1 and inviter_id:  # 判断 是否首次充值 和 是否有 上线人
                     print('================================条件满足')
-                    price = renewal_objs[0].price / 100  # 首次充值钱数
+                    price = float(renewal_objs[0].price) / 100  # 首次充值钱数
 
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
                     if inviter_id_user_obj.vip_type == 2: # 推广人当前为 高级会员
