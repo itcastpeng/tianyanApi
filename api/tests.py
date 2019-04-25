@@ -216,9 +216,9 @@ from urllib.parse import unquote
 price = 0.10
 
 one = float(price) * 0.3
-
-two = float(one) * 0.15
-
+# one = round(one, 2)
+two = float(price) * 0.15
+# two = round(two, 2)
 print(one, two )
 
 test = '3'
