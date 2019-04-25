@@ -260,6 +260,7 @@ def user_oper(request, oper_type, o_id):
             q = Q()
             q.add(Q(create_user_id__in=invite_friend_list) | Q(create_user_id__inviter_id__in=invite_friend_list), Q.AND)
             number_clinch_deal_objs = models.renewal_log.objects.filter(
+                q,
                 isSuccess=1
             ).values(
                 'create_user__name',
