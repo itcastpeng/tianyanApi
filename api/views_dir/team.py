@@ -92,8 +92,6 @@ def team_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
-        print('--------')
-
         # 添加团队
         if oper_type == "add":
             form_data = {
@@ -218,12 +216,15 @@ def team_oper(request, oper_type, o_id):
 
         # 删除团队
         elif oper_type == 'delete':
-            print('-----------')
-            member_objs = models.UserprofileTeam.objects.filter(team_id=o_id).delete()
-            team_objs = models.Team.objects.filter(id=o_id).delete()
-            response.code = 200
-            response.msg = '删除团队成功'
-
+            member_objs = models.UserprofileTeam.objects.filter(team_id=o_id)
+            if user_id in [i.get('id') for i in member_objs.filter(type=2).values('id')]: # 该团队管理员列表
+                member_objs.delete()
+                models.Team.objects.filter(id=o_id).delete()
+                response.code = 200
+                response.msg = '删除团队成功'
+            else:
+                response.code = 301
+                response.msg = '权限不足'
     else:
         # 查看团队人员列表
         if oper_type == "select_user_list":
