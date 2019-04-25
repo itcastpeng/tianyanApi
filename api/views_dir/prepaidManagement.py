@@ -81,6 +81,7 @@ def weixin_pay(request, oper_type, o_id):
 
     # 微信回调
 def payback(request):
+    print('------------------微信回调000000000000000000000000000000000000000000000000')
     weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
     response = Response.ResponseObj()
     isSuccess = 0
@@ -114,21 +115,27 @@ def payback(request):
                     vip_type=2, # 更改为高级会员
                 )
 
+                inviter_id = None  # 父级 推广人
+                if user_objs[0].inviter:
+                    inviter_id = user_objs[0].inviter_id
+
                 # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增钱
                 renewal_objs = models.renewal_log.objects.filter(
                     create_user_id=pay_user_id,
                     isSuccess=1
                 ) # 充值人为自己 且充值成功
-                inviter_id = user_objs[0].inviter_id
+                print('----------------------判断是否首次充值 和 是否有 上线人')
+                if renewal_objs.count() == 1 and inviter_id:  # 判断 是否首次充值 和 是否有 上线人
+                    price = renewal_objs[0].price  # 首次充值钱数
 
-                if renewal_objs.count() == 1 and inviter_id:
-                    print('=-----------------上线人充值 -->', renewal_objs[0].price)
-                    price = renewal_objs[0].price  #充值钱数
-                    cumulative_amount = price * 0.3  # 一级分享人应加钱数  30%
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
-                    inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
-                    inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
-                    inviter_id_user_obj.save()
+                    if inviter_id_user_obj.vip_type == 3: # 推广人当前为 高级会员
+                        print('=-----------------上线人充值 -->', renewal_objs[0].price)
+                        cumulative_amount = price * 0.3  # 一级分享人应加钱数  30%
+                        print('-----------一级推广人 应给钱数')
+                        inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
+                        inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
+                        inviter_id_user_obj.save()
 
                     two_inviter_id = inviter_id_user_obj.inviter # 二级分享人  15%
                     if two_inviter_id:
