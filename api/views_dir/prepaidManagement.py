@@ -91,7 +91,7 @@ def payback(request):
     data = ['mch_id', 'return_code', 'appid', 'openid', 'cash_fee', 'out_trade_no']
     resultData = xmldom_parsing.xmldom(collection, data)
     renewal_log_objs = models.renewal_log.objects.filter(pay_order_no=resultData['out_trade_no'])
-    if resultData['return_code'] == 'SUCCESS':
+    if resultData['return_code'] == 'SUCCESS' and renewal_log_objs:
         renewal_log_obj = renewal_log_objs[0]
         if not renewal_log_obj.isSuccess:
             # 查询订单是否付款成功
@@ -126,24 +126,29 @@ def payback(request):
                 ) # 充值人为自己 且充值成功
                 print('----------------------判断是否首次充值 和 是否有 上线人')
                 if renewal_objs.count() == 1 and inviter_id:  # 判断 是否首次充值 和 是否有 上线人
+                    print('================================条件满足')
                     price = renewal_objs[0].price  # 首次充值钱数
 
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
-                    if inviter_id_user_obj.vip_type == 3: # 推广人当前为 高级会员
+                    if inviter_id_user_obj.vip_type == 2: # 推广人当前为 高级会员
                         print('=-----------------上线人充值 -->', renewal_objs[0].price)
-                        cumulative_amount = price * 0.3  # 一级分享人应加钱数  30%
+                        cumulative_amount = float(price) * 0.3  # 一级分享人应加钱数  30%
                         print('-----------一级推广人 应给钱数')
                         inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
                         inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
                         inviter_id_user_obj.save()
 
-                    two_inviter_id = inviter_id_user_obj.inviter # 二级分享人  15%
-                    if two_inviter_id:
-                        cumulative_amount = price * 0.15  # 二级分享人应加钱数
-                        two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
-                        two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
-                        two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
-                        two_user_obj.save()
+                        two_inviter_id = None
+                        if inviter_id_user_obj.inviter:
+                            two_inviter_id = inviter_id_user_obj.inviter_id # 二级分享人  15%
+                        if two_inviter_id:
+                            two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
+                            if two_user_obj.vip_type == 2:
+                                cumulative_amount = float(price) * 0.15  # 二级分享人应加钱数
+                                two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
+                                two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
+                                two_user_obj.save()
+
                 print('--------------------支付成功-------------')
                 models.renewal_log.objects.filter(create_user_id=pay_user_id, isSuccess=0).delete()  # 删除该人原有 未成功 订单
             else:

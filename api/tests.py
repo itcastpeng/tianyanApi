@@ -213,15 +213,9 @@ from urllib.parse import unquote
 
 
 
+price = 100
 
-
-
-p = '天眼高级会员'
-
-print(p.encode('utf8').decode('ISO-8859-1'))
-
-
-
+print(float(price) * 0.3)
 
 
 
