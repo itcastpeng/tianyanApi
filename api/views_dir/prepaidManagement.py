@@ -81,7 +81,7 @@ def weixin_pay(request, oper_type, o_id):
 
     # 微信回调
 def payback(request):
-    print('------------------微信回调000000000000000000000000000000000000000000000000')
+    print('------------------微信回调000000000000000000000000000000000000000000000000', request.body)
     weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
     response = Response.ResponseObj()
     isSuccess = 0
