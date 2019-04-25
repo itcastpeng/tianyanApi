@@ -249,17 +249,18 @@ def user_oper(request, oper_type, o_id):
             response_data = {}
             user_obj = user_pub_objs.get(id=user_id)
 
-            invite_objs = user_pub_objs.filter(inviter_id=user_id)
-            response_data['invite_number_count'] = invite_objs.count() # 邀请人数量
             response_data['cumulative_amount'] = user_obj.cumulative_amount # 累计钱数
             response_data['make_money'] = user_obj.make_money                  # 待提钱数
 
+            invite_objs = user_pub_objs.filter(inviter_id=user_id)
             invite_friend_list = [i.get('id') for i in invite_objs.values('id')] # 该邀请人 邀请的好友ID
             data_list = []
             for i in invite_friend_list:
                 data_list.insert(0, i)
                 data_list.extend([i.get('id') for i in models.Userprofile.objects.filter(inviter_id=i).values('id')])
 
+            invite_objs = models.Userprofile.objects.filter(id__in=data_list)
+            response_data['invite_number_count'] = invite_objs.count()  # 邀请人数量
 
             q = Q()
             q.add(Q(create_user_id__in=data_list) | Q(create_user__inviter_id__in=data_list), Q.AND)
