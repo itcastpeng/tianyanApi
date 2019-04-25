@@ -127,7 +127,7 @@ def payback(request):
                 print('----------------------判断是否首次充值 和 是否有 上线人')
                 if renewal_objs.count() == 1 and inviter_id:  # 判断 是否首次充值 和 是否有 上线人
                     print('================================条件满足')
-                    price = renewal_objs[0].price  # 首次充值钱数
+                    price = renewal_objs[0].price / 100  # 首次充值钱数
 
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
                     if inviter_id_user_obj.vip_type == 2: # 推广人当前为 高级会员
@@ -140,11 +140,13 @@ def payback(request):
 
                         two_inviter_id = None
                         if inviter_id_user_obj.inviter:
-                            two_inviter_id = inviter_id_user_obj.inviter_id # 二级分享人  15%
+                            two_inviter_id = inviter_id_user_obj.inviter_id
                         if two_inviter_id:
+                            print('=-========================二级分享人========================')
                             two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
                             if two_user_obj.vip_type == 2:
                                 cumulative_amount = float(price) * 0.15  # 二级分享人应加钱数
+                                print('============================================支付钱数', cumulative_amount)
                                 two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
                                 two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
                                 two_user_obj.save()
