@@ -214,13 +214,11 @@ from urllib.parse import unquote
 
 
 
-p = 'article_id_241|pid_|level_1|uid_|company_id_15'
 
 
+p = '天眼高级会员'
 
-print(p.split('|')[0].split('_')[1])
-
-
+print(p.encode('utf8').decode('utf8'))
 
 
 
