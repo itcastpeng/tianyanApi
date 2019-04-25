@@ -81,8 +81,6 @@ def weixin_pay(request, oper_type, o_id):
 
     # 微信回调
 def payback(request):
-    print('-----------------------------------------=====00000000000000微信回调00000000》 ', request.GET)
-    print('-----------------------------------------=====00000000000000微信回调00000000》 ', request.body)
     weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
     response = Response.ResponseObj()
     isSuccess = 0
@@ -91,7 +89,6 @@ def payback(request):
     collection = DOMTree.documentElement
     data = ['mch_id', 'return_code', 'appid', 'openid', 'cash_fee', 'out_trade_no']
     resultData = xmldom_parsing.xmldom(collection, data)
-    print('resultData-=------------> ', resultData)
     renewal_log_objs = models.renewal_log.objects.filter(pay_order_no=resultData['out_trade_no'])
     if resultData['return_code'] == 'SUCCESS':
         renewal_log_obj = renewal_log_objs[0]
@@ -125,6 +122,7 @@ def payback(request):
                 inviter_id = user_objs[0].inviter_id
 
                 if renewal_objs.count() == 1 and inviter_id:
+                    print('=-----------------上线人充值 -->', renewal_objs[0].price)
                     price = renewal_objs[0].price  #充值钱数
                     cumulative_amount = price * 0.3  # 一级分享人应加钱数  30%
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
