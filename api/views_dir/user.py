@@ -152,14 +152,15 @@ def user_oper(request, oper_type, o_id):
         # 修改手机号
         elif oper_type == "update_phone_number":
             phone_number = request.POST.get('phone_number')
-            flag = re.match(r"^1\d{10}$", phone_number)      # 验证是否以1开头，并且是11位的数字
-            if phone_number and flag:
+            phone_pat = re.compile('^(13\\d|14[5|7]|15\\d|166|17[3|6|7]|18\\d)\\d{8}$')
+            res = re.search(phone_pat, phone_number)
+            if res:
                 models.Userprofile.objects.filter(id=user_id).update(phone_number=phone_number)
                 response.code = 200
                 response.msg = "修改成功"
             else:
                 response.code = 301
-                response.msg = "手机号传参异常"
+                response.msg = "请填写正确手机号"
 
         # 修改微信二维码
         elif oper_type == "update_qr_code":
