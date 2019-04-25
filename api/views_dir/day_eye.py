@@ -205,7 +205,7 @@ def day_eye_oper(request, oper_type, o_id):
             elif oper_type == 'add_customer_info':
                 pass
 
-            # 修改客户资料
+            # 修改客户资料 个人信息等
             elif oper_type == 'update_customer_info':
                 customer_info = request.POST.get('customer_info')
                 objs = models.user_comments_customer_information.objects.filter(

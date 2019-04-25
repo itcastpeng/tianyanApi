@@ -215,6 +215,15 @@ def team_oper(request, oper_type, o_id):
                 response.code = 301
                 response.data = json.loads(forms_obj.errors.as_json())
 
+        # 删除团队
+        elif oper_type == 'delete':
+            member_objs = models.UserprofileTeam.objects.filter(team_id=o_id)
+            member_objs.delete()
+            team_objs = models.Team.objects.filter(id=o_id)
+            team_objs.delete()
+            response.code = 200
+            response.msg = '删除团队成功'
+
     else:
         # 查看团队人员列表
         if oper_type == "select_user_list":
