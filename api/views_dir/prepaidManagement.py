@@ -85,7 +85,7 @@ def weixin_pay(request, oper_type, o_id):
         collection = DOMTree.documentElement
         data = ['mch_id', 'return_code', 'appid', 'openid', 'cash_fee', 'out_trade_no']
         resultData = xmldom_parsing.xmldom(collection, data)
-
+        print('resultData-=------------> ', resultData)
         renewal_log_objs = models.renewal_log.objects.filter(pay_order_no=resultData['out_trade_no'])
         if resultData['return_code'] == 'SUCCESS':
             renewal_log_obj = renewal_log_objs[0]
@@ -126,7 +126,7 @@ def weixin_pay(request, oper_type, o_id):
                             two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
                             two_user_obj.cumulative_amount = F('make_money') + cumulative_amount
                             two_user_obj.save()
-
+                    print('--------------------支付成功-------------')
                     models.renewal_log.objects.filter(create_user_id=pay_user_id, isSuccess=0).delete()  # 删除该人原有 未成功 订单
                 else:
                     objs = models.renewal_log.objects.filter(pay_order_no=result_data.get('out_trade_no'))

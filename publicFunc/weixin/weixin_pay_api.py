@@ -38,7 +38,7 @@ class weixin_pay_api(WeixinApiPublic):
             'out_trade_no': dingdanhao,                 # 订单号
             'total_fee': total_fee,                     # 金额(分 为单位)
             'spbill_create_ip': '0.0.0.0',              # 终端IP
-            'notify_url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/weixin_pay/wxpay',
+            'notify_url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/weixin_pay/wxpay/0',
             'trade_type': 'JSAPI'                    # 支付方式  NATIVE--Native支付、APP--app支付，MWEB--H5支付
         }
         print('result_data===========> ', result_data)
