@@ -138,10 +138,9 @@ def payback(request):
                         inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
                         inviter_id_user_obj.save()
 
-                        two_inviter_id = None
                         if inviter_id_user_obj.inviter:
                             two_inviter_id = inviter_id_user_obj.inviter_id
-                        if two_inviter_id:
+
                             print('=-========================二级分享人========================')
                             two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
                             if two_user_obj.vip_type == 2:
