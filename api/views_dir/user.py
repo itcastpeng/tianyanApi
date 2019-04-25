@@ -264,7 +264,7 @@ def user_oper(request, oper_type, o_id):
 
             q = Q()
             q.add(Q(create_user_id__in=data_list) | Q(create_user__inviter_id__in=data_list), Q.AND)
-            print('=-000000000000000000000---------------> ', q)
+
             number_clinch_deal_objs = models.renewal_log.objects.filter(
                 q,
                 isSuccess=1
@@ -273,7 +273,6 @@ def user_oper(request, oper_type, o_id):
                 'create_user__set_avator'
             ).distinct()
             response_data['number_clinch_count'] = number_clinch_deal_objs.count()  # 成交人数
-            print('number_clinch_deal_objs--------> ', number_clinch_deal_objs)
 
 
             if o_id and int(o_id) == 1:  # 邀请人数详情

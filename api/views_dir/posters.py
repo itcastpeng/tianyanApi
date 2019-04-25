@@ -3,7 +3,7 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.posters import AddForm, UpdateForm, SelectForm, UpdatePosterInfoForm
+from api.forms.posters import AddForm, UpdateForm, SelectForm, posterInfoForm
 from publicFunc.play_watermark import watermark # 图片打水印
 from publicFunc.base64_encryption import b64decode
 from publicFunc.account import randon_str
@@ -180,29 +180,14 @@ def posters_oper(request, oper_type, o_id):
 
                 posters_status = int(posters_status)
                 if posters_status == 1:
-                    # obj = models.Userprofile.objects.get(id=user_id)
-                    # set_avator = obj.set_avator
-
-                    # if 'statics/img' not in set_avator:  # 如果不是自己服务器的图片 则保存在咱们的服务器
-                    #     ret = requests.get(set_avator)
-                    #     set_avator = os.path.join('statics', 'img') + randon_str() + '.png'
-                    #     with open(set_avator, 'wb') as e:
-                    #         e.write(ret.content)
-                    #     obj.set_avator = set_avator # 更改该人头像地址
-                    #     obj.save()
-
-                    # data = {
-                    #     'posters_status': posters_status,
-                    #     'img_path': img_path,
-                    #     'name': b64decode(obj.name),
-                    #     'phone': obj.phone_number,
-                    #     'set_avator': set_avator,
-                    # }
                     data = {
                         'user_id': user_id,
                         'posters':o_id,
                         'posters_status':posters_status
                     }
+                    watermark_objs = watermark(data)  # 实例化
+                    path = watermark_objs.posters_play_watermark()
+                    response.data = {'path': path}
 
                 else:
                     place = request.GET.get('place')                # 地址
@@ -211,6 +196,7 @@ def posters_oper(request, oper_type, o_id):
                     zhu_title = request.GET.get('title')            # 主标题
                     name = request.GET.get('name')                  # 姓名
                     phone = request.GET.get('phone')                # 电话
+
                     data = {
                         'posters_status': posters_status,
                         'img_path': img_path,
@@ -221,13 +207,17 @@ def posters_oper(request, oper_type, o_id):
                         'time': time,
                         'place': place,
                     }
-                # print('data-----------> ', data)
-                watermark_objs = watermark(data) # 实例化
-                path = watermark_objs.posters_play_watermark()
-                response.code = 200
-                response.msg = '生成成功'
-                print('-------生成海报路径-------> ', path)
-                response.data = {'path':path}
+                    form = posterInfoForm(data)
+                    if form.is_valid():
+                        watermark_objs = watermark(data) # 实例化
+                        path = watermark_objs.posters_play_watermark()
+                        response.code = 200
+                        response.msg = '生成成功'
+                        response.data = {'path':path}
+                    else:
+                        response.code = 301
+                        response.msg = json.loads(form.errors.as_json())
+
             else:
                 response.code = 301
                 response.msg = '海报被删除'

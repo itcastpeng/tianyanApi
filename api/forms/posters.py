@@ -119,7 +119,7 @@ class SelectForm(forms.Form):
 
 
 # 海报修改
-class UpdatePosterInfoForm(forms.Form):
+class posterInfoForm(forms.Form):
     title = forms.CharField(
         required=True,
         error_messages={
