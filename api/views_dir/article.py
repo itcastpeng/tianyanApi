@@ -174,7 +174,6 @@ def article(request):
                         # 记录查看次数
                         obj.look_num = F('look_num') + 1
                         obj.save()
-
                     # 热卖商品 我的里面设置是否展示
                     goods_list = []
                     if user_obj.show_product:
@@ -189,11 +188,6 @@ def article(request):
                             good_objs = good_objs[0:1]
 
                         for good_obj in good_objs:
-                            # pub = 'micro_' + str(good_obj.id)
-                            # url = forwarding_article(
-                            #     pub=pub,
-                            #     user_id=good_obj.goods_classify.oper_user_id,
-                            # )
                             goods_list.append({
                                 'id': good_obj.id,
                                 'goods_describe': good_obj.goods_describe,  # 商品描述
@@ -201,6 +195,7 @@ def article(request):
                                 'goods_name': good_obj.goods_name,  # 商品名称
                                 'cover_img': good_obj.cover_img,  # 封面图
                             })
+                    result_data['goods_list'] = goods_list
 
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
                     result_data['create_user__name'] = obj.create_user.name

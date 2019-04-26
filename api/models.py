@@ -85,17 +85,6 @@ class Userprofile(models.Model):
     cumulative_amount = models.CharField(verbose_name='累计钱数', max_length=64, default=0)
     make_money = models.CharField(verbose_name='待提钱数', max_length=64, default=0)
 
-# 微商用户和团队关系表
-class UserprofileTeam(models.Model):
-    user = models.ForeignKey('Userprofile', verbose_name="微商用户")
-    team = models.ForeignKey('Team', verbose_name="团队")
-    type_choices = (
-        (1, "普通成员"),
-        (2, "管理员"),
-    )
-    type = models.SmallIntegerField(verbose_name="成员类型", choices=type_choices, default=1)
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-
 
 # 客户表(用户的客户)
 class Customer(models.Model):
@@ -144,7 +133,7 @@ class user_comments_customer_information(models.Model):
     customer_info = models.TextField(verbose_name='客户信息', null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-"""  文章相关的 数据表"""
+"""文章相关 数据表"""
 
 # 文章管理
 class Article(models.Model):
@@ -203,6 +192,7 @@ class SelectClickArticleLog(models.Model):
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 
+"""商品相关 数据表"""
 
 # 商品分类
 class GoodsClassify(models.Model):
@@ -230,6 +220,7 @@ class Goods(models.Model):
     # goods_picture = models.TextField(verbose_name='商品图片')
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
 
+"""海报相关 数据表"""
 
 # 海报管理
 class Posters(models.Model):
@@ -241,6 +232,7 @@ class Posters(models.Model):
         (2, '邀请函')
     )
     posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
+
 
 # 续费管理
 class renewal_management(models.Model):
@@ -269,11 +261,28 @@ class renewal_log(models.Model):
     overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
     isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
 
+"""团队相关 数据表"""
+
 # 团队表
 class Team(models.Model):
     name = models.CharField(verbose_name="团队名称", max_length=128)
     create_user = models.ForeignKey('Userprofile', verbose_name="创建人", related_name="team_create_user")
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+# 微商用户和团队关系表
+class UserprofileTeam(models.Model):
+    user = models.ForeignKey('Userprofile', verbose_name="微商用户")
+    team = models.ForeignKey('Team', verbose_name="团队")
+    type_choices = (
+        (1, "普通成员"),
+        (2, "管理员"),
+    )
+    type = models.SmallIntegerField(verbose_name="成员类型", choices=type_choices, default=1)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+
+
+"""微信问题 数据表"""
 
 # 保存微信回调code用 (获取用户信息 微信会回调多次 code一致 多次请求微信同样code获取不到用户信息)
 class save_code(models.Model):
