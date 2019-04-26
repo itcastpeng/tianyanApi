@@ -27,7 +27,7 @@ def qiniu_oper(request, oper_type):
             classify__create_user__isnull=True,
         )
         for obj in objs:
-            if 'statics' in obj.cover_img:
+            if 'statics' in obj.cover_img and os.path.exists(obj.cover_img):
                 token = qiniu_get_token()
                 img_path = update_qiniu(obj.cover_img, token)
                 obj.cover_img = img_path
