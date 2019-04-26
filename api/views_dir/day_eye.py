@@ -46,9 +46,15 @@ def day_eye(request):
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
+            ret_data = []
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             user_id = forms_obj.cleaned_data['user_id']
+
+            # if length != 0:
+            #     start_line = (current_page - 1) * length
+            #     stop_line = start_line + length
+            #     objs = objs[start_line: stop_line]
 
             objs = models.SelectArticleLog.objects.filter(
                 inviter_id=user_id
@@ -56,32 +62,72 @@ def day_eye(request):
                 'customer'
             ).values(
                 'customer_id', 'customer__name', 'customer__set_avator'
-            ).distinct().annotate(Count('customer_id')).exclude(customer_id__isnull=True)
-
-            if length != 0:
-                start_line = (current_page - 1) * length
-                stop_line = start_line + length
-                objs = objs[start_line: stop_line]
+            ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
             count = objs.count()
 
             # 返回的数据
-            ret_data = []
+            data_list = []
             for obj in objs:
                 customer_id = obj.get('customer_id')
-                article_count = models.SelectArticleLog.objects.filter(
-                    customer_id=customer_id,
-                    inviter_id=user_id,
-                ).values('article_id').distinct().count()
                 customer__name = ''
                 if obj.get('customer__name'):
                     customer__name = b64decode(obj.get('customer__name'))
-                ret_data.append({
+
+                article_objs = models.SelectArticleLog.objects.filter(
+                    customer_id=customer_id,
+                    inviter_id=user_id,
+                ).distinct().order_by('-create_datetime')
+
+                article_count = article_objs.count()
+                data_list.append({
                     'customer_id': customer_id,
                     'customer__name': customer__name,
                     'customer__set_avator': obj.get('customer__set_avator'),
-                    'customer_id__count': obj.get('customer_id__count'),    # 总共查看几次
-                    'article_count': article_count,                         # 总共查看几篇文章
+
+                    'text': '看了{}篇文章, 总共查看{}次'.format(
+                        article_count,                  # 总共查看几篇文章
+                        obj.get('customer_id__count') # # 总共查看几次
+                    ),
+                    'status':1, # 代表文章
+                    'create_date':article_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S') # 代表文章
                 })
+
+
+
+            objs = models.customer_look_goods_log.objects.filter(
+                user_id=user_id
+            ).select_related(
+                'customer'
+            ).values(
+                'customer_id', 'customer__name', 'customer__set_avator'
+            ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
+            for obj in objs:
+                customer_id = obj.get('customer_id')
+                customer__name = ''
+                if obj.get('customer__name'):
+                    customer__name = b64decode(obj.get('customer__name'))
+
+                goods_objs = models.customer_look_goods_log.objects.filter(
+                    customer_id=customer_id,
+                    user_id=user_id,
+                ).distinct().order_by('-create_datetime')
+                goods_count = goods_objs.count()
+                data_list.append({
+                    'customer_id': customer_id,
+                    'customer__name': customer__name,
+                    'customer__set_avator': obj.get('customer__set_avator'),
+
+                    'text': '看了{}件商品, 总共查看{}次'.format(
+                        goods_count,  # 总共查看几篇文章
+                        obj.get('customer_id__count')  # # 总共查看几次
+                    ),
+                    'status': 2,  # 代表商品
+                    'create_date': goods_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
+                })
+
+
+            ret_data = sorted(data_list, key=lambda x: x['create_date'], reverse=True)
+
 
             #  查询成功 返回200 状态码
             response.code = 200
@@ -318,67 +364,11 @@ def day_eye_oper(request, oper_type, o_id):
                     'title':'标题',
                 }
 
-            # 谁看了我 详情
+            # 谁看了我 (文章详情)
             elif oper_type == 'day_eye_detail':
                 user_id = forms_obj.cleaned_data['user_id']
                 article_objs = models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id)
                 info_objs = article_objs.order_by(order)
-
-
-                # 谁看了我详情 右上角星星数据
-                info_data = {
-                    'xueli': '初中',
-                    'diqu': '北京',
-                    'guanxi': '朋友',
-                    'qinmidu': 1,
-                    'yingxiangli': 1,
-                    'qituxin': 1,
-                    'shiyetaidu': 1,
-                    'renmaiquan': 1,
-                    'jingjinengli': 1,
-                    'customer_demand':[]
-                }
-                information_objs = models.user_comments_customer_information.objects.filter(user_id=user_id, customer_id=o_id)
-                if information_objs:
-                    information_obj = information_objs[0]
-                    try:
-                        customer_info = eval(information_obj.customer_info)
-                    except Exception:
-                        customer_info = information_obj.customer_info
-                    customer_label = customer_info.get('customer_label')
-
-                    try:
-                        customer_demand = json.loads(customer_info.get('customer_demand'))
-                    except Exception:
-                        customer_demand = customer_info.get('customer_demand')
-
-                    info_data = {
-                        'xueli': customer_label.get('xueli'),
-                        'diqu': customer_label.get('diqu'),
-                        'guanxi': customer_label.get('guanxi'),
-                        'qinmidu': customer_label.get('qinmidu'),
-                        'yingxiangli': customer_label.get('yingxiangli'),
-                        'qituxin': customer_label.get('qituxin'),
-                        'shiyetaidu': customer_label.get('shiyetaidu'),
-                        'renmaiquan': customer_label.get('renmaiquan'),
-                        'jingjinengli': customer_label.get('jingjinengli'),
-                        'customer_demand': customer_demand,
-                    }
-                avg_stars_list = []
-                for k, v in info_data.items():
-                    if k in ['qinmidu', 'yingxiangli', 'qituxin', 'shiyetaidu', 'renmaiquan', 'jingjinengli']:
-                        avg_stars_list.append(int(v))
-                avg_stars = sum(avg_stars_list) / 6  # 右上角星星 平均值
-
-                # 客户基本信息
-                obj = info_objs[0]
-                customer_info = {
-                    'customer_id': obj.customer_id,
-                    'customer__name': b64decode(obj.customer.name),
-                    'customer__set_avator': obj.customer.set_avator,
-                    'info_data': info_data,
-                    'avg_stars': avg_stars,
-                }
 
                 objs = article_objs.values('article_id', 'article__title', 'article__cover_img').annotate(Count('id'))
                 is_remake_count = models.customer_information_the_user.objects.filter(user_id=user_id, customer_id=o_id).count()
@@ -418,31 +408,18 @@ def day_eye_oper(request, oper_type, o_id):
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'customer_info': customer_info,
                     'ret_data': ret_data,
                     'data_count': count,
                     'is_remake': is_remake,
                 }
                 response.note = {
-                    'customer_id': "客户id",
-                    'customer__name': "客户姓名",
-                    'customer__set_avator': "客户头像",
                     'article_id': "文章ID",
                     'article__title': "文章标题",
-                    'close_datetime': "关闭页面时间",
-                    'create_datetime': "创建时间",
                     'article_info': "看了几次 最后一次查看时间",
                     'time_length': "时长",
                     'select_datetime': "查看时间",
                     'article__cover_img': "文章图片",
-                    'is_remake': "该客户是否有备注(如果有那么可删除)",
-                    'qinmidu': '亲密度',
-                    'yingxiangli': '影响力',
-                    'qituxin': '企图心',
-                    'shiyetaidu': '事业态度',
-                    'renmaiquan': '人脉圈',
-                    'jingjinengli': '经济能力',
-                    'avg_stars':'星星平均值'
+                    'create_datetime': "创建时间",
                 }
 
             # 按文章查看(天眼功能)列表页
@@ -640,6 +617,87 @@ def day_eye_oper(request, oper_type, o_id):
                         'jingjinengli':'经济能力',
                     }
                 }
+
+            # 查看客户详情(客户信息)
+            elif oper_type == 'info_detail':
+                info_objs = models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id).order_by(order)
+                # 谁看了我详情 右上角星星数据
+                info_data = {
+                    'xueli': '初中',
+                    'diqu': '北京',
+                    'guanxi': '朋友',
+                    'qinmidu': 1,
+                    'yingxiangli': 1,
+                    'qituxin': 1,
+                    'shiyetaidu': 1,
+                    'renmaiquan': 1,
+                    'jingjinengli': 1,
+                    'customer_demand':[]
+                }
+                information_objs = models.user_comments_customer_information.objects.filter(user_id=user_id, customer_id=o_id)
+                if information_objs:
+                    information_obj = information_objs[0]
+                    try:
+                        customer_info = eval(information_obj.customer_info)
+                    except Exception:
+                        customer_info = information_obj.customer_info
+                    customer_label = customer_info.get('customer_label')
+
+                    try:
+                        customer_demand = json.loads(customer_info.get('customer_demand'))
+                    except Exception:
+                        customer_demand = customer_info.get('customer_demand')
+
+                    info_data = {
+                        'xueli': customer_label.get('xueli'),
+                        'diqu': customer_label.get('diqu'),
+                        'guanxi': customer_label.get('guanxi'),
+                        'qinmidu': customer_label.get('qinmidu'),
+                        'yingxiangli': customer_label.get('yingxiangli'),
+                        'qituxin': customer_label.get('qituxin'),
+                        'shiyetaidu': customer_label.get('shiyetaidu'),
+                        'renmaiquan': customer_label.get('renmaiquan'),
+                        'jingjinengli': customer_label.get('jingjinengli'),
+                        'customer_demand': customer_demand,
+                    }
+                avg_stars_list = []
+                for k, v in info_data.items():
+                    if k in ['qinmidu', 'yingxiangli', 'qituxin', 'shiyetaidu', 'renmaiquan', 'jingjinengli']:
+                        avg_stars_list.append(int(v))
+                avg_stars = sum(avg_stars_list) / 6  # 右上角星星 平均值
+
+                # 客户基本信息
+                obj = info_objs[0]
+                customer_info = {
+                    'customer_id': obj.customer_id,
+                    'customer__name': b64decode(obj.customer.name),
+                    'customer__set_avator': obj.customer.set_avator,
+                    'info_data': info_data,
+                    'avg_stars': avg_stars,
+                }
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'customer_info': customer_info
+                }
+                response.note = {
+                    'customer_id': "客户id",
+                    'customer__name': "客户姓名",
+                    'customer__set_avator': "客户头像",
+                    'is_remake': "该客户是否有备注(如果有那么可删除)",
+                    'qinmidu': '亲密度',
+                    'yingxiangli': '影响力',
+                    'qituxin': '企图心',
+                    'shiyetaidu': '事业态度',
+                    'renmaiquan': '人脉圈',
+                    'jingjinengli': '经济能力',
+                    'avg_stars': '星星平均值'
+                }
+
+            # 谁看了我(商品详情)
+            elif oper_type == 'day_eye_goods_detail':
+                pass
 
             else:
                 response.code = 402
