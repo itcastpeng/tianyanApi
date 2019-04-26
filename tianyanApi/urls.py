@@ -18,5 +18,4 @@ from django.conf.urls import url, include
 
 urlpatterns = [
     url('api/', include('api.urls')),
-    url('celery_pub/', include('celery_pub.urls')),
 ]

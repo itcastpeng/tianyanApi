@@ -187,6 +187,7 @@ def posters_oper(request, oper_type, o_id):
                     }
                     watermark_objs = watermark(data)  # 实例化
                     path = watermark_objs.posters_play_watermark()
+                    response.code = 200
                     response.data = {'path': path}
 
                 else:

@@ -5,6 +5,7 @@ from django.conf.urls import url
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
     upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article, html_oper, qiniu_oper
 
+from api.views_dir.my_celery import day_eye_data
 
 urlpatterns = [
 
@@ -98,5 +99,9 @@ urlpatterns = [
 
     # 七牛云操作
     url(r'^qiniu_oper/(?P<oper_type>\w+)$', qiniu_oper.qiniu_oper),
+
+    # celery_--------------------------
+    url(r'^day_eye_data$', day_eye_data.day_eye_data),
+
 
 ]
