@@ -4,7 +4,7 @@ import qiniu
 from django.http import JsonResponse
 from api import models
 import json, requests, os
-
+from publicFunc.qiniu_oper import qiniu_get_token,update_qiniu
 # 前端请求
 def qiniu_oper(request, oper_type):
     response = Response.ResponseObj()
@@ -25,25 +25,13 @@ def qiniu_oper(request, oper_type):
         print('-=-----------------------000000000000000000-----------------------------------=-')
         objs = models.Article.objects.filter(
             classify__create_user__isnull=True,
-
         )
         for obj in objs:
-            print('obj.id----------> ', obj.id)
-            content = json.loads(obj.content)
-            if len(content) <= 5:
-                print('obj.style------。 ', obj.style)
-                if os.path.exists(obj.style):
-                    os.remove(obj.style)
-                if os.path.exists(obj.cover_img):
-                    os.remove(obj.cover_img)
-                url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/delete_article/{}?timestamp=1545822031837&rand_str=b965c1e6875a3d4e7793c3ca20801109&user_id=16'.format(
-                    obj.id
-                )
-                ret = requests.post(url)
-                print('ret.text-----> ', ret.text)
-                print(ret.json())
-
-
+            if 'statics' in obj.cover_img:
+                token = qiniu_get_token()
+                img_path = update_qiniu(obj.cover_img, token)
+                obj.cover_img = img_path
+                obj.save()
 
     return JsonResponse(response.__dict__)
 
