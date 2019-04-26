@@ -175,6 +175,32 @@ def article(request):
                         obj.look_num = F('look_num') + 1
                         obj.save()
 
+                    # 热卖商品 我的里面设置是否展示
+                    goods_list = []
+                    if user_obj.show_product:
+                        good_objs = models.Goods.objects.filter(goods_classify__oper_user_id=user_id)
+
+                        good_count = good_objs.count()
+                        if good_count >= 2:
+                            good_objs = good_objs[0:2]
+                        elif good_count <= 0:
+                            good_objs = good_objs
+                        else:
+                            good_objs = good_objs[0:1]
+
+                        for good_obj in good_objs:
+                            # pub = 'micro_' + str(good_obj.id)
+                            # url = forwarding_article(
+                            #     pub=pub,
+                            #     user_id=good_obj.goods_classify.oper_user_id,
+                            # )
+                            goods_list.append({
+                                'id': good_obj.id,
+                                'goods_describe': good_obj.goods_describe,  # 商品描述
+                                'price': good_obj.price,  # 商品价格
+                                'goods_name': good_obj.goods_name,  # 商品名称
+                                'cover_img': good_obj.cover_img,  # 封面图
+                            })
 
                 if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
                     result_data['create_user__name'] = obj.create_user.name

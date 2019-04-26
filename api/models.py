@@ -144,8 +144,8 @@ class user_comments_customer_information(models.Model):
     customer_info = models.TextField(verbose_name='客户信息', null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
+"""  文章相关的 数据表"""
 
-# ---------------------------------文章相关--------
 # 文章管理
 class Article(models.Model):
     title = models.CharField(verbose_name="文章标题", max_length=256, null=True)
@@ -202,14 +202,7 @@ class SelectClickArticleLog(models.Model):
     article = models.ForeignKey('Article', verbose_name="点赞文章")
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-# 用户分享文章表
-# class users_forward_articles(models.Model):
-#     user = models.ForeignKey('Userprofile', verbose_name='分享文章的用户')
-#     article = models.ForeignKey('Article', verbose_name='分享的文章')
-#     article_url = models.TextField(verbose_name='文章链接')
-#     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-# -----------------------------------商品相关表--------------------------
 
 # 商品分类
 class GoodsClassify(models.Model):
