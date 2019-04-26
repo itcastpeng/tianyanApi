@@ -28,6 +28,7 @@ def qiniu_oper(request, oper_type):
 
         )
         for obj in objs:
+            print('obj.id----------> ', obj.id)
             content = json.loads(obj.content)
             if len(content) <= 5:
                 print('obj.style------。 ', obj.style)
@@ -41,7 +42,6 @@ def qiniu_oper(request, oper_type):
                 ret = requests.post(url)
                 print('ret.text-----> ', ret.text)
                 print(ret.json())
-                print('obj.id----------> ', obj.id)
 
 
 
