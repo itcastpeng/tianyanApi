@@ -661,9 +661,9 @@ def day_eye_oper(request, oper_type, o_id):
                 obj = models.Customer.objects.get(id=o_id)
                 # 客户基本信息
                 customer_info = {
-                    'customer_id': obj.customer_id,
-                    'customer__name': b64decode(obj.customer.name),
-                    'customer__set_avator': obj.customer.set_avator,
+                    'customer_id': obj.id,
+                    'customer__name': b64decode(obj.name),
+                    'customer__set_avator': obj.set_avator,
                     'info_data': info_data,
                     'avg_stars': avg_stars,
                 }
