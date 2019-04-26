@@ -83,7 +83,7 @@ def day_eye_data(request):
             })
         for i in data_list:
             eye_objs = models.day_eye_celery.objects.filter(
-                user_id=i.get('user_id'),
+                user_id=user_id,
                 status=i.get('status'),
                 customer_id=i.get('customer_id'),
             )
