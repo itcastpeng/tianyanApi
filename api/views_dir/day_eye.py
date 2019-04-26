@@ -62,7 +62,7 @@ def day_eye(request):
             for obj in objs:
                 ret_data.append({
                     'customer_id': obj.customer_id,
-                    'customer__name': obj.customer.name,
+                    'customer__name': b64decode(obj.customer.name),
                     'customer__set_avator': obj.customer.set_avator,
                     'text': obj.text,
                     'status': obj.status,
