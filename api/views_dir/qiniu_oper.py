@@ -42,7 +42,6 @@ def qiniu_oper(request, oper_type):
                 print('ret.text-----> ', ret.text)
                 print(ret.json())
                 print('obj.id----------> ', obj.id)
-                break
 
 
 
