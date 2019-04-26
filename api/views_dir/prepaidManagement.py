@@ -21,6 +21,7 @@ def weixin_pay(request, oper_type, o_id):
         user_id = request.GET.get('user_id')
         fee_objs = models.renewal_management.objects.filter(id=o_id)
         if fee_objs:
+            models.renewal_log.objects.filter(create_user_id=user_id, isSuccess=0).delete() # 删除未付款的订单
             userObjs = models.Userprofile.objects.filter(id=user_id)
             user_obj = userObjs[0]
             fee_obj = fee_objs[0]
@@ -156,7 +157,6 @@ def payback(request):
                                 two_user_obj.save()
 
                 print('--------------------支付成功-------------')
-                models.renewal_log.objects.filter(create_user_id=pay_user_id, isSuccess=0).delete()  # 删除该人原有 未成功 订单
             else:
                 objs = models.renewal_log.objects.filter(pay_order_no=result_data.get('out_trade_no'))
                 if objs:

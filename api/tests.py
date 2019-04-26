@@ -213,21 +213,24 @@ from urllib.parse import unquote
 
 
 
-price = 0.10
-
-one = float(price) * 0.3
-# one = round(one, 2)
-two = float(price) * 0.15
-# two = round(two, 2)
-print(one, two )
-
-test = '3'
-
-print(float(test) / 100)
-
-
+# price = 0.10
+#
+# one = float(price) * 0.3
+# # one = round(one, 2)
+# two = float(price) * 0.15
+# # two = round(two, 2)
+# print(one, two )
+#
+# test = '3'
+#
+# print(float(test) / 100)
 
 
+
+l = ["\n", "\n"]
+print(
+    len(l)
+)
 
 
 

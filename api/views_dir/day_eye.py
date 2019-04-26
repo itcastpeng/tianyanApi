@@ -741,6 +741,7 @@ def day_eye_oper(request, oper_type, o_id):
                 response.data = {
                     'data_list': data_list
                 }
+
             else:
                 response.code = 402
                 response.msg = '请求异常'

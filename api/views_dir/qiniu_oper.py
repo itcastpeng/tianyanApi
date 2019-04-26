@@ -2,8 +2,8 @@
 from publicFunc import Response
 import qiniu
 from django.http import JsonResponse
-
-
+from api import models
+import json, requests
 
 # 前端请求
 def qiniu_oper(request, oper_type):
@@ -19,6 +19,29 @@ def qiniu_oper(request, oper_type):
         response.code = 200
         response.msg = '生成成功'
         response.data = {'token': token}
+
+
+    elif oper_type == 'test_article':
+        print('-=-----------------------000000000000000000-----------------------------------=-')
+        objs = models.Article.objects.filter(
+            classify__create_user__isnull=True,
+
+        )
+        for obj in objs:
+            content = json.loads(obj.content)
+            if len(content) <= 5:
+                url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/delete_article/{}?timestamp=1545822031837&rand_str=b965c1e6875a3d4e7793c3ca20801109&user_id=16'.format(
+                    obj.id
+                )
+                ret = requests.get(url)
+                print('ret.text-----> ', ret.text)
+                print(ret.json())
+
+
+
+
     return JsonResponse(response.__dict__)
+
+
 
 
