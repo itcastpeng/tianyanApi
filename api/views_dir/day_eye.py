@@ -139,9 +139,9 @@ def day_eye(request):
             response.note = {
                 'customer_id': "查看人ID",
                 'customer__name': "查看人姓名",
-                'customer_id__count': '总共查看几次',
-                'article_count': '总共查看几篇文章',
                 'customer__set_avator': '客户头像',
+                'text': '显示的文字',
+                'status': '区分 文章还是商品',
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
