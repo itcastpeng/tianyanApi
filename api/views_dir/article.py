@@ -190,7 +190,7 @@ def article(request):
                         for good_obj in good_objs:
                             goods_list.append({
                                 'id': good_obj.id,
-                                'goods_describe': good_obj.goods_describe,  # 商品描述
+                                # 'goods_describe': good_obj.goods_describe,  # 商品描述
                                 'price': good_obj.price,  # 商品价格
                                 'goods_name': good_obj.goods_name,  # 商品名称
                                 'cover_img': good_obj.cover_img,  # 封面图
@@ -612,7 +612,7 @@ def article_customer_oper(request, oper_type):
                             user_id=good_obj.goods_classify.oper_user_id,
                         )
                         goods_list.append({
-                            'goods_describe':good_obj.goods_describe,# 商品描述
+                            # 'goods_describe':good_obj.goods_describe,# 商品描述
                             'price':good_obj.price,             # 商品价格
                             'goods_name':good_obj.goods_name,   # 商品名称
                             'cover_img': good_obj.cover_img,    # 封面图
@@ -671,7 +671,7 @@ def article_customer_oper(request, oper_type):
                         'is_like': '是否点赞',
                     },
                     'goods_list_热门商品':{
-                        'goods_describe': '商品描述',
+                        # 'goods_describe': '商品描述',
                         'price': '商品价格',
                         'goods_name': '商品名称',
                         'cover_img': '封面图',
@@ -764,6 +764,16 @@ def article_customer_oper(request, oper_type):
                         'cover_img': obj.cover_img,  # 商品封面图片
                         'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                     })
+
+
+                # 查询详情记录
+                id = request.GET.get('id')
+                if id:
+                    models.customer_look_goods_log.objects.create(
+                        goods_id=id,
+                        customer_id=user_id,
+                        user_id=inviter_user_id
+                    )
 
                 response.code = 200
                 response.msg = '查询成功'

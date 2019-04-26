@@ -181,7 +181,7 @@ class SelectArticleLog(models.Model):
     )
 
     article = models.ForeignKey('Article', verbose_name="查看文章")
-    close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
+    # close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 # 客户点赞文章日志表
@@ -219,6 +219,14 @@ class Goods(models.Model):
     goods_status = models.SmallIntegerField(verbose_name='商品状态', choices=goods_status_choices, default=2)
     # goods_picture = models.TextField(verbose_name='商品图片')
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
+
+# 客户查看商品 日志表
+class customer_look_goods_log(models.Model):
+    customer = models.ForeignKey(to='Customer', verbose_name='哪个客户查看了商品', null=True)
+    goods = models.ForeignKey(to='Goods', verbose_name='查看了哪个商品', null=True)
+    user = models.ForeignKey(to='Userprofile', verbose_name='查看的那个用户', null=True)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
 
 """海报相关 数据表"""
 
