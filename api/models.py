@@ -302,3 +302,16 @@ class send_msg_duplicate(models.Model):
     user_id = models.IntegerField(verbose_name='记录user_id避免重复', null=True)
     create_date_time = models.CharField(verbose_name='创建时间', max_length=64, null=True)
 
+
+"""天眼功能(谁看了我) celery跑出来的数据 """
+
+class day_eye_celery(models.Model):
+    user = models.ForeignKey(to='Userprofile', verbose_name='哪个用户的数据', null=True)
+    customer = models.ForeignKey(to='Customer', verbose_name='哪个客户', null=True)
+    text = models.CharField(verbose_name='文本内容', max_length=256, null=True)
+    status_choices = (
+        (1, '文章'),
+        (2, '商品')
+    )
+    status = models.SmallIntegerField(verbose_name='类别 区分文章和商品', choices=status_choices, null=True)
+    create_date = models.DateTimeField(verbose_name='创建时间', null=True)

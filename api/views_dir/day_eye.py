@@ -49,13 +49,8 @@ def day_eye(request):
             ret_data = []
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
+
             user_id = forms_obj.cleaned_data['user_id']
-
-            # if length != 0:
-            #     start_line = (current_page - 1) * length
-            #     stop_line = start_line + length
-            #     objs = objs[start_line: stop_line]
-
             objs = models.SelectArticleLog.objects.filter(
                 inviter_id=user_id
             ).select_related(
@@ -85,14 +80,12 @@ def day_eye(request):
                     'customer__set_avator': obj.get('customer__set_avator'),
 
                     'text': '看了{}篇文章, 总共查看{}次'.format(
-                        article_count,                  # 总共查看几篇文章
-                        obj.get('customer_id__count') # # 总共查看几次
+                        article_count,  # 总共查看几篇文章
+                        obj.get('customer_id__count')  # # 总共查看几次
                     ),
-                    'status':1, # 代表文章
-                    'create_date':article_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S') # 代表文章
+                    'status': 1,  # 代表文章
+                    'create_date': article_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
                 })
-
-
 
             objs = models.customer_look_goods_log.objects.filter(
                 user_id=user_id
@@ -124,7 +117,6 @@ def day_eye(request):
                     'status': 2,  # 代表商品
                     'create_date': goods_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
                 })
-
 
             ret_data = sorted(data_list, key=lambda x: x['create_date'], reverse=True)
 
