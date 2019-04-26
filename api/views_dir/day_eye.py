@@ -388,8 +388,8 @@ def day_eye_oper(request, oper_type, o_id):
                         if int(info_obj.article_id) == int(article_id):
                             time_length = '1秒'
                             create_datetime = info_obj.create_datetime
-                            if info_obj.close_datetime:
-                                time_length = get_min_s(info_obj.close_datetime, create_datetime)
+                            # if info_obj.close_datetime:
+                            #     time_length = get_min_s(info_obj.close_datetime, create_datetime)
                             time_detail.append({
                                 'time_length': time_length,
                                 'select_datetime': create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
