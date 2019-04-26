@@ -3,9 +3,9 @@ from celery import Celery
 from celery.schedules import crontab
 
 app = Celery(
-    broker='redis://redis_host:6379/5',
+    broker='redis://redis_host:6379/6',
     # broker='redis://127.0.0.1:6379/0',
-    backend='redis://redis_host:6379/5',
+    backend='redis://redis_host:6379/6',
     # backend='redis://127.0.0.1:6379/0',
     include=['tianyan_celery.tasks'],
 
