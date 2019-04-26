@@ -20,18 +20,18 @@ def qiniu_oper(request, oper_type):
         response.msg = '生成成功'
         response.data = {'token': token}
 
-
-    elif oper_type == 'test_article':
-        print('-=-----------------------000000000000000000-----------------------------------=-')
-        objs = models.Article.objects.filter(
-            classify__create_user__isnull=True,
-        )
-        for obj in objs:
-            if 'statics' in obj.cover_img and os.path.exists(obj.cover_img):
-                token = qiniu_get_token()
-                img_path = update_qiniu(obj.cover_img, token)
-                obj.cover_img = img_path
-                obj.save()
+    #
+    # elif oper_type == 'test_article':
+    #     print('-=-----------------------000000000000000000-----------------------------------=-')
+    #     objs = models.Article.objects.filter(
+    #         classify__create_user__isnull=True,
+    #     )
+    #     for obj in objs:
+    #         if 'statics' in obj.cover_img and os.path.exists(obj.cover_img):
+    #             token = qiniu_get_token()
+    #             img_path = update_qiniu(obj.cover_img, token)
+    #             obj.cover_img = img_path
+    #             obj.save()
 
     return JsonResponse(response.__dict__)
 
