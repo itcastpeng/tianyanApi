@@ -46,80 +46,27 @@ def day_eye(request):
     if request.method == "GET":
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
-            ret_data = []
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
-
             user_id = forms_obj.cleaned_data['user_id']
-            objs = models.SelectArticleLog.objects.filter(
-                inviter_id=user_id
-            ).select_related(
-                'customer'
-            ).values(
-                'customer_id', 'customer__name', 'customer__set_avator'
-            ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
+
+            objs = models.day_eye_celery.objects.filter(user_id=user_id)
             count = objs.count()
 
-            # 返回的数据
-            data_list = []
+            if length != 0:
+                start_line = (current_page - 1) * length
+                stop_line = start_line + length
+                objs = objs[start_line: stop_line]
+
+            ret_data = []
             for obj in objs:
-                customer_id = obj.get('customer_id')
-                customer__name = ''
-                if obj.get('customer__name'):
-                    customer__name = b64decode(obj.get('customer__name'))
-
-                article_objs = models.SelectArticleLog.objects.filter(
-                    customer_id=customer_id,
-                    inviter_id=user_id,
-                ).distinct().order_by('-create_datetime')
-
-                article_count = article_objs.count()
-                data_list.append({
-                    'customer_id': customer_id,
-                    'customer__name': customer__name,
-                    'customer__set_avator': obj.get('customer__set_avator'),
-
-                    'text': '看了{}篇文章, 总共查看{}次'.format(
-                        article_count,  # 总共查看几篇文章
-                        obj.get('customer_id__count')  # # 总共查看几次
-                    ),
-                    'status': 1,  # 代表文章
-                    'create_date': article_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
+                ret_data.append({
+                    'customer_id': obj.customer_id,
+                    'customer__name': obj.customer.name,
+                    'customer__set_avator': obj.customer.set_avator,
+                    'text': obj.text,
+                    'status': obj.status,
                 })
-
-            objs = models.customer_look_goods_log.objects.filter(
-                user_id=user_id
-            ).select_related(
-                'customer'
-            ).values(
-                'customer_id', 'customer__name', 'customer__set_avator'
-            ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
-            for obj in objs:
-                customer_id = obj.get('customer_id')
-                customer__name = ''
-                if obj.get('customer__name'):
-                    customer__name = b64decode(obj.get('customer__name'))
-
-                goods_objs = models.customer_look_goods_log.objects.filter(
-                    customer_id=customer_id,
-                    user_id=user_id,
-                ).distinct().order_by('-create_datetime')
-                goods_count = goods_objs.count()
-                data_list.append({
-                    'customer_id': customer_id,
-                    'customer__name': customer__name,
-                    'customer__set_avator': obj.get('customer__set_avator'),
-
-                    'text': '看了{}件商品, 总共查看{}次'.format(
-                        goods_count,  # 总共查看几篇文章
-                        obj.get('customer_id__count')  # # 总共查看几次
-                    ),
-                    'status': 2,  # 代表商品
-                    'create_date': goods_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
-                })
-
-            ret_data = sorted(data_list, key=lambda x: x['create_date'], reverse=True)
-
 
             #  查询成功 返回200 状态码
             response.code = 200
