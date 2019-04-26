@@ -181,7 +181,7 @@ class SelectArticleLog(models.Model):
     )
 
     article = models.ForeignKey('Article', verbose_name="查看文章")
-    # close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
+    close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 # 客户点赞文章日志表

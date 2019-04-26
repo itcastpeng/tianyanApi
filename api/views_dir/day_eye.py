@@ -388,8 +388,8 @@ def day_eye_oper(request, oper_type, o_id):
                         if int(info_obj.article_id) == int(article_id):
                             time_length = '1秒'
                             create_datetime = info_obj.create_datetime
-                            # if info_obj.close_datetime:
-                            #     time_length = get_min_s(info_obj.close_datetime, create_datetime)
+                            if info_obj.close_datetime:
+                                time_length = get_min_s(info_obj.close_datetime, create_datetime)
                             time_detail.append({
                                 'time_length': time_length,
                                 'select_datetime': create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
@@ -400,7 +400,7 @@ def day_eye_oper(request, oper_type, o_id):
                     ret_data.append({
                         'article_id': article_id,
                         'article__title': obj.get('article__title'),
-                        'article_info': '看了' + str(obj.get('id__count')) + '次' + '-' + after_time + '前',
+                        'article_info': '看了' + str(obj.get('id__count')) + '次-' + after_time + '前',
                         'time_detail': time_detail,
                         'article__cover_img': obj.get('article__cover_img'),
                     })
@@ -697,8 +697,50 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 谁看了我(商品详情)
             elif oper_type == 'day_eye_goods_detail':
-                pass
+                print('-=------------------')
+                objs = models.customer_look_goods_log.objects.filter(
+                    user_id=user_id,
+                    customer_id=o_id
+                ).select_related('goods').values(
+                    'goods_id',
+                    'goods__cover_img',
+                    'goods__goods_name',
+                ).annotate(Count('id'))
 
+                data_list = []
+                for obj in objs:
+                    goods_id = obj.get('goods_id')
+                    detail_objs = models.customer_look_goods_log.objects.filter(
+                        user_id=user_id,
+                        customer_id=o_id,
+                        goods_id=goods_id
+                    ).order_by('-create_datetime')
+
+                    time_detail = []
+                    for detail_obj in detail_objs: # 详情
+                        time_length = '1秒'
+                        time_detail.append({
+                            'create_datetime': detail_obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                            'time_length': time_length
+                        })
+
+                    time_length = get_min_s(detail_objs[0].create_datetime, datetime.datetime.today())
+                    data_list.append({
+                        'goods_id': goods_id,
+                        'goods__cover_img': obj.get('goods__cover_img'),
+                        'goods__goods_name': obj.get('goods__goods_name'),
+                        'text':'看了{}次-{}前'.format(
+                            obj.get('id__count'),
+                            time_length
+                        ),
+                        'time_detail':time_detail
+                    })
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'data_list': data_list
+                }
             else:
                 response.code = 402
                 response.msg = '请求异常'
