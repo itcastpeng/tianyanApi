@@ -38,7 +38,7 @@ def qiniu_oper(request, oper_type):
                 url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/delete_article/{}?timestamp=1545822031837&rand_str=b965c1e6875a3d4e7793c3ca20801109&user_id=16'.format(
                     obj.id
                 )
-                ret = requests.get(url)
+                ret = requests.post(url)
                 print('ret.text-----> ', ret.text)
                 print(ret.json())
                 print('obj.id----------> ', obj.id)
