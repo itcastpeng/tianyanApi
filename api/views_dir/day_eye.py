@@ -612,7 +612,7 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 查看客户详情(客户信息)
             elif oper_type == 'info_detail':
-                info_objs = models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id).order_by(order)
+                # info_objs = models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id).order_by(order)
                 # 谁看了我详情 右上角星星数据
                 info_data = {
                     'xueli': '初中',
@@ -658,8 +658,8 @@ def day_eye_oper(request, oper_type, o_id):
                         avg_stars_list.append(int(v))
                 avg_stars = sum(avg_stars_list) / 6  # 右上角星星 平均值
 
+                obj = models.Customer.objects.get(id=o_id)
                 # 客户基本信息
-                obj = info_objs[0]
                 customer_info = {
                     'customer_id': obj.customer_id,
                     'customer__name': b64decode(obj.customer.name),
