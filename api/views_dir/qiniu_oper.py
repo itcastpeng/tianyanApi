@@ -3,7 +3,7 @@ from publicFunc import Response
 import qiniu
 from django.http import JsonResponse
 from api import models
-import json, requests
+import json, requests, os
 
 # 前端请求
 def qiniu_oper(request, oper_type):
@@ -30,13 +30,19 @@ def qiniu_oper(request, oper_type):
         for obj in objs:
             content = json.loads(obj.content)
             if len(content) <= 5:
+                print('obj.style------。 ', obj.style)
+                if os.path.exists(obj.style):
+                    os.remove(obj.style)
+                if os.path.exists(obj.cover_img):
+                    os.remove(obj.cover_img)
                 url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/delete_article/{}?timestamp=1545822031837&rand_str=b965c1e6875a3d4e7793c3ca20801109&user_id=16'.format(
                     obj.id
                 )
                 ret = requests.get(url)
                 print('ret.text-----> ', ret.text)
                 print(ret.json())
-
+                print('obj.id----------> ', obj.id)
+                break
 
 
 
