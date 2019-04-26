@@ -90,7 +90,7 @@ def small_shop(request):
                 'goods_status_list': goods_status_list,
             }
             response.note = {
-                'id': "文章id",
+                'id': "商品id",
                 'goods_classify': '商品分类',
                 'goods_name': '分类名称',
                 'price': '商品价格',

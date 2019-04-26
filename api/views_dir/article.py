@@ -507,7 +507,7 @@ def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
     inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
     if request.method == 'GET':
-        user_id = request.GET.get('user_id')
+        user_id = request.GET.get('user_id')    # 客户ID
 
         # 客户查询文章详情
         if oper_type == 'article':
@@ -551,12 +551,13 @@ def article_customer_oper(request, oper_type):
                 result_data['qr_code'] = user_obj.qr_code   # 用户微信二维码
                 result_data['is_like'] = is_like            # 是否点赞
 
+                # 随机查询三篇文章=========================================================
                 article_objs = models.Article.objects.filter(
                     title__isnull=False
                 ).exclude(
                     id=id
                 ).order_by('look_num')[:3]
-                print('article_objs---> ', article_objs)
+
                 popula_articles_list = []
                 for article_obj in article_objs:
                     pub = 'article_' + str(article_obj.id)
@@ -569,6 +570,34 @@ def article_customer_oper(request, oper_type):
                         'cover_img':article_obj.cover_img,
                         'url':url
                     })
+
+                goods_list = []
+                if user_obj.show_product: # 如果客户 打开文章底部显示热卖
+                    # 查询最热商品=======================
+                    good_objs = models.Goods.objects.filter(goods_classify__oper_user_id=inviter_user_id)
+
+                    good_count = good_objs.count()
+                    if good_count >= 2:
+                        good_objs = good_objs[0:2]
+                    elif good_count <= 0:
+                        good_objs = good_objs
+                    else:
+                        good_objs = good_objs[0:1]
+
+                    for good_obj in good_objs:
+                        pub = 'micro_' + str(good_obj.id)
+                        url = forwarding_article(
+                            pub=pub,
+                            user_id=good_obj.goods_classify.oper_user_id,
+                        )
+                        goods_list.append({
+                            'goods_describe':good_obj.goods_describe,# 商品描述
+                            'price':good_obj.price,             # 商品价格
+                            'goods_name':good_obj.goods_name,   # 商品名称
+                            'cover_img': good_obj.cover_img,    # 封面图
+                            'url': url
+                        })
+
 
                 # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
                 now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
@@ -589,10 +618,45 @@ def article_customer_oper(request, oper_type):
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
+                    'goods_list': goods_list,
                     'popula_articles': popula_articles_list,
-                    'result_data': result_data
+                    'result_data': result_data,
                 }
-
+                response.note = {
+                    'popula_articles热门文章': {
+                        'title': '标题',
+                        'cover_img': '封面',
+                        'url': '链接'
+                    },
+                    'result_data_文章内容': {
+                        'id': '文章ID',
+                        'title': '文章标题',
+                        'summary': '文章摘要',
+                        'look_num': '文章查看人数',
+                        'like_num': '文章点赞人数',
+                        'create_user_id': '文章创建人ID',
+                        'cover_img': '文章封面',
+                        'create_datetime': '文章创建时间',
+                        'content': '文章内容',
+                        'style': '文章样式',
+                        'top_advertising': '顶部内容',
+                        'end_advertising': '底部内容',
+                        'name': '用户名称',
+                        'phone_number': '用户电话',
+                        'signature': '用户签名',
+                        'set_avator': '用户头像',
+                        'brand_name': '用户品牌',
+                        'qr_code': '用户微信二维码',
+                        'is_like': '是否点赞',
+                    },
+                    'goods_list_热门商品':{
+                        'goods_describe': '商品描述',
+                        'price': '商品价格',
+                        'goods_name': '商品名称',
+                        'cover_img': '封面图',
+                        'url': '跳转链接'
+                    }
+                }
 
             else:
                 response.code = 400
