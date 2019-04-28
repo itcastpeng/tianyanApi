@@ -231,6 +231,7 @@ def day_eye_oper(request, oper_type, o_id):
                         'jingjinengli':'经济能力',
                     },
                 }
+
         else:
 
             # 查询客户信息备注
@@ -310,12 +311,7 @@ def day_eye_oper(request, oper_type, o_id):
                 info_objs = article_objs.order_by(order)
 
                 objs = article_objs.values('article_id', 'article__title', 'article__cover_img').annotate(Count('id'))
-                is_remake_count = models.customer_information_the_user.objects.filter(user_id=user_id, customer_id=o_id).count()
                 count = objs.count()
-
-                is_remake = False
-                if is_remake_count >= 1:
-                    is_remake = True
 
                 ret_data = []
                 for obj in objs:
@@ -349,7 +345,6 @@ def day_eye_oper(request, oper_type, o_id):
                 response.data = {
                     'ret_data': ret_data,
                     'data_count': count,
-                    'is_remake': is_remake,
                 }
                 response.note = {
                     'article_id': "文章ID",
@@ -615,10 +610,19 @@ def day_eye_oper(request, oper_type, o_id):
                     'avg_stars': avg_stars,
                 }
 
+                is_remake_count = models.customer_information_the_user.objects.filter(
+                    user_id=user_id,
+                    customer_id=o_id
+                ).count()
+                is_remake = False
+                if is_remake_count >= 1:
+                    is_remake = True
+
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'customer_info': customer_info
+                    'customer_info': customer_info,
+                    'is_remake': is_remake
                 }
                 response.note = {
                     'customer_id': "客户id",
@@ -631,7 +635,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'shiyetaidu': '事业态度',
                     'renmaiquan': '人脉圈',
                     'jingjinengli': '经济能力',
-                    'avg_stars': '星星平均值'
+                    'avg_stars': '星星平均值',
                 }
 
             # 谁看了我(商品详情)

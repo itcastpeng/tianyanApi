@@ -135,10 +135,6 @@ def merge(request):
                 file_dir = os.path.join('statics', 'file')
                 file_type = '文件'
 
-            # elif img_source == 'video':
-            #     file_dir = os.path.join('statics', 'video')
-            #     file_type = '视频'
-
             else:
                 response.code = 402
                 response.msg = '合并异常'
@@ -151,7 +147,7 @@ def merge(request):
                     print('---file_save_path---file_save_path-----', file_save_path)
                     with open(file_save_path, 'rb') as f:
                         fileData += str(f.read())
-                    # os.remove(file_save_path)  # 删除分片 文件
+                    os.remove(file_save_path)  # 删除分片 文件
 
             video_name = encryption() + img_name
             path = os.path.join(file_dir, video_name)

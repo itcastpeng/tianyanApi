@@ -211,7 +211,7 @@ from urllib.parse import unquote
 #     },
 #     "code":200
 
-
+from publicFunc.account import str_encrypt
 
 
 price = float(99) /100
@@ -221,11 +221,7 @@ amount = float(price) * 0.3
 
 print(amount)
 
-
-
-
-
-
+print(str_encrypt('1545822031837' + '49dfe624da3f246f638791d6859906a4'))
 
 
 
