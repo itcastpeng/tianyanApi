@@ -5,6 +5,9 @@ from django.http import JsonResponse
 from api import models
 import json, requests, os
 from publicFunc.qiniu_oper import qiniu_get_token,update_qiniu
+from django.db.models import F
+
+
 # 前端请求
 def qiniu_oper(request, oper_type):
     response = Response.ResponseObj()
@@ -22,6 +25,11 @@ def qiniu_oper(request, oper_type):
 
     #
     # elif oper_type == 'test_article':
+    #     price = 0.27
+    #     objs = models.Userprofile.objects.get(id=1)
+    #
+    #     objs.cumulative_amount = F('cumulative_amount') + price  # 累计钱数 + 30%
+    #     objs.save()
     #     print('-=-----------------------000000000000000000-----------------------------------=-')
     #     objs = models.Article.objects.filter(
     #         classify__create_user__isnull=True,
