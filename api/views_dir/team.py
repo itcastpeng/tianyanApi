@@ -217,7 +217,7 @@ def team_oper(request, oper_type, o_id):
         # 删除团队
         elif oper_type == 'delete':
             member_objs = models.UserprofileTeam.objects.filter(team_id=o_id)
-            if user_id in [i.get('id') for i in member_objs.filter(type=2).values('id')]: # 该团队管理员列表
+            if user_id in [i.get('user_id') for i in member_objs.filter(type=2).values('user_id')]: # 该团队管理员列表
                 member_objs.delete()
                 models.Team.objects.filter(id=o_id).delete()
                 response.code = 200
