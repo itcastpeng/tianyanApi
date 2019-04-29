@@ -219,7 +219,7 @@ def team_oper(request, oper_type, o_id):
             member_objs = models.UserprofileTeam.objects.filter(team_id=o_id)
             user_id_list = [i.get('user_id') for i in member_objs.filter(type=2).values('user_id')]
             print('user_id_list===================. >', user_id_list)
-            if user_id in user_id_list: # 该团队管理员列表
+            if int(user_id) in user_id_list: # 该团队管理员列表
                 member_objs.delete()
                 models.Team.objects.filter(id=o_id).delete()
                 response.code = 200
