@@ -574,7 +574,8 @@ def article_customer_oper(request, oper_type):
 
                 # 随机查询三篇文章=========================================================
                 article_objs = models.Article.objects.filter(
-                    title__isnull=False
+                    title__isnull=False,
+                    create_user_id__isnull=False
                 ).exclude(
                     id=id
                 ).order_by('look_num')[:3]
