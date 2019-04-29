@@ -412,6 +412,7 @@ def wechat_oper(request, oper_type):
 
         # 用户分享文章①
         elif oper_type == 'forwarding_article':
+            print('request.GET---------------> ', request.GET)
             article_id = request.GET.get('article_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 二级以上文章转发 需要传递用户ID
             pub = 'article_' + str(article_id)
