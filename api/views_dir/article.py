@@ -572,10 +572,10 @@ def article_customer_oper(request, oper_type):
                 result_data['qr_code'] = user_obj.qr_code   # 用户微信二维码
                 result_data['is_like'] = is_like            # 是否点赞
 
-                # 随机查询三篇文章=========================================================
+                print('随机查询三篇文章=========================================================')
                 article_objs = models.Article.objects.filter(
                     title__isnull=False,
-                    create_user_id__isnull=False
+                    create_user_id=inviter_user_id
                 ).exclude(
                     id=id
                 ).order_by('look_num')[:3]
@@ -585,7 +585,7 @@ def article_customer_oper(request, oper_type):
                     pub = 'article_' + str(article_obj.id)
                     url = forwarding_article(
                         pub=pub,
-                        user_id=article_obj.create_user_id,
+                        user_id=inviter_user_id,
                     )
                     popula_articles_list.append({
                         'title': article_obj.title,
