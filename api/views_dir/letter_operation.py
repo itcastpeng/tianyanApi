@@ -10,6 +10,7 @@ def letter_operation(request, oper_type):
         user_id = request.GET.get('user_id')
         inviter_user_id = request.GET.get('inviter_user_id')
         if inviter_user_id:
+
             user_id = inviter_user_id
         data = get_ent_info(user_id)
         weixin_obj = weixin_gongzhonghao_api.WeChatApi(data)
