@@ -14,7 +14,7 @@ def forwarding_article(pub, user_id=None, inviter_user_id=None, redirect_uri=Non
         redirect_uri = "http://zhugeleida.zhugeyingxiao.com/tianyan/api/share_article/" + str(pub)
     if inviter_user_id:
         user_id = inviter_user_id
-
+    print('user_id--------------------------user_id-------------------user_id-------------> ', user_id)
     data = get_ent_info(user_id)
     weichat_api_obj = WeChatApi(data)
 
