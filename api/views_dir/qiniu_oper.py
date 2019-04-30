@@ -26,11 +26,11 @@ def qiniu_oper(request, oper_type):
     elif oper_type == 'test_article':
         objs = models.Userprofile.objects.all()
         for obj in objs:
-            if 'http://tianyan.zhugeyingxiao.com' not in obj.set_avator:
-                path = requests_img_download(obj.set_avator)
+            if 'http://tianyan.zhugeyingxiao.com' not in obj.qr_code:
+                path = requests_img_download(obj.qr_code)
                 token = qiniu_get_token()
                 path = update_qiniu(path, token)
-                obj.set_avator = path
+                obj.qr_code = path
                 obj.save()
     return JsonResponse(response.__dict__)
 
