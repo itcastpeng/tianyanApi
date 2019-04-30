@@ -1,7 +1,7 @@
 from django import forms
 from bs4 import BeautifulSoup
 from api import models
-import json
+import json, datetime
 from publicFunc.get_content_article import get_article
 
 
@@ -339,10 +339,6 @@ class DecideIfYourArticle(forms.Form):
                 flag = True
             return flag
 
-
-#
-
-
 # 普通查询
 class select_form(forms.Form):
     current_page = forms.IntegerField(
@@ -373,7 +369,7 @@ class select_form(forms.Form):
             length = int(self.data['length'])
         return length
 
-
+# 添加文章
 class add_article(forms.Form):
     classify_id = forms.CharField(
         required=True,
@@ -388,9 +384,60 @@ class add_article(forms.Form):
         return json.loads(classify_id)
 
 
+# 记录时长日志
+class RecordLengthForm(forms.Form):
+    status = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "请选择日志类型"
+        }
+    )
+    public_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "记录ID不能为空"
+        }
+    )
+    inviter_user_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "分享人不能为空"
+        }
+    )
+    user_id = forms.IntegerField(
+        required=True,
+        error_messages={
+            'invalid': "权限不足"
+        }
+    )
+    close_date = forms.DateTimeField(
+        required=True,
+        error_messages={
+            'invalid': "关闭时间不能为空"
+        }
+    )
+    def clean_public_id(self):
+        status = int(self.data.get('status'))
+        public_id = self.data.get('public_id')
+        inviter_user_id = self.data.get('inviter_user_id')
+        user_id = self.data.get('user_id')
+        close_date= self.data.get('close_date')
 
+        if status == 1: # 记录文章日志
+            models.SelectArticleLog.objects.filter(
+                inviter_id=inviter_user_id,
+                customer_id=user_id,
+                article_id=public_id
+            ).update(close_datetime=close_date)
 
+        else: # 记录微店日志
+            models.customer_look_goods_log.objects.filter(
+                customer_id=user_id,
+                user_id=inviter_user_id,
+                goods_id=public_id
+            ).update(close_datetime=close_date)
 
+        return public_id
 
 
 

@@ -3,7 +3,8 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike, PopulaSelectForm, DecideIfYourArticle, select_form, add_article
+from api.forms.article import AddForm, UpdateForm, SelectForm, UpdateClassifyForm, GiveALike,\
+PopulaSelectForm, DecideIfYourArticle, select_form, add_article, RecordLengthForm
 from django.db.models import Q, F
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.article_oper import give_like
@@ -797,6 +798,34 @@ def article_customer_oper(request, oper_type):
             else:
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
+
+        # 客户记录 文章查看时长/商城查看时长
+        elif oper_type == 'record_length':
+            status = request.GET.get('status')
+            public_id = request.GET.get('public_id')
+            close_date = request.GET.get('close_date')
+            """
+            inviter_user_id  为分享人ID
+            status == 1 为记录文章日志 
+            status == 2 为记录微店日志
+            user_id 为客户ID
+            close_date 最后一次时间 每几秒请求一次 以最后一次请求为关闭时间
+            """
+            form_data = {
+                'status': status,
+                'public_id': public_id,
+                'user_id': user_id,
+                'inviter_user_id': inviter_user_id,
+                'close_date': close_date,
+            }
+            form_objs = RecordLengthForm(form_data)
+            if form_objs.is_valid():
+                response.code = 200
+                response.msg = '日志记录成功'
+
+            else:
+                response.code = 301
+                response.msg = json.loads(form_objs.errors.as_json())
 
     else:
 

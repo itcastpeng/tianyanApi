@@ -226,6 +226,7 @@ class customer_look_goods_log(models.Model):
     goods = models.ForeignKey(to='Goods', verbose_name='查看了哪个商品', null=True)
     user = models.ForeignKey(to='Userprofile', verbose_name='查看的那个用户', null=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+    close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
 
 
 """海报相关 数据表"""
