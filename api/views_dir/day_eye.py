@@ -198,10 +198,10 @@ def day_eye_oper(request, oper_type, o_id):
                     user_id=user_id,
                     customer_id=o_id
                 )
-                print('request.POST=============================000000000-=-------------> ', customer_info)
+                print('request.POST=============================000000000-=-------------> ', type(customer_info), customer_info)
 
                 if objs:
-                    objs.update(customer_info=json.dumps(customer_info))
+                    objs.update(customer_info=customer_info)
                 else:
                     objs.create(
                         customer_info=customer_info,
