@@ -617,7 +617,7 @@ def article_customer_oper(request, oper_type):
                             # 'goods_describe':good_obj.goods_describe,# 商品描述
                             'price':good_obj.price,             # 商品价格
                             'goods_name':good_obj.goods_name,   # 商品名称
-                            'cover_img': good_obj.cover_img + '?imageView2/2/w/100',    # 封面图
+                            'cover_img': good_obj.cover_img + '?imageView2/2/w/200',    # 封面图
                             'url': url
                         })
 
