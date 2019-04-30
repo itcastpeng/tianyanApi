@@ -210,15 +210,18 @@ from urllib.parse import unquote
 #         "count":3
 #     },
 #     "code":200
-p = [{'status': 'img','content': 'http://tianyan.zhangcong.top/statics/img/1f75da72013edbb7fcaae9660ca55cbenews5.png'},{'status': 'msg','content': '领队开发是个啥地方好给对方和你说的覅给不给uaghudagiahfgidsfh吧卡规划是电饭锅抠脚大汉奉公克己大复合弓科技的复合弓可大法官'}]
-goods_describe_list = []
-for i in p:
-    if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
-        goods_describe_list.append({
-            'status': i.get('status'),
-            'content': i.get('content')  + '?imageView2/2/w/500',
-        })
-    else:
-        goods_describe_list.append(i)
 
-[{'content': 'http://tianyan.zhugeyingxiao.com/FtXgCx9VqzW1rqgjH6SkT7UCMbJ_', 'status': 'img'}, {'content': '领队开发是个啥地方好给对方和你说的覅给不给uaghudagiahfgidsfh吧卡规划是电饭锅抠脚大汉奉公克己大复合弓科技的复合弓可大法官', 'status': 'msg'}]
+
+
+
+
+
+print('1.5'.isdigit())
+
+
+
+
+
+
+
+

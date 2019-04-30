@@ -278,6 +278,38 @@ class AddGoodForm(forms.Form):
         }
     )
 
+
+    def clean_price(self):
+        price = self.data.get('price')
+        if price.isdigit():
+            if len(price) < 5:
+                return price
+            else:
+                self.add_error('price', '价格不得超于五位数')
+        else:
+            self.add_error('price', '价格请输入整数')
+
+    def clean_inventory(self):
+        inventory = self.data.get('inventory')
+        if inventory.isdigit():
+            if len(inventory) < 5:
+                return inventory
+            else:
+                self.add_error('inventory', '库存不得超于五位数')
+        else:
+            self.add_error('inventory', '库存请输入整数')
+
+    def clean_freight(self):
+        freight = self.data.get('freight')
+        if freight.isdigit():
+            if len(freight) < 5:
+                return freight
+            else:
+                self.add_error('freight', '运费不得超于五位数')
+        else:
+            self.add_error('freight', '运费请输入整数')
+
+
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
         create_user_id = self.data.get('create_user_id')
@@ -290,11 +322,14 @@ class AddGoodForm(forms.Form):
     def clean_goods_name(self):
         create_user_id = self.data.get('create_user_id')
         goods_name = self.data.get('goods_name')
-        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name)
-        if objs:
-            self.add_error('goods_name', '商品名称已存在')
+        if len(goods_name) < 60:
+            objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name)
+            if objs:
+                self.add_error('goods_name', '商品名称已存在')
+            else:
+                return goods_name
         else:
-            return goods_name
+            self.add_error('goods_name', '标题长度不可超过60')
 
 
 # 商品更新
@@ -372,6 +407,36 @@ class UpdateGoodForm(forms.Form):
             'required': '封面图片不能为空'
         }
     )
+    def clean_price(self):
+        price = self.data.get('price')
+        if price.isdigit():
+            if len(price) < 5:
+                return price
+            else:
+                self.add_error('price', '价格不得超于五位数')
+        else:
+            self.add_error('price', '价格请输入整数')
+
+    def clean_inventory(self):
+        inventory = self.data.get('inventory')
+        if inventory.isdigit():
+            if len(inventory) < 5:
+                return inventory
+            else:
+                self.add_error('inventory', '库存不得超于五位数')
+        else:
+            self.add_error('inventory', '库存请输入整数')
+
+    def clean_freight(self):
+        freight = self.data.get('freight')
+        if freight.isdigit():
+            if len(freight) < 5:
+                return freight
+            else:
+                self.add_error('freight', '运费不得超于五位数')
+        else:
+            self.add_error('freight', '运费请输入整数')
+
 
     def clean_goods_classify_id(self):
         goods_classify_id = self.data.get('goods_classify_id')
@@ -386,13 +451,15 @@ class UpdateGoodForm(forms.Form):
         create_user_id = self.data.get('create_user_id')
         goods_name = self.data.get('goods_name')
         o_id = self.data.get('o_id')
-        objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name).exclude(
-            id=o_id)
-        if objs:
-            self.add_error('goods_name', '商品名称已存在')
+        if len(goods_name) < 60:
+            objs = models.Goods.objects.filter(goods_classify__oper_user_id=create_user_id, goods_name=goods_name).exclude(
+                id=o_id)
+            if objs:
+                self.add_error('goods_name', '商品名称已存在')
+            else:
+                return goods_name
         else:
-            return goods_name
-
+            self.add_error('goods_name', '标题长度不可超过60')
 
 # 查询
 class SelectForm(forms.Form):
