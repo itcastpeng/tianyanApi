@@ -63,7 +63,7 @@ def user(request):
                     'show_product': obj.show_product,
                     'register_date': obj.register_date.strftime('%Y-%m-%d'),
                     'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
-                    'set_avator': obj.set_avator,
+                    'set_avator': obj.set_avator + '?imageView2/2/w/50',
                     'qr_code': obj.qr_code,
                     'brand_list': brand_list,
                     'team_list': team_list,
