@@ -64,7 +64,7 @@ def user(request):
                     'register_date': obj.register_date.strftime('%Y-%m-%d'),
                     'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
                     'set_avator': obj.set_avator + '?imageView2/2/w/50',
-                    'qr_code': obj.qr_code,
+                    'qr_code': obj.qr_code + '?imageView2/2/w/50',
                     'brand_list': brand_list,
                     'team_list': team_list,
                     'vip_type': obj.get_vip_type_display(),

@@ -26,7 +26,7 @@ def qiniu_oper(request, oper_type):
     elif oper_type == 'test_article':
         objs = models.Userprofile.objects.all()
         for obj in objs:
-            if 'http://tianyan.zhugeyingxiao.com' not in obj.qr_code:
+            if obj.qr_code and 'http://tianyan.zhugeyingxiao.com' not in obj.qr_code:
                 path = requests_img_download(obj.qr_code)
                 token = qiniu_get_token()
                 path = update_qiniu(path, token)
