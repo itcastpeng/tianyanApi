@@ -24,13 +24,13 @@ def qiniu_oper(request, oper_type):
         response.data = {'token': token}
 
     elif oper_type == 'test_article':
-        objs = models.Userprofile.objects.all()
+        objs = models.Goods.objects.all()
         for obj in objs:
-            if obj.qr_code and 'http://tianyan.zhugeyingxiao.com' not in obj.qr_code:
-                path = requests_img_download(obj.qr_code)
+            if obj.cover_img and 'http://tianyan.zhugeyingxiao.com' not in obj.cover_img:
+                path = requests_img_download(obj.cover_img)
                 token = qiniu_get_token()
                 path = update_qiniu(path, token)
-                obj.qr_code = path
+                obj.cover_img = path
                 obj.save()
     return JsonResponse(response.__dict__)
 

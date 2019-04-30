@@ -70,7 +70,7 @@ def small_shop(request):
                     'goods_status_id': obj.goods_status,  # 商品状态ID
                     'goods_status': obj.get_goods_status_display(),  # 商品状态
                     # 'goods_picture': goods_picture,  # 商品图片
-                    'cover_img': obj.cover_img,  # 商品封面图片
+                    'cover_img': obj.cover_img + '?imageView2/2/w/200',  # 商品封面图片
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
 
