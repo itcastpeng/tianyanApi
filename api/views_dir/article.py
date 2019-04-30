@@ -565,7 +565,7 @@ def article_customer_oper(request, oper_type):
                 result_data['name'] = b64decode(user_obj.name)  # 用户名称
                 result_data['phone_number'] = user_obj.phone_number  # 用户电话
                 result_data['signature'] = user_obj.signature  # 用户签名
-                result_data['set_avator'] = user_obj.set_avator + '?imageView2/2/w/50' # 用户头像
+                result_data['set_avator'] = user_obj.set_avator + '?imageView2/2/w/100' # 用户头像
                 brand_name_list = []
                 for i in user_obj.brand_classify.all():
                     brand_name_list.append(i.name)
@@ -590,7 +590,7 @@ def article_customer_oper(request, oper_type):
                     )
                     popula_articles_list.append({
                         'title': article_obj.title,
-                        'cover_img':article_obj.cover_img,
+                        'cover_img':article_obj.cover_img + '?imageView2/2/w/200',
                         'url':url
                     })
 
