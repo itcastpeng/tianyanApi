@@ -12,7 +12,7 @@ import random
 import json
 import base64
 from PIL import Image,ImageFont,ImageDraw
-
+from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu
 sysstr = platform.system()
 
 # 加密名字
@@ -46,6 +46,148 @@ def upload_poster_watermark(poster_path, video_name):
 def get_name_suffix(fileName):
     houzhui = re.search(r'[^.]+$', fileName).group(0)  # 获取点后面的后缀
     return houzhui
+
+# base分片
+@csrf_exempt
+def upload_base_shard(request):
+    response = Response.ResponseObj()
+    if request.method == 'POST':
+        print('request.POST------> ', request.FILES)
+
+        forms_obj = upload_form.imgUploadForm(request.POST)
+        if forms_obj.is_valid():
+            img_data = forms_obj.cleaned_data.get('img_data')       # 文件内容
+            img_name = forms_obj.cleaned_data.get('img_name')       # 图片名称
+            img_source = forms_obj.cleaned_data.get('img_source')   # 文件类型
+            timestamp = forms_obj.cleaned_data.get('timestamp')     # 时间戳
+            chunk = forms_obj.cleaned_data.get('chunk')             # 第几片文件
+            expanded_name = get_name_suffix(img_name)               # 获取扩展名称
+            if img_source == 'file':
+                if expanded_name.lower().strip() not in ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf']:
+                    response.code = 301
+                    response.msg = '请上传正确(文件)格式'
+                    return JsonResponse(response.__dict__)
+
+            elif img_source == 'img':
+                extension_list = [
+                    'bmp', 'dib', 'rle', 'emf', 'gif', 'jpg', 'jpeg', 'jpe', 'jif', 'pcx', 'dcx', 'pic', 'png',
+                    'tga', 'tif', 'tiffxif', 'wmf', 'jfif', 'pdf'
+                ]
+                if expanded_name.lower().strip() not in extension_list:
+                    response.code = 301
+                    response.msg = '请上传正确(图片)格式'
+                    return JsonResponse(response.__dict__)
+
+            else:
+                response.code = 301
+                response.msg = '请上传正确格式'
+                return JsonResponse(response.__dict__)
+            # print('img_data--------> ', img_data)
+            img_name = timestamp + "_" + str(chunk) + '.' + expanded_name
+            img_save_path = os.path.join('statics', 'tmp', img_name)
+            with open(img_save_path, "w", encoding='utf8') as f:
+                f.write(img_data)
+
+            if os.path.exists(img_save_path):
+                response.code = 200
+                response.msg = '上传成功'
+            else:
+                response.code = 301
+                response.msg = '上传失败'
+        else:
+            response.code = 301
+            response.msg = json.loads(forms_obj.errors.as_json())
+    else:
+        response.code = 402
+        response.msg = '请求异常'
+    return JsonResponse(response.__dict__)
+
+# base合并
+@csrf_exempt
+def base_merge(request):
+    response = Response.ResponseObj()
+    if request.method == 'POST':
+        is_posters = request.GET.get('is_posters') # 判断是否为海报  如果该参数有值 则打水印
+        not_qiniu = request.GET.get('not_qiniu') # 不上传到七牛云
+        forms_obj = upload_form.imgMergeForm(request.POST)
+        if forms_obj.is_valid():
+            img_source = forms_obj.cleaned_data.get('img_source')   # 文件类型
+            img_name = forms_obj.cleaned_data.get('img_name')       # 图片名称
+            timestamp = forms_obj.cleaned_data.get('timestamp')     # 时间戳
+            chunk_num = forms_obj.cleaned_data.get('chunk_num')     # 一共多少份
+            expanded_name = get_name_suffix(img_name)               # 获取扩展名称
+
+            file_type = '图片'
+            if img_source == 'img':
+                file_dir = os.path.join('statics', 'img')
+
+            elif img_source == 'file':
+                file_dir = os.path.join('statics', 'file')
+                file_type = '文件'
+
+            else:
+                response.code = 402
+                response.msg = '合并异常'
+                return JsonResponse(response.__dict__)
+
+            fileData = ''
+            for chunk in range(chunk_num):
+                file_name = timestamp + "_" + str(chunk) + '.' + expanded_name
+                file_save_path = os.path.join('statics', 'tmp', file_name)
+                if os.path.exists(file_save_path):
+                    with open(file_save_path, 'r') as f:
+                        fileData += f.read()
+                    os.remove(file_save_path)  # 删除分片 文件
+
+            video_name = encryption() + '.' + expanded_name
+            path = os.path.join(file_dir, video_name)
+            try:
+                with open(path, 'ab')as f:
+                    f.write(base64.b64decode(fileData))         # 写入
+            except Exception as e:
+                print('e--> ', e)
+
+            if is_posters: # 海报打水印
+                path_name = encryption() + '.png' # 打水印文件名
+                path = upload_poster_watermark(path, path_name)
+                os.remove(os.path.join(file_dir, video_name)) # 删除原始上传图片
+
+            if not not_qiniu: # 上传七牛云
+                token = qiniu_get_token()
+                path = update_qiniu(path, token)
+
+            print('video_name------> ', video_name)
+            response.data = {'url': path}
+            print('path-> ', path)
+            response.code = 200
+            response.msg = "上传{}成功".format(file_type)
+
+        else:
+            response.code = 301
+            response.msg = json.loads(forms_obj.errors.as_json())
+    else:
+        response.code = 402
+        response.msg = '请求异常'
+    return JsonResponse(response.__dict__)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 分片
 @csrf_exempt
@@ -109,8 +251,6 @@ def upload_shard(request):
         response.code = 402
         response.msg = '请求异常'
     return JsonResponse(response.__dict__)
-
-
 # 合并
 @csrf_exempt
 def merge(request):
@@ -169,122 +309,3 @@ def merge(request):
         response.msg = '请求异常'
     return JsonResponse(response.__dict__)
 
-
-# base分片
-@csrf_exempt
-def upload_base_shard(request):
-    response = Response.ResponseObj()
-    if request.method == 'POST':
-        print('request.POST------> ', request.FILES)
-
-        forms_obj = upload_form.imgUploadForm(request.POST)
-        if forms_obj.is_valid():
-            img_data = forms_obj.cleaned_data.get('img_data')       # 文件内容
-            img_name = forms_obj.cleaned_data.get('img_name')       # 图片名称
-            img_source = forms_obj.cleaned_data.get('img_source')   # 文件类型
-            timestamp = forms_obj.cleaned_data.get('timestamp')     # 时间戳
-            chunk = forms_obj.cleaned_data.get('chunk')             # 第几片文件
-            expanded_name = get_name_suffix(img_name)               # 获取扩展名称
-            if img_source == 'file':
-                if expanded_name.lower().strip() not in ['doc', 'docx', 'xls', 'xlsx', 'ppt', 'pptx', 'pdf']:
-                    response.code = 301
-                    response.msg = '请上传正确(文件)格式'
-                    return JsonResponse(response.__dict__)
-
-            elif img_source == 'img':
-                extension_list = [
-                    'bmp', 'dib', 'rle', 'emf', 'gif', 'jpg', 'jpeg', 'jpe', 'jif', 'pcx', 'dcx', 'pic', 'png',
-                    'tga', 'tif', 'tiffxif', 'wmf', 'jfif', 'pdf'
-                ]
-                if expanded_name.lower().strip() not in extension_list:
-                    response.code = 301
-                    response.msg = '请上传正确(图片)格式'
-                    return JsonResponse(response.__dict__)
-
-            else:
-                response.code = 301
-                response.msg = '请上传正确格式'
-                return JsonResponse(response.__dict__)
-            # print('img_data--------> ', img_data)
-            img_name = timestamp + "_" + str(chunk) + '.' + expanded_name
-            img_save_path = os.path.join('statics', 'tmp', img_name)
-            with open(img_save_path, "w", encoding='utf8') as f:
-                f.write(img_data)
-
-            if os.path.exists(img_save_path):
-                response.code = 200
-                response.msg = '上传成功'
-            else:
-                response.code = 301
-                response.msg = '上传失败'
-        else:
-            response.code = 301
-            response.msg = json.loads(forms_obj.errors.as_json())
-    else:
-        response.code = 402
-        response.msg = '请求异常'
-    return JsonResponse(response.__dict__)
-
-# base合并
-@csrf_exempt
-def base_merge(request):
-    response = Response.ResponseObj()
-    if request.method == 'POST':
-        is_posters = request.GET.get('is_posters') # 判断是否为海报  如果该参数有值 则打水印
-        forms_obj = upload_form.imgMergeForm(request.POST)
-        if forms_obj.is_valid():
-            img_source = forms_obj.cleaned_data.get('img_source')   # 文件类型
-            img_name = forms_obj.cleaned_data.get('img_name')       # 图片名称
-            timestamp = forms_obj.cleaned_data.get('timestamp')     # 时间戳
-            chunk_num = forms_obj.cleaned_data.get('chunk_num')     # 一共多少份
-            expanded_name = get_name_suffix(img_name)               # 获取扩展名称
-
-            file_type = '图片'
-            if img_source == 'img':
-                file_dir = os.path.join('statics', 'img')
-
-            elif img_source == 'file':
-                file_dir = os.path.join('statics', 'file')
-                file_type = '文件'
-
-            else:
-                response.code = 402
-                response.msg = '合并异常'
-                return JsonResponse(response.__dict__)
-
-            fileData = ''
-            for chunk in range(chunk_num):
-                file_name = timestamp + "_" + str(chunk) + '.' + expanded_name
-                file_save_path = os.path.join('statics', 'tmp', file_name)
-                if os.path.exists(file_save_path):
-                    with open(file_save_path, 'r') as f:
-                        fileData += f.read()
-                    os.remove(file_save_path)  # 删除分片 文件
-
-            video_name = encryption() + '.' + expanded_name
-            path = os.path.join(file_dir, video_name)
-            try:
-                with open(path, 'ab')as f:
-                    f.write(base64.b64decode(fileData))         # 写入
-            except Exception as e:
-                print('e--> ', e)
-
-            if is_posters: # 海报打水印
-                path_name = encryption() + '.png'
-                path = upload_poster_watermark(path, path_name)
-
-                os.remove(os.path.join(file_dir, video_name)) # 删除原始上传图片
-
-            print('video_name------> ', video_name)
-            response.data = {'url': path}
-            print('path-> ', path)
-            response.code = 200
-            response.msg = "上传{}成功".format(file_type)
-
-        else:
-            response.code = 301
-            response.msg = json.loads(forms_obj.errors.as_json())
-    else:
-        response.code = 402
-        response.msg = '请求异常'
-    return JsonResponse(response.__dict__)
