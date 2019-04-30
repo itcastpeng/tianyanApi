@@ -210,7 +210,7 @@ def small_shop_oper(request, oper_type, o_id):
                 cover_img = ''
                 if '?' in form_obj.get('cover_img'):
                     cover_img = form_obj.get('cover_img').split('?')[0]
-                for i in form_obj.get('goods_describe'):
+                # for i in form_obj.get('goods_describe'):
 
                 models.Goods.objects.filter(id=o_id).update(**{
                     'goods_classify_id': form_obj.get('goods_classify_id'),
