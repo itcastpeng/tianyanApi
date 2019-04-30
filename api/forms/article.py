@@ -424,19 +424,22 @@ class RecordLengthForm(forms.Form):
         close_date= self.data.get('close_date')
 
         if status == 1: # 记录文章日志
-            models.SelectArticleLog.objects.filter(
+            objs = models.SelectArticleLog.objects.filter(
                 inviter_id=inviter_user_id,
                 customer_id=user_id,
                 article_id=public_id
-            ).update(close_datetime=close_date)
+            ).order_by('-create_datetime')
 
         else: # 记录微店日志
-            models.customer_look_goods_log.objects.filter(
+            objs = models.customer_look_goods_log.objects.filter(
                 customer_id=user_id,
                 user_id=inviter_user_id,
                 goods_id=public_id
-            ).update(close_datetime=close_date)
-
+            ).order_by('-create_datetime')
+        if objs:
+            obj = objs[0]
+            obj.close_datetime=close_date
+            obj.save()
         return public_id
 
 
