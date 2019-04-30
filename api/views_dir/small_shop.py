@@ -206,6 +206,11 @@ def small_shop_oper(request, oper_type, o_id):
             if forms_obj.is_valid():
                 print('验证通过')
                 form_obj = forms_obj.cleaned_data
+
+                cover_img = ''
+                if '?' in form_obj.get('cover_img'):
+                    cover_img = form_obj.get('cover_img').split('?')[0]
+
                 models.Goods.objects.filter(id=o_id).update(**{
                     'goods_classify_id': form_obj.get('goods_classify_id'),
                     'goods_name': form_obj.get('goods_name'),
@@ -216,7 +221,7 @@ def small_shop_oper(request, oper_type, o_id):
                     'point_origin': form_obj.get('point_origin'),
                     'goods_status': form_obj.get('goods_status'),
                     # 'goods_picture': form_obj.get('goods_picture'),
-                    'cover_img': form_obj.get('cover_img')
+                    'cover_img':cover_img
                 })
                 response.code = 200
                 response.msg = "修改成功"

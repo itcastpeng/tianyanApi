@@ -226,7 +226,9 @@ print(goods_describe_list)
 
 
 
-
+p = 'http://tianyan.zhugeyingxiao.com/Foc2S983teDXeoorutpmUe9XTduf?imageView2/2/w/500?imageView2/2/w/500'
+if '?' in p:
+    print(p.split('?')[0])
 
 
 
