@@ -24,14 +24,25 @@ def qiniu_oper(request, oper_type):
         response.data = {'token': token}
 
     elif oper_type == 'test_article':
-        objs = models.Goods.objects.all()
+        objs = models.Goods.objects.filter(id=29)
         for obj in objs:
-            if obj.cover_img and 'http://tianyan.zhugeyingxiao.com' not in obj.cover_img:
-                path = requests_img_download(obj.cover_img)
-                token = qiniu_get_token()
-                path = update_qiniu(path, token)
-                obj.cover_img = path
-                obj.save()
+            goods_describe = []
+            for i in json.loads(obj.goods_describe):
+                status = i.get('status')
+                content = i.get('content')
+                if status == 'img' and 'http://tianyan.zhugeyingxiao.com' not in content:
+                    path = requests_img_download(content)
+                    token = qiniu_get_token()
+                    img = update_qiniu(path, token)
+                    goods_describe.append({
+                        'status':status,
+                        'content':img,
+                    })
+                else:
+                    goods_describe.append(i)
+            obj.goods_describe = goods_describe
+            obj.save()
+
     return JsonResponse(response.__dict__)
 
 

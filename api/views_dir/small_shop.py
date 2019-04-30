@@ -44,20 +44,6 @@ def small_shop(request):
             ret_data = []
             id = request.GET.get('id')
             for obj in objs:
-                # try:
-                #     goods_picture = eval(obj.goods_picture)
-                # except Exception:
-                #     goods_picture = obj.goods_picture
-
-                # print('obj.goods_describe----> ', type(eval(obj.goods_describe)), obj.goods_describe)
-                try:
-                    goods_describe = eval(obj.goods_describe)
-                except Exception:
-                    goods_describe = obj.goods_describe
-                if id:
-                    cover_img = obj.cover_img + '?imageView2/2/w/500'
-                else:
-                    cover_img = obj.cover_img + '?imageView2/2/w/200'
 
                 #  将查询出来的数据 加入列表
                 ret_data.append({
@@ -66,16 +52,31 @@ def small_shop(request):
                     'goods_classify': obj.goods_classify.goods_classify,  # 分类名称
                     'goods_name': obj.goods_name,  # 商品名称
                     'price': obj.price,  # 商品价格
-                    'inventory': obj.inventory,  # 商品库存
-                    'freight': obj.freight,  # 商品运费
-                    'goods_describe': goods_describe,  # 商品描述
-                    'point_origin': obj.point_origin,  # 商品发货地
                     'goods_status_id': obj.goods_status,  # 商品状态ID
                     'goods_status': obj.get_goods_status_display(),  # 商品状态
-                    # 'goods_picture': goods_picture,  # 商品图片
-                    'cover_img': cover_img,  # 商品封面图片
+                    'cover_img': obj.cover_img + '?imageView2/2/w/200',  # 商品封面图片
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    'inventory': obj.inventory,  # 商品库存
+                    'freight': obj.freight,  # 商品运费
+                    'point_origin': obj.point_origin,  # 商品发货地
                 })
+                if id:
+                    try:
+                        goods_describe = eval(obj.goods_describe)
+                    except Exception:
+                        goods_describe = obj.goods_describe
+                    goods_describe_list = []
+                    for i in goods_describe:
+                        if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
+                            goods_describe_list.append({
+                                'status': i.get('status'),
+                                'content': i.get('content')  + '?imageView2/2/w/500',
+                            })
+                        else:
+                            goods_describe_list.append(i)
+
+                    ret_data[0]['goods_describe'] = goods_describe_list,  # 商品描述
+                    ret_data[0]['cover_img'] = obj.cover_img + '?imageView2/2/w/500'
 
             goods_status_list = []
             for i in models.Goods.goods_status_choices:
