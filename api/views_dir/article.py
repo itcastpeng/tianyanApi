@@ -565,12 +565,12 @@ def article_customer_oper(request, oper_type):
                 result_data['name'] = b64decode(user_obj.name)  # 用户名称
                 result_data['phone_number'] = user_obj.phone_number  # 用户电话
                 result_data['signature'] = user_obj.signature  # 用户签名
-                result_data['set_avator'] = user_obj.set_avator  # 用户头像
+                result_data['set_avator'] = user_obj.set_avator + '?imageView2/2/w/50' # 用户头像
                 brand_name_list = []
                 for i in user_obj.brand_classify.all():
                     brand_name_list.append(i.name)
                 result_data['brand_name'] = brand_name_list  # 用户品牌
-                result_data['qr_code'] = user_obj.qr_code   # 用户微信二维码
+                result_data['qr_code'] = user_obj.qr_code + '?imageView2/2/w/50'   # 用户微信二维码
                 result_data['is_like'] = is_like            # 是否点赞
 
                 print('随机查询三篇文章=========================================================')
@@ -617,7 +617,7 @@ def article_customer_oper(request, oper_type):
                             # 'goods_describe':good_obj.goods_describe,# 商品描述
                             'price':good_obj.price,             # 商品价格
                             'goods_name':good_obj.goods_name,   # 商品名称
-                            'cover_img': good_obj.cover_img,    # 封面图
+                            'cover_img': good_obj.cover_img + '?imageView2/2/w/100',    # 封面图
                             'url': url
                         })
 
