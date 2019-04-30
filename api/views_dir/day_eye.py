@@ -192,6 +192,7 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 修改客户资料 个人信息等
             elif oper_type == 'update_customer_info':
+                print('request.POST=============================000000000-=-------------> ', request.POST)
                 customer_info = request.POST.get('customer_info')
                 objs = models.user_comments_customer_information.objects.filter(
                     user_id=user_id,
