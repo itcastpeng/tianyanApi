@@ -164,8 +164,6 @@ def user_oper(request, oper_type, o_id):
         elif oper_type == "update_qr_code":
             qr_code = request.POST.get('qr_code')
             if qr_code:
-                token = qiniu_get_token()
-                qr_code = update_qiniu(qr_code, token)
                 models.Userprofile.objects.filter(id=user_id).update(qr_code=qr_code)
                 response.code = 200
                 response.msg = "修改成功"
