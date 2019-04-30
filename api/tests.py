@@ -213,10 +213,9 @@ from urllib.parse import unquote
 
 
 
+p = {'customer_info': ['{"customer_set_avator":"http://thirdwx.qlogo.cn/mmopen/vi_32/BOsNEib02mGic6R7gOUMNO1QyXnU4Exic8GPZneNvwCMHpzIic37ibKztU8367HyJuuf29rtiaHI5PibCJqCWqc0onSkg/132","customer_name":"过客丶💟","customer_sex":"","customer_phone":"15531506906","customer_wechat":"过客丶💟","customer_professional":"","customer_birthday":"","customer_remake":"","customer_label":{"xueli":"初中","diqu":"北京","guanxi":"朋友","qinmidu":"1","yingxiangli":"1","qituxin":"1","shiyetaidu":"1","renmaiquan":"1","jingjinengli":"1"},"customer_demand":"[{\\"title\\":\\"漂亮\\",\\"checked\\":false},{\\"title\\":\\"健康\\",\\"checked\\":false},{\\"title\\":\\"事业\\",\\"checked\\":false}]"}']}
 
-
-
-print('1.5'.isdigit())
+print(p['customer_info'])
 
 
 

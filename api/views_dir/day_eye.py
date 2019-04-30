@@ -200,7 +200,7 @@ def day_eye_oper(request, oper_type, o_id):
                 )
 
                 if objs:
-                    objs.update(customer_info=customer_info)
+                    objs.update(customer_info=json.dumps(customer_info))
                 else:
                     objs.create(
                         customer_info=customer_info,
