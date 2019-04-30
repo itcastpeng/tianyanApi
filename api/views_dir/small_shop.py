@@ -65,18 +65,18 @@ def small_shop(request):
                         goods_describe = eval(obj.goods_describe)
                     except Exception:
                         goods_describe = obj.goods_describe
-                    goods_describe_list = []
-                    for i in goods_describe:
-                        print('i====================000000000000000000----------------> ', i)
-                        if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
-                            goods_describe_list.append({
-                                'status': i.get('status'),
-                                'content': i.get('content')  + '?imageView2/2/w/500',
-                            })
-                        else:
-                            goods_describe_list.append(i)
-                    print('goods_describe_list-------> ', goods_describe_list)
-                    ret_data[0]['goods_describe'] = goods_describe_list,  # 商品描述
+                    # goods_describe_list = []
+                    # for i in goods_describe:
+                    #     print('i====================000000000000000000----------------> ', i)
+                    #     if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
+                    #         goods_describe_list.append({
+                    #             'status': i.get('status'),
+                    #             'content': i.get('content')  + '?imageView2/2/w/500',
+                    #         })
+                    #     else:
+                    #         goods_describe_list.append(i)
+                    print('goods_describe_list-------> ', goods_describe)
+                    ret_data[0]['goods_describe'] = goods_describe,  # 商品描述
                     ret_data[0]['cover_img'] = obj.cover_img + '?imageView2/2/w/500'
 
             goods_status_list = []

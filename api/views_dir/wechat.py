@@ -302,7 +302,7 @@ def wechat(request):
                                      "title":title,
                                      "description":b64decode(summary),
                                      "url":url,
-                                     "picurl":cover_img + '?imageView2/2/w/200'
+                                     "picurl":cover_img + '?imageView2/2/w/50'
                                  }
                                  ]
                             }
