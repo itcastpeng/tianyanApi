@@ -67,6 +67,7 @@ def small_shop(request):
                         goods_describe = obj.goods_describe
                     goods_describe_list = []
                     for i in goods_describe:
+                        print('i====================000000000000000000----------------> ', i)
                         if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
                             goods_describe_list.append({
                                 'status': i.get('status'),
