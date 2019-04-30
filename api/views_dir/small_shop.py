@@ -75,8 +75,8 @@ def small_shop(request):
                             })
                         else:
                             goods_describe_list.append(i)
-
-                    ret_data[0]['goods_describe'] =goods_describe_list,  # 商品描述
+                    print('goods_describe_list-------> ', goods_describe_list)
+                    ret_data[0]['goods_describe'] = goods_describe_list,  # 商品描述
                     ret_data[0]['cover_img'] = obj.cover_img + '?imageView2/2/w/500'
 
             goods_status_list = []
