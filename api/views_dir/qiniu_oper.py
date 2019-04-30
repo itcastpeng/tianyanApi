@@ -6,7 +6,7 @@ from api import models
 import json, requests, os
 from publicFunc.qiniu_oper import qiniu_get_token,update_qiniu
 from django.db.models import F
-
+from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu, requests_img_download
 
 # 前端请求
 def qiniu_oper(request, oper_type):
@@ -23,24 +23,16 @@ def qiniu_oper(request, oper_type):
         response.msg = '生成成功'
         response.data = {'token': token}
 
-    #
-    # elif oper_type == 'test_article':
-    #     price = 0.27
-    #     objs = models.Userprofile.objects.get(id=1)
-    #
-    #     objs.cumulative_amount = F('cumulative_amount') + price  # 累计钱数 + 30%
-    #     objs.save()
-    #     print('-=-----------------------000000000000000000-----------------------------------=-')
-    #     objs = models.Article.objects.filter(
-    #         classify__create_user__isnull=True,
-    #     )
-    #     for obj in objs:
-    #         if 'statics' in obj.cover_img and os.path.exists(obj.cover_img):
-    #             token = qiniu_get_token()
-    #             img_path = update_qiniu(obj.cover_img, token)
-    #             obj.cover_img = img_path
-    #             obj.save()
-
+    elif oper_type == 'test_article':
+        objs = models.Userprofile.objects.all()
+        for obj in objs:
+            if 'http://tianyan.zhugeyingxiao.com' not in obj.set_avator:
+                path = requests_img_download(obj.set_avator)
+                token = qiniu_get_token()
+                path = update_qiniu(path, token)
+                obj.set_avator = path
+                obj.save()
+            break
     return JsonResponse(response.__dict__)
 
 
