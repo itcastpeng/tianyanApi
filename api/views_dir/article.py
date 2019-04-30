@@ -570,7 +570,7 @@ def article_customer_oper(request, oper_type):
                 for i in user_obj.brand_classify.all():
                     brand_name_list.append(i.name)
                 result_data['brand_name'] = brand_name_list  # 用户品牌
-                result_data['qr_code'] = user_obj.qr_code + '?imageView2/2/w/50'   # 用户微信二维码
+                result_data['qr_code'] = user_obj.qr_code + '?imageView2/2/w/200'   # 用户微信二维码
                 result_data['is_like'] = is_like            # 是否点赞
 
                 print('随机查询三篇文章=========================================================')
