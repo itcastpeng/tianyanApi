@@ -210,27 +210,19 @@ from urllib.parse import unquote
 #         "count":3
 #     },
 #     "code":200
-goods_describe = [{"content":"","status":"msg"},{"content":"http://zhugeleida.zhugeyingxiao.com/tianyan/statics/img/8f8f36d63bdf7076a2eb284299efc625A468E0A4-3931-45E0-A62D-8E0DAB3A362C.jpeg","status":"img"}]
-
-
+p = [{'status': 'img','content': 'http://tianyan.zhangcong.top/statics/img/1f75da72013edbb7fcaae9660ca55cbenews5.png'},{'status': 'msg','content': '领队开发是个啥地方好给对方和你说的覅给不给uaghudagiahfgidsfh吧卡规划是电饭锅抠脚大汉奉公克己大复合弓科技的复合弓可大法官'}]
 goods_describe_list = []
-for i in goods_describe:
+for i in p:
     if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
         goods_describe_list.append({
             'status': i.get('status'),
-            'content': i.get('content') + '?imageView2/2/w/500',
+            'content': i.get('content')  + '?imageView2/2/w/500',
         })
     else:
         goods_describe_list.append(i)
-print(goods_describe_list)
 
 
-
-p = 'http://tianyan.zhugeyingxiao.com/Foc2S983teDXeoorutpmUe9XTduf?imageView2/2/w/500?imageView2/2/w/500'
-if '?' in p:
-    print(p.split('?')[0])
-
-
-
+for i in goods_describe_list:
+    print('i-----> ', i)
 
 
