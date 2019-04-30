@@ -238,7 +238,10 @@ def user_oper(request, oper_type, o_id):
         # 使用微信头像
         elif oper_type == 'use_wechat_avatar':
             objs = models.Userprofile.objects.filter(id=user_id)
-            objs.update(set_avator=objs[0].headimgurl)
+            path = requests_img_download(objs[0].headimgurl)
+            token = qiniu_get_token()
+            set_avator = update_qiniu(path, token)
+            objs.update(set_avator=set_avator)
             response.code = 200
             response.msg = '修改成功'
 
@@ -401,7 +404,7 @@ def user_login_oper(request, oper_type):
                 #     ret_obj = weichat_api_obj.get_user_info(openid=openid)
                 #     subscribe = ret_obj.get('subscribe')
 
-                user_data['wechat_name'] = ret_obj.get('headimgurl')
+                user_data['wechat_name'] = encode_username
                 user_data['set_avator'] = set_avator
                 user_data['headimgurl'] = ret_obj.get('headimgurl')
                 user_data['subscribe'] = True
