@@ -42,9 +42,8 @@ def small_shop(request):
 
             # 返回的数据
             ret_data = []
-
+            id = request.GET.get('id')
             for obj in objs:
-
                 # try:
                 #     goods_picture = eval(obj.goods_picture)
                 # except Exception:
@@ -55,6 +54,10 @@ def small_shop(request):
                     goods_describe = eval(obj.goods_describe)
                 except Exception:
                     goods_describe = obj.goods_describe
+                if id:
+                    cover_img = obj.cover_img + '?imageView2/2/w/500'
+                else:
+                    cover_img = obj.cover_img + '?imageView2/2/w/200'
 
                 #  将查询出来的数据 加入列表
                 ret_data.append({
@@ -70,7 +73,7 @@ def small_shop(request):
                     'goods_status_id': obj.goods_status,  # 商品状态ID
                     'goods_status': obj.get_goods_status_display(),  # 商品状态
                     # 'goods_picture': goods_picture,  # 商品图片
-                    'cover_img': obj.cover_img + '?imageView2/2/w/200',  # 商品封面图片
+                    'cover_img': cover_img,  # 商品封面图片
                     'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                 })
 
