@@ -6,17 +6,15 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.user import SelectForm
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-import datetime, requests, time
 from publicFunc import base64_encryption
 from publicFunc.account import get_token
-from publicFunc.account import str_encrypt
 from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
-from django.db.models import Count
 from publicFunc.account import randon_str
-import re, os, json, sys
 from publicFunc.screenshots import screenshots
 from django.db.models import Q
+from publicFunc.qiniu_oper import requests_img_download, qiniu_get_token, update_qiniu
+import re, os, json, sys, datetime
 
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -393,9 +391,10 @@ def user_login_oper(request, oper_type):
                 user_objs = user_objs[0]
 
             else:  # 不存在，创建用户
+                path = requests_img_download(ret_obj.get('headimgurl'))
+                token = qiniu_get_token()
+                set_avator = update_qiniu(path, token) # 上传至七牛云
 
-                # subscribe = ret_obj.get('subscribe')
-                #
                 # # 如果没有关注，获取个人信息判断是否关注
                 # if not subscribe:
                 #     weichat_api_obj = WeChatApi()
@@ -403,7 +402,7 @@ def user_login_oper(request, oper_type):
                 #     subscribe = ret_obj.get('subscribe')
 
                 user_data['wechat_name'] = ret_obj.get('headimgurl')
-                user_data['set_avator'] = ret_obj.get('headimgurl')
+                user_data['set_avator'] = set_avator
                 user_data['headimgurl'] = ret_obj.get('headimgurl')
                 user_data['subscribe'] = True
                 user_data['name'] = encode_username

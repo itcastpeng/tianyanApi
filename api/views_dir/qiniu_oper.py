@@ -32,7 +32,6 @@ def qiniu_oper(request, oper_type):
                 path = update_qiniu(path, token)
                 obj.set_avator = path
                 obj.save()
-            break
     return JsonResponse(response.__dict__)
 
 
