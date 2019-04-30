@@ -221,8 +221,3 @@ for i in p:
     else:
         goods_describe_list.append(i)
 
-
-for i in goods_describe_list:
-    print('i-----> ', i)
-
-

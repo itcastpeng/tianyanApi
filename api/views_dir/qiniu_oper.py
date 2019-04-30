@@ -26,6 +26,7 @@ def qiniu_oper(request, oper_type):
     elif oper_type == 'test_article':
         objs = models.Goods.objects.all()
         for obj in objs:
+            print('obj.id--> ', obj.id, obj.goods_describe)
             goods_describe = []
             for i in json.loads(obj.goods_describe):
                 status = i.get('status')
