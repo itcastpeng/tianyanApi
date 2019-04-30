@@ -65,17 +65,15 @@ def small_shop(request):
                         goods_describe = eval(obj.goods_describe)
                     except Exception:
                         goods_describe = obj.goods_describe
-                    goods_describe_list = []
-                    for i in goods_describe:
-                        print('i====================000000000000000000----------------> ', i)
-                        if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
-                            goods_describe_list.append({
-                                'status': i.get('status'),
-                                'content': i.get('content')  + '?imageView2/2/w/500',
-                            })
-                        else:
-                            goods_describe_list.append(i)
-                    print('goods_describe_list-------> ', goods_describe)
+                    # goods_describe_list = []
+                    # for i in goods_describe:
+                    #     if i.get('status') == 'img' and 'http://tianyan.zhugeyingxiao.com' in i.get('content'):
+                    #         goods_describe_list.append({
+                    #             'status': i.get('status'),
+                    #             'content': i.get('content')  + '?imageView2/2/w/500',
+                    #         })
+                    #     else:
+                    #         goods_describe_list.append(i)
                     ret_data[0]['goods_describe'] = goods_describe  # 商品描述
                     ret_data[0]['cover_img'] = obj.cover_img + '?imageView2/2/w/500'
 
@@ -85,7 +83,6 @@ def small_shop(request):
                     'id': i[0],
                     'name': i[1]
                 })
-            print('ret_data===========> ', ret_data)
             #  查询成功 返回200 状态码
             response.code = 200
             response.msg = '查询成功'
@@ -201,7 +198,7 @@ def small_shop_oper(request, oper_type, o_id):
                 # 'goods_picture': request.POST.get('goods_picture'),  # 商品图片
                 'cover_img': request.POST.get('cover_img'),  # 商品图片
             }
-
+            print('form_data===========================> ', form_data)
             forms_obj = UpdateGoodForm(form_data)
             if forms_obj.is_valid():
                 print('验证通过')
