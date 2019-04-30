@@ -85,7 +85,7 @@ def small_shop(request):
                     'id': i[0],
                     'name': i[1]
                 })
-
+            print('ret_data===========> ', ret_data)
             #  查询成功 返回200 状态码
             response.code = 200
             response.msg = '查询成功'
