@@ -573,7 +573,7 @@ def article_customer_oper(request, oper_type):
                 result_data['qr_code'] = user_obj.qr_code + '?imageView2/2/w/200'   # 用户微信二维码
                 result_data['is_like'] = is_like            # 是否点赞
 
-                print('随机查询三篇文章=========================================================')
+                # print('随机查询三篇文章=========================================================')
                 article_objs = models.Article.objects.filter(
                     title__isnull=False,
                     create_user_id=inviter_user_id

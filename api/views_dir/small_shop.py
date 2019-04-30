@@ -156,7 +156,7 @@ def small_shop_oper(request, oper_type, o_id):
                 # 'goods_picture': request.POST.get('goods_picture'),  # 商品图片
                 'cover_img': request.POST.get('cover_img'),  # 封面图片
             }
-            print('form_data-------> ', form_data)
+            # print('form_data-------> ', form_data)
 
             forms_obj = AddGoodForm(form_data)
             if forms_obj.is_valid():

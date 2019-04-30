@@ -361,7 +361,7 @@ def wechat(request):
 # @account.is_token(models.Userprofile)
 def wechat_oper(request, oper_type):
     response = Response.ResponseObj()
-    print('request.GET---------------> ', request.GET)
+    # print('request.GET---------------> ', request.GET)
     user_id = request.GET.get('user_id')
     if request.method == "POST":
         pass
@@ -373,7 +373,7 @@ def wechat_oper(request, oper_type):
 
         # 邀请成员页面展示信息
         if oper_type == "invite_members":
-            print('request.GET=====invite_members------------invite_members------------invite_members====', request.GET)
+            # print('request.GET=====invite_members------------invite_members------------invite_members====', request.GET)
             team_id = request.GET.get('team_id')
             inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
 
@@ -464,9 +464,9 @@ def wechat_oper(request, oper_type):
                 redirect_url = str(share_url) + '&redirect_uri=' + str(redirect_uri) + '&response_type=' + str(response_type) + '&scope=' + str(scope) + '&state=' + str(state)
             else:
                 redirect_url = share_url
-            print('==================跳转链接========================================')
-            print('request.GET========> ', request.GET)
-            print('redirect_url-------------------> ', redirect_url)
+            # print('==================跳转链接========================================')
+            # print('request.GET========> ', request.GET)
+            # print('redirect_url-------------------> ', redirect_url)
             return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
@@ -486,7 +486,7 @@ def share_article(request, oper_type):
         weichat_api_obj = weixin_gongzhonghao_api.WeChatApi(data)
         ret_obj = weichat_api_obj.get_openid(code)
         openid = ret_obj.get('openid')
-        print('ret_obj-----------> ', ret_obj)
+        # print('ret_obj-----------> ', ret_obj)
         encode_username = b64encode(
             ret_obj['nickname']
         )
@@ -512,7 +512,7 @@ def share_article(request, oper_type):
                 ret_obj_subscribe = weichat_api_obj.get_user_info(openid=openid)
                 subscribe = ret_obj_subscribe.get('subscribe')
 
-            print('ret_objret_obj--ret_obj---> ', ret_obj)
+            # print('ret_objret_obj--ret_obj---> ', ret_obj)
             user_data['subscribe'] = subscribe
             user_data['name'] = encode_username
             user_data['openid'] = ret_obj.get('openid')
@@ -524,7 +524,7 @@ def share_article(request, oper_type):
 
         _type = oper_type.split('_')[0]  # 类型
         oid = oper_type.split('_')[1]  # ID
-        print('o_id---o_id--o_id--> ', oper_type)
+        # print('o_id---o_id--o_id--> ', oper_type)
         if _type == 'article':
             # 此处跳转到文章页面 文章
             redirect_url = '{host_url}#/share_article?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
