@@ -55,7 +55,7 @@ def article_oper(request, oper_type):
         content = json.dumps(data.get('content'))  # 标题
         objs = models.Article.objects.filter(title=title)
         if not objs:
-            if len(content) > 0 and title and len(content) > 5:
+            if len(content) > 20 and title:
                 add_article_public(data, classify_id)
 
     return JsonResponse(response.__dict__)
