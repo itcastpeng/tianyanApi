@@ -26,8 +26,8 @@ app.conf.beat_schedule = {
 
     # 马上超过二十四小时活跃的用户发送消息
     'last_active_time':{
-        'task':'tianyan_celery.tasks.upload_day_eye',
-        'schedule': crontab(minute='*/6'),  # 6分钟一次因为设置的是提前十分钟  
+        'task':'tianyan_celery.tasks.last_active_time',
+        'schedule': crontab(minute='*/6'),  # 6分钟一次因为设置的是提前十分钟
         'args':[] # # 传入任务函数的参数,可以是一个列表或元组,如果函数没参数则为空列表或空元组
     },
 
