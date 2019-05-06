@@ -355,6 +355,7 @@ def user_login_oper(request, oper_type):
             "city": ret_obj.get('city'),
             "headimgurl": ret_obj.get('headimgurl'), # 更新微信头像
             "wechat_name": encode_username,
+            "last_active_time": datetime.datetime.today(),
         }
         user_objs = models.Userprofile.objects.filter(openid=openid)
         if user_objs:  # 客户已经存在
@@ -372,6 +373,7 @@ def user_login_oper(request, oper_type):
             #     ret_obj = weichat_api_obj.get_user_info(openid=openid)
             #     subscribe = ret_obj.get('subscribe')
 
+            user_data['last_active_time'] = datetime.datetime.today()
             user_data['wechat_name'] = encode_username
             user_data['set_avator'] = set_avator
             user_data['headimgurl'] = ret_obj.get('headimgurl')

@@ -75,6 +75,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
         "city": ret_obj.get('city'),
         "headimgurl": ret_obj.get('headimgurl'),
         "wechat_name": encode_username,
+        "last_active_time": datetime.datetime.today(),
     }
 
     if user_objs:
@@ -96,6 +97,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
             ret_obj = weichat_api_obj.get_user_info(openid=openid)
             subscribe = ret_obj.get('subscribe')
 
+        user_data['last_active_time'] = datetime.datetime.today()
         user_data['wechat_name'] = encode_username
         user_data['headimgurl'] = ret_obj.get('headimgurl')
         user_data['inviter_id'] = inviter_user_id
@@ -204,6 +206,7 @@ def wechat(request):
             elif msg_type == 'text':
                 print('---------用户发送消息')
                 user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
+                user_obj.last_active_time = datetime.datetime.today() # 最后活跃时间
                 user_id = user_obj.id
                 token = user_obj.token
                 data = get_ent_info(user_id)  # 获取该用户appid等

@@ -8,19 +8,13 @@ from publicFunc.article_oper import get_ent_info
 import datetime, json, time
 
 
-
-
-
-
-
-
 # 创建天眼公众号 导航栏
 def create_menu(request):
     response = Response.ResponseObj()
     data = get_ent_info(1)
     weixin_objs = WeChatApi(data)
     APPID = weixin_objs.APPID
-    weixin_objs.getMenu() # 获取自定义菜单栏列表
+    # weixin_objs.getMenu() # 获取自定义菜单栏列表
 
 
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
@@ -63,6 +57,14 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/shezhi'
+    shezhi_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                  "&state=STATE#wechat_redirect" \
+        .format(
+        appid=APPID,
+        redirect_uri=redirect_uri,
+    )
     button = {
         "button": [
             {
@@ -70,7 +72,7 @@ def create_menu(request):
                 "sub_button": [
                     {
                         "type": "view",
-                        "name": "文章首页",
+                        "name": "获客文章",
                         "url": login_url
                     },
                     {
@@ -90,8 +92,13 @@ def create_menu(request):
                 "url": tianyan_url,
             },
             {
-                "name": "设置",
+                "name": "我的",
                 "sub_button": [
+                    {
+                        "type": "view",
+                        "name": "设置",
+                        "url": shezhi_url
+                    },
                     {
                         "type": "view",
                         "name": "我的名片",
@@ -111,15 +118,12 @@ def create_menu(request):
         ]
     }
     print('button-button---button--------> ', button)
-    # weixin_objs.createMenu(button)
+    weixin_objs.createMenu(button)
 
 
     response.code = 200
 
     return JsonResponse(response.__dict__)
-
-
-
 
 
 # 天眼功能统计数据
@@ -217,9 +221,37 @@ def day_eye_data(request):
 
 
 
-# 最后活跃时间马上到24小时的 发送模板消息
+# 最后活跃时间马上到24小时的 发送消息
 def last_active_time(request):
     response = Response.ResponseObj()
+    now = datetime.datetime.today()
+    date_time = (now - datetime.timedelta(days=1, minutes=10))
+    # 最后活跃时间 至当前 差十分钟 满一小时
+    objs = models.Userprofile.objects.filter(
+        openid__isnull=False,
+        last_active_time__isnull=False,
+        last_active_time__gte=date_time
+    )
+    for obj in objs:
+        data = get_ent_info(obj.id)
+        weixin_objs = WeChatApi(data)
+
+        post_data = {
+            "touser": obj.openid,
+            "msgtype": "text",
+            "text": {
+                "content": '天眼将暂停为您推送消息, 微信限制于超过24小时未互动 公众号则不能发送消息\n快来点击下方获客文章解除限制'
+            }
+        }
+        print('--------------------post_data-----> ', post_data)
+
+        # 发送客服消息
+        # post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+        # weixin_objs.news_service(post_data)
+
+
+    response.code = 200
+
     return JsonResponse(response.__dict__)
 
 
