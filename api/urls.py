@@ -5,7 +5,7 @@ from django.conf.urls import url
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
     upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article, html_oper, qiniu_oper
 
-from api.views_dir.my_celery import day_eye_data
+from api.views_dir.my_celery import celery_url
 
 urlpatterns = [
 
@@ -101,7 +101,9 @@ urlpatterns = [
     url(r'^qiniu_oper/(?P<oper_type>\w+)$', qiniu_oper.qiniu_oper),
 
     # celery_--------------------------
-    url(r'^day_eye_data$', day_eye_data.day_eye_data),
+    url(r'^day_eye_data$', celery_url.day_eye_data),            # 天眼功能提前缓存
+    url(r'^last_active_time$', celery_url.last_active_time),    # 最后活跃时间快到24小时的用户提醒
 
-
+    # 创建天眼公众号 导航栏
+    url(r'^create_menu$', celery_url.create_menu),
 ]

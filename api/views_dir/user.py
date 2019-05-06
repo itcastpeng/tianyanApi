@@ -333,93 +333,66 @@ def user_oper(request, oper_type, o_id):
 # 用户登录
 def user_login_oper(request, oper_type):
     response = Response.ResponseObj()
-    # if oper_type == 'login':  # 创建 模板 生成跳转页面
-    #     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
-    #     weixin_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-    #                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-    #                  "&state=STATE#wechat_redirect" \
-    #         .format(
-    #         appid=weichat_api_obj.APPID,
-    #         redirect_uri=redirect_uri,
-    #     )
-    #     key = int(time.time())
-    #     menu_data = {
-    #         'button':[
-    #             {
-    #                 'type':'view',
-    #                 'name':'天眼',
-    #                 'url': weixin_url,
-    #                 'key': key
-    #             }
-    #         ]
-    #     }
-    #
-    #     weichat_api_obj.createMenu(menu_data)
 
-        # weichat_api_obj.deleteMenu()
-        # weichat_api_obj.delMenu()
-        # data = weichat_api_obj.getMenu()
-        # print('data-----> ', data)
-        # print('weixin_url------> ', weixin_url)
+    # 判断该用户是否存在
+    code = request.GET.get('code')
+    objs = models.save_code.objects.filter(save_code=code)
+    if not objs:
+        models.save_code.objects.create(
+            save_code=code
+        )
+        data = get_ent_info(1)
+        weichat_api_obj = WeChatApi(data)
+        ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+        encode_username = base64_encryption.b64encode(
+            ret_obj['nickname']
+        )
+        print('code-----code-------code--------code--------code-------> ', code, ret_obj)
+        openid = ret_obj.get('openid')
+        user_data = {
+            "sex": ret_obj.get('sex'),
+            "country": ret_obj.get('country'),
+            "province": ret_obj.get('province'),
+            "city": ret_obj.get('city'),
+            "headimgurl": ret_obj.get('headimgurl'), # 更新微信头像
+            "wechat_name": encode_username,
+        }
+        user_objs = models.Userprofile.objects.filter(openid=openid)
+        if user_objs:  # 客户已经存在
+            user_objs.update(**user_data)
+            user_objs = user_objs[0]
+
+        else:  # 不存在，创建用户
+            path = requests_img_download(ret_obj.get('headimgurl'))
+            token = qiniu_get_token()
+            set_avator = update_qiniu(path, token) # 上传至七牛云
+
+            # # 如果没有关注，获取个人信息判断是否关注
+            # if not subscribe:
+            #     weichat_api_obj = WeChatApi()
+            #     ret_obj = weichat_api_obj.get_user_info(openid=openid)
+            #     subscribe = ret_obj.get('subscribe')
+
+            user_data['wechat_name'] = encode_username
+            user_data['set_avator'] = set_avator
+            user_data['headimgurl'] = ret_obj.get('headimgurl')
+            user_data['subscribe'] = True
+            user_data['name'] = encode_username
+            user_data['openid'] = ret_obj.get('openid')
+            user_data['token'] = get_token()
+            user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
+            print("user_data --->", user_data)
+            user_objs = models.Userprofile.objects.create(**user_data)
 
 
+        redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1&page_type={page_type}'.format(
+            host=host_url,
+            token=user_objs.token,
+            user_id=user_objs.id,
+            page_type=oper_type,
+        )
+        return redirect(redirect_url)
 
-    # # 判断该用户是否存在
-    if oper_type == 'user_login_get_info':
-        code = request.GET.get('code')
-        objs = models.save_code.objects.filter(save_code=code)
-        if not objs:
-            models.save_code.objects.create(
-                save_code=code
-            )
-            data = get_ent_info(1)
-            weichat_api_obj = WeChatApi(data)
-            ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
-            encode_username = base64_encryption.b64encode(
-                ret_obj['nickname']
-            )
-            print('code-----code-------code--------code--------code-------> ', code, ret_obj)
-            openid = ret_obj.get('openid')
-            user_data = {
-                "sex": ret_obj.get('sex'),
-                "country": ret_obj.get('country'),
-                "province": ret_obj.get('province'),
-                "city": ret_obj.get('city'),
-                "headimgurl": ret_obj.get('headimgurl'), # 更新微信头像
-                "wechat_name": encode_username,
-            }
-            user_objs = models.Userprofile.objects.filter(openid=openid)
-            if user_objs:  # 客户已经存在
-                user_objs.update(**user_data)
-                user_objs = user_objs[0]
 
-            else:  # 不存在，创建用户
-                path = requests_img_download(ret_obj.get('headimgurl'))
-                token = qiniu_get_token()
-                set_avator = update_qiniu(path, token) # 上传至七牛云
-
-                # # 如果没有关注，获取个人信息判断是否关注
-                # if not subscribe:
-                #     weichat_api_obj = WeChatApi()
-                #     ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                #     subscribe = ret_obj.get('subscribe')
-
-                user_data['wechat_name'] = encode_username
-                user_data['set_avator'] = set_avator
-                user_data['headimgurl'] = ret_obj.get('headimgurl')
-                user_data['subscribe'] = True
-                user_data['name'] = encode_username
-                user_data['openid'] = ret_obj.get('openid')
-                user_data['token'] = get_token()
-                user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
-                print("user_data --->", user_data)
-                user_objs = models.Userprofile.objects.create(**user_data)
-
-            redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1'.format(
-                host=host_url,
-                token=user_objs.token,
-                user_id=user_objs.id,
-            )
-            return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)

@@ -85,6 +85,7 @@ class Userprofile(models.Model):
     cumulative_amount = models.CharField(verbose_name='累计钱数', max_length=64, default=0)
     make_money = models.CharField(verbose_name='待提钱数', max_length=64, default=0)
 
+    last_active_time = models.DateTimeField(verbose_name='用户最后活跃时间', null=True)
 
 # 客户表(用户的客户)
 class Customer(models.Model):
@@ -328,7 +329,7 @@ class withdrawal_log(models.Model):
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     is_success = models.BooleanField(verbose_name='是否提现成功', default=0)
     wechat_returns_data = models.TextField(verbose_name='微信返回数据, 相当于失败信息', null=True)
-
+    dingdanhao = models.CharField(verbose_name='订单号', max_length=256, null=True)
 
 
 

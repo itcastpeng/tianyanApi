@@ -108,10 +108,28 @@ def weixin_pay(request, oper_type, o_id):
 
             code = response_data.get('code')
             return_msg = response_data.get('return_msg')
+
+            make_money = float(user_obj.make_money)             # 用户待提钱数
+            withdrawal_amount = int(withdrawal_amount)    # 用户提现钱数
+            withdrawal_after = make_money - withdrawal_amount   # 待提钱数减去提现钱数
+
             if code == 200:
+                is_success = 1 # 是否提现成功
                 response.code = 200
             else:
+                is_success = 0
                 response.code = 301
+
+            models.withdrawal_log.objects.create(           # 创建提现记录
+                user_id=user_id,
+                withdrawal_befor=make_money,           # 提现前 待提钱数
+                withdrawal_amount=withdrawal_amount,  # 提现金额
+                withdrawal_after=withdrawal_after,  # 提现后 待提钱数
+                is_success=is_success,
+                wechat_returns_data=return_msg,
+                dingdanhao=dingdanhao
+            )
+
             response.msg = return_msg
         else:
             response.code = 301

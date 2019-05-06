@@ -214,7 +214,7 @@ class WeChatApi(WeixinApiPublic):
         # }
 
         # print(parse.urlencode())
-        post_data_json = json.dumps(menu_data, ensure_ascii=False).encode()
+        post_data_json = json.dumps(menu_data, ensure_ascii=False).encode('utf8')
         print(post_data_json)
         ret = requests.post(url, data=post_data_json)
 
@@ -256,7 +256,7 @@ class WeChatApi(WeixinApiPublic):
             ACCESS_TOKEN=self.access_token
         )
         ret = requests.get(url)
-        # print('获取自定义菜单ret.text-----> ', ret.text)
+        print('获取自定义菜单ret.text-----> ', ret.text)
 
     # 创建标签
     def create_tag(self, tag_name):
