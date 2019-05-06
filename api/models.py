@@ -138,7 +138,7 @@ class user_comments_customer_information(models.Model):
 # 文章管理
 class Article(models.Model):
     title = models.CharField(verbose_name="文章标题", max_length=256, null=True)
-    summary = models.CharField(verbose_name="文章描述", max_length=256, null=True)
+    summary = models.TextField(verbose_name="文章描述", null=True)
     content = models.TextField(verbose_name="文章内容", null=True)
     classify = models.ManyToManyField('Classify', verbose_name='所属分类')
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)

@@ -229,3 +229,26 @@ stop_time = (
 
 print(stop_time)
 
+import base64
+p = '4oCL5LmM5YWw5qC85pel5LmQLOS4reWFseWFmuWRmCzlsI/lrabpq5jnuqfmlZnluIgs546w5Lu75LiA5bm05LqM54+t54+t5Li75Lu7LuWFiOWQjuiOt+W+l+iHquayu+WMuuS8mOengOi+heWvvOWRmC7ljIXlpLTluILkvJjnp4DmlZnluIgu5YyF5aS05biC5LyY56eA6L6F5a+85ZGYLuWMheWktOW4guS8mOengOePreS4u+S7gA=='
+p = '4oCL5LmM5YWw5qC85pel5LmQLOS4reWFseWFmuWRmCzlsI/lrabpq5jnuqfmlZnluIgs546w5Lu75LiA5bm05LqM54+t54+t5Li75Lu7LuWFiOWQjuiOt+W+l+iHquayu+WMuuS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOaVmeW4iOOAgeWMheWktOW4guS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOePreS4u+S7gA=='
+p = '4oCL5LmM5YWw5qC85pel5LmQLOS4reWFseWFmuWRmCzlsI/lrabpq5jnuqfmlZnluIgs546w5Lu75LiA5bm05LqM54+t54+t5Li75Lu7LuWFiOWQjuiOt+W+l+iHquayu+WMuuS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOaVmeW4iOOAgeWMheWktOW4guS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOePreS4u+S7'
+
+print(base64.b64decode(p.encode('utf8')).decode('utf8'))
+# 替换中文符号
+def replace_chinese_character(string):
+    table = {ord(f): ord(t) for f, t in zip(
+        '，。！？【】（）％＃＠＆１２３４５６７８９０“”；：',
+        ',.!?[]()%#@&1234567890"";:')}
+
+    new_string = string.translate(table)
+    return new_string
+
+
+p = '​乌兰格日乐,中共党员,小学高级教师,现任一年二班班主任.先后获得自治区优秀辅导员、包头市优秀教师、包头市优秀辅导员、包头市优秀班主什'
+    # '​乌兰格日乐,中共党员,小学高级教师,现任一年二班班主任.先后获得自治区优秀辅导员、包头市优秀教师、包头市优秀辅导员、包头市优秀班主什'
+l = replace_chinese_character(p)
+print(l)
+
+
+

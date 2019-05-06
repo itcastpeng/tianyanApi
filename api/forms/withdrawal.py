@@ -27,16 +27,19 @@ class WithdrawalForm(forms.Form):
     def clean_withdrawal_amount(self):
         withdrawal_amount = self.data.get('withdrawal_amount') # 提现金额
         user_id = self.data.get('user_id')
-        withdrawal_amount = float(withdrawal_amount)
-        if withdrawal_amount <= 200:
-            user_obj = models.Userprofile.objects.get(id=user_id)
-            if float(user_obj.make_money) >= withdrawal_amount:
-                return user_obj, withdrawal_amount
+        if withdrawal_amount.isdigit():
+            withdrawal_amount = int(withdrawal_amount)
+            if withdrawal_amount <= 200:
+                user_obj = models.Userprofile.objects.get(id=user_id)
+                if float(user_obj.make_money) >= withdrawal_amount:
+                    return user_obj, withdrawal_amount
 
+                else:
+                    self.add_error('withdrawal_amount', '余额不足')
             else:
-                self.add_error('withdrawal_amount', '余额不足')
+                self.add_error('withdrawal_amount', '每次最多提现贰佰元人民币')
         else:
-            self.add_error('withdrawal_amount', '每次最多提现贰佰元人民币')
+            self.add_error('withdrawal_amount', '不能提现小数')
 
 
 

@@ -8,6 +8,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.article_oper import get_ent_info
 from django.db.models import F
 from api.forms.withdrawal import WithdrawalForm
+from publicFunc.base64_encryption import b64decode
 import xml.dom.minidom as xmldom, datetime, time, json
 
 
@@ -99,10 +100,19 @@ def weixin_pay(request, oper_type, o_id):
                 'dingdanhao': dingdanhao,               # 订单号
                 'appid': appid,                         # appid
                 'openid': user_obj.openid,              # openid
+                'user_id': user_id,                     # user_id
+                'user_name': b64decode(user_obj.name),
+                'make_money': user_obj.make_money,
             }
-            weixin_pay_api_obj.withdrawal(data) # 提现
+            response_data = weixin_pay_api_obj.withdrawal(data) # 提现
 
-
+            code = response_data.get('code')
+            return_msg = response_data.get('return_msg')
+            if code == 200:
+                response.code = 200
+            else:
+                response.code = 301
+            response.msg = return_msg
         else:
             response.code = 301
             response.msg = json.loads(form_objs.errors.as_json())

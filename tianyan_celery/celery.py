@@ -20,7 +20,7 @@ app.conf.beat_schedule = {
     'upload_day_eye':{
         'task':'tianyan_celery.tasks.upload_day_eye',
         # 'schedule': crontab("0", '*/1', '*', '*', '*'),  # 此处跟 linux 中 crontab 的格式一样
-        'schedule': crontab(minute='*/10'),  # 直接写个10为1小时执行一次  */10 为 十分钟一次
+        'schedule': crontab(minute='*/1'),  # 直接写个10为1小时执行一次  */10 为 十分钟一次
         'args':[] # # 传入任务函数的参数,可以是一个列表或元组,如果函数没参数则为空列表或空元组
     },
 
