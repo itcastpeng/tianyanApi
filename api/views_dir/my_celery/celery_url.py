@@ -31,14 +31,6 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/huoke'
-    huoke_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
-                "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                "&state=STATE#wechat_redirect" \
-        .format(
-        appid=APPID,
-        redirect_uri=redirect_uri,
-    )
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/wodepinpai'
     pinpai_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
@@ -63,6 +55,14 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tianyan'
+    tianyan_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                   "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                   "&state=STATE#wechat_redirect" \
+        .format(
+        appid=APPID,
+        redirect_uri=redirect_uri,
+    )
     button = {
         "button": [
             {
@@ -71,7 +71,7 @@ def create_menu(request):
                     {
                         "type": "view",
                         "name": "文章首页",
-                        "url": huoke_url
+                        "url": login_url
                     },
                     {
                         "type": "view",
@@ -87,7 +87,7 @@ def create_menu(request):
             {
                 "type": "view",
                 "name": "天眼",
-                "url": login_url,
+                "url": tianyan_url,
             },
             {
                 "name": "设置",
