@@ -84,7 +84,7 @@ urlpatterns = [
     url(r'^renewal$', renewal.renewal),
 
     # ----------------支付管理--------------------
-    url(r'^weixin_pay/(?P<oper_type>\w+)/(?P<o_id>\d+)$', prepaidManagement.weixin_pay), # 统一下单
+    url(r'^weixin_pay/(?P<oper_type>\w+)/(?P<o_id>\d+)$', prepaidManagement.weixin_pay), # 统一下单/提现
     url(r'^payback$', prepaidManagement.payback), # 微信回调
 
     # ----------------天眼---------------------

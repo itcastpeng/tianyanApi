@@ -1,5 +1,3 @@
-import xml.dom.minidom as xmldom
-import datetime, time
 from api import models
 from publicFunc import Response
 from publicFunc import account, xmldom_parsing
@@ -9,16 +7,25 @@ from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.article_oper import get_ent_info
 from django.db.models import F
+from api.forms.withdrawal import WithdrawalForm
+import xml.dom.minidom as xmldom, datetime, time, json
+
+
 
 @csrf_exempt
 @account.is_token(models.Userprofile)
 def weixin_pay(request, oper_type, o_id):
     response = Response.ResponseObj()
     weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
+    user_id = request.GET.get('user_id')
+
+    data = get_ent_info(user_id) # 获取用户信息
+    weixin_obj = WeChatApi(data) # 获取用户公众号信息
+    appid = weixin_obj.APPID     # appid
+    APPSECRET = weixin_obj.APPSECRET     # 商户号
 
     # 预支付
     if oper_type == 'yuZhiFu':
-        user_id = request.GET.get('user_id')
         fee_objs = models.renewal_management.objects.filter(id=o_id)
         if fee_objs:
             models.renewal_log.objects.filter(create_user_id=user_id, isSuccess=0).delete() # 删除未付款的订单
@@ -27,9 +34,6 @@ def weixin_pay(request, oper_type, o_id):
             fee_obj = fee_objs[0]
             price = int(fee_obj.price)
             # price = int(fee_obj.price) * 100
-            data = get_ent_info(user_id)
-            weixin_obj = WeChatApi(data)
-            appid = weixin_obj.APPID
             data = {
                 'total_fee': price,  # 金额(分 为单位)
                 'openid': user_obj.openid,  # 微信用户唯一标识
@@ -82,9 +86,46 @@ def weixin_pay(request, oper_type, o_id):
 
     # 提现功能
     elif oper_type == 'withdrawal':
-        pass
+        form_data = {
+            'user_id': user_id,
+            'withdrawal_amount': request.GET.get('withdrawal_amount'), # 提现金额
+        }
+        form_objs = WithdrawalForm(form_data)
+        if form_objs.is_valid():
+            user_obj, withdrawal_amount = form_objs.cleaned_data.get('withdrawal_amount')
+            dingdanhao = weixin_pay_api_obj.shengcheng_dingdanhao()
+            data = {
+                'withdrawal_amount': withdrawal_amount, # 提现金额
+                'dingdanhao': dingdanhao,               # 订单号
+                'appid': appid,                         # appid
+                'openid': user_obj.openid,              # openid
+            }
+            weixin_pay_api_obj.withdrawal(data) # 提现
+
+
+        else:
+            response.code = 301
+            response.msg = json.loads(form_objs.errors.as_json())
 
     return JsonResponse(response.__dict__)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 # 微信回调
 def payback(request):

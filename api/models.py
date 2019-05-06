@@ -258,18 +258,6 @@ class renewal_management(models.Model):
     create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
 
 
-# 续费日志
-class renewal_log(models.Model):
-    pay_order_no = models.CharField(verbose_name='订单号', max_length=128, null=True, blank=True)
-    the_length = models.CharField(verbose_name='时长', max_length=128, null=True, blank=True)
-    renewal_number_days = models.IntegerField(verbose_name='续费天数', default=30)
-    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
-    price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
-    original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
-    overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
-    isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
-
 """团队相关 数据表"""
 
 # 团队表
@@ -316,3 +304,32 @@ class day_eye_celery(models.Model):
     )
     status = models.SmallIntegerField(verbose_name='类别 区分文章和商品', choices=status_choices, null=True)
     create_date = models.DateTimeField(verbose_name='创建时间', null=True)
+
+
+"""钱相关"""
+# 续费日志
+class renewal_log(models.Model):
+    pay_order_no = models.CharField(verbose_name='订单号', max_length=128, null=True, blank=True)
+    the_length = models.CharField(verbose_name='时长', max_length=128, null=True, blank=True)
+    renewal_number_days = models.IntegerField(verbose_name='续费天数', default=30)
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
+    price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
+    original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
+    overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
+    isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
+
+# 提现日志
+class withdrawal_log(models.Model):
+    user = models.ForeignKey('Userprofile', verbose_name='提现人')
+    withdrawal_befor = models.CharField(verbose_name='提现前余额 make_money字段', max_length=64)
+    withdrawal_amount = models.CharField(verbose_name='提现钱数', max_length=64)
+    withdrawal_after = models.CharField(verbose_name='提现后余额 make_money字段', max_length=64)
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    is_success = models.BooleanField(verbose_name='是否提现成功', default=0)
+    wechat_returns_data = models.TextField(verbose_name='微信返回数据, 相当于失败信息', null=True)
+
+
+
+
+
