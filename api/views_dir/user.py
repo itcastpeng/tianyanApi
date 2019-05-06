@@ -333,7 +333,6 @@ def user_oper(request, oper_type, o_id):
 # 用户登录
 def user_login_oper(request, oper_type):
     response = Response.ResponseObj()
-
     # 判断该用户是否存在
     code = request.GET.get('code')
     objs = models.save_code.objects.filter(save_code=code)

@@ -55,7 +55,14 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tuiguang'
+    tuiguang_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                 "&state=STATE#wechat_redirect" \
+        .format(
+        appid=APPID,
+        redirect_uri=redirect_uri,
+    )
     button = {
         "button": [
             {
@@ -88,23 +95,23 @@ def create_menu(request):
                     {
                         "type": "view",
                         "name": "我的名片",
-                        "url": huoke_url
+                        "url": login_url
                     },
                     {
                         "type": "view",
                         "name": "我的分销",
-                        "url": pinpai_url,
+                        "url": tuiguang_url,
                     },
                     {
                         "type": "view",
                         "name": "使用指南",
-                        "url": dianpu_url,
+                        "url": login_url,
                     }]
             },
         ]
     }
     print('button-button---button--------> ', button)
-    weixin_objs.createMenu(button)
+    # weixin_objs.createMenu(button)
 
 
     response.code = 200
