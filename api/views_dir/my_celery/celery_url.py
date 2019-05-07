@@ -311,10 +311,10 @@ def customer_view_articles_send_msg(request):
     print('user_obj.overdue_date--------> ', type(user_obj.overdue_date))
     if user_obj.overdue_date >= datetime.date.today():
         msg = '有人看了您的{}\n《{}》\n查看人:{}\n赶快点击 *天眼* 查看吧！'.format(
-            check_type, b64decode(customer_obj.name), title
+            check_type, title, b64decode(customer_obj.name)
         )
     else:
-        msg = '有人看了您的{}\n《{}》\n赶快点击 *天眼* 查看吧！'.format(
+        msg = '有人看了您的{}\n《{}》\n赶快点击 *天眼* 查看吧 ↓↓↓'.format(
             check_type, title
         )
 

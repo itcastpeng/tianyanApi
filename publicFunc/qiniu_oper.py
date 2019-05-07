@@ -20,7 +20,7 @@ def update_qiniu(img_path, token):
         'file': open(img_path, 'rb')
     }
     ret = requests.post(url, data=data, files=files)
-
+    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@____________________>', ret.text, ret.content)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片
     img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')
