@@ -4,7 +4,7 @@ from urllib.parse import unquote
 from bs4 import BeautifulSoup
 from publicFunc.base64_encryption import b64encode
 from publicFunc.replace_chinese_character import replace_chinese_character
-from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu
+from publicFunc.qiniu_oper import update_qiniu
 from tianyanApi import settings
 
 pcRequestHeader = [
@@ -75,8 +75,6 @@ def eliminate_label(i):
 # 放入微信文章 获取全部内容
 def get_article(article_url):
     print('----------------------------------------------------------------------------------')
-    token = qiniu_get_token() # 获取七牛云token
-
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
     ret.encoding = 'utf-8'
@@ -99,7 +97,7 @@ def get_article(article_url):
     cover_url = os.path.join('statics', 'img') + cover_name
     with open(cover_url, 'wb') as file:
         file.write(html.content)
-    cover_url = update_qiniu(cover_url, token)
+    cover_url = update_qiniu(cover_url)
 
     # 获取所有样式
     style = ""
@@ -128,7 +126,7 @@ def get_article(article_url):
             file_dir = os.path.join('statics', 'img') + img_name
             with open(file_dir, 'wb') as file:
                 file.write(html.content)
-            img_url = update_qiniu(file_dir, token)
+            img_url = update_qiniu(file_dir)
             img_tag.attrs['data-src'] = img_url
             # img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
 

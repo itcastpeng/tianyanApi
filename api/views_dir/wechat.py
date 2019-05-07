@@ -10,7 +10,7 @@ from django.shortcuts import render, redirect
 from publicFunc.weixin import weixin_gongzhonghao_api
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.host import host_url
-from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu, requests_img_download
+from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 from publicFunc.weixin.weixin_gongzhonghao_api import checkSignature
 from publicFunc.article_oper import get_ent_info
 from publicFunc.get_content_article import get_article
@@ -91,8 +91,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
 
         subscribe = ret_obj.get('subscribe')
         path = requests_img_download(ret_obj.get('headimgurl'))
-        token = qiniu_get_token()
-        set_avator = update_qiniu(path, token)
+        set_avator = update_qiniu(path)
         # 如果没有关注，获取个人信息判断是否关注
         if not subscribe:
             data = get_ent_info(inviter_user_id)

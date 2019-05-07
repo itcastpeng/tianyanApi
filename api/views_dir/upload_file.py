@@ -12,7 +12,7 @@ import random
 import json
 import base64
 from PIL import Image,ImageFont,ImageDraw
-from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu
+from publicFunc.qiniu_oper import update_qiniu
 sysstr = platform.system()
 
 # 加密名字
@@ -153,8 +153,7 @@ def base_merge(request):
                 os.remove(os.path.join(file_dir, video_name)) # 删除原始上传图片
 
             if not not_qiniu: # 上传七牛云
-                token = qiniu_get_token()
-                path = update_qiniu(path, token)
+                path = update_qiniu(path)
 
             print('video_name------> ', video_name)
             response.data = {'url': path}

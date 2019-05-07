@@ -13,7 +13,7 @@ from publicFunc.article_oper import get_ent_info
 from publicFunc.account import randon_str
 from publicFunc.screenshots import screenshots
 from django.db.models import Q
-from publicFunc.qiniu_oper import requests_img_download, qiniu_get_token, update_qiniu
+from publicFunc.qiniu_oper import requests_img_download, update_qiniu
 import re, os, json, sys, datetime
 
 # cerf  token验证 用户展示模块
@@ -239,8 +239,7 @@ def user_oper(request, oper_type, o_id):
         elif oper_type == 'use_wechat_avatar':
             objs = models.Userprofile.objects.filter(id=user_id)
             path = requests_img_download(objs[0].headimgurl)
-            token = qiniu_get_token()
-            set_avator = update_qiniu(path, token)
+            set_avator = update_qiniu(path)
             objs.update(set_avator=set_avator)
             response.code = 200
             response.msg = '修改成功'
@@ -365,8 +364,7 @@ def user_login_oper(request, oper_type):
 
         else:  # 不存在，创建用户
             path = requests_img_download(ret_obj.get('headimgurl'))
-            token = qiniu_get_token()
-            set_avator = update_qiniu(path, token) # 上传至七牛云
+            set_avator = update_qiniu(path) # 上传至七牛云
 
             # # 如果没有关注，获取个人信息判断是否关注
             # if not subscribe:

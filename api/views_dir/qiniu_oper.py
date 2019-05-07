@@ -4,9 +4,8 @@ import qiniu
 from django.http import JsonResponse
 from api import models
 import json, requests, os
-from publicFunc.qiniu_oper import qiniu_get_token,update_qiniu
 from django.db.models import F
-from publicFunc.qiniu_oper import qiniu_get_token, update_qiniu, requests_img_download
+from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 
 # 前端请求
 def qiniu_oper(request, oper_type):
@@ -33,8 +32,7 @@ def qiniu_oper(request, oper_type):
                 content = i.get('content')
                 if status == 'img' and 'http://tianyan.zhugeyingxiao.com' not in content:
                     path = requests_img_download(content)
-                    token = qiniu_get_token()
-                    img = update_qiniu(path, token)
+                    img = update_qiniu(path)
                     goods_describe.append({
                         'status':status,
                         'content':img,
