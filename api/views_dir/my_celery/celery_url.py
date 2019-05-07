@@ -304,12 +304,10 @@ def customer_view_articles_send_msg(request):
         user_info = get_ent_info(user_id)
         weixin_objs = WeChatApi(user_info)
         post_data = {
-                    "touser": user_info.get('openid'),
+                    "touser": user_info.openid,
                     "msgtype": "text",
                     "text": {
-                        "content": '有人看了你的{}\n\n《{}》\n 赶快点击 *天眼* 查看吧！'.format(
-                                   check_type,title
-                        )
+                        "content": '有人看了您的{}\n\n\n《{}》\n\n赶快点击 *天眼* 查看吧！'.format(check_type,title)
                     }
             }
 
