@@ -24,15 +24,15 @@ def update_qiniu(img_path, token):
     #     'Access-Control-Allow-Methods': 'GET, POST, PUT,DELETE'
     # }
     # ret = requests.post(url, data=data, files=files, headers=headers)
-    zone = Zone(
-        up_host='https://up-z1.qiniup.com',
-        up_host_backup='https://upload.qiniup.com',
-        io_host='http://iovip.qbox.me',
-        scheme='https')
-
-    set_default(default_zone=zone)
-    print('----------------上传七牛k云--------------')
+    # zone = Zone(
+    #     up_host='https://up-z1.qiniup.com',
+    #     up_host_backup='https://upload.qiniup.com',
+    #     io_host='http://iovip.qbox.me',
+    #     scheme='https')
+    #
+    # set_default(default_zone=zone)
     key = randon_str()
+    print('----------------上传七牛k云--------------')
     ret, info = put_file(token, key, img_path)
     print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret, info)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
