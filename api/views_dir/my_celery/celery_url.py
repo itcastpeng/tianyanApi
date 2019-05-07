@@ -302,7 +302,19 @@ def customer_view_articles_send_msg(request):
     try:
         check_type = request.POST.get('check_type')
         title = request.POST.get('title')
+        customer_id = request.POST.get('customer_id')
         user_id = request.POST.get('user_id')
+        customer_obj = models.Customer.objects.get(id=customer_id)
+        user_obj = models.Userprofile.objects.get(id=user_id)
+
+        if user_obj.overdue_date >= datetime.datetime.today():
+            msg = '有人看了您的{}\n\n\n《{}》\n\n查看人:{}\n赶快点击 *天眼* 查看吧！'.format(
+                check_type, b64decode(customer_obj.name), title
+            )
+        else:
+            msg = '有人看了您的{}\n\n\n《{}》\n\n赶快点击 *天眼* 查看吧！'.format(
+                check_type, title
+            )
 
         user_info = get_ent_info(user_id)
         weixin_objs = WeChatApi(user_info)
@@ -310,7 +322,7 @@ def customer_view_articles_send_msg(request):
                     "touser": user_info.get('openid'),
                     "msgtype": "text",
                     "text": {
-                        "content": '有人看了您的{}\n\n\n《{}》\n\n赶快点击 *天眼* 查看吧！'.format(check_type,title)
+                        "content":msg
                     }
             }
 

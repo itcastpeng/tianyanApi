@@ -627,7 +627,7 @@ def article_customer_oper(request, oper_type):
                 now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
                 log_objs = models.SelectArticleLog.objects.filter(
                     customer_id=user_id,
-                    inviter_id=user_id,
+                    inviter_id=inviter_user_id,
                     create_datetime__gte=now
                 )
                 if not log_objs:
@@ -644,7 +644,8 @@ def article_customer_oper(request, oper_type):
                 celery_data = {
                     'check_type': '文章',
                     'user_id': inviter_user_id,
-                    'title': obj.title
+                    'title': obj.title,
+                    'customer_id': user_id,
                 }
                 customer_view_articles_send_msg.delay(celery_data)
 
