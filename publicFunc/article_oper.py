@@ -82,6 +82,7 @@ def get_ent_info(user_id):
         'create_datetime': ent_obj.create_datetime,
         'user_name': b64decode(user_obj.name),
         'user_set_avator': user_obj.set_avator,
+        'openid': user_obj.openid,
     }
     return data
 

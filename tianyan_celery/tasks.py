@@ -18,9 +18,12 @@ def last_active_time():
     print('-----------------------------------celery---------超过24小时的发送消息--------> ', datetime.datetime.today())
     requests.get(url)
 
-
-
-
+# 客户查看文章等 发送消息给用户
+@app.task
+def customer_view_articles_send_msg(data):
+    url = '{}/api/customer_view_articles_send_msg'
+    print('-----------------------------------celery---------客户查看文章等 发送消息给用户--------> ', datetime.datetime.today())
+    requests.post(url, data=data)
 
 
 

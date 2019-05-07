@@ -8,6 +8,10 @@ from publicFunc.article_oper import get_ent_info
 import datetime, json, time
 
 
+# 报错警告  celery捕获异常 发送客服消息 到管理员
+def celery_error_warning(msg):
+    print('')
+
 # 创建天眼公众号 导航栏
 def create_menu(request):
     response = Response.ResponseObj()
@@ -129,136 +133,183 @@ def create_menu(request):
 # 天眼功能统计数据
 def day_eye_data(request):
     response = Response.ResponseObj()
-    for i in models.Userprofile.objects.all():
-        user_id = i.id
-        objs = models.SelectArticleLog.objects.filter(
-            inviter_id=user_id
-        ).select_related(
-            'customer'
-        ).values(
-            'customer_id', 'customer__name', 'customer__set_avator'
-        ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
+    try:
+        for i in models.Userprofile.objects.all():
+            user_id = i.id
+            objs = models.SelectArticleLog.objects.filter(
+                inviter_id=user_id
+            ).select_related(
+                'customer'
+            ).values(
+                'customer_id', 'customer__name', 'customer__set_avator'
+            ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
 
-        # 返回的数据
-        data_list = []
-        for obj in objs:
-            customer_id = obj.get('customer_id')
-            customer__name = ''
-            if obj.get('customer__name'):
-                customer__name = b64decode(obj.get('customer__name'))
+            # 返回的数据
+            data_list = []
+            for obj in objs:
+                customer_id = obj.get('customer_id')
+                customer__name = ''
+                if obj.get('customer__name'):
+                    customer__name = b64decode(obj.get('customer__name'))
 
-            article_objs = models.SelectArticleLog.objects.filter(
-                customer_id=customer_id,
-                inviter_id=user_id,
-            ).distinct().order_by('-create_datetime')
+                article_objs = models.SelectArticleLog.objects.filter(
+                    customer_id=customer_id,
+                    inviter_id=user_id,
+                ).distinct().order_by('-create_datetime')
 
-            article_count = article_objs.count()
-            data_list.append({
-                'customer_id': customer_id,
-                'customer__name': customer__name,
-                'customer__set_avator': obj.get('customer__set_avator'),
+                article_count = article_objs.count()
+                data_list.append({
+                    'customer_id': customer_id,
+                    'customer__name': customer__name,
+                    'customer__set_avator': obj.get('customer__set_avator'),
 
-                'text': '看了{}篇文章, 总共查看{}次'.format(
-                    article_count,  # 总共查看几篇文章
-                    obj.get('customer_id__count')  # # 总共查看几次
-                ),
-                'status': 1,  # 代表文章
-                'create_date': article_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
-            })
+                    'text': '看了{}篇文章, 总共查看{}次'.format(
+                        article_count,  # 总共查看几篇文章
+                        obj.get('customer_id__count')  # # 总共查看几次
+                    ),
+                    'status': 1,  # 代表文章
+                    'create_date': article_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
+                })
 
-        objs = models.customer_look_goods_log.objects.filter(
-            user_id=user_id
-        ).select_related(
-            'customer'
-        ).values(
-            'customer_id', 'customer__name', 'customer__set_avator'
-        ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
-        for obj in objs:
-            customer_id = obj.get('customer_id')
-            customer__name = ''
-            if obj.get('customer__name'):
-                customer__name = b64decode(obj.get('customer__name'))
+            objs = models.customer_look_goods_log.objects.filter(
+                user_id=user_id
+            ).select_related(
+                'customer'
+            ).values(
+                'customer_id', 'customer__name', 'customer__set_avator'
+            ).annotate(Count('customer_id')).exclude(customer_id__isnull=True).distinct()
+            for obj in objs:
+                customer_id = obj.get('customer_id')
+                customer__name = ''
+                if obj.get('customer__name'):
+                    customer__name = b64decode(obj.get('customer__name'))
 
-            goods_objs = models.customer_look_goods_log.objects.filter(
-                customer_id=customer_id,
-                user_id=user_id,
-            ).distinct().order_by('-create_datetime')
-            goods_count = goods_objs.count()
-            data_list.append({
-                'customer_id': customer_id,
-                'customer__name': customer__name,
-                'customer__set_avator': obj.get('customer__set_avator'),
+                goods_objs = models.customer_look_goods_log.objects.filter(
+                    customer_id=customer_id,
+                    user_id=user_id,
+                ).distinct().order_by('-create_datetime')
+                goods_count = goods_objs.count()
+                data_list.append({
+                    'customer_id': customer_id,
+                    'customer__name': customer__name,
+                    'customer__set_avator': obj.get('customer__set_avator'),
 
-                'text': '看了{}件商品, 总共查看{}次'.format(
-                    goods_count,  # 总共查看几篇文章
-                    obj.get('customer_id__count')  # # 总共查看几次
-                ),
-                'status': 2,  # 代表商品
-                'create_date': goods_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
-            })
-        for i in data_list:
-            eye_objs = models.day_eye_celery.objects.filter(
-                user_id=user_id,
-                status=i.get('status'),
-                customer_id=i.get('customer_id'),
-            )
-            if eye_objs:
-                eye_objs.update(
-                    text = i.get('text'),
-                    create_date = i.get('create_date'),
-                )
-            else:
-                models.day_eye_celery.objects.create(
+                    'text': '看了{}件商品, 总共查看{}次'.format(
+                        goods_count,  # 总共查看几篇文章
+                        obj.get('customer_id__count')  # # 总共查看几次
+                    ),
+                    'status': 2,  # 代表商品
+                    'create_date': goods_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
+                })
+            for i in data_list:
+                eye_objs = models.day_eye_celery.objects.filter(
                     user_id=user_id,
                     status=i.get('status'),
                     customer_id=i.get('customer_id'),
-                    text=i.get('text'),
-                    create_date=i.get('create_date'),
                 )
+                if eye_objs:
+                    eye_objs.update(
+                        text = i.get('text'),
+                        create_date = i.get('create_date'),
+                    )
+                else:
+                    models.day_eye_celery.objects.create(
+                        user_id=user_id,
+                        status=i.get('status'),
+                        customer_id=i.get('customer_id'),
+                        text=i.get('text'),
+                        create_date=i.get('create_date'),
+                    )
 
-    response.code = 200
+
+        response.code = 200
+    except Exception as e:
+        msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+            'celery_天眼功能统计数据报错 warning警告！！！',
+            e,
+            datetime.datetime.today()
+        )
+        celery_error_warning(msg)
     return JsonResponse(response.__dict__)
-
 
 
 # 最后活跃时间马上到24小时的 发送消息
 def last_active_time(request):
     response = Response.ResponseObj()
-    now = datetime.datetime.today()
-    start_time = (now - datetime.timedelta(days=1, minutes=10))
-    stop_time = (now - datetime.timedelta(days=1))
-    # 最后活跃时间 至当前 差十分钟 满24小时
-    objs = models.Userprofile.objects.filter(
-        openid__isnull=False,
-        last_active_time__isnull=False,
-        last_active_time__gte=start_time,
-        last_active_time__lte=stop_time,
-        is_send_msg=0,                      # 未发送过消息的
-    )
-    print(start_time, stop_time)
-    for obj in objs:
-        obj.is_send_msg = 1
-        obj.save()
+    try:
+        now = datetime.datetime.today()
+        start_time = (now - datetime.timedelta(days=1, minutes=10))
+        stop_time = (now - datetime.timedelta(days=1))
+        # 最后活跃时间 至当前 差十分钟 满24小时
+        objs = models.Userprofile.objects.filter(
+            openid__isnull=False,
+            last_active_time__isnull=False,
+            last_active_time__gte=start_time,
+            last_active_time__lte=stop_time,
+            is_send_msg=0,                      # 未发送过消息的
+        )
+        print(start_time, stop_time)
+        for obj in objs:
+            obj.is_send_msg = 1
+            obj.save()
+
+            post_data = {
+                "touser": obj.openid,
+                "msgtype": "text",
+                "text": {
+                    "content": '天眼将暂停为您推送消息, 微信限制于超过24小时未互动 公众号则不能发送消息\n快来点击下方获客文章解除限制'
+                }
+            }
+            data = get_ent_info(obj.id)
+            weixin_objs = WeChatApi(data)
+
+            # 发送客服消息
+            post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+            weixin_objs.news_service(post_data)
+        response.code = 200
+    except Exception as e:
+        msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+            'celery_活跃即将超时发送消息报错---警告',
+            e,
+            datetime.datetime.today()
+        )
+        celery_error_warning(msg)
+    return JsonResponse(response.__dict__)
+
+
+# 客户查看 文章/微店 给用户发送消息
+def customer_view_articles_send_msg(request):
+    response = Response.ResponseObj()
+    try:
+        data = request.GET.get('data')
+        check_type = data.get('check_type')
+        title = data.get('title')
+        user_id = data.get('user_id')
+
+        user_info = get_ent_info(user_id)
+        weixin_objs = WeChatApi(user_info)
 
         post_data = {
-            "touser": obj.openid,
-            "msgtype": "text",
-            "text": {
-                "content": '天眼将暂停为您推送消息, 微信限制于超过24小时未互动 公众号则不能发送消息\n快来点击下方获客文章解除限制'
+                    "touser": user_info.openid,
+                    "msgtype": "text",
+                    "text": {
+                        "content": '有人看了你的{}\n\n《{}》\n 赶快点击 *天眼* 查看吧！'.format(
+                                   check_type,title
+                        )
+                    }
             }
-        }
-        data = get_ent_info(obj.id)
-        weixin_objs = WeChatApi(data)
 
         # 发送客服消息
         post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
         weixin_objs.news_service(post_data)
-    response.code = 200
+
+        response.code = 200
+    except Exception as e:
+        msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+            'celery_客户查看 文章/微店 给用户发送消息---警告',
+            e,
+            datetime.datetime.today()
+        )
+        celery_error_warning(msg)
     return JsonResponse(response.__dict__)
-
-
-
-
-
-
 

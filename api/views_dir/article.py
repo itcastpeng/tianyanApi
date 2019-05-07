@@ -12,6 +12,7 @@ from publicFunc.get_content_article import get_article
 from publicFunc.forwarding_article import forwarding_article
 import requests, datetime, random, json
 from publicFunc.article_oper import add_article_public
+from tianyan_celery.tasks import customer_view_articles_send_msg
 
 # token验证 文章展示模块
 @account.is_token(models.Userprofile)
@@ -595,8 +596,8 @@ def article_customer_oper(request, oper_type):
                     })
 
                 goods_list = []
+                # 查询最热商品=======================
                 if user_obj.show_product: # 如果客户 打开文章底部显示热卖
-                    # 查询最热商品=======================
                     good_objs = models.Goods.objects.filter(goods_classify__oper_user_id=inviter_user_id)
 
                     good_count = good_objs.count()
@@ -638,6 +639,15 @@ def article_customer_oper(request, oper_type):
                     # 记录查看次数
                     obj.look_num = F('look_num') + 1
                     obj.save()
+
+                # 给用户发送消息
+                celery_data = {
+                    'check_type': '文章',
+                    'user_id': inviter_user_id,
+                    'title': obj.title
+                }
+                customer_view_articles_send_msg.delay(celery_data)
+
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
@@ -680,7 +690,6 @@ def article_customer_oper(request, oper_type):
                         'url': '跳转链接'
                     }
                 }
-
             else:
                 response.code = 400
                 response.msg = '页面丢失'
