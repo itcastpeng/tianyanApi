@@ -281,12 +281,9 @@ def last_active_time(request):
 def customer_view_articles_send_msg(request):
     response = Response.ResponseObj()
     try:
-        print(request.GET)
-        print(request.POST)
-        data = request.POST.get('data')
-        check_type = data.get('check_type')
-        title = data.get('title')
-        user_id = data.get('user_id')
+        check_type = request.POST.get('check_type')
+        title = request.POST.get('title')
+        user_id = request.POST.get('user_id')
 
         user_info = get_ent_info(user_id)
         weixin_objs = WeChatApi(user_info)
