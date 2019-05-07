@@ -69,7 +69,7 @@ def add_article_public(data, classify_id=None):
 
 # 获取用户 企业的 appid等信息
 def get_ent_info(user_id):
-    # print('---------# 获取用户 企业的 appid等信息-------------> ', user_id)
+    print('---------# 获取用户 企业的 appid等信息-------------> ', user_id)
     if not user_id:
         user_id = 1
     user_obj = models.Userprofile.objects.get(id=user_id)
