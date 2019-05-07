@@ -34,7 +34,7 @@ def update_qiniu(img_path, token):
     print('----------------上传七牛k云--------------')
     key = randon_str()
     ret, info = put_file(token, key, img_path)
-    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
+    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret, info)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片
     img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.get('key')
