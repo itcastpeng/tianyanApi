@@ -24,6 +24,7 @@ def update_qiniu(img_path, token):
     #     'Access-Control-Allow-Methods': 'GET, POST, PUT,DELETE'
     # }
     # ret = requests.post(url, data=data, files=files, headers=headers)
+    print('----------------上传七牛云--------------')
     key = randon_str()
     ret, info = put_file(token, key, img_path)
     print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
