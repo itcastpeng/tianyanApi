@@ -14,19 +14,22 @@ def celery_error_warning(msg):
     user_info = get_ent_info(1)
     weixin_objs = WeChatApi(user_info)
 
-
-
-    post_data = {
-        "touser": user_info.get('openid'),
-        "msgtype": "text",
-        "text": {
-            "content": msg
+    openid_list = [
+        'oX0xv1iqlzEtIhkeutd6f_wzAEpM', # 赵欣鹏
+        'oX0xv1pmPrR24l6ezv4mI9HE0-ME', # 小明
+    ]
+    for i in openid_list:
+        post_data = {
+            "touser": i,
+            "msgtype": "text",
+            "text": {
+                "content": msg
+            }
         }
-    }
 
-    # 发送客服消息
-    post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-    weixin_objs.news_service(post_data)
+        # 发送客服消息
+        post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+        weixin_objs.news_service(post_data)
 
 # 创建天眼公众号 导航栏
 def create_menu(request):
