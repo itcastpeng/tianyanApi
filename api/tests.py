@@ -212,43 +212,14 @@ from urllib.parse import unquote
 #     "code":200
 
 
+import datetime
 
-p = {'customer_info': ['{"customer_set_avator":"http://thirdwx.qlogo.cn/mmopen/vi_32/BOsNEib02mGic6R7gOUMNO1QyXnU4Exic8GPZneNvwCMHpzIic37ibKztU8367HyJuuf29rtiaHI5PibCJqCWqc0onSkg/132","customer_name":"过客丶💟","customer_sex":"","customer_phone":"15531506906","customer_wechat":"过客丶💟","customer_professional":"","customer_birthday":"","customer_remake":"","customer_label":{"xueli":"初中","diqu":"北京","guanxi":"朋友","qinmidu":"1","yingxiangli":"1","qituxin":"1","shiyetaidu":"1","renmaiquan":"1","jingjinengli":"1"},"customer_demand":"[{\\"title\\":\\"漂亮\\",\\"checked\\":false},{\\"title\\":\\"健康\\",\\"checked\\":false},{\\"title\\":\\"事业\\",\\"checked\\":false}]"}']}
-
-print(p['customer_info'])
-
-
-
-from datetime import datetime, timedelta
-create_date__lt = '2019-05-05'
-
-stop_time = (
-        datetime.strptime(create_date__lt, '%Y-%m-%d') + timedelta(days=1)
-    ).strftime("%Y-%m-%d")
+p = '2039-04-21'
+p = datetime.datetime.strptime(p, '%Y-%m-%d')
 
 
-print(stop_time)
-
-import base64
-p = '4oCL5LmM5YWw5qC85pel5LmQLOS4reWFseWFmuWRmCzlsI/lrabpq5jnuqfmlZnluIgs546w5Lu75LiA5bm05LqM54+t54+t5Li75Lu7LuWFiOWQjuiOt+W+l+iHquayu+WMuuS8mOengOi+heWvvOWRmC7ljIXlpLTluILkvJjnp4DmlZnluIgu5YyF5aS05biC5LyY56eA6L6F5a+85ZGYLuWMheWktOW4guS8mOengOePreS4u+S7gA=='
-p = '4oCL5LmM5YWw5qC85pel5LmQLOS4reWFseWFmuWRmCzlsI/lrabpq5jnuqfmlZnluIgs546w5Lu75LiA5bm05LqM54+t54+t5Li75Lu7LuWFiOWQjuiOt+W+l+iHquayu+WMuuS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOaVmeW4iOOAgeWMheWktOW4guS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOePreS4u+S7gA=='
-p = '4oCL5LmM5YWw5qC85pel5LmQLOS4reWFseWFmuWRmCzlsI/lrabpq5jnuqfmlZnluIgs546w5Lu75LiA5bm05LqM54+t54+t5Li75Lu7LuWFiOWQjuiOt+W+l+iHquayu+WMuuS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOaVmeW4iOOAgeWMheWktOW4guS8mOengOi+heWvvOWRmOOAgeWMheWktOW4guS8mOengOePreS4u+S7'
-
-print(base64.b64decode(p.encode('utf8')).decode('utf8'))
-# 替换中文符号
-def replace_chinese_character(string):
-    table = {ord(f): ord(t) for f, t in zip(
-        '，。！？【】（）％＃＠＆１２３４５６７８９０“”；：',
-        ',.!?[]()%#@&1234567890"";:')}
-
-    new_string = string.translate(table)
-    return new_string
-
-
-p = '​乌兰格日乐,中共党员,小学高级教师,现任一年二班班主任.先后获得自治区优秀辅导员、包头市优秀教师、包头市优秀辅导员、包头市优秀班主什'
-    # '​乌兰格日乐,中共党员,小学高级教师,现任一年二班班主任.先后获得自治区优秀辅导员、包头市优秀教师、包头市优秀辅导员、包头市优秀班主什'
-l = replace_chinese_character(p)
-print(l)
+if p >= datetime.datetime.today():
+    print('---------')
 
 
 

@@ -307,7 +307,7 @@ def customer_view_articles_send_msg(request):
         customer_obj = models.Customer.objects.get(id=customer_id)
         user_obj = models.Userprofile.objects.get(id=user_id)
 
-        if user_obj.overdue_date >= datetime.datetime.today():
+        if datetime.datetime.strptime(user_obj.overdue_date, '%Y-%m-%d') >= datetime.datetime.today():
             msg = '有人看了您的{}\n\n\n《{}》\n\n查看人:{}\n赶快点击 *天眼* 查看吧！'.format(
                 check_type, b64decode(customer_obj.name), title
             )
