@@ -76,6 +76,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
         "headimgurl": ret_obj.get('headimgurl'),
         "wechat_name": encode_username,
         "last_active_time": datetime.datetime.today(),
+        "is_send_msg": 0,
     }
 
     if user_objs:

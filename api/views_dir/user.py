@@ -356,6 +356,7 @@ def user_login_oper(request, oper_type):
             "headimgurl": ret_obj.get('headimgurl'), # 更新微信头像
             "wechat_name": encode_username,
             "last_active_time": datetime.datetime.today(),
+            "is_send_msg": 0, # 互动超时消息 互动过改为未发
         }
         user_objs = models.Userprofile.objects.filter(openid=openid)
         if user_objs:  # 客户已经存在

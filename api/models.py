@@ -86,6 +86,7 @@ class Userprofile(models.Model):
     make_money = models.CharField(verbose_name='待提钱数', max_length=64, default=0)
 
     last_active_time = models.DateTimeField(verbose_name='用户最后活跃时间', null=True)
+    is_send_msg = models.BooleanField(verbose_name='是否发送过互动超时消息', default=0)
 
 # 客户表(用户的客户)
 class Customer(models.Model):

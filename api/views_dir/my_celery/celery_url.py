@@ -118,7 +118,7 @@ def create_menu(request):
         ]
     }
     print('button-button---button--------> ', button)
-    weixin_objs.createMenu(button)
+    # weixin_objs.createMenu(button)
 
 
     response.code = 200
@@ -225,16 +225,20 @@ def day_eye_data(request):
 def last_active_time(request):
     response = Response.ResponseObj()
     now = datetime.datetime.today()
-    date_time = (now - datetime.timedelta(days=1, minutes=10))
-    # 最后活跃时间 至当前 差十分钟 满一小时
+    start_time = (now - datetime.timedelta(days=1, minutes=10))
+    stop_time = (now - datetime.timedelta(days=1))
+    # 最后活跃时间 至当前 差十分钟 满24小时
     objs = models.Userprofile.objects.filter(
         openid__isnull=False,
         last_active_time__isnull=False,
-        last_active_time__gte=date_time
+        last_active_time__gte=start_time,
+        last_active_time__lte=stop_time,
+        is_send_msg=0,                      # 未发送过消息的
     )
+    print(start_time, stop_time)
     for obj in objs:
-        data = get_ent_info(obj.id)
-        weixin_objs = WeChatApi(data)
+        obj.is_send_msg = 1
+        obj.save()
 
         post_data = {
             "touser": obj.openid,
@@ -243,15 +247,13 @@ def last_active_time(request):
                 "content": '天眼将暂停为您推送消息, 微信限制于超过24小时未互动 公众号则不能发送消息\n快来点击下方获客文章解除限制'
             }
         }
-        print('--------------------post_data-----> ', post_data)
+        data = get_ent_info(obj.id)
+        weixin_objs = WeChatApi(data)
 
         # 发送客服消息
-        # post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-        # weixin_objs.news_service(post_data)
-
-
+        post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+        weixin_objs.news_service(post_data)
     response.code = 200
-
     return JsonResponse(response.__dict__)
 
 
