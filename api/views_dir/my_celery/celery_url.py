@@ -11,6 +11,22 @@ import datetime, json, time
 # 报错警告  celery捕获异常 发送客服消息 到管理员
 def celery_error_warning(msg):
     print('*********!!!!!!!!!!!!!!!!!!!!!!!!!!!!!******************!!!!!!!!!!!!!!!!!!!!!!*************!!!!!!!!!!', msg)
+    user_info = get_ent_info(1)
+    weixin_objs = WeChatApi(user_info)
+
+
+
+    post_data = {
+        "touser": user_info.get('openid'),
+        "msgtype": "text",
+        "text": {
+            "content": msg
+        }
+    }
+
+    # 发送客服消息
+    post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+    weixin_objs.news_service(post_data)
 
 # 创建天眼公众号 导航栏
 def create_menu(request):
