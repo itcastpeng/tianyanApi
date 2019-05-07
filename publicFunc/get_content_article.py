@@ -74,6 +74,7 @@ def eliminate_label(i):
 
 # 放入微信文章 获取全部内容
 def get_article(article_url):
+    print('----------------------------------------------------------------------------------')
     token = qiniu_get_token() # 获取七牛云token
 
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
