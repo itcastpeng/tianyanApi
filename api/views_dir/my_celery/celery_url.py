@@ -281,7 +281,9 @@ def last_active_time(request):
 def customer_view_articles_send_msg(request):
     response = Response.ResponseObj()
     try:
-        data = request.GET.get('data')
+        print(request.GET)
+        print(request.POST)
+        data = request.POST.get('data')
         check_type = data.get('check_type')
         title = data.get('title')
         user_id = data.get('user_id')
