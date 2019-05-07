@@ -1,6 +1,6 @@
 import qiniu, requests, os, base64
 from publicFunc.account import randon_str
-from qiniu import put_file
+from qiniu import put_file, Zone, set_default
 
 def qiniu_get_token():
     SecretKey = 'wVig2MgDzTmN_YqnL-hxVd6ErnFhrWYgoATFhccu'
@@ -24,7 +24,14 @@ def update_qiniu(img_path, token):
     #     'Access-Control-Allow-Methods': 'GET, POST, PUT,DELETE'
     # }
     # ret = requests.post(url, data=data, files=files, headers=headers)
-    print('----------------上传七牛云--------------')
+    zone = Zone(
+        up_host='https://up-z1.qiniup.com',
+        up_host_backup='https://upload.qiniup.com',
+        io_host='http://iovip.qbox.me',
+        scheme='https')
+
+    set_default(default_zone=zone)
+    print('----------------上传七牛k云--------------')
     key = randon_str()
     ret, info = put_file(token, key, img_path)
     print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
