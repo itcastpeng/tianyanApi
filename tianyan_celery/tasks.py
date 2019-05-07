@@ -14,7 +14,7 @@ def upload_day_eye():
 # 最后活跃时间马上到24小时的 发送消息
 @app.task
 def last_active_time():
-    url = '/api/last_active_time?timestamp=1545822031837&rand_str=28a922b00654c407007f3d712c2fdd6b&user_id=1'.format(host_url)
+    url = '{}/api/last_active_time?timestamp=1545822031837&rand_str=28a922b00654c407007f3d712c2fdd6b&user_id=1'.format(host_url)
     print('-----------------------------------celery---------超过24小时的发送消息--------> ', datetime.datetime.today())
     requests.get(url)
 
