@@ -1,6 +1,6 @@
 import qiniu, requests, os, base64
 from publicFunc.account import randon_str
-
+from qiniu import put_file
 
 def qiniu_get_token():
     SecretKey = 'wVig2MgDzTmN_YqnL-hxVd6ErnFhrWYgoATFhccu'
@@ -12,18 +12,25 @@ def qiniu_get_token():
 
 # 上传七牛云
 def update_qiniu(img_path, token):
-    url = 'https://up-z1.qiniup.com/'
-    data = {
-        'token': token,
-    }
-    files = {
-        'file': open(img_path, 'rb')
-    }
-    ret = requests.post(url, data=data, files=files)
-    print('@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@@____________________>', ret.text, ret.content)
+    # url = 'https://up-z1.qiniup.com/'
+    # data = {
+    #     'token': token,
+    # }
+    # files = {
+    #     'file': open(img_path, 'rb')
+    # }
+    # headers = {
+    #     'Content-Type': 'multipart/form-data; charset=utf-8',
+    #     'Access-Control-Allow-Methods': 'GET, POST, PUT,DELETE'
+    # }
+    key = randon_str()
+    ret, info = put_file(token, key, img_path)
+    print()
+    # ret = requests.post(url, data=data, files=files, headers=headers)
+    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片
-    img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')
+    img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.get('key')
     return img_path
 
 # 请求图片地址保存本地
@@ -36,6 +43,9 @@ def requests_img_download(old_url):
 
 
 if __name__ == '__main__':
-    url = 'http://thirdwx.qlogo.cn/mmopen/PeW1cmicnQppB7nYSsEKoR2HzTic5eMpTeMPEqmMtnLoXgt3Ro0z5nSNbbpL5fV6gzDWZbudSMrRleZDeAyKTNoZyKzd4YriafO/132'
-    requests_img_download(url)
+    token = qiniu_get_token()
+    update_qiniu('1.png', token)
+
+    # url = 'http://thirdwx.qlogo.cn/mmopen/PeW1cmicnQppB7nYSsEKoR2HzTic5eMpTeMPEqmMtnLoXgt3Ro0z5nSNbbpL5fV6gzDWZbudSMrRleZDeAyKTNoZyKzd4YriafO/132'
+    # requests_img_download(url)
 
