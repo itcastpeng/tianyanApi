@@ -23,10 +23,9 @@ def update_qiniu(img_path, token):
     #     'Content-Type': 'multipart/form-data; charset=utf-8',
     #     'Access-Control-Allow-Methods': 'GET, POST, PUT,DELETE'
     # }
+    # ret = requests.post(url, data=data, files=files, headers=headers)
     key = randon_str()
     ret, info = put_file(token, key, img_path)
-    print()
-    # ret = requests.post(url, data=data, files=files, headers=headers)
     print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片

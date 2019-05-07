@@ -211,15 +211,25 @@ from urllib.parse import unquote
 #     },
 #     "code":200
 
-
-import datetime
-
-p = '2039-04-21'
-p = datetime.datetime.strptime(p, '%Y-%m-%d')
+import requests
 
 
-if p >= datetime.datetime.today():
-    print('---------')
+
+
+url = 'https://mp.weixin.qq.com/s?__biz=MTI0MDU3NDYwMQ==&mid=2656759584&idx=1&sn=572327d9ee79a9a4236e2d9c401c5b1e&chksm=7a6012c64d179bd0cb3a11daefaadd3e113c7a7193861fe492fe335c049254b3ab07c6feedf9&xtrack=1&scene=0&subscene=131&clicktime=1556667234&ascene=7&devicetype=android-28&version=27000439&nettype=3gnet&abtest_cookie=BQABAAgACgALABIAEwAHAJ2GHgBbmR4Av5keANyZHgDimR4A55keAPqZHgAAAA%3D%3D&lang=zh_CN&pass_ticket=W%2BdRnRqPUHyHrI4qOn2Mg%2Bl5baLmHUrTplHZ9soYkxP5dbNEnIh3BN3gw2l5iR1T&wx_header=1'
+ret = requests.get(url)
+print(ret.url)
+print(ret.content)
+# print(ret.json())
+
+soup = BeautifulSoup(ret.text, 'lxml')
+title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
+
+print(title)
+
+
+
+
 
 
 

@@ -16,7 +16,9 @@ from publicFunc.article_oper import get_ent_info
 from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
 from publicFunc.account import str_encrypt
-import json, xml.dom.minidom, datetime, time, requests
+from bs4 import BeautifulSoup
+
+import json, xml.dom.minidom, datetime, time, requests, re
 
 
 
@@ -264,7 +266,8 @@ def wechat(request):
 
                     else:
                         try:
-                            data_dict = get_article(Content)        # 获取文章
+                            ret = requests.get(Content, timeout=5)
+                            ret.encoding = 'utf-8'
                         except Exception:
                             post_data = {
                                 "touser": openid,
@@ -276,10 +279,12 @@ def wechat(request):
                             weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
                             return HttpResponse('')
 
-                        title = data_dict.get('title')
+                        title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
+
                         article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
 
                         if not article_objs:  # 判断数据库是否有 该文章
+                            data_dict = get_article(Content)  # 获取文章
                             summary = data_dict.get('summary')              # 摘要
                             data_dict['create_user_id'] = user_id           # 增加创建人
                             id = add_article_public(data_dict, 39)          # 创建文章 第二个参数为 classify_id 默认为其他
