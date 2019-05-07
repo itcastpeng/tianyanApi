@@ -13,7 +13,7 @@ def update_qiniu(img_path):
 
     token = q.upload_token(bucket_name, key, 3600)  # 可以指定key 图片名称
 
-    print('----------------上传七牛k云--------------')
+    print('----------------上传七牛k云--------------', img_path)
     ret, info = put_file(token, key, img_path)
     print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret, info)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
