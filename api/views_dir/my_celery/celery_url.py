@@ -299,44 +299,46 @@ def last_active_time(request):
 # 客户查看 文章/微店 给用户发送消息
 def customer_view_articles_send_msg(request):
     response = Response.ResponseObj()
-    try:
-        check_type = request.POST.get('check_type')
-        title = request.POST.get('title')
-        customer_id = request.POST.get('customer_id')
-        user_id = request.POST.get('user_id')
-        customer_obj = models.Customer.objects.get(id=customer_id)
-        user_obj = models.Userprofile.objects.get(id=user_id)
+    # try:
+    check_type = request.POST.get('check_type')
+    title = request.POST.get('title')
+    customer_id = request.POST.get('customer_id')
+    user_id = request.POST.get('user_id')
+    customer_obj = models.Customer.objects.get(id=customer_id)
+    user_obj = models.Userprofile.objects.get(id=user_id)
 
-        if datetime.datetime.strptime(user_obj.overdue_date, '%Y-%m-%d') >= datetime.datetime.today():
-            msg = '有人看了您的{}\n\n\n《{}》\n\n查看人:{}\n赶快点击 *天眼* 查看吧！'.format(
-                check_type, b64decode(customer_obj.name), title
-            )
-        else:
-            msg = '有人看了您的{}\n\n\n《{}》\n\n赶快点击 *天眼* 查看吧！'.format(
-                check_type, title
-            )
-
-        user_info = get_ent_info(user_id)
-        weixin_objs = WeChatApi(user_info)
-        post_data = {
-                    "touser": user_info.get('openid'),
-                    "msgtype": "text",
-                    "text": {
-                        "content":msg
-                    }
-            }
-
-        # 发送客服消息
-        post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-        weixin_objs.news_service(post_data)
-
-        response.code = 200
-    except Exception as e:
-        msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
-            'celery_客户查看 文章/微店 给用户发送消息---警告',
-            e,
-            datetime.datetime.today()
+    # 区分普通用户和 会员用户 会员用户发送查看人名称
+    print('user_obj.overdue_date--------> ', type(user_obj.overdue_date))
+    if user_obj.overdue_date >= datetime.date.today():
+        msg = '有人看了您的{}\n《{}》\n查看人:{}\n赶快点击 *天眼* 查看吧！'.format(
+            check_type, b64decode(customer_obj.name), title
         )
-        celery_error_warning(msg)
+    else:
+        msg = '有人看了您的{}\n《{}》\n赶快点击 *天眼* 查看吧！'.format(
+            check_type, title
+        )
+
+    user_info = get_ent_info(user_id)
+    weixin_objs = WeChatApi(user_info)
+    post_data = {
+                "touser": user_info.get('openid'),
+                "msgtype": "text",
+                "text": {
+                    "content":msg
+                }
+        }
+
+    # 发送客服消息
+    post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+    weixin_objs.news_service(post_data)
+
+    response.code = 200
+    # except Exception as e:
+    #     msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+    #         'celery_客户查看 文章/微店 给用户发送消息---警告',
+    #         e,
+    #         datetime.datetime.today()
+    #     )
+    #     celery_error_warning(msg)
     return JsonResponse(response.__dict__)
 
