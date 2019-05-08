@@ -7,18 +7,44 @@ from qiniu import put_file, Zone, set_default
 def update_qiniu(img_path):
     SecretKey = 'wVig2MgDzTmN_YqnL-hxVd6ErnFhrWYgoATFhccu'
     AccessKey = 'a1CqK8BZm94zbDoOrIyDlD7_w7O8PqJdBHK-cOzz'
+
+
     q = qiniu.Auth(AccessKey, SecretKey)
     bucket_name = 'bjhzkq_tianyan'
     key = randon_str()
 
-    token = q.upload_token(bucket_name, key, 3600)  # 可以指定key 图片名称
+    headers = {
+        'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
+    }
 
-    print('----------------上传七牛k云--------------', img_path)
-    ret, info = put_file(token, key, img_path)
-    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret, info)
-    if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
-        os.remove(img_path)  # 删除本地图片
-    img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.get('key')
+    token = q.upload_token(bucket_name)  # 可以指定key 图片名称
+
+    url = 'https://up-z1.qiniup.com/'
+
+    data = {
+        'token': token
+    }
+    files = {
+        'file':open(img_path, 'rb')
+    }
+
+    print('----------------上传七牛k云--------------')
+    ret = requests.post(url, data=data, files=files, headers=headers)
+
+    # zone = Zone(
+    #     up_host='https://up-z1.qiniup.com/',
+    #     up_host_backup='https://upload-z1.qiniup.com',
+    #     io_host='http://iovip-z1.qbox.me',
+    #     scheme='https')
+    # set_default(default_zone=zone)
+    #
+    # ret, info = put_file(token, key, img_path)
+
+
+    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
+    # if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
+    #     os.remove(img_path)  # 删除本地图片
+    img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')
     return img_path
 
 # 请求图片地址保存本地
@@ -31,7 +57,7 @@ def requests_img_download(old_url):
 
 
 if __name__ == '__main__':
-    update_qiniu('1.png')
+    update_qiniu('1.jpg')
 
     # url = 'http://thirdwx.qlogo.cn/mmopen/PeW1cmicnQppB7nYSsEKoR2HzTic5eMpTeMPEqmMtnLoXgt3Ro0z5nSNbbpL5fV6gzDWZbudSMrRleZDeAyKTNoZyKzd4YriafO/132'
     # requests_img_download(url)
