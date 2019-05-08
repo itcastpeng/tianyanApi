@@ -267,7 +267,7 @@ def last_active_time(request):
             last_active_time__lte=stop_time,
             is_send_msg=0,                      # 未发送过消息的
         )
-        print(start_time, stop_time)
+        print(start_time, stop_time, now)
         for obj in objs:
             obj.is_send_msg = 1
             obj.save()

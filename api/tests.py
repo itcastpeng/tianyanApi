@@ -229,7 +229,7 @@ print(title)
 
 
 
-
+print(0.297 * 0.3)
 
 
 
