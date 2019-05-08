@@ -358,7 +358,7 @@ class WeChatApi(WeixinApiPublic):
 
 
     # 通过 code 获取openid/用户信息（公众号）
-    def get_openid(self, code, openid=None):
+    def get_openid(self, code):
         print('self.APPID, self.APPSECRET===========> ', self.APPID, self.APPSECRET)
         url = "https://api.weixin.qq.com/sns/oauth2/access_token?" \
               "appid={APPID}&secret={SECRET}&code={CODE}&grant_type=authorization_code" \
@@ -370,33 +370,29 @@ class WeChatApi(WeixinApiPublic):
         ret = requests.get(url)
         ret.encoding = "utf8"
         print("ret.text -->", ret.text)
+
         access_token = ret.json().get('access_token')
         openid = ret.json().get('openid')
+        url = "https://api.weixin.qq.com/sns/userinfo?access_token=" \
+              "{ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN" \
+            .format(
+            ACCESS_TOKEN=access_token,
+            OPENID=openid,
+        )
+        ret = requests.get(url)
+        ret.encoding = "utf8"
+        ret_obj = ret.json()
+        print('ret_obj---------------> ', ret_obj)
         data = {
-            'openid': openid,
-            'access_token': access_token,
+            'openid':openid,
+            'sex':ret_obj.get('sex'),
+            'country':ret_obj.get('country'),
+            'city':ret_obj.get('city'),
+            'province':ret_obj.get('province'),
+            'nickname':ret_obj.get('nickname'),
+            'subscribe':ret_obj.get('subscribe'),
+            'headimgurl':ret_obj.get('headimgurl'),
         }
-        if not openid:
-            url = "https://api.weixin.qq.com/sns/userinfo?access_token=" \
-                  "{ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN" \
-                .format(
-                ACCESS_TOKEN=access_token,
-                OPENID=openid,
-            )
-            ret = requests.get(url)
-            ret.encoding = "utf8"
-            ret_obj = ret.json()
-            print('ret_obj---------------> ', ret_obj)
-            data = {
-                'openid':openid,
-                'sex':ret_obj.get('sex'),
-                'country':ret_obj.get('country'),
-                'city':ret_obj.get('city'),
-                'province':ret_obj.get('province'),
-                'nickname':ret_obj.get('nickname'),
-                'subscribe':ret_obj.get('subscribe'),
-                'headimgurl':ret_obj.get('headimgurl'),
-            }
 
         return data
 

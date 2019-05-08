@@ -16,7 +16,6 @@ from django.db.models import Q
 from publicFunc.qiniu_oper import requests_img_download, update_qiniu
 from publicFunc.base64_encryption import b64decode
 import re, os, json, sys, datetime
-from tianyan_celery.tasks import update_user_info
 
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
@@ -354,34 +353,34 @@ def user_login_oper(request, oper_type):
             save_code=code
         )
         data = get_ent_info(1)
+        print('===============获取信息--------------------------》 ', datetime.datetime.today())
         weichat_api_obj = WeChatApi(data)
-        ret_obj = weichat_api_obj.get_openid(code, openid=1)  # 获取用户信息
+        print('----------------------------------实例化 公共对象', datetime.datetime)
+        ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+        print('code-----code-------code--------code--------code-------> ', code, datetime.datetime.today())
+        encode_username = base64_encryption.b64encode(
+            ret_obj['nickname']
+        )
         openid = ret_obj.get('openid')
+        user_data = {
+            "sex": ret_obj.get('sex'),
+            "country": ret_obj.get('country'),
+            "province": ret_obj.get('province'),
+            "city": ret_obj.get('city'),
+            "headimgurl": ret_obj.get('headimgurl'), # 更新微信头像
+            "wechat_name": encode_username,
+            "last_active_time": datetime.datetime.today(),
+            "is_send_msg": 0, # 互动超时消息 互动过改为未发
+        }
         user_objs = models.Userprofile.objects.filter(openid=openid)
         if user_objs:  # 客户已经存在
-            print('ret_obj-----------------------> ', ret_obj)
-            update_user_info.delay(ret_obj)
-
-            # user_objs.update(**user_data)
+            user_objs.update(**user_data)
             user_objs = user_objs[0]
 
         else:  # 不存在，创建用户
-            ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
             path = requests_img_download(ret_obj.get('headimgurl'))
             set_avator = update_qiniu(path) # 上传至七牛云
-            encode_username = base64_encryption.b64encode(
-                ret_obj['nickname']
-            )
-            user_data = {
-                "sex": ret_obj.get('sex'),
-                "country": ret_obj.get('country'),
-                "province": ret_obj.get('province'),
-                "city": ret_obj.get('city'),
-                "headimgurl": ret_obj.get('headimgurl'),  # 更新微信头像
-                "wechat_name": encode_username,
-                "last_active_time": datetime.datetime.today(),
-                "is_send_msg": 0,  # 互动超时消息 互动过改为未发
-            }
+
             # # 如果没有关注，获取个人信息判断是否关注
             # if not subscribe:
             #     weichat_api_obj = WeChatApi()
