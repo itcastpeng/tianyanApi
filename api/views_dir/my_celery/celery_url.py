@@ -206,8 +206,8 @@ def day_eye_data(request):
                 goods_objs = models.customer_look_goods_log.objects.filter(
                     customer_id=customer_id,
                     user_id=user_id,
-                ).distinct().order_by('-create_datetime')
-                goods_count = goods_objs.count()
+                ).order_by('-create_datetime')
+                goods_count = goods_objs.distinct().count()
                 data_list.append({
                     'customer_id': customer_id,
                     'customer__name': customer__name,
