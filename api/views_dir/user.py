@@ -359,6 +359,7 @@ def user_login_oper(request, oper_type):
         openid = ret_obj.get('openid')
         user_objs = models.Userprofile.objects.filter(openid=openid)
         if user_objs:  # 客户已经存在
+            print('ret_obj-----------------------> ', ret_obj)
             update_user_info.delay(ret_obj)
 
             # user_objs.update(**user_data)
