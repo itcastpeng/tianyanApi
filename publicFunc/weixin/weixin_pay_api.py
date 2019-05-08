@@ -123,6 +123,7 @@ class weixin_pay_api(WeixinApiPublic):
         if err_code == 'SUCCESS' and return_msg == '发放成功':
             err_code = 200
             return_msg = '提现成功'
+
         else:
             if err_code == 'NOTENOUGH': # 账户余额不足
                 user_data = get_ent_info(user_id=user_id)

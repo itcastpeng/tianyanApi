@@ -116,6 +116,10 @@ def weixin_pay(request, oper_type, o_id):
                 if code == 200:
                     is_success = 1 # 是否提现成功
                     response.code = 200
+                    # 减去提现的钱数
+                    models.Userprofile.objects.filter(id=user_id).update(
+                        F('withdrawal_amount') - withdrawal_amount
+                    )
                 else:
                     is_success = 0
                     response.code = 301
