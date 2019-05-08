@@ -118,7 +118,7 @@ def weixin_pay(request, oper_type, o_id):
                     response.code = 200
                     # 减去提现的钱数
                     user_money_obj = models.Userprofile.objects.get(id=user_id)
-                    user_money_obj.make_money = F('withdrawal_amount') - withdrawal_amount
+                    user_money_obj.make_money = F('make_money') - withdrawal_amount
                     user_money_obj.save()
 
                 else:
