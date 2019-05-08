@@ -95,8 +95,8 @@ class weixin_pay_api(WeixinApiPublic):
             'total_amount':withdrawal_amount * 100,      # 提现金额 分为单位
             'total_num':1,                               # 发放红包总人数
             'client_ip':'0.0.0.0',                       # IP地址
-            'send_name': 'tianyan',                      # 商家名称
-            'wishing':'tianyan_tixian',                  # 红包祝福语
+            'send_name': '微商天眼',                      # 商家名称
+            'wishing':'提现到账,大吉大利!',                  # 红包祝福语
             'act_name':'tianyanhuodong',                 # 活动名称
             'remark':'tianyan_beizhu!',                  # 备注
         }
