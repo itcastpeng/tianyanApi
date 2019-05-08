@@ -338,6 +338,7 @@ def user_oper(request, oper_type, o_id):
 
 # 用户登录
 def user_login_oper(request, oper_type):
+    print('----------开始登录-----------------------》 ', datetime.datetime.today())
     response = Response.ResponseObj()
     # 判断该用户是否存在
     now = datetime.datetime.today()
@@ -403,6 +404,7 @@ def user_login_oper(request, oper_type):
             user_id=user_objs.id,
             page_type=oper_type,
         )
+        print('----------返回数据 登录完成-----------------------》 ', datetime.datetime.today())
         return redirect(redirect_url)
 
     else:
