@@ -312,7 +312,6 @@ def user_oper(request, oper_type, o_id):
                 "make_money": '待提钱数',
                 "number_clinch_count": '成交人数',
                 "invite_number_list": '邀请人详情',
-                "number_clinch_deal_list": '成交人详情',
             }
 
         # 推广赚钱 二维码截图
