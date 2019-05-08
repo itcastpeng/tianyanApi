@@ -174,9 +174,17 @@ def day_eye_data(request):
                 article_objs = models.SelectArticleLog.objects.filter(
                     customer_id=customer_id,
                     inviter_id=user_id,
-                ).order_by('-create_datetime')
+                )
 
-                article_count = article_objs.distinct().count()
+                for article_obj in article_objs:
+                    print(article_obj.article_id)
+
+                article_count = article_objs.values(
+                    'customer_id',
+                    'article_id',
+                    'inviter_id'
+                ).distinct().count()
+
                 data_list.append({
                     'customer_id': customer_id,
                     'customer__name': customer__name,
@@ -187,7 +195,7 @@ def day_eye_data(request):
                         obj.get('customer_id__count')  # # 总共查看几次
                     ),
                     'status': 1,  # 代表文章
-                    'create_date': article_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
+                    'create_date': article_objs.order_by('-create_datetime')[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
                 })
 
             objs = models.customer_look_goods_log.objects.filter(
@@ -209,7 +217,8 @@ def day_eye_data(request):
                 )
                 goods_count = goods_objs.values(
                     'customer_id',
-                    'customer__set_avator'
+                    'goods_id',
+                    'user_id',
                 ).distinct().count()
                 data_list.append({
                     'customer_id': customer_id,
@@ -224,6 +233,7 @@ def day_eye_data(request):
                     'create_date': goods_objs.order_by('-create_datetime')[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
                 })
             for i in data_list:
+                print("i.get('text')-------------------------> ", i.get('text'))
                 eye_objs = models.day_eye_celery.objects.filter(
                     user_id=user_id,
                     status=i.get('status'),
