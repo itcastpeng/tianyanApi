@@ -174,9 +174,9 @@ def day_eye_data(request):
                 article_objs = models.SelectArticleLog.objects.filter(
                     customer_id=customer_id,
                     inviter_id=user_id,
-                ).distinct().order_by('-create_datetime')
+                ).order_by('-create_datetime')
 
-                article_count = article_objs.count()
+                article_count = article_objs.distinct().count()
                 data_list.append({
                     'customer_id': customer_id,
                     'customer__name': customer__name,
