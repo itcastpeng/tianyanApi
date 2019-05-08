@@ -332,6 +332,11 @@ class withdrawal_log(models.Model):
     wechat_returns_data = models.TextField(verbose_name='微信返回数据, 相当于失败信息', null=True)
     dingdanhao = models.CharField(verbose_name='订单号', max_length=256, null=True)
 
-
+# 记录充值人充值钱数 和 给父级钱数  # 充值分销的钱记录
+class distribute_money_log(models.Model):
+    user = models.ForeignKey('Userprofile', verbose_name='充值人')
+    inviter = models.ForeignKey('Userprofile', verbose_name='分销人', related_name='distribute_money_log_inviter')
+    money = models.CharField(verbose_name='钱数', max_length=128)
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
 

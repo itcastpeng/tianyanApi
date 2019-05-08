@@ -145,7 +145,7 @@ def weixin_pay(request, oper_type, o_id):
 
                 objs = models.withdrawal_log.objects.filter(user_id=user_id).order_by('-create_date')
 
-                withdrawal_amount_sum = objs.filter(is_success=1).aggregate(
+                withdrawal_amount_sum_obj = objs.filter(is_success=1).aggregate(
                     nums=Sum('withdrawal_amount')
                 )
 
@@ -166,11 +166,15 @@ def weixin_pay(request, oper_type, o_id):
                     })
                     cumulative_amount = obj.user.cumulative_amount
                     make_money = obj.user.make_money
-                print('withdrawal_amount_sum===========> ', withdrawal_amount_sum)
+
+                withdrawal_amount_sum = 0
+                if withdrawal_amount_sum_obj:
+                    withdrawal_amount_sum = withdrawal_amount_sum_obj.get('nums')
+
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'withdrawal_amount_sum': withdrawal_amount_sum.get('nums'),
+                    'withdrawal_amount_sum': withdrawal_amount_sum,
                     'cumulative_amount': cumulative_amount,
                     'make_money': make_money,
                     'data_list': data_list,
@@ -274,6 +278,13 @@ def payback(request):
                         inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
                         inviter_id_user_obj.save()
 
+                        # 创建充值分销人应得钱数日志
+                        models.distribute_money_log.objects.create(
+                            user_id=renewal_log_obj.create_user_id,
+                            inviter_id=inviter_id,
+                            money=cumulative_amount
+                        )
+
                         if inviter_id_user_obj.inviter:
                             two_inviter_id = inviter_id_user_obj.inviter_id
 
@@ -285,6 +296,12 @@ def payback(request):
                                 two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
                                 two_user_obj.make_money = F('make_money') + cumulative_amount
                                 two_user_obj.save()
+                                # 创建充值分销人应得钱数日志
+                                models.distribute_money_log.objects.create(
+                                    user_id=renewal_log_obj.create_user_id,
+                                    inviter_id=inviter_id,
+                                    money=cumulative_amount
+                                )
 
                 print('--------------------支付成功-------------')
             else:
