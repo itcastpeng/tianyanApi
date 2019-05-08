@@ -1,12 +1,13 @@
 from api import models
 from publicFunc import Response
-from django.http import JsonResponse
+from django.http import JsonResponse, HttpResponse
 from django.db.models import Count
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.article_oper import get_ent_info
-import datetime, json, time
-
+from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
+from publicFunc import base64_encryption
+import datetime, json, time, requests
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
 def celery_error_warning(msg):
@@ -351,4 +352,39 @@ def customer_view_articles_send_msg(request):
     #     )
     #     celery_error_warning(msg)
     return JsonResponse(response.__dict__)
+
+# 更新用户信息
+def update_user_info(request):
+    openid = request.GET.get('openid')
+    access_token = request.GET.get('access_token')
+
+    url = "https://api.weixin.qq.com/sns/userinfo?access_token=" \
+          "{ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN" \
+        .format(
+        ACCESS_TOKEN=access_token,
+        OPENID=openid,
+    )
+    ret = requests.get(url)
+    ret.encoding = "utf8"
+    ret_obj = ret.json()
+
+    encode_username = base64_encryption.b64encode(
+        ret_obj['nickname']
+    )
+    user_data = {
+        "sex": ret_obj.get('sex'),
+        "country": ret_obj.get('country'),
+        "province": ret_obj.get('province'),
+        "city": ret_obj.get('city'),
+        "headimgurl": ret_obj.get('headimgurl'),  # 更新微信头像
+        "wechat_name": encode_username,
+        "last_active_time": datetime.datetime.today(),
+        "is_send_msg": 0,  # 互动超时消息 互动过改为未发
+    }
+    models.Userprofile.objects.filter(openid=openid).update(**user_data)
+
+    return HttpResponse('')
+
+
+
 

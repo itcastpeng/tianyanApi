@@ -25,9 +25,11 @@ def customer_view_articles_send_msg(data):
     print('-----------------------------------celery---------客户查看文章等 发送消息给用户--------> ', datetime.datetime.today())
     requests.post(url, data=data)
 
-
-
-
+# 异步更新用户信息
+@app.task
+def update_user_info(ret_obj):
+    url = '{}/api/update_user_info'.format(host_url)
+    requests.post(url, data=ret_obj)
 
 
 
