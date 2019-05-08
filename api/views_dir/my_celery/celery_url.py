@@ -206,7 +206,7 @@ def day_eye_data(request):
                 goods_objs = models.customer_look_goods_log.objects.filter(
                     customer_id=customer_id,
                     user_id=user_id,
-                ).order_by('-create_datetime')
+                )
                 goods_count = goods_objs.distinct().count()
                 data_list.append({
                     'customer_id': customer_id,
@@ -218,7 +218,7 @@ def day_eye_data(request):
                         obj.get('customer_id__count')  # # 总共查看几次
                     ),
                     'status': 2,  # 代表商品
-                    'create_date': goods_objs[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
+                    'create_date': goods_objs.order_by('-create_datetime')[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
                 })
             for i in data_list:
                 eye_objs = models.day_eye_celery.objects.filter(
