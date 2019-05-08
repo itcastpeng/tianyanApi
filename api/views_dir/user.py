@@ -340,6 +340,11 @@ def user_oper(request, oper_type, o_id):
 def user_login_oper(request, oper_type):
     response = Response.ResponseObj()
     # 判断该用户是否存在
+    now = datetime.datetime.today()
+    models.save_code.objects.filter(
+        create_datetime__lt=now
+    ).delete()
+
     code = request.GET.get('code')
     objs = models.save_code.objects.filter(save_code=code)
     if not objs:
@@ -400,6 +405,9 @@ def user_login_oper(request, oper_type):
         )
         return redirect(redirect_url)
 
+    else:
+        response.code = 301
+        response.msg = '请重新登录'
 
 
     return JsonResponse(response.__dict__)
