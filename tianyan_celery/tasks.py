@@ -27,9 +27,9 @@ def customer_view_articles_send_msg(data):
 # 异步更新用户信息
 @app.task
 def update_user_info(ret_obj):
-    print('==========================================================================')
-    # url = '{}/api/update_user_info'.format(host_url)
-    # requests.post(url, data=ret_obj)
+    print('-----------------------------------celery---------异步更新用户数据 --------> ', datetime.datetime.today())
+    url = '{}/api/update_user_info'.format(host_url)
+    requests.post(url, data=ret_obj)
 
 
 
