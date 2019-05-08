@@ -158,10 +158,11 @@ def get_article(article_url):
 
     # 分布标签
     data_list = []
-    for i in body.children:
-        flag = eliminate_label(str(i))  # 剔除A标签
-        if flag:
-            continue
+    # for i in body.children:
+    #     flag = eliminate_label(str(i))  # 剔除A标签
+    #     if flag:
+    #         continue
+    for i in body:
         content = convert_content(s, str(i)) # 替换内容
         data_list.append(content)
 

@@ -240,7 +240,7 @@ def wechat(request):
                     }
                     weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')) # 发送客服消息
                     try:
-                        ret = requests.get(Content)
+                        ret = requests.get(Content, timeout=5)
                         status_code = ret.status_code
                     except Exception:
                         post_data = {
@@ -264,19 +264,19 @@ def wechat(request):
                         }
 
                     else:
-                        try:
-                            ret = requests.get(Content, timeout=5)
-                            ret.encoding = 'utf-8'
-                        except Exception:
-                            post_data = {
-                                "touser": openid,
-                                "msgtype": "text",
-                                "text": {
-                                    "content": '这个链接没有文章{}'.format(b64decode('4p2X'))
-                                }
-                            }
-                            weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
-                            return HttpResponse('')
+                        # try:
+                        #     ret = requests.get(Content, timeout=5)
+                        #     ret.encoding = 'utf-8'
+                        # except Exception:
+                        #     post_data = {
+                        #         "touser": openid,
+                        #         "msgtype": "text",
+                        #         "text": {
+                        #             "content": '这个链接没有文章{}'.format(b64decode('4p2X'))
+                        #         }
+                        #     }
+                        #     weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
+                        #     return HttpResponse('')
 
                         title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
 
