@@ -88,6 +88,17 @@ class Userprofile(models.Model):
     last_active_time = models.DateTimeField(verbose_name='用户最后活跃时间', null=True)
     is_send_msg = models.BooleanField(verbose_name='是否发送过互动超时消息', default=0)
 
+    message_remind_status = (
+        (0, '立即提醒我'),
+        (1, '15分钟内提醒我一次(汇总提醒)'),
+        (2, '1小时内提醒我一次(汇总提醒)'),
+        (3, '3小时内提醒我一次(汇总提醒)'),
+        (4, '关闭提醒')
+    )
+    message_remind = models.SmallIntegerField(verbose_name='消息提醒', choices=message_remind_status, default=0)
+    last_message_remind_time = models.DateTimeField(verbose_name='最后发送消息提醒时间', null=True)
+
+
 # 客户表(用户的客户)
 class Customer(models.Model):
     name = models.CharField(verbose_name="微信姓名", max_length=128)

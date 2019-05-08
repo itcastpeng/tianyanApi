@@ -1,6 +1,6 @@
-import qiniu, requests, os, base64
 from publicFunc.account import randon_str
 from qiniu import put_file, Zone, set_default
+import qiniu, requests, os, base64, datetime
 
 
 # 上传七牛云
@@ -14,13 +14,21 @@ def update_qiniu(img_path):
     bucket_name = 'bjhzkq_tianyan'
     key = randon_str()
 
+    # zone = Zone(
+    #     up_host='https://up-z1.qiniup.com',
+    #     up_host_backup='https://upload-z1.qiniup.com',
+    #     io_host='http://iovip-z1.qbox.me',
+    #     scheme='https')
+    # set_default(default_zone=zone)
+
     policy = {  # 指定上传文件的格式 等
 
     }
     token = q.upload_token(bucket_name, None, 360000, policy)  # 可以指定key 图片名称
-
+    print('-----------> ', datetime.datetime.today())
     ret, info = put_file(token, None, mime_type="text/js", file_path=img_path)
-
+    print('ret-----> ', ret, info)
+    print('--> ', datetime.datetime.today())
 
 
     # headers = {
@@ -49,7 +57,7 @@ def update_qiniu(img_path):
 
 
 
-    # print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
+    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片
     img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.get('key')
@@ -65,7 +73,7 @@ def requests_img_download(old_url):
 
 
 if __name__ == '__main__':
-    update_qiniu('1.jpg')
+    update_qiniu('1.png')
 
     # url = 'http://thirdwx.qlogo.cn/mmopen/PeW1cmicnQppB7nYSsEKoR2HzTic5eMpTeMPEqmMtnLoXgt3Ro0z5nSNbbpL5fV6gzDWZbudSMrRleZDeAyKTNoZyKzd4YriafO/132'
     # requests_img_download(url)

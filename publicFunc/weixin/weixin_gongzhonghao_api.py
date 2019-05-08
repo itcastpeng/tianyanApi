@@ -375,6 +375,7 @@ class WeChatApi(WeixinApiPublic):
 
         access_token = ret.json().get('access_token')
         openid = ret.json().get('openid')
+        print('access_token, openid--------。 ', access_token, openid)
         url = "https://api.weixin.qq.com/sns/userinfo?access_token=" \
               "{ACCESS_TOKEN}&openid={OPENID}&lang=zh_CN" \
             .format(

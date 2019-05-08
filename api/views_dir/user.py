@@ -196,7 +196,12 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = "是否显示产品传参异常"
 
-
+        # 设置消息提醒
+        elif oper_type == 'message_remind_setting':
+            objs = models.Userprofile.objects.filter(id=user_id)
+            objs.update(message_remind=o_id)
+            response.code = 200
+            response.msg = '修改成功'
 
     else:
         # 查询我的会员 有效期 和剩余天数/会员类型
@@ -329,6 +334,29 @@ def user_oper(request, oper_type, o_id):
                 'path': img_path
             }
 
+        # 查询消息提醒设置
+        elif oper_type == 'get_message_remind':
+            user_obj = models.Userprofile.objects.get(id=user_id)
+
+            objs = models.Userprofile.message_remind_status
+            data_list = []
+
+            for obj in objs:
+                is_choose = False
+                if obj[0] == user_obj.message_remind:
+                    is_choose = True
+
+                data_list.append({
+                    'id': obj[0],
+                    'name': obj[1],
+                    'is_choose': is_choose
+                })
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'data_list': data_list
+            }
+
         else:
             response.code = 402
             response.msg = '请求异常'
@@ -338,7 +366,6 @@ def user_oper(request, oper_type, o_id):
 
 # 用户登录
 def user_login_oper(request, oper_type):
-    print('----------开始登录--@@@@@@@@@@@@@@@@@@@@@@@---------------------》 ', datetime.datetime.today())
     response = Response.ResponseObj()
     # 判断该用户是否存在
     now = datetime.datetime.today()
@@ -353,11 +380,8 @@ def user_login_oper(request, oper_type):
             save_code=code
         )
         data = get_ent_info(1)
-        print('===============获取信息--------------------------》 ', datetime.datetime.today())
         weichat_api_obj = WeChatApi(data)
-        print('----------------------------------实例化 公共对象', datetime.datetime.today())
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
-        print('code-----code-------code--------code--------code-------> ', code, datetime.datetime.today())
         encode_username = base64_encryption.b64encode(
             ret_obj['nickname']
         )
@@ -396,7 +420,6 @@ def user_login_oper(request, oper_type):
             user_data['openid'] = ret_obj.get('openid')
             user_data['token'] = get_token()
             user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
-            print("user_data --->", user_data)
             user_objs = models.Userprofile.objects.create(**user_data)
 
 
@@ -406,7 +429,6 @@ def user_login_oper(request, oper_type):
             user_id=user_objs.id,
             page_type=oper_type,
         )
-        print('----------返回数据 登录完成----@@@@@@@@@@@@@@@@@@@@@@@@@@-------------------》 ', datetime.datetime.today())
         return redirect(redirect_url)
 
     else:
