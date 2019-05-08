@@ -14,6 +14,7 @@ from publicFunc.account import randon_str
 from publicFunc.screenshots import screenshots
 from django.db.models import Q
 from publicFunc.qiniu_oper import requests_img_download, update_qiniu
+from publicFunc.base64_encryption import b64decode
 import re, os, json, sys, datetime
 
 # cerf  token验证 用户展示模块
@@ -266,13 +267,11 @@ def user_oper(request, oper_type, o_id):
             q = Q()
             q.add(Q(create_user_id__in=data_list) | Q(create_user__inviter_id__in=data_list), Q.AND)
 
-            number_clinch_deal_objs = models.renewal_log.objects.filter(
-                q,
-                isSuccess=1
-            ).values(
-                'create_user__name',
-                'create_user__set_avator'
-            ).distinct()
+            # 查询充值自己分销的钱数
+            number_clinch_deal_objs = models.distribute_money_log.objects.filter(
+                inviter_id=user_id
+            ).order_by('-create_date')
+
             response_data['number_clinch_count'] = number_clinch_deal_objs.count()  # 成交人数
 
 
@@ -289,8 +288,10 @@ def user_oper(request, oper_type, o_id):
                 number_clinch_deal_list = []
                 for number_clinch_deal_obj in number_clinch_deal_objs:
                     number_clinch_deal_list.append({
-                        'create_user__set_avator': number_clinch_deal_obj.get('create_user__set_avator'),
-                        'name': base64_encryption.b64decode(number_clinch_deal_obj.get('create_user__name')),
+                        'user_set_avator': number_clinch_deal_obj.user.set_avator,
+                        'user_name': b64decode(number_clinch_deal_obj.user.name),
+                        'price': number_clinch_deal_obj.price,
+                        'money': number_clinch_deal_obj.money,
                     })
                 response_data['number_clinch_deal_list'] = number_clinch_deal_list
 
@@ -299,6 +300,12 @@ def user_oper(request, oper_type, o_id):
             response.msg = '查询成功'
             response.data = response_data
             response.note = {
+                'number_clinch_deal_list': {
+                    'user_set_avator':'充值人头像',
+                    'user_name':'充值人名称',
+                    'price':'充值钱数',
+                    'money':'应得钱数',
+                },
                 "invite_number_count": '邀请人数量',
                 "cumulative_amount": '累计钱数',
                 "make_money": '待提钱数',

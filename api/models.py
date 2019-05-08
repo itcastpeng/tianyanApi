@@ -336,6 +336,7 @@ class withdrawal_log(models.Model):
 class distribute_money_log(models.Model):
     user = models.ForeignKey('Userprofile', verbose_name='充值人')
     inviter = models.ForeignKey('Userprofile', verbose_name='分销人', related_name='distribute_money_log_inviter')
+    price = models.CharField(verbose_name='充值钱数', max_length=128)
     money = models.CharField(verbose_name='钱数', max_length=128)
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
