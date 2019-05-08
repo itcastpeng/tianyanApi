@@ -147,6 +147,7 @@ def weixin_pay(request, oper_type, o_id):
             if form_objs.is_valid():
                 current_page = form_objs.cleaned_data['current_page']
                 length = form_objs.cleaned_data['length']
+                user_obj = models.Userprofile.objects.get(id=user_id)
 
                 objs = models.withdrawal_log.objects.filter(user_id=user_id).order_by('-create_date')
 
@@ -159,8 +160,6 @@ def weixin_pay(request, oper_type, o_id):
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
                 data_list = []
-                cumulative_amount = 0   # 累计现金
-                make_money = 0          # 当前待提余额
                 for obj in objs:
                     data_list.append({
                         'dingdanhao': obj.dingdanhao,                   # 提现订单号
@@ -169,8 +168,6 @@ def weixin_pay(request, oper_type, o_id):
                         'is_success': obj.is_success,                   # 提现是否成功
                         'wechat_returns_data': obj.wechat_returns_data, # 失败原因
                     })
-                    cumulative_amount = obj.user.cumulative_amount
-                    make_money = obj.user.make_money
 
                 withdrawal_amount_sum = 0
                 if withdrawal_amount_sum_obj:
@@ -180,8 +177,8 @@ def weixin_pay(request, oper_type, o_id):
                 response.msg = '查询成功'
                 response.data = {
                     'withdrawal_amount_sum': withdrawal_amount_sum,
-                    'cumulative_amount': cumulative_amount,
-                    'make_money': make_money,
+                    'cumulative_amount': user_obj.cumulative_amount,
+                    'make_money': user_obj.make_money,
                     'data_list': data_list,
                 }
                 response.note = {
