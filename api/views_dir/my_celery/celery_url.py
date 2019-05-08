@@ -44,7 +44,7 @@ def create_menu(request):
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
     login_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                 "&state=STATE#wechat_redirect" \
+                 "&state=STATE#wechat_redirect&connect_redirect=1" \
         .format(
         appid=APPID,
         redirect_uri=redirect_uri,
@@ -52,7 +52,7 @@ def create_menu(request):
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/wodepinpai'
     pinpai_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                "&state=STATE#wechat_redirect" \
+                "&state=STATE#wechat_redirect&connect_redirect=1" \
         .format(
         appid=APPID,
         redirect_uri=redirect_uri,
@@ -60,7 +60,7 @@ def create_menu(request):
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/wodedianpu'
     dianpu_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                "&state=STATE#wechat_redirect" \
+                "&state=STATE#wechat_redirect&connect_redirect=1" \
         .format(
         appid=APPID,
         redirect_uri=redirect_uri,
@@ -68,7 +68,7 @@ def create_menu(request):
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tuiguang'
     tuiguang_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                 "&state=STATE#wechat_redirect" \
+                 "&state=STATE#wechat_redirect&connect_redirect=1" \
         .format(
         appid=APPID,
         redirect_uri=redirect_uri,
@@ -76,7 +76,7 @@ def create_menu(request):
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tianyan'
     tianyan_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                    "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                   "&state=STATE#wechat_redirect" \
+                   "&state=STATE#wechat_redirect&connect_redirect=1" \
         .format(
         appid=APPID,
         redirect_uri=redirect_uri,
@@ -84,7 +84,7 @@ def create_menu(request):
     redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/shezhi'
     shezhi_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                   "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
-                  "&state=STATE#wechat_redirect" \
+                  "&state=STATE#wechat_redirect&connect_redirect=1" \
         .format(
         appid=APPID,
         redirect_uri=redirect_uri,
