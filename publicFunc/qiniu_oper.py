@@ -50,8 +50,8 @@ def update_qiniu(img_path):
 
 
     print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
-    # if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
-    #     os.remove(img_path)  # 删除本地图片
+    if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
+        os.remove(img_path)  # 删除本地图片
     img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.get('key')
     return img_path
 
