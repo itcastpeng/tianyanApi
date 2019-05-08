@@ -305,6 +305,7 @@ def user_oper(request, oper_type, o_id):
                     'user_name':'充值人名称',
                     'price':'充值钱数',
                     'money':'应得钱数',
+
                 },
                 "invite_number_count": '邀请人数量',
                 "cumulative_amount": '累计钱数',
