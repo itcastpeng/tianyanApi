@@ -145,7 +145,10 @@ def weixin_pay(request, oper_type, o_id):
 
                 objs = models.withdrawal_log.objects.filter(user_id=user_id).order_by('-create_date')
 
-                withdrawal_amount_sum = objs.filter(is_success=1).annotate(Sum('withdrawal_amount'))
+                withdrawal_amount_sum = objs.filter(is_success=1).aggregate(
+                    nums=Sum('withdrawal_amount')
+                )
+
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
@@ -163,11 +166,11 @@ def weixin_pay(request, oper_type, o_id):
                     })
                     cumulative_amount = obj.user.cumulative_amount
                     make_money = obj.user.make_money
-
+                print('withdrawal_amount_sum===========> ', withdrawal_amount_sum)
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'withdrawal_amount_sum': withdrawal_amount_sum,
+                    'withdrawal_amount_sum': withdrawal_amount_sum.get('nums'),
                     'cumulative_amount': cumulative_amount,
                     'make_money': make_money,
                     'data_list': data_list,

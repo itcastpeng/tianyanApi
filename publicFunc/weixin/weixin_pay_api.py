@@ -116,14 +116,14 @@ class weixin_pay_api(WeixinApiPublic):
         collection = dom_tree.documentElement
         data = ['err_code', 'return_msg']
         result_data = xmldom_parsing.xmldom(collection, data)
-        if result_data.get('err_code') == 'SUCCESS' and result_data.get('return_msg') == '发放成功.':
+        err_code = result_data.get('err_code')
+        return_msg = result_data.get('return_msg')
+        print('return_msg----------> ', err_code, return_msg)
+
+        if err_code == 'SUCCESS' and return_msg == '发放成功':
             err_code = 200
             return_msg = '提现成功'
         else:
-            err_code = result_data.get('err_code')
-            return_msg = result_data.get('return_msg')
-            print('return_msg----------> ', err_code, return_msg)
-
             if err_code == 'NOTENOUGH': # 账户余额不足
                 user_data = get_ent_info(user_id=user_id)
                 gongzhonghao_objs = WeChatApi(user_data)
