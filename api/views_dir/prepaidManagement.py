@@ -6,7 +6,7 @@ from django.views.decorators.csrf import csrf_exempt
 from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.article_oper import get_ent_info
-from django.db.models import F
+from django.db.models import F, Sum
 from api.forms.withdrawal import WithdrawalForm, SelectForm
 from publicFunc.base64_encryption import b64decode
 import xml.dom.minidom as xmldom, datetime, time, json
@@ -145,11 +145,14 @@ def weixin_pay(request, oper_type, o_id):
 
                 objs = models.withdrawal_log.objects.filter(user_id=user_id).order_by('-create_date')
 
+                withdrawal_amount_sum = objs.filter(is_success=1).annotate(Sum('withdrawal_amount'))
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
                 data_list = []
+                cumulative_amount = 0   # 累计现金
+                make_money = 0          # 当前待提余额
                 for obj in objs:
                     data_list.append({
                         'dingdanhao': obj.dingdanhao,                   # 提现订单号
@@ -158,18 +161,29 @@ def weixin_pay(request, oper_type, o_id):
                         'is_success': obj.is_success,                   # 提现是否成功
                         'wechat_returns_data': obj.wechat_returns_data, # 失败原因
                     })
+                    cumulative_amount = obj.user.cumulative_amount
+                    make_money = obj.user.make_money
 
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'data_list': data_list
+                    'withdrawal_amount_sum': withdrawal_amount_sum,
+                    'cumulative_amount': cumulative_amount,
+                    'make_money': make_money,
+                    'data_list': data_list,
                 }
                 response.note = {
-                    'dingdanhao': '提现订单号',
-                    'withdrawal_amount': '提现金额',
-                    'create_date': '提现时间',
-                    'is_success': '提现是否成功',
-                    'wechat_returns_data': '失败原因'
+                    'withdrawal_amount_sum': '已提现钱数',
+                    'cumulative_amount': '累计现金',
+                    'make_money': '当前待提余额',
+                    'data_list':{
+                        'dingdanhao': '提现订单号',
+                        'withdrawal_amount': '提现金额',
+                        'create_date': '提现时间',
+                        'is_success': '提现是否成功',
+                        'wechat_returns_data': '失败原因'
+                    }
+
                 }
             else:
                 response.code = 301
