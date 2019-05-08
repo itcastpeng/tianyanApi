@@ -258,13 +258,13 @@ def user_oper(request, oper_type, o_id):
             invite_friend_list = [i.get('id') for i in invite_objs.values('id')] # 该邀请人 邀请的好友ID
 
             print('invite_friend_list----------> ', invite_friend_list)
-            data_list = []
-            for i in invite_friend_list:
-                data_list.insert(0, i)
-                data_list.extend([i.get('id') for i in models.Userprofile.objects.filter(inviter_id=i).values('id')])
-            print('data_list--------------> ', data_list)
+            # data_list = []
+            # for i in invite_friend_list:
+            #     data_list.insert(0, i)
+            #     data_list.extend([i.get('id') for i in models.Userprofile.objects.filter(inviter_id=i).values('id')])
+            # print('data_list--------------> ', data_list)
 
-            invite_objs = models.Userprofile.objects.filter(id__in=data_list)
+            invite_objs = models.Userprofile.objects.filter(id__in=invite_friend_list)
             response_data['invite_number_count'] = invite_objs.count()  # 邀请人数量
 
             # 查询充值自己分销的钱数
