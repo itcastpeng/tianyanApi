@@ -338,7 +338,7 @@ def user_oper(request, oper_type, o_id):
 
 # 用户登录
 def user_login_oper(request, oper_type):
-    print('----------开始登录-----------------------》 ', datetime.datetime.today())
+    print('----------开始登录--@@@@@@@@@@@@@@@@@@@@@@@---------------------》 ', datetime.datetime.today())
     response = Response.ResponseObj()
     # 判断该用户是否存在
     now = datetime.datetime.today()
@@ -353,12 +353,13 @@ def user_login_oper(request, oper_type):
             save_code=code
         )
         data = get_ent_info(1)
+        print('===============获取信息--------------------------》 ', datetime.datetime.today())
         weichat_api_obj = WeChatApi(data)
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
         encode_username = base64_encryption.b64encode(
             ret_obj['nickname']
         )
-        print('code-----code-------code--------code--------code-------> ', code, ret_obj)
+        print('code-----code-------code--------code--------code-------> ', code, datetime.datetime.today())
         openid = ret_obj.get('openid')
         user_data = {
             "sex": ret_obj.get('sex'),
@@ -404,7 +405,7 @@ def user_login_oper(request, oper_type):
             user_id=user_objs.id,
             page_type=oper_type,
         )
-        print('----------返回数据 登录完成-----------------------》 ', datetime.datetime.today())
+        print('----------返回数据 登录完成----@@@@@@@@@@@@@@@@@@@@@@@@@@-------------------》 ', datetime.datetime.today())
         return redirect(redirect_url)
 
     else:
