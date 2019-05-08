@@ -355,11 +355,12 @@ def user_login_oper(request, oper_type):
         data = get_ent_info(1)
         print('===============获取信息--------------------------》 ', datetime.datetime.today())
         weichat_api_obj = WeChatApi(data)
+        print('----------------------------------实例化 公共对象', datetime.datetime.today())
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
+        print('code-----code-------code--------code--------code-------> ', code, datetime.datetime.today())
         encode_username = base64_encryption.b64encode(
             ret_obj['nickname']
         )
-        print('code-----code-------code--------code--------code-------> ', code, datetime.datetime.today())
         openid = ret_obj.get('openid')
         user_data = {
             "sex": ret_obj.get('sex'),
