@@ -176,8 +176,6 @@ def day_eye_data(request):
                     inviter_id=user_id,
                 )
 
-                for article_obj in article_objs:
-                    print(article_obj.article_id)
 
                 article_count = article_objs.values(
                     'customer_id',
@@ -233,7 +231,6 @@ def day_eye_data(request):
                     'create_date': goods_objs.order_by('-create_datetime')[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
                 })
             for i in data_list:
-                print("i.get('text')-------------------------> ", i.get('text'))
                 eye_objs = models.day_eye_celery.objects.filter(
                     user_id=user_id,
                     status=i.get('status'),
