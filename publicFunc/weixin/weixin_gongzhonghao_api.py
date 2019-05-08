@@ -12,10 +12,10 @@ import os
 # import sys
 # import datetime
 import hashlib
-# import uuid
 # from publicFunc.weixin.weixin_pay_api import weixin_pay_api
 from publicFunc.weixin.weixin_api_public import WeixinApiPublic
 from api import models
+import datetime
 
 
 # 验证收到的消息是否来自微信服务器
@@ -367,7 +367,9 @@ class WeChatApi(WeixinApiPublic):
             SECRET=self.APPSECRET,
             CODE=code,
         )
+        print('-----------开始请求第一个链接--------------------', datetime.datetime.today())
         ret = requests.get(url)
+        print('-----------结束请求第一个链接--------------------', datetime.datetime.today())
         ret.encoding = "utf8"
         print("ret.text -->", ret.text)
 
@@ -379,7 +381,9 @@ class WeChatApi(WeixinApiPublic):
             ACCESS_TOKEN=access_token,
             OPENID=openid,
         )
+        print('-----------开始请求第二个链接--------------------', datetime.datetime.today())
         ret = requests.get(url)
+        print('-----------结束请求第二个链接--------------------', datetime.datetime.today())
         ret.encoding = "utf8"
         ret_obj = ret.json()
         print('ret_obj---------------> ', ret_obj)
