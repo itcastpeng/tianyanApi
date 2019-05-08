@@ -362,7 +362,7 @@ def user_login_oper(request, oper_type):
             update_user_info.delay(ret_obj)
 
             # user_objs.update(**user_data)
-            # user_objs = user_objs[0]
+            user_objs = user_objs[0]
 
         else:  # 不存在，创建用户
             ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
