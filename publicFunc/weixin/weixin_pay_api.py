@@ -29,7 +29,7 @@ class weixin_pay_api(WeixinApiPublic):
             'mch_id': self.mch_id,                      # 商户号
             'nonce_str': self.generateRandomStamping(), # 32位随机值
             'openid': openid,                           # 微信用户唯一标识
-            'body': 'tianYan-VIP',                      # 描述
+            'body': '天眼会员支付',                      # 描述
             'out_trade_no': dingdanhao,                 # 订单号
             'total_fee': total_fee,                     # 金额(分 为单位)
             'spbill_create_ip': '0.0.0.0',              # 终端IP
@@ -39,7 +39,7 @@ class weixin_pay_api(WeixinApiPublic):
         print('result_data===========> ', result_data)
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
         result_data['sign'] = self.md5(string_sign_temp).upper()
-        xml_data = self.toXml(result_data)
+        xml_data = self.toXml(result_data).encode('utf-8')
         print('xml_data=-xml_data-----------xml_data---------------------------> ', xml_data)
         ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
         ret.encoding = 'utf8'
@@ -100,9 +100,10 @@ class weixin_pay_api(WeixinApiPublic):
             'act_name':'tianyanhuodong',                 # 活动名称
             'remark':'tianyan_beizhu!',                  # 备注
         }
+        print('result_data-=--------------> ', result_data)
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
         result_data['sign'] = self.md5(string_sign_temp).upper()
-        xml_data = self.toXml(result_data)
+        xml_data = self.toXml(result_data).encode('utf-8')
 
         apiclient_key = os.path.join('statics', 'zhengshu', 'apiclient_key.pem')
         apiclient_cert = os.path.join('statics', 'zhengshu', 'apiclient_cert.pem')
