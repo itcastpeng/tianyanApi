@@ -9,7 +9,7 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.user import is_send_msg
 from django.db.models import F
 import datetime, json, time, requests
-from publicFunc.emoji import xiajiantou
+from publicFunc.emoji import xiajiantou, nanshou, caidai
 
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
@@ -281,16 +281,21 @@ def last_active_time(request):
             last_active_time__lte=stop_time,
             is_send_msg=0,                      # 未发送过消息的
         )
-        print(start_time, stop_time, now)
+        print('start_time, stop_time, now-------> ', start_time, stop_time, now)
         for obj in objs:
+            print('--------------------马上超过24小时', obj.id)
             obj.is_send_msg = 1
             obj.save()
 
+            emj = caidai + xiajiantou + caidai
             post_data = {
                 "touser": obj.openid,
                 "msgtype": "text",
                 "text": {
-                    "content": '天眼将暂停为您推送消息, 微信限制于超过24小时未互动 公众号则不能发送消息\n快来点击下方获客文章解除限制'
+                    "content": """天眼将暂停为您推送消息,微信限制于超过24小时未互动 
+                    公众号则不能发送消息{}\n快来点击下方获客文章解除限制\n{}""".format(
+                        nanshou, emj
+                    )
                 }
             }
             data = get_ent_info(obj.id)
@@ -387,9 +392,7 @@ def summary_message_reminder_celery(request):
             message_remind=4
         )
         for user_obj in user_objs:
-            print('user_obj.id---汇总消息------------------> ', user_obj.id)
             if is_send_msg(user_obj.id): # 如果此用户可以发送 消息
-                print('user_obj可以发送------------------> ', user_obj.id)
                 objs = models.summary_message_reminder.objects.select_related('user').filter(
                     is_send=0,
                     user_id=user_obj.id,
