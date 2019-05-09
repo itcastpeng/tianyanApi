@@ -232,9 +232,9 @@ def weixin_pay(request, oper_type, o_id):
                     data_list.append({
                         'pay_order_no': obj.pay_order_no,               # 订单号
                         'price':obj.price,                              # 价钱
-                        'original_price':obj.original_price,            # 原价
+                        # 'original_price':obj.original_price,            # 原价
                         'renewal_number_days':obj.renewal_number_days,  # 续费天数
-                        'overdue_date':obj.overdue_date.strftime('%Y-%m-%d %H:%M:%S'),  # 过期时间
+                        # 'overdue_date':obj.overdue_date.strftime('%Y-%m-%d %H:%M:%S'),  # 过期时间
                         'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),  # 创建时间
                     })
 
@@ -245,11 +245,10 @@ def weixin_pay(request, oper_type, o_id):
                 }
                 response.note = {
                     'data_list': {
-                        'dingdanhao': '提现订单号',
-                        'withdrawal_amount': '提现金额',
-                        'create_date': '提现时间',
-                        'is_success': '提现是否成功',
-                        'wechat_returns_data': '失败原因'
+                        'pay_order_no': '订单号',
+                        'price': '支付金额',
+                        'renewal_number_days': '续费天数',
+                        'create_date': '下单时间',
                     }
 
                 }

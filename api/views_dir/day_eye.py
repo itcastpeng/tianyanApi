@@ -63,7 +63,7 @@ def day_eye(request):
                 ret_data.append({
                     'customer_id': obj.customer_id,
                     'customer__name': b64decode(obj.customer.name),
-                    'customer__set_avator': obj.customer.set_avator + '?imageView2/2/w/200',
+                    'customer__set_avator': obj.customer.set_avator,
                     'text': obj.text,
                     'status': obj.status,
                 })
