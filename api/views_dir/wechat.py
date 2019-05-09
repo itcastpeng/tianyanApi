@@ -16,7 +16,7 @@ from publicFunc.article_oper import get_ent_info
 from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
 from publicFunc.account import str_encrypt
-from bs4 import BeautifulSoup
+from publicFunc.emoji import baiyan, xiajiantou, zhayan
 
 import json, xml.dom.minidom, datetime, time, requests, re
 
@@ -173,30 +173,50 @@ def wechat(request):
 
                     if event == 'subscribe':  # 首次关注
                         nickname = ret_obj.get('nickname')  # 关注人名称
+
+
                         post_data = {
                             "touser": openid,
-                            "template_id": "gwB4lxYzpWhtyFSFs3Pj0ZrMweHY0-GCTvS4b0ZeTmI",  # 登录提醒模板
-                            # "url": "http://wenda.zhugeyingxiao.com/",
-                            "data": {
-                                "first": {
-                                    "value": "欢迎关注微商天眼公众号!",
-                                    "color": "#173177"
-                                },
-                                "keyword1": {
-                                    "value": nickname,
-                                    "color": "#173177"
-                                },
-                                "keyword2": {
-                                    "value": datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S"),
-                                    "color": "#173177"
-                                },
-                                "remark": {
-                                    "value": "感谢使用,请注意账号安全!\n进入天眼请点击最下方↓↓↓",
-                                    "color": "#173177"
-                                }
+                            "msgtype": "text",
+                            "text": {
+                                "content": '欢迎关注微商天眼公众号！\n\n{emj_1}衣带渐宽终不悔，为你消得人憔悴!\n'
+                                           '分享文章后我会告诉您谁看了您的文章,\n精准追踪客户\n'
+                                           '点击下方【天眼】速速打开 天眼客户追踪神器吧！{emj_2},\n'
+                                           '{emj_3}'.format(
+                                    emj_1=baiyan,
+                                    emj_2=zhayan,
+                                    emj_3=xiajiantou
+                                )
                             }
                         }
-                        weichat_api_obj.sendTempMsg(post_data)
+                        post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+                        weichat_api_obj.news_service(post_data)
+
+
+                        # post_data = {
+                        #     "touser": openid,
+                        #     "template_id": "gwB4lxYzpWhtyFSFs3Pj0ZrMweHY0-GCTvS4b0ZeTmI",  # 登录提醒模板
+                        #     # "url": "http://wenda.zhugeyingxiao.com/",
+                        #     "data": {
+                        #         "first": {
+                        #             "value": "欢迎关注微商天眼公众号!",
+                        #             "color": "#173177"
+                        #         },
+                        #         "keyword1": {
+                        #             "value": nickname,
+                        #             "color": "#173177"
+                        #         },
+                        #         "keyword2": {
+                        #             "value": datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S"),
+                        #             "color": "#173177"
+                        #         },
+                        #         "remark": {
+                        #             "value": "感谢使用,请注意账号安全!\n进入天眼请点击最下方↓↓↓",
+                        #             "color": "#173177"
+                        #         }
+                        #     }
+                        # }
+                        # weichat_api_obj.sendTempMsg(post_data)
 
                 # 取消关注
                 elif event == "unsubscribe":

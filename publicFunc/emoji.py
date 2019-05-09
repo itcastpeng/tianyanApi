@@ -15,10 +15,11 @@ nanshou = b64decode('8J+Ynw==')
 # 彩带 🎉
 caidai = b64decode('8J+OiQ==')
 
+# 白眼🙄
+baiyan = b64decode('8J+ZhA==')
 
-
-
-
+# 眨眼
+zhayan = b64decode('8J+YiQ==')
 
 
 
@@ -31,6 +32,6 @@ caidai = b64decode('8J+OiQ==')
 
 
 if __name__ == '__main__':
-    encode =  b64encode('🎉')
+    encode =  b64encode('😉')
     print('encode----> ', encode)
     print(b64decode(encode))
