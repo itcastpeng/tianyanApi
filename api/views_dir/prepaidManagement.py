@@ -9,7 +9,7 @@ from publicFunc.article_oper import get_ent_info
 from django.db.models import F, Sum
 from api.forms.withdrawal import WithdrawalForm, SelectForm
 from publicFunc.base64_encryption import b64decode
-import xml.dom.minidom as xmldom, datetime, time, json
+import xml.dom.minidom as xmldom, datetime, time, json, os
 
 
 
@@ -93,6 +93,15 @@ def weixin_pay(request, oper_type, o_id):
             }
             form_objs = WithdrawalForm(form_data)
             if form_objs.is_valid():
+                print(request.META)
+                # 当前路径
+                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                # 获取访问用户IP
+                if request.META.get('HTTP_X_FORWARDED_FOR'):
+                    ip = request.META['HTTP_X_FORWARDED_FOR']
+                else:
+                    ip = request.META['REMOTE_ADDR']
+
                 user_obj, withdrawal_amount = form_objs.cleaned_data.get('withdrawal_amount')
                 dingdanhao = weixin_pay_api_obj.shengcheng_dingdanhao()
                 data = {
@@ -103,6 +112,7 @@ def weixin_pay(request, oper_type, o_id):
                     'user_id': user_id,                     # user_id
                     'user_name': b64decode(user_obj.name),
                     'make_money': user_obj.make_money,
+                    'ip': ip,
                 }
                 response_data = weixin_pay_api_obj.withdrawal(data) # 提现
 
@@ -139,6 +149,8 @@ def weixin_pay(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = json.loads(form_objs.errors.as_json())
+
+
     else:
 
         # 提现记录

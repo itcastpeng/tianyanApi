@@ -83,6 +83,7 @@ class weixin_pay_api(WeixinApiPublic):
         user_name = result.get('user_name')
         make_money = result.get('make_money') # 用户待提钱数
         withdrawal_amount = int(result.get('withdrawal_amount'))
+        ip = result.get('ip')
 
         now_datetime = datetime.datetime.today()
         url = 'https://api.mch.weixin.qq.com/mmpaymkttransfers/sendredpack'
@@ -94,9 +95,9 @@ class weixin_pay_api(WeixinApiPublic):
             're_openid':result.get('openid'),            # openid
             'total_amount':withdrawal_amount * 100,      # 提现金额 分为单位
             'total_num':1,                               # 发放红包总人数
-            'client_ip':'0.0.0.0',                       # IP地址
+            'client_ip': ip,                             # IP地址
             'send_name': '微商天眼',                      # 商家名称
-            'wishing':'提现到账,大吉大利!',                  # 红包祝福语
+            'wishing':'提现到账,大吉大利!',                 # 红包祝福语
             'act_name':'tianyanhuodong',                 # 活动名称
             'remark':'tianyan_beizhu!',                  # 备注
         }
