@@ -783,7 +783,7 @@ def article_customer_oper(request, oper_type):
                 if id:
                     models.customer_look_goods_log.objects.create(
                         goods_id=id,
-                        customer_id=user_id,
+                        customer_id=customer_id,
                         user_id=inviter_user_id
                     )
 
@@ -824,7 +824,7 @@ def article_customer_oper(request, oper_type):
             form_data = {
                 'status': status,
                 'public_id': public_id,
-                'user_id': user_id,
+                'user_id': customer_id,
                 'inviter_user_id': inviter_user_id,
                 'close_date': close_date,
             }
