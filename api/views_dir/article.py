@@ -813,7 +813,7 @@ def article_customer_oper(request, oper_type):
         elif oper_type == 'record_length':
             status = request.GET.get('status')
             public_id = request.GET.get('public_id')
-            close_date = request.GET.get('close_date')
+            # close_date = request.GET.get('close_date')
             """
             inviter_user_id  为分享人ID
             status == 1 为记录文章日志 
@@ -826,7 +826,7 @@ def article_customer_oper(request, oper_type):
                 'public_id': public_id,
                 'user_id': customer_id,
                 'inviter_user_id': inviter_user_id,
-                'close_date': close_date,
+                'close_date': datetime.datetime.now(),
             }
             form_objs = RecordLengthForm(form_data)
             if form_objs.is_valid():
