@@ -33,8 +33,8 @@ def weixin_pay(request, oper_type, o_id):
                 userObjs = models.Userprofile.objects.filter(id=user_id)
                 user_obj = userObjs[0]
                 fee_obj = fee_objs[0]
-                # price = int(fee_obj.price)
-                price = int(fee_obj.price) * 100
+                price = int(fee_obj.price)
+                # price = int(fee_obj.price) * 100
                 data = {
                     'total_fee': price,  # 金额(分 为单位)
                     'openid': user_obj.openid,  # 微信用户唯一标识
@@ -165,11 +165,11 @@ def weixin_pay(request, oper_type, o_id):
                     nums=Sum('withdrawal_amount')
                 )
 
+                data_count = objs.count()
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
-                data_count = objs.count()
                 data_list = []
                 for obj in objs:
                     data_list.append({
@@ -224,11 +224,11 @@ def weixin_pay(request, oper_type, o_id):
                     isSuccess=1
                 ).order_by('-create_date')
 
+                data_count = objs.count()
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
-                data_count = objs.count()
                 data_list = []
                 for obj in objs:
                     data_list.append({
