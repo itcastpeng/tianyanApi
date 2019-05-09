@@ -387,7 +387,9 @@ def summary_message_reminder_celery(request):
             message_remind=4
         )
         for user_obj in user_objs:
+            print('user_obj.id---汇总消息------------------> ', user_obj.id)
             if is_send_msg(user_obj.id): # 如果此用户可以发送 消息
+                print('user_obj可以发送------------------> ', user_obj.id)
                 objs = models.summary_message_reminder.objects.select_related('user').filter(
                     is_send=0,
                     user_id=user_obj.id,
@@ -400,6 +402,8 @@ def summary_message_reminder_celery(request):
                         b64decode(obj.customer.name),
                         obj.select_num
                     )
+                    obj.is_send = 1
+                    obj.save()
 
                 if title_str: # 如果有文字发送
 
@@ -424,6 +428,7 @@ def summary_message_reminder_celery(request):
                     weixin_objs.news_service(post_data)
                     user_obj.last_message_remind_time = datetime.datetime.now()
                     user_obj.save()
+
                     response.code = 200
             else:
                 continue
