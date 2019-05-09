@@ -292,8 +292,7 @@ def last_active_time(request):
                 "touser": obj.openid,
                 "msgtype": "text",
                 "text": {
-                    "content": """天眼将暂停为您推送消息,微信限制于超过24小时未互动 
-                    公众号则不能发送消息{}\n快来点击下方获客文章解除限制\n{}""".format(
+                    "content": """天眼将暂停为您推送消息!\n微信限制于超过24小时未互动,公众号则不能发送消息{}\n快来点击下方获客文章解除限制\n{}""".format(
                         nanshou, emj
                     )
                 }

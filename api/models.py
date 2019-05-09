@@ -85,8 +85,8 @@ class Userprofile(models.Model):
     cumulative_amount = models.CharField(verbose_name='累计钱数', max_length=64, default=0)
     make_money = models.CharField(verbose_name='待提钱数', max_length=64, default=0)
 
-    last_active_time = models.DateTimeField(verbose_name='用户最后活跃时间', null=True)
-    is_send_msg = models.BooleanField(verbose_name='是否发送过互动超时消息', default=0)
+    last_active_time = models.DateTimeField(verbose_name='用户最后活跃时间', null=True) # 记录用户最后一次与公众号互动的时间
+    is_send_msg = models.BooleanField(verbose_name='是否发送过互动超时消息', default=0) # 互动则为未发送 发送消息后改为1
 
     message_remind_status = (
         (0, '立即提醒我'),

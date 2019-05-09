@@ -111,7 +111,6 @@ def small_shop(request):
     else:
         response.code = 402
         response.msg = "请求异常"
-    print(response.data)
     return JsonResponse(response.__dict__)
 
 
