@@ -530,7 +530,7 @@ def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
     inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
     if request.method == 'GET':
-        user_id = request.GET.get('user_id')    # 客户ID
+        customer_id = request.GET.get('user_id')    # 客户ID
 
         # 客户查询文章详情
         if oper_type == 'article':
@@ -543,7 +543,7 @@ def article_customer_oper(request, oper_type):
                 is_like = False  # 是否点赞
                 log_obj = models.SelectClickArticleLog.objects.filter(
                     article_id=obj.id,
-                    customer_id=user_id
+                    customer_id=customer_id
                 )
                 if log_obj:
                     is_like = True
@@ -626,13 +626,13 @@ def article_customer_oper(request, oper_type):
                 # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
                 now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
                 log_objs = models.SelectArticleLog.objects.filter(
-                    customer_id=user_id,
+                    customer_id=customer_id,
                     inviter_id=inviter_user_id,
                     create_datetime__gte=now
                 )
                 if not log_objs:
                     models.SelectArticleLog.objects.create(
-                        customer_id=user_id,
+                        customer_id=customer_id,
                         article_id=id,
                         inviter_id=inviter_user_id
                     )
@@ -645,7 +645,7 @@ def article_customer_oper(request, oper_type):
                     'check_type': '文章',
                     'user_id': inviter_user_id,
                     'title': obj.title,
-                    'customer_id': user_id,
+                    'customer_id': customer_id,
                 }
                 customer_view_articles_send_msg.delay(celery_data)
 
