@@ -233,7 +233,7 @@ def weixin_pay(request, oper_type, o_id):
                         'pay_order_no': obj.pay_order_no,               # 订单号
                         'price':obj.price,                              # 价钱
                         # 'original_price':obj.original_price,            # 原价
-                        'renewal_number_days':obj.renewal_number_days,  # 续费天数
+                        'the_length':obj.the_length,                    # 时长
                         # 'overdue_date':obj.overdue_date.strftime('%Y-%m-%d %H:%M:%S'),  # 过期时间
                         'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),  # 创建时间
                     })
@@ -247,7 +247,7 @@ def weixin_pay(request, oper_type, o_id):
                     'data_list': {
                         'pay_order_no': '订单号',
                         'price': '支付金额',
-                        'renewal_number_days': '续费天数',
+                        'the_length': '时长',
                         'create_date': '下单时间',
                     }
 
