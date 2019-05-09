@@ -624,21 +624,21 @@ def article_customer_oper(request, oper_type):
 
 
                 # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
-                now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
-                log_objs = models.SelectArticleLog.objects.filter(
+                # now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
+                # log_objs = models.SelectArticleLog.objects.filter(
+                #     customer_id=customer_id,
+                #     inviter_id=inviter_user_id,
+                #     create_datetime__gte=now
+                # )
+                # if not log_objs:
+                models.SelectArticleLog.objects.create(
                     customer_id=customer_id,
-                    inviter_id=inviter_user_id,
-                    create_datetime__gte=now
+                    article_id=id,
+                    inviter_id=inviter_user_id
                 )
-                if not log_objs:
-                    models.SelectArticleLog.objects.create(
-                        customer_id=customer_id,
-                        article_id=id,
-                        inviter_id=inviter_user_id
-                    )
-                    # 记录查看次数
-                    obj.look_num = F('look_num') + 1
-                    obj.save()
+                # 记录查看次数
+                obj.look_num = F('look_num') + 1
+                obj.save()
 
                 # 给用户发送消息
                 celery_data = {
