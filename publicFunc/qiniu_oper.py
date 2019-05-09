@@ -24,28 +24,29 @@ def update_qiniu(img_path):
     policy = {  # 指定上传文件的格式 等
 
     }
-    token = q.upload_token(bucket_name, None, 360000, policy)  # 可以指定key 图片名称
-    print('-----------> ', datetime.datetime.today())
-    ret, info = put_file(token, None, mime_type="text/js", file_path=img_path)
-    print('ret-----> ', ret, info)
-    print('--> ', datetime.datetime.today())
+    token = q.upload_token(bucket_name)  # 可以指定key 图片名称
+    # token = q.upload_token(bucket_name, None, 360000, policy)  # 可以指定key 图片名称
+    # print('-----------> ', datetime.datetime.today())
+    # ret, info = put_file(token, None, mime_type="text/js", file_path=img_path)
+    # print('ret-----> ', ret, info)
+    # print('--> ', datetime.datetime.today())
 
 
-    # headers = {
-    #     'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
-    # }
+    headers = {
+        'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
+    }
 
-    # url = 'https://up-z1.qiniup.com/'
-    #
-    # data = {
-    #     'token': token
-    # }
-    # files = {
-    #     'file':open(img_path, 'rb')
-    # }
-    #
-    # print('----------------上传七牛k云--------------')
-    # ret = requests.post(url, data=data, files=files, headers=headers)
+    url = 'https://up-z1.qiniup.com/'
+
+    data = {
+        'token': token
+    }
+    files = {
+        'file':open(img_path, 'rb')
+    }
+
+    print('----------------上传七牛k云--------------')
+    ret = requests.post(url, data=data, files=files, headers=headers)
 
     # zone = Zone(
     #     up_host='https://up-z1.qiniup.com/',
@@ -60,7 +61,7 @@ def update_qiniu(img_path):
     print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片
-    img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.get('key')
+    img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')
     return img_path
 
 # 请求图片地址保存本地

@@ -120,7 +120,7 @@ def weixin_pay(request, oper_type, o_id):
                 return_msg = response_data.get('return_msg')
 
                 make_money = float(user_obj.make_money)             # 用户待提钱数
-                withdrawal_amount = int(withdrawal_amount)    # 用户提现钱数
+                withdrawal_amount = withdrawal_amount    # 用户提现钱数
                 withdrawal_after = make_money - withdrawal_amount   # 待提钱数减去提现钱数
 
                 if code == 200:

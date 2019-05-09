@@ -336,7 +336,7 @@ class renewal_log(models.Model):
 class withdrawal_log(models.Model):
     user = models.ForeignKey('Userprofile', verbose_name='提现人')
     withdrawal_befor = models.CharField(verbose_name='提现前余额 make_money字段', max_length=64)
-    withdrawal_amount = models.IntegerField(verbose_name='提现钱数')
+    withdrawal_amount = models.CharField(verbose_name='提现钱数', max_length=64)
     withdrawal_after = models.CharField(verbose_name='提现后余额 make_money字段', max_length=64)
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     is_success = models.BooleanField(verbose_name='是否提现成功', default=0)

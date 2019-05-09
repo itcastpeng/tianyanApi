@@ -55,6 +55,9 @@ def user(request):
                 for team_obj in team_objs:
                     team_list.append(team_obj.team_id)
                 brand_list = [i['name'] for i in obj.brand_classify.values('name')]
+                qr_code = ''
+                if obj.qr_code:
+                    qr_code = obj.qr_code + '?imageView2/2/w/100'
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
@@ -65,7 +68,7 @@ def user(request):
                     'register_date': obj.register_date.strftime('%Y-%m-%d'),
                     'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
                     'set_avator': obj.set_avator + '?imageView2/2/w/100',
-                    'qr_code': obj.qr_code + '?imageView2/2/w/100',
+                    'qr_code': qr_code,
                     'brand_list': brand_list,
                     'team_list': team_list,
                     'vip_type': obj.get_vip_type_display(),
