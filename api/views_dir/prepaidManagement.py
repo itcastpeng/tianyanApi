@@ -33,8 +33,8 @@ def weixin_pay(request, oper_type, o_id):
                 userObjs = models.Userprofile.objects.filter(id=user_id)
                 user_obj = userObjs[0]
                 fee_obj = fee_objs[0]
-                price = int(fee_obj.price)
-                # price = int(fee_obj.price) * 100
+                # price = int(fee_obj.price)
+                price = int(fee_obj.price) * 100
                 data = {
                     'total_fee': price,  # 金额(分 为单位)
                     'openid': user_obj.openid,  # 微信用户唯一标识
