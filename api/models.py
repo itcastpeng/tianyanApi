@@ -305,8 +305,9 @@ class send_msg_duplicate(models.Model):
     create_date_time = models.CharField(verbose_name='创建时间', max_length=64, null=True)
 
 
-"""天眼功能(谁看了我) celery跑出来的数据 """
+"""celery跑出来的数据 """
 
+# 天眼谁看了我
 class day_eye_celery(models.Model):
     user = models.ForeignKey(to='Userprofile', verbose_name='哪个用户的数据', null=True)
     customer = models.ForeignKey(to='Customer', verbose_name='哪个客户', null=True)
@@ -317,6 +318,17 @@ class day_eye_celery(models.Model):
     )
     status = models.SmallIntegerField(verbose_name='类别 区分文章和商品', choices=status_choices, null=True)
     create_date = models.DateTimeField(verbose_name='创建时间', null=True)
+
+# 设置消息提醒 未提醒的消息 汇总提醒消息
+class summary_message_reminder(models.Model):
+    user = models.ForeignKey('Userprofile', verbose_name='提醒的人')
+    customer = models.ForeignKey('Customer', verbose_name='查看 (文章) 人')
+    check_type = models.CharField(verbose_name='查看了什么名称 (文章/微店)', max_length=32)
+    title = models.CharField(verbose_name='文章标题', max_length=256)
+    is_send = models.BooleanField(verbose_name='是否发送', default=0)
+    select_num = models.IntegerField(verbose_name='查看次数', default=1)
+
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
 
 """钱相关"""
@@ -350,5 +362,4 @@ class distribute_money_log(models.Model):
     price = models.CharField(verbose_name='充值钱数', max_length=128)
     money = models.CharField(verbose_name='钱数', max_length=128)
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
-
 

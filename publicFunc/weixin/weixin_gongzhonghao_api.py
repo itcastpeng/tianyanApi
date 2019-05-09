@@ -47,10 +47,7 @@ class WeChatApi(WeixinApiPublic):
         self.APPSECRET = data["APPSECRET"]
         self.access_token = data["access_token"]
         self.create_datetime = int(data["create_datetime"])
-        print('self.create_datetime--------> ', self.create_datetime)
-        print('int(time.time()) - self.create_datetime----------> ', int(time.time()) - self.create_datetime)
         if not self.create_datetime or (int(time.time()) - self.create_datetime) > 5000:
-            print('-------------------------------')
             self.get_access_token()
 
         # if wechat_data_path:
