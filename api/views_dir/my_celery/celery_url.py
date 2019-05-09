@@ -9,6 +9,8 @@ from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.user import is_send_msg
 from django.db.models import F
 import datetime, json, time, requests
+from publicFunc.emoji import xiajiantou
+
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
 def celery_error_warning(msg):
@@ -323,12 +325,12 @@ def customer_view_articles_send_msg(request):
 
             # 区分普通用户和 会员用户 会员用户发送查看人名称
             if user_obj.overdue_date >= datetime.date.today():
-                msg = '有人看了您的{}\n《{}》\n查看人:{}\n赶快点击 *天眼* 查看吧！'.format(
-                    check_type, title, b64decode(customer_obj.name)
+                msg = '有人看了您的{}\n\n《{}》\n查看人:{}\n\n查看点击下方【天眼】\n{}'.format(
+                    check_type, title, b64decode(customer_obj.name), xiajiantou
                 )
             else:
-                msg = '有人看了您的{}\n《{}》\n赶快点击 *天眼* 查看吧 ↓↓↓'.format(
-                    check_type, title
+                msg = '有人看了您的{}\n\n《{}》\n\n查看点击下方【天眼】\n{}'.format(
+                    check_type, title, xiajiantou
                 )
 
             user_info = get_ent_info(user_id)
@@ -400,7 +402,7 @@ def summary_message_reminder_celery(request):
                     )
 
                 if title_str: # 如果有文字发送
-                    xiajiantou = b64decode('8J+Rhw==') + b64decode('8J+Rhw==') + b64decode('8J+Rhw==') + b64decode('8J+Rhw==')
+
                     # 区分普通用户和 会员用户 会员用户发送查看人名称
                     if user_obj.overdue_date >= datetime.date.today():
                         msg = '有人看了您多篇文章\n\n{}\n查看点击下方【天眼】\n{}'.format(title_str, xiajiantou)  # 充值用户显示所有文章标题
