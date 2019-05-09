@@ -84,7 +84,6 @@ def weixin_pay(request, oper_type, o_id):
                 response.code = 301
                 response.msg = '请选择一项会员'
 
-
         # 提现功能
         elif oper_type == 'withdrawal':
             form_data = {
@@ -150,7 +149,6 @@ def weixin_pay(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(form_objs.errors.as_json())
 
-
     else:
 
         # 提现记录
@@ -210,21 +208,62 @@ def weixin_pay(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(form_objs.errors.as_json())
 
+        # 支付记录
+        elif oper_type == 'payment_records':
+            form_objs = SelectForm(request.GET)
+            if form_objs.is_valid():
+                current_page = form_objs.cleaned_data['current_page']
+                length = form_objs.cleaned_data['length']
+
+                # user_obj = models.Userprofile.objects.get(id=user_id)
+
+                objs = models.renewal_log.objects.filter(
+                    create_user_id=user_id,
+                    isSuccess=1
+                ).order_by('-create_date')
+
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+
+                data_list = []
+                for obj in objs:
+                    data_list.append({
+                        'pay_order_no': obj.pay_order_no,               # 订单号
+                        'price':obj.price,                              # 价钱
+                        'original_price':obj.original_price,            # 原价
+                        'renewal_number_days':obj.renewal_number_days,  # 续费天数
+                        'overdue_date':obj.overdue_date.strftime('%Y-%m-%d %H:%M:%S'),  # 过期时间
+                        'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),  # 创建时间
+                    })
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'data_list': data_list,
+                }
+                response.note = {
+                    'data_list': {
+                        'dingdanhao': '提现订单号',
+                        'withdrawal_amount': '提现金额',
+                        'create_date': '提现时间',
+                        'is_success': '提现是否成功',
+                        'wechat_returns_data': '失败原因'
+                    }
+
+                }
+            else:
+                response.code = 301
+                response.msg = json.loads(form_objs.errors.as_json())
+
+
         else:
             response.code = 402
             response.msg = '请求异常'
+
+
     return JsonResponse(response.__dict__)
-
-
-
-
-
-
-
-
-
-
-
 
 
 

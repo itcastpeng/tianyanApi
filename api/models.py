@@ -299,7 +299,7 @@ class save_code(models.Model):
     save_code = models.CharField(verbose_name='存在的code', max_length=128, null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-# 客户给公众号发送同一消息多次后  发送一次会回调多次 微信回调问题
+# 客户给公众号发送 同一时间 多次重复消息  发送一次会回调多次 微信回调问题
 class send_msg_duplicate(models.Model):
     user_id = models.IntegerField(verbose_name='记录user_id避免重复', null=True)
     create_date_time = models.CharField(verbose_name='创建时间', max_length=64, null=True)

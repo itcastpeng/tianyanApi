@@ -384,7 +384,7 @@ def day_eye_oper(request, oper_type, o_id):
                         'article__title': obj['article__title'],
                         'id__count': obj['id__count'],
                         'after_time': after_time + '前',
-                        'cover_img': cover_img,
+                        'cover_img': cover_img + '?imageView2/2/w/200',
                     })
 
                 response.code = 200
@@ -422,7 +422,7 @@ def day_eye_oper(request, oper_type, o_id):
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
                     ret_data.append({
                         'customer_id': obj['customer_id'],
-                        'customer__set_avator': obj['customer__set_avator'],
+                        'customer__set_avator': obj['customer__set_avator'] + '?imageView2/2/w/200',
                         'customer__name': b64decode(obj['customer__name']),
                         'article_info': '看了' + str(obj['id__count']) + '次-' + after_time + '前',
                     })
