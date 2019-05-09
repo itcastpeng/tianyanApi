@@ -169,6 +169,7 @@ def weixin_pay(request, oper_type, o_id):
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
+                data_count = objs.count()
                 data_list = []
                 for obj in objs:
                     data_list.append({
@@ -186,6 +187,7 @@ def weixin_pay(request, oper_type, o_id):
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
+                    'data_count': data_count,
                     'withdrawal_amount_sum': withdrawal_amount_sum,
                     'cumulative_amount': user_obj.cumulative_amount,
                     'make_money': user_obj.make_money,
@@ -226,7 +228,7 @@ def weixin_pay(request, oper_type, o_id):
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
-
+                data_count = objs.count()
                 data_list = []
                 for obj in objs:
                     data_list.append({
@@ -241,6 +243,7 @@ def weixin_pay(request, oper_type, o_id):
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
+                    'data_count': data_count,
                     'data_list': data_list,
                 }
                 response.note = {
