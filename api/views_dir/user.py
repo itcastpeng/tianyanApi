@@ -16,7 +16,7 @@ from django.db.models import Q
 from publicFunc.qiniu_oper import requests_img_download, update_qiniu
 from publicFunc.base64_encryption import b64decode
 import re, os, json, sys, datetime
-
+from publicFunc.emoji import qian
 # cerf  token验证 用户展示模块
 @account.is_token(models.Userprofile)
 def user(request):
@@ -290,9 +290,20 @@ def user_oper(request, oper_type, o_id):
             if o_id and int(o_id) == 1:  # 邀请人数详情
                 invite_number_list = []
                 for invite_number_obj in invite_objs:
+
+                    # 该用户未充值展示的话
+                    prepaid_text = '用户未开通会员, 邀请付款有现金奖励{}!'.format(qian)
+                    if invite_number_obj.renewal_log_set.count() >= 1: # 判断该用户是否充值
+                        money = models.distribute_money_log.objects.get(
+                            inviter_id=invite_number_obj.id,
+                            user_id=user_id
+                        ).money
+                        prepaid_text = '成为会员, 加入账户{}元!{}'.format(money, qian)
+
                     invite_number_list.append({
                         'create_user__set_avator': invite_number_obj.set_avator,
-                        'name':base64_encryption.b64decode(invite_number_obj.name)
+                        'name':base64_encryption.b64decode(invite_number_obj.name),
+                        'prepaid_text':prepaid_text,
                     })
                 response_data['invite_number_list'] = invite_number_list
 
@@ -362,6 +373,15 @@ def user_oper(request, oper_type, o_id):
             response.msg = '查询成功'
             response.data = {
                 'data_list': data_list
+            }
+
+        # 复制昵称
+        elif oper_type == 'copy_nickname':
+            obj = models.Customer.objects.get(id=o_id)
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'nickname': b64decode(obj.name)
             }
 
         else:

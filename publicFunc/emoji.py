@@ -22,7 +22,8 @@ baiyan = b64decode('8J+ZhO+4jw==')
 zhayan = b64decode('8J+YiQ==')
 
 
-
+# 钱
+qian = b64decode('8J+StO+4jw==')
 
 
 
@@ -32,6 +33,6 @@ zhayan = b64decode('8J+YiQ==')
 
 
 if __name__ == '__main__':
-    encode =  b64encode('🙄️')
+    encode =  b64encode('💴️')
     print('encode----> ', encode)
     print(b64decode(encode))
