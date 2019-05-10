@@ -44,10 +44,10 @@ class SelectForm(forms.Form):
                 remaining_days = (objs[0].overdue_date - now_date_obj).days
                 msg = ''
 
-                if objs[0].overdue_date == now_date: # 今天到期
-                    remaining_days = 1
 
                 if remaining_days <= 7:
+                    if objs[0].overdue_date == now_date: # 今天到期
+                        remaining_days = '今'
                     msg = '您的会员剩余' + str(remaining_days) + '天到期, 避免正常使用, 请及时续费{}'.format(baiyan)
 
                 return user_id, msg

@@ -227,7 +227,7 @@ def user_oper(request, oper_type, o_id):
             if remaining_days <= 0:
 
                 if remaining_days == 0:
-                    remaining_days = 1
+                    remaining_days = '今'
                 else:
                     remaining_days = 0
                     obj.vip_type = 0
@@ -239,7 +239,7 @@ def user_oper(request, oper_type, o_id):
             response.data = {
                 'vip_type': vip_type,
                 'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
-                'remaining_days': remaining_days
+                'remaining_days': str(remaining_days) + '天'
             }
 
             response.note = {
