@@ -3,7 +3,7 @@ from django import forms
 from api import models
 # from publicFunc import account
 import datetime
-
+from publicFunc.emoji import baiyan
 
 # 判断是否是数字
 class SelectForm(forms.Form):
@@ -32,10 +32,23 @@ class SelectForm(forms.Form):
         objs = models.Userprofile.objects.filter(id=user_id)
         if objs and objs[0].overdue_date:
             now_date = datetime.date.today()
-            if objs[0].overdue_date >= now_date:
-                return user_id
+            if objs[0].overdue_date >= now_date: # 未过期
+
+                # 时间对象 - 年月日时分秒
+                now_datetime_obj = datetime.datetime.now()
+
+                # 时间对象 - 年月日
+                now_date_obj = datetime.date(now_datetime_obj.year, now_datetime_obj.month, now_datetime_obj.day)
+
+                # 计算剩余天数
+                remaining_days = (objs[0].overdue_date - now_date_obj).days
+                msg = ''
+                if remaining_days <= 7:
+                    msg = '您的会员剩余' + str(remaining_days) + '天到期, 避免正常使用, 请及时续费{}'.format(baiyan)
+                return user_id, msg
             else:
                 self.add_error('user_id', '您的会员已经到期, 为了避免您的正常使用, 请续费继续使用')
+                objs.update(vip_type=0)
         else:
             if not objs:
                 self.add_error('user_id', '非法用户')

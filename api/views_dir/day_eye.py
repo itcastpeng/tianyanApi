@@ -48,7 +48,7 @@ def day_eye(request):
         if forms_obj.is_valid():
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
-            user_id = forms_obj.cleaned_data['user_id']
+            user_id, message = forms_obj.cleaned_data['user_id']
 
             objs = models.day_eye_celery.objects.filter(user_id=user_id)
             count = objs.count()
@@ -74,6 +74,7 @@ def day_eye(request):
             response.data = {
                 'ret_data': ret_data,
                 'count': count,
+                'message': message,
             }
             response.note = {
                 'customer_id': "查看人ID",
@@ -81,6 +82,7 @@ def day_eye(request):
                 'customer__set_avator': '客户头像',
                 'text': '显示的文字',
                 'status': '区分 文章还是商品',
+                'message': '展示的文字/判断是否为空 为空不显示',
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
