@@ -24,74 +24,28 @@ def weixin_pay(request, oper_type, o_id):
         # 预支付
         if oper_type == 'yuZhiFu':
             pay_type = request.GET.get('pay_type') # 支付方式 余额支付/微信支付
-            # try:
-            fee_objs = models.renewal_management.objects.filter(id=o_id)
-            if fee_objs:
-                models.renewal_log.objects.filter(create_user_id=user_id, isSuccess=0).delete() # 删除未付款的订单
+            try:
+                fee_objs = models.renewal_management.objects.filter(id=o_id)
+                if fee_objs:
+                    models.renewal_log.objects.filter(create_user_id=user_id, isSuccess=0).delete() # 删除未付款的订单
 
-                userObjs = models.Userprofile.objects.filter(id=user_id)
-                user_obj = userObjs[0]
-                fee_obj = fee_objs[0]
+                    userObjs = models.Userprofile.objects.filter(id=user_id)
+                    user_obj = userObjs[0]
+                    fee_obj = fee_objs[0]
 
-                price = int(fee_obj.price)                                                  # 支付钱数
-                get_the_length_display = fee_obj.get_the_length_display()                   # 续费时长 (几个月/几年)
-                renewal_number_days = fee_obj.renewal_number_days                           # 续费天数
-                overdue_date = (user_obj.overdue_date + datetime.timedelta(days=renewal_number_days))  # 续费后 到期时间
-                dingdanhao = weixin_pay_api_obj.shengcheng_dingdanhao()                     # 订单号
+                    price = int(fee_obj.price)                                                  # 支付钱数
+                    get_the_length_display = fee_obj.get_the_length_display()                   # 续费时长 (几个月/几年)
+                    renewal_number_days = fee_obj.renewal_number_days                           # 续费天数
+                    overdue_date = (user_obj.overdue_date + datetime.timedelta(days=renewal_number_days))  # 续费后 到期时间
+                    dingdanhao = weixin_pay_api_obj.shengcheng_dingdanhao()                     # 订单号
 
-                order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 查询订单日志
-                if not order_objs:
+                    order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 查询订单日志
+                    if not order_objs:
 
-                    # 余额支付
-                    if pay_type == 'balance_payment':
-                        # 创建订单
-                        ren_obj = models.renewal_log.objects.create(
-                            pay_order_no=dingdanhao,
-                            the_length=get_the_length_display,  # 续费时长
-                            renewal_number_days=renewal_number_days,
-                            create_user_id=user_id,
-                            price=price,
-                            original_price=fee_obj.original_price,  # 原价
-                            overdue_date=overdue_date,
-                        )
-                        if float(user_obj.make_money) >= price:
-                            userObjs.update(make_money=F('make_money') - price)
-                            # 修改到期时间
-                            userObjs.update(
-                                overdue_date=overdue_date,
-                                vip_type=2,  # 更改为高级会员
-                            )
-                            ren_obj.isSuccess = 1
-                            response.code = 200
-                            response.msg = '支付成功'
-                        else:
-                            ren_obj.isSuccess = 0
-                            response.code = 301
-                            response.msg = '余额不足'
-                        ren_obj.save()
-
-
-                    # 微信支付
-                    else:
-                        data = get_ent_info(user_id)  # 获取用户信息
-                        weixin_obj = WeChatApi(data)  # 获取用户公众号信息
-                        appid = weixin_obj.APPID  # appid
-                        APPSECRET = weixin_obj.APPSECRET  # 商户号
-                        data = {
-                            'total_fee': price,  # 金额(分 为单位)
-                            'openid': user_obj.openid,  # 微信用户唯一标识
-                            'appid': appid,  # appid
-                            'dingdanhao': dingdanhao  # 生成订单号
-                        }
-
-                        # price = price * 100                       # 单位 分
-                        result = weixin_pay_api_obj.yuzhifu(data)  # 预支付
-                        return_code = result.get('return_code')
-                        return_msg = result.get('return_msg')
-                        prepay_id = result.get('prepay_id')['prepay_id']
-
-                        if return_code == 'SUCCESS':  # 判断预支付返回参数 是否正确
-                            models.renewal_log.objects.create(
+                        # 余额支付
+                        if pay_type == 'balance_payment':
+                            # 创建订单
+                            ren_obj = models.renewal_log.objects.create(
                                 pay_order_no=dingdanhao,
                                 the_length=get_the_length_display,  # 续费时长
                                 renewal_number_days=renewal_number_days,
@@ -100,37 +54,87 @@ def weixin_pay(request, oper_type, o_id):
                                 original_price=fee_obj.original_price,  # 原价
                                 overdue_date=overdue_date,
                             )
+                            if float(user_obj.make_money) >= price:
+                                userObjs.update(make_money=F('make_money') - price)
+                                # 修改到期时间
+                                userObjs.update(
+                                    overdue_date=overdue_date,
+                                    vip_type=2,  # 更改为高级会员
+                                )
+                                ren_obj.isSuccess = 1
+                                response.code = 200
+                                response.msg = '支付成功'
+                            else:
+                                ren_obj.isSuccess = 0
+                                response.code = 301
+                                response.msg = '余额不足'
+                            ren_obj.save()
 
-                            # 返回数据
-                            data_dict = {
-                                'appId': appid,
-                                'timeStamp': int(time.time()),
-                                'nonceStr': weixin_pay_api_obj.generateRandomStamping(),
-                                'package': 'prepay_id=' + prepay_id,
-                                'signType': 'MD5'
-                            }
-                            SHANGHUKEY = weixin_pay_api_obj.SHANGHUKEY
-                            stringSignTemp = weixin_pay_api_obj.shengchengsign(data_dict, SHANGHUKEY)
-                            data_dict['paySign'] = weixin_pay_api_obj.md5(stringSignTemp).upper()  # upper转换为大写
 
-                            response.data = data_dict
-                            response.code = 200
-                            response.msg = '预支付请求成功'
+                        # 微信支付
                         else:
-                            response.code = 301
-                            response.msg = '支付失败, 原因:{}'.format(return_msg)
+                            data = get_ent_info(user_id)  # 获取用户信息
+                            weixin_obj = WeChatApi(data)  # 获取用户公众号信息
+                            appid = weixin_obj.APPID  # appid
+                            APPSECRET = weixin_obj.APPSECRET  # 商户号
+                            data = {
+                                'total_fee': price,  # 金额(分 为单位)
+                                'openid': user_obj.openid,  # 微信用户唯一标识
+                                'appid': appid,  # appid
+                                'dingdanhao': dingdanhao  # 生成订单号
+                            }
 
-            else:
-                response.code = 301
-                response.msg = '请选择一项会员'
-            # except Exception as e:
-            #     if pay_type balance_payment
-            #     msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
-            #         '用户支付报错--->用户ID{}充值ID{} '.format(user_id, o_id),
-            #         e,
-            #         datetime.datetime.today()
-            #     )
-            #     celery_error_warning(msg)
+                            # price = price * 100                       # 单位 分
+                            result = weixin_pay_api_obj.yuzhifu(data)  # 预支付
+                            return_code = result.get('return_code')
+                            return_msg = result.get('return_msg')
+                            prepay_id = result.get('prepay_id')['prepay_id']
+
+                            if return_code == 'SUCCESS':  # 判断预支付返回参数 是否正确
+                                models.renewal_log.objects.create(
+                                    pay_order_no=dingdanhao,
+                                    the_length=get_the_length_display,  # 续费时长
+                                    renewal_number_days=renewal_number_days,
+                                    create_user_id=user_id,
+                                    price=price,
+                                    original_price=fee_obj.original_price,  # 原价
+                                    overdue_date=overdue_date,
+                                )
+
+                                # 返回数据
+                                data_dict = {
+                                    'appId': appid,
+                                    'timeStamp': int(time.time()),
+                                    'nonceStr': weixin_pay_api_obj.generateRandomStamping(),
+                                    'package': 'prepay_id=' + prepay_id,
+                                    'signType': 'MD5'
+                                }
+                                SHANGHUKEY = weixin_pay_api_obj.SHANGHUKEY
+                                stringSignTemp = weixin_pay_api_obj.shengchengsign(data_dict, SHANGHUKEY)
+                                data_dict['paySign'] = weixin_pay_api_obj.md5(stringSignTemp).upper()  # upper转换为大写
+
+                                response.data = data_dict
+                                response.code = 200
+                                response.msg = '预支付请求成功'
+                            else:
+                                response.code = 301
+                                response.msg = '支付失败, 原因:{}'.format(return_msg)
+
+                else:
+                    response.code = 301
+                    response.msg = '请选择一项会员'
+            except Exception as e:
+                if pay_type=='balance_payment':
+                    text = '余额支付'
+                else:
+                    text = '微信支付'
+
+                msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+                    '用户支付报错--->用户ID{}-充值ID{}-充值方式'.format(user_id, o_id, text),
+                    e,
+                    datetime.datetime.today()
+                )
+                celery_error_warning(msg)
 
 
         # 提现功能
