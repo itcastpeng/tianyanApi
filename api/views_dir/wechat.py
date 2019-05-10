@@ -186,7 +186,7 @@ def wechat(request):
                             "text": {
                                 "content": '欢迎关注微商天眼公众号！\n\n<{sex}-{name}>你终于来了!天眼已经在此等候多时!{emj_1}\n\n'
                                            '分享文章后我会告诉您谁看了您的文章, 精准追踪客户\n\n'
-                                           '快天眼客户追踪神器吧！{emj_2}\n\n'
+                                           '快进入天眼客户追踪神器吧！{emj_2}\n\n'
                                            '点击下方【天眼】{emj_3}'.format(
                                     name=nickname,
                                     emj_1=baiyan,

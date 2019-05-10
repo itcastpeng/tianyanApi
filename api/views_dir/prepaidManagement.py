@@ -10,7 +10,7 @@ from django.db.models import F, Sum
 from api.forms.withdrawal import WithdrawalForm, SelectForm
 from publicFunc.base64_encryption import b64decode
 import xml.dom.minidom as xmldom, datetime, time, json, os
-
+from api.views_dir.my_celery.celery_url import celery_error_warning
 
 
 @csrf_exempt
@@ -27,128 +27,144 @@ def weixin_pay(request, oper_type, o_id):
     if request.method == 'POST':
         # 预支付
         if oper_type == 'yuZhiFu':
-            fee_objs = models.renewal_management.objects.filter(id=o_id)
-            if fee_objs:
-                models.renewal_log.objects.filter(create_user_id=user_id, isSuccess=0).delete() # 删除未付款的订单
-                userObjs = models.Userprofile.objects.filter(id=user_id)
-                user_obj = userObjs[0]
-                fee_obj = fee_objs[0]
-                price = int(fee_obj.price)
-                # price = int(fee_obj.price) * 100
-                data = {
-                    'total_fee': price,  # 金额(分 为单位)
-                    'openid': user_obj.openid,  # 微信用户唯一标识
-                    'appid': appid,  # appid
-                }
-                result = weixin_pay_api_obj.yuzhifu(data)  # 预支付
-                return_code = result.get('return_code')
-                return_msg = result.get('return_msg')
-                dingdanhao = result.get('dingdanhao')
-                prepay_id = result.get('prepay_id')['prepay_id']
-
-                if return_code == 'SUCCESS':  # 判断预支付返回参数 是否正确
-
-                    order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 创建订单日志
-                    renewal_number_days = fee_obj.renewal_number_days  # 续费天数
-                    overdue_date = (user_obj.overdue_date + datetime.timedelta(days=renewal_number_days))  # 续费后 到期时间
-                    if not order_objs:
-                        models.renewal_log.objects.create(
-                            pay_order_no=dingdanhao,
-                            the_length=fee_obj.get_the_length_display(),  # 续费时长
-                            renewal_number_days=renewal_number_days,
-                            create_user_id=user_id,
-                            price=price,
-                            original_price=fee_obj.original_price,  # 原价
-                            overdue_date=overdue_date,
-                        )
-
-                    data_dict = {
-                        'appId': appid,
-                        'timeStamp': int(time.time()),
-                        'nonceStr': weixin_pay_api_obj.generateRandomStamping(),
-                        'package': 'prepay_id=' + prepay_id,
-                        'signType': 'MD5'
+            try:
+                fee_objs = models.renewal_management.objects.filter(id=o_id)
+                if fee_objs:
+                    models.renewal_log.objects.filter(create_user_id=user_id, isSuccess=0).delete() # 删除未付款的订单
+                    userObjs = models.Userprofile.objects.filter(id=user_id)
+                    user_obj = userObjs[0]
+                    fee_obj = fee_objs[0]
+                    price = int(fee_obj.price)
+                    # price = int(fee_obj.price) * 100
+                    data = {
+                        'total_fee': price,  # 金额(分 为单位)
+                        'openid': user_obj.openid,  # 微信用户唯一标识
+                        'appid': appid,  # appid
                     }
-                    SHANGHUKEY = weixin_pay_api_obj.SHANGHUKEY
-                    stringSignTemp = weixin_pay_api_obj.shengchengsign(data_dict, SHANGHUKEY)
-                    data_dict['paySign'] = weixin_pay_api_obj.md5(stringSignTemp).upper()  # upper转换为大写
+                    result = weixin_pay_api_obj.yuzhifu(data)  # 预支付
+                    return_code = result.get('return_code')
+                    return_msg = result.get('return_msg')
+                    dingdanhao = result.get('dingdanhao')
+                    prepay_id = result.get('prepay_id')['prepay_id']
 
-                    response.data = data_dict
-                    response.code = 200
-                    response.msg = '预支付请求成功'
+                    if return_code == 'SUCCESS':  # 判断预支付返回参数 是否正确
+
+                        order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 创建订单日志
+                        renewal_number_days = fee_obj.renewal_number_days  # 续费天数
+                        overdue_date = (user_obj.overdue_date + datetime.timedelta(days=renewal_number_days))  # 续费后 到期时间
+                        if not order_objs:
+                            models.renewal_log.objects.create(
+                                pay_order_no=dingdanhao,
+                                the_length=fee_obj.get_the_length_display(),  # 续费时长
+                                renewal_number_days=renewal_number_days,
+                                create_user_id=user_id,
+                                price=price,
+                                original_price=fee_obj.original_price,  # 原价
+                                overdue_date=overdue_date,
+                            )
+
+                        data_dict = {
+                            'appId': appid,
+                            'timeStamp': int(time.time()),
+                            'nonceStr': weixin_pay_api_obj.generateRandomStamping(),
+                            'package': 'prepay_id=' + prepay_id,
+                            'signType': 'MD5'
+                        }
+                        SHANGHUKEY = weixin_pay_api_obj.SHANGHUKEY
+                        stringSignTemp = weixin_pay_api_obj.shengchengsign(data_dict, SHANGHUKEY)
+                        data_dict['paySign'] = weixin_pay_api_obj.md5(stringSignTemp).upper()  # upper转换为大写
+
+                        response.data = data_dict
+                        response.code = 200
+                        response.msg = '预支付请求成功'
+                    else:
+                        response.code = 301
+                        response.msg = '支付失败, 原因:{}'.format(return_msg)
+
                 else:
                     response.code = 301
-                    response.msg = '支付失败, 原因:{}'.format(return_msg)
+                    response.msg = '请选择一项会员'
+            except Exception as e:
+                msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+                    '用户支付报错--->用户ID{}充值ID{} '.format(user_id, o_id),
+                    e,
+                    datetime.datetime.today()
+                )
+                celery_error_warning(msg)
 
-            else:
-                response.code = 301
-                response.msg = '请选择一项会员'
 
         # 提现功能
         elif oper_type == 'withdrawal':
-            form_data = {
-                'user_id': user_id,
-                'withdrawal_amount': request.GET.get('withdrawal_amount'), # 提现金额
-            }
-            form_objs = WithdrawalForm(form_data)
-            if form_objs.is_valid():
-                print(request.META)
-                # 当前路径
-                os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-                # 获取访问用户IP
-                if request.META.get('HTTP_X_FORWARDED_FOR'):
-                    ip = request.META['HTTP_X_FORWARDED_FOR']
-                else:
-                    ip = request.META['REMOTE_ADDR']
-
-                user_obj, withdrawal_amount = form_objs.cleaned_data.get('withdrawal_amount')
-                dingdanhao = weixin_pay_api_obj.shengcheng_dingdanhao()
-                data = {
-                    'withdrawal_amount': withdrawal_amount, # 提现金额
-                    'dingdanhao': dingdanhao,               # 订单号
-                    'appid': appid,                         # appid
-                    'openid': user_obj.openid,              # openid
-                    'user_id': user_id,                     # user_id
-                    'user_name': b64decode(user_obj.name),
-                    'make_money': user_obj.make_money,
-                    'ip': ip,
+            try:
+                form_data = {
+                    'user_id': user_id,
+                    'withdrawal_amount': request.GET.get('withdrawal_amount'), # 提现金额
                 }
-                response_data = weixin_pay_api_obj.withdrawal(data) # 提现
+                form_objs = WithdrawalForm(form_data)
+                if form_objs.is_valid():
+                    print(request.META)
+                    # 当前路径
+                    os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+                    # 获取访问用户IP
+                    if request.META.get('HTTP_X_FORWARDED_FOR'):
+                        ip = request.META['HTTP_X_FORWARDED_FOR']
+                    else:
+                        ip = request.META['REMOTE_ADDR']
 
-                code = response_data.get('code')
-                return_msg = response_data.get('return_msg')
+                    user_obj, withdrawal_amount = form_objs.cleaned_data.get('withdrawal_amount')
+                    dingdanhao = weixin_pay_api_obj.shengcheng_dingdanhao()
+                    data = {
+                        'withdrawal_amount': withdrawal_amount, # 提现金额
+                        'dingdanhao': dingdanhao,               # 订单号
+                        'appid': appid,                         # appid
+                        'openid': user_obj.openid,              # openid
+                        'user_id': user_id,                     # user_id
+                        'user_name': b64decode(user_obj.name),
+                        'make_money': user_obj.make_money,
+                        'ip': ip,
+                    }
+                    response_data = weixin_pay_api_obj.withdrawal(data) # 提现
 
-                make_money = float(user_obj.make_money)             # 用户待提钱数
-                withdrawal_amount = withdrawal_amount    # 用户提现钱数
-                withdrawal_after = make_money - withdrawal_amount   # 待提钱数减去提现钱数
+                    code = response_data.get('code')
+                    return_msg = response_data.get('return_msg')
 
-                if code == 200:
-                    is_success = 1 # 是否提现成功
-                    response.code = 200
-                    # 减去提现的钱数
-                    user_money_obj = models.Userprofile.objects.get(id=user_id)
-                    user_money_obj.make_money = F('make_money') - withdrawal_amount
-                    user_money_obj.save()
+                    make_money = float(user_obj.make_money)             # 用户待提钱数
+                    withdrawal_amount = withdrawal_amount    # 用户提现钱数
+                    withdrawal_after = make_money - withdrawal_amount   # 待提钱数减去提现钱数
 
+                    if code == 200:
+                        is_success = 1 # 是否提现成功
+                        response.code = 200
+                        # 减去提现的钱数
+                        user_money_obj = models.Userprofile.objects.get(id=user_id)
+                        user_money_obj.make_money = F('make_money') - withdrawal_amount
+                        user_money_obj.save()
+
+                    else:
+                        is_success = 0
+                        response.code = 301
+
+                    models.withdrawal_log.objects.create(           # 创建提现记录
+                        user_id=user_id,
+                        withdrawal_befor=make_money,           # 提现前 待提钱数
+                        withdrawal_amount=withdrawal_amount,  # 提现金额
+                        withdrawal_after=withdrawal_after,  # 提现后 待提钱数
+                        is_success=is_success,
+                        wechat_returns_data=return_msg,
+                        dingdanhao=dingdanhao
+                    )
+
+                    response.msg = return_msg
                 else:
-                    is_success = 0
                     response.code = 301
-
-                models.withdrawal_log.objects.create(           # 创建提现记录
-                    user_id=user_id,
-                    withdrawal_befor=make_money,           # 提现前 待提钱数
-                    withdrawal_amount=withdrawal_amount,  # 提现金额
-                    withdrawal_after=withdrawal_after,  # 提现后 待提钱数
-                    is_success=is_success,
-                    wechat_returns_data=return_msg,
-                    dingdanhao=dingdanhao
+                    response.msg = json.loads(form_objs.errors.as_json())
+            except Exception as e:
+                msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+                    '用户提现报错--->用户ID{}, 提现钱数{} '.format(user_id, request.GET.get('withdrawal_amount')),
+                    e,
+                    datetime.datetime.today()
                 )
-
-                response.msg = return_msg
-            else:
-                response.code = 301
-                response.msg = json.loads(form_objs.errors.as_json())
-
+                celery_error_warning(msg)
     else:
 
         # 提现记录
