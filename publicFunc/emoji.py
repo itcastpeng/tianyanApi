@@ -16,7 +16,7 @@ nanshou = b64decode('8J+Ynw==')
 caidai = b64decode('8J+OiQ==')
 
 # 白眼🙄
-baiyan = b64decode('8J+ZhA==')
+baiyan = b64decode('8J+ZhO+4jw==')
 
 # 眨眼
 zhayan = b64decode('8J+YiQ==')
@@ -32,6 +32,6 @@ zhayan = b64decode('8J+YiQ==')
 
 
 if __name__ == '__main__':
-    encode =  b64encode('😉')
+    encode =  b64encode('🙄️')
     print('encode----> ', encode)
     print(b64decode(encode))
