@@ -371,7 +371,7 @@ def payback(request):
                                 # 创建充值分销人应得钱数日志
                                 models.distribute_money_log.objects.create(
                                     user_id=renewal_log_obj.create_user_id,
-                                    inviter_id=inviter_id,
+                                    inviter_id=two_inviter_id,
                                     price=price,
                                     money=cumulative_amount
                                 )
