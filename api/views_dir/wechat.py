@@ -179,10 +179,11 @@ def wechat(request):
                             "touser": openid,
                             "msgtype": "text",
                             "text": {
-                                "content": '欢迎关注微商天眼公众号！\n\n{emj_1}衣带渐宽终不悔，为你消得人憔悴!\n\n'
+                                "content": '欢迎关注微商天眼公众号！\n\n{emj_1}{name}你终于来了!天眼已经在此等候多时!\n\n'
                                            '分享文章后我会告诉您谁看了您的文章,\n精准追踪客户\n'
                                            '速速打开 天眼客户追踪神器吧！{emj_2}\n'
                                            '点击下方【天眼】{emj_3}'.format(
+                                    name=nickname,
                                     emj_1=baiyan,
                                     emj_2=zhayan,
                                     emj_3=xiajiantou
