@@ -21,9 +21,9 @@ class weixin_pay_api(WeixinApiPublic):
         openid = data.get('openid')
         total_fee = data.get('total_fee')
         appid = data.get('appid')
+        dingdanhao = data.get('dingdanhao')
         url = 'https://api.mch.weixin.qq.com/pay/unifiedorder'  # 微信支付接
 
-        dingdanhao = self.shengcheng_dingdanhao()       # 生成订单号
         result_data = {
             'appid': appid,                             # appid
             'mch_id': self.mch_id,                      # 商户号
