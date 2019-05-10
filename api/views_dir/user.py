@@ -225,10 +225,14 @@ def user_oper(request, oper_type, o_id):
 
             # 如果已经过期，则剩余过期时间为0，vip类型为vip已过期
             if remaining_days <= 0:
-                remaining_days = 0
-                obj.vip_type = 0
-                obj.save()
-                obj = models.Userprofile.objects.get(id=user_id)
+
+                if remaining_days == 0:
+                    remaining_days = 1
+                else:
+                    remaining_days = 0
+                    obj.vip_type = 0
+                    obj.save()
+                    obj = models.Userprofile.objects.get(id=user_id)
                 vip_type = obj.get_vip_type_display()
 
             response.code = 200

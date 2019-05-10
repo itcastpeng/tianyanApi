@@ -86,8 +86,7 @@ def day_eye(request):
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
-            response.code = 402
-            response.msg = "请求异常"
+            response.code = 301
             response.data = json.loads(forms_obj.errors.as_json())
     return JsonResponse(response.__dict__)
 
