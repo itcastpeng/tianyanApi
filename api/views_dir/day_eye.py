@@ -362,7 +362,7 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 按文章查看(天眼功能)列表页
             elif oper_type == 'view_by_article':
-
+                user_id, message = forms_obj.cleaned_data['user_id']
                 objs = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id
                 ).values('article_id', 'article__title').distinct().annotate(Count('id')).exclude(customer_id__isnull=True)
@@ -393,6 +393,7 @@ def day_eye_oper(request, oper_type, o_id):
                 response.data = {
                     'ret_data': ret_data,
                     'count': count,
+                    'message': message,
                 }
                 response.note = {
                     'article_id': '文章ID',
