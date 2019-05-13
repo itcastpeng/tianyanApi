@@ -120,13 +120,13 @@ class SelectForm(forms.Form):
 
 # 海报修改
 class posterInfoForm(forms.Form):
-    title = forms.CharField(
+    zhu_title = forms.CharField(
         required=True,
         error_messages={
             'invalid': "标题不能为空"
         }
     )
-    subtitle = forms.CharField(
+    fu_title = forms.CharField(
         required=True,
         error_messages={
             'invalid': "副标题不能为空"
@@ -181,19 +181,19 @@ class posterInfoForm(forms.Form):
         else:
             self.add_error('name', '名字过长')
 
-    def clean_title(self):
-        title = self.data.get('title')
+    def clean_zhu_title(self):
+        title = self.data.get('zhu_title')
         if len(title) <= 15:
             return title
         else:
-            self.add_error('title', '标题过长')
+            self.add_error('zhu_title', '标题过长')
 
-    def clean_subtitle(self):
-        subtitle = self.data.get('subtitle')
+    def clean_fu_title(self):
+        subtitle = self.data.get('fu_title')
         if len(subtitle) <= 15:
             return subtitle
         else:
-            self.add_error('subtitle', '副标题过长')
+            self.add_error('fu_title', '副标题过长')
 
     def clean_place(self):
         place = self.data.get('place')
