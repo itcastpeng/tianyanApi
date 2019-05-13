@@ -294,11 +294,13 @@ def user_oper(request, oper_type, o_id):
                     # 该用户未充值展示的话
                     prepaid_text = '用户未开通会员, 邀请付款有现金奖励{}!'.format(qian)
                     if invite_number_obj.renewal_log_set.count() >= 1: # 判断该用户是否充值
-                        money = models.distribute_money_log.objects.get(
+                        money_objs = models.distribute_money_log.objects.filter(
                             inviter_id=user_id,
                             user_id=invite_number_obj.id
-                        ).money
-                        prepaid_text = '成为会员, 加入账户{}元!{}'.format(money, qian)
+                        )
+                        if money_objs:
+                            money = money_objs[0].money
+                            prepaid_text = '成为会员, 加入账户{}元!{}'.format(money, qian)
 
                     invite_number_list.append({
                         'create_user__set_avator': invite_number_obj.set_avator,
