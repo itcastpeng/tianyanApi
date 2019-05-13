@@ -82,7 +82,7 @@ def article(request):
                 q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False), Q.AND) # 没有选择推荐的用户默认 推荐系统标签的
                 order_by = '-like_num'
 
-            elif team_list and len(team_list) >= 1 :  # 团队
+            elif team_list:  # 团队
                 q.add(Q(create_user_id=user_id), Q.OR)
                 order_by = '-like_num'
 
