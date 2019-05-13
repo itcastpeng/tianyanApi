@@ -76,7 +76,6 @@ def article(request):
 
 
             if classify_type and classify_type == 2:  # 我的品牌
-                q.add(Q(create_user_id=user_id), Q.OR)
                 order_by = '-like_num'
 
             elif classify_type and classify_type == 1 and len(classify_id_list) > 0: # 推荐为空
@@ -84,6 +83,7 @@ def article(request):
                 order_by = '-like_num'
 
             elif team_list and len(team_list) >= 1 :  # 团队
+                q.add(Q(create_user_id=user_id), Q.OR)
                 order_by = '-like_num'
 
             else:
