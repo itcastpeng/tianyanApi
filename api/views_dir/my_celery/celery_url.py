@@ -271,39 +271,51 @@ def last_active_time(request):
     response = Response.ResponseObj()
     try:
         now = datetime.datetime.today()
-        start_time = (now - datetime.timedelta(days=1, minutes=10))
-        stop_time = (now - datetime.timedelta(days=1))
+        Yesterday = (now - datetime.timedelta(days=1))
+
         # 最后活跃时间 至当前 差十分钟 满24小时
         objs = models.Userprofile.objects.filter(
             openid__isnull=False,
             last_active_time__isnull=False,
-            last_active_time__gte=start_time,
-            last_active_time__lte=stop_time,
             is_send_msg=0,                      # 未发送过消息的
         )
-        print('start_time, stop_time, now-------> ', start_time, stop_time, now)
         for obj in objs:
-            print('--------------------马上超过24小时', obj.id)
-            obj.is_send_msg = 1
-            obj.save()
+            last_active_time = obj.last_active_time
+            active_time_hms = last_active_time.strftime('%H:%M:%S')
+            active_time_hms_start = datetime.datetime.strptime(active_time_hms, '%H:%M:%S')
+            start_time_active_time_hms = (active_time_hms_start - datetime.timedelta(minutes=10))
 
-            emj = caidai + xiajiantou + caidai
-            post_data = {
-                "touser": obj.openid,
-                "msgtype": "text",
-                "text": {
-                    "content": """天眼将暂停为您推送消息!\n微信限制于超过24小时未互动,公众号则不能发送消息{}\n快来点击下方获客文章解除限制\n{}""".format(
-                        nanshou, emj
-                    )
+            start_time = Yesterday.strftime('%Y-%m-%d') + ' ' + start_time_active_time_hms.strftime('%H:%M:%S')
+            stop_time = Yesterday.strftime('%Y-%m-%d') + ' ' + active_time_hms
+
+            start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
+            stop_time = datetime.datetime.strptime(stop_time, '%Y-%m-%d %H:%M:%S')
+
+            if last_active_time >= start_time and last_active_time <= stop_time:
+                print(start_time, stop_time)
+                print('--------------------马上超过24小时', obj.id)
+                obj.is_send_msg = 1
+                obj.save()
+
+                emj = caidai + xiajiantou + caidai
+                post_data = {
+                    "touser": obj.openid,
+                    "msgtype": "text",
+                    "text": {
+                        "content": """天眼将暂停为您推送消息!\n微信限制于超过24小时未互动,公众号则不能发送消息{}\n快来点击下方获客文章解除限制\n{}""".format(
+                            nanshou, emj
+                        )
+                    }
                 }
-            }
-            data = get_ent_info(obj.id)
-            weixin_objs = WeChatApi(data)
+                data = get_ent_info(obj.id)
+                weixin_objs = WeChatApi(data)
 
-            # 发送客服消息
-            post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-            weixin_objs.news_service(post_data)
-        response.code = 200
+                # 发送客服消息
+                post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+                weixin_objs.news_service(post_data)
+                response.code = 200
+            else:
+                continue
     except Exception as e:
         msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
             'celery_活跃即将超时发送消息报错---警告',

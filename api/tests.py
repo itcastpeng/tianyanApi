@@ -122,103 +122,48 @@
 #
 # print(title, summary, cover_url, content)
 
-
-from django.shortcuts import render
-from publicFunc import Response
-from publicFunc import account
-from django.http import JsonResponse
-from django.views.decorators.csrf import csrf_exempt, csrf_protect
-from django.db.models import Max, Avg, F, Q, Min, Count, Sum
 import datetime
-import json, base64
-from django.db.models import Q, Count
+now = '2019-05-13 09:05:00'
+now_date = datetime.datetime.strptime(now, '%Y-%m-%d %H:%M:%S')
 
-from bs4 import BeautifulSoup
-import time
-import requests
-import re, os
-from urllib.parse import unquote
-# def deal_gzh_picture_url(leixing, url):
-#     '''
-#     ata-src 替换为src，将微信尾部?wx_fmt=jpeg去除
-#     http://mmbiz.qpic.cn/mmbiz_jpg/icg7bNmmiaWLhUcPY7I4r6wvBFRLSTJ6L7lBRILWoKKVuvdHe4BmVxhiclQnYo2F1TDU7CcibXawl9E2n1MOicTkt6w/0?wx_fmt=jpeg
+print(type(now_date))
 
-#     '''
-#     # content = 'data-src="111?wx_fmt=png data-src="222?wx_fmt=jpg'
-#     # phone = "2004-959-559#这是一个电话号码"
-#     # # 删除注释
-#     # num = re.sub(r'#.*$', "", phone)
-#     # print("电话号码 : ", num)
-#
-#     # 移除非数字的内容
-#     # url = 'https://mp.weixin.qq.com/s?__biz=MzA5NzQxODgzNw==&mid=502884331&idx=1&sn=863da48ef5bd01f5ba8ac30d45fea912&chksm=08acecd13fdb65c72e407f973c4db69a988a93a169234d2c4a95c0ca6c97054adff54c48a24f#rd'
-#
-# #     ret = requests.get(url)
-# #
-# #     ret.encoding = 'utf8'
-# #
-# #     soup = BeautifulSoup(ret.text, 'lxml')
-# #
-# #     img_tags = soup.find_all('img')
-# #     for img_tag in img_tags:
-# #         if img_tag.attrs.get('style'):
-# #             style_list = img_tag.attrs.get('style').split(';')
-# #             style_tag = ''
-# #             for i in style_list:
-# #                 if i and i.split(':')[0] == 'width':
-# #                     style_tag = i.split(':')[1]
-# #
-# #             img_tag.attrs['style'] = style_tag
-# #
-# #         data_src = img_tag.attrs.get('data-src')
-# #
-# #
-# #
-# #
-# # if __name__ == '__main__':
-# #     deal_gzh_picture_url('only_url', 'https://mp.weixin.qq.com/s/dQdgO3OAIvzIOi8lmtoAog')
+start_time = (now_date - datetime.timedelta(days=1, minutes=10))
+stop_time = (now_date - datetime.timedelta(days=1))
+
+print(start_time, stop_time)
+p = '2019-05-12 09:03:56'
 
 
 
-# ret_data = {
-#     "note":{
-#         "title":"文章标题",
-#         "cover_img":"文章封面"
-#     },
-#     "msg":"查询成功",
-#     "data":{
-#         "ret_data":[
-#             {
-#                 "summary":"4oCL572R5LiK55qE5Z+L57q/5a+55q+U5Zu+5pWI5p6c5aW95Yiw5b+D5Yqo77yM5Yiw5bqV6IO95LiN6IO95YGa5ZGi77yf",
-#                 "id":1285,
-#                 "cover_img":"statics/img/cover_1555035227.7503235.jpg",
-#                 "title":"医美经|揭开线雕的秘密"
-#             },
-#             {
-#                 "summary":"6ZiF6K+75pys5paH5YmN77yM6K+35oKo5YWI54K55Ye75LiK6Z2i55qE6JOd6Imy5a2X5L2T4oCc6K+05oOF5oSf5LqL4oCd77yM5YaN54K55Ye74oCc5YWz5rOo4oCd77yM6L+Z5qC35oKo5bCx5Y+v5Lul57un57ut5YWN6LS55pS25Yiw5pyA5paw5paH56ug5LqG44CC5q+P5aSp6YO9",
-#                 "id":1541,
-#                 "cover_img":"statics/img/cover_1555293009.808119.jpg",
-#                 "title":"情感故事：算了吧！放弃这段你自己所谓的“情”吧！"
-#             },
-#             {
-#                 "summary":"44CK56ys5LqU5Lq65qC844CL5pys5ZGo5pu05paw6aKE6KeI",
-#                 "id":1030,
-#                 "cover_img":"statics/img/cover_1555032853.8592942.jpg",
-#                 "title":"【新情报】“深渊的呼唤”主题时装终于要和大家见面啦"
-#             }
-#         ],
-#         "count":3
-#     },
-#     "code":200
 
-from publicFunc.base64_encryption import b64decode, b64encode
 
-title = '在现代社会中,有一句大家十分熟悉的话:计划赶不上变化、世界唯一不变的就是变!由此可以理解到其中的哲学道理,在生命的个体上、或者在生活皀'
-encode = b64encode(title)
-print('encode-------> ', len(encode))
 
-decode = b64decode(encode)
-print(decode)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
