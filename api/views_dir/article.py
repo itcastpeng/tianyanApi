@@ -45,11 +45,15 @@ def article(request):
                 classify_objs = None
                 if classify_type == 1:  # 推荐分类
                     classify_objs = user_obj.recommend_classify.all()
+                    classify_id_list = [obj.id for obj in classify_objs]
+                    if len(classify_id_list) > 0:
+                        q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
+
                 elif classify_type == 2:    # 品牌分类
                     classify_objs = user_obj.brand_classify.all()
-                if classify_objs:
                     classify_id_list = [obj.id for obj in classify_objs]
-                q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
+                    q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
+
 
             # 团队
             if team_list and len(team_list) >= 1:
@@ -73,12 +77,12 @@ def article(request):
                 q.add(Q(**{'id__in':article_list}), Q.AND)
 
 
-
+            print('------------------classify_id_list-----------> ', classify_id_list)
 
             if classify_type and classify_type == 2:  # 我的品牌
                 order_by = '-like_num'
 
-            elif classify_type and classify_type == 1 and len(classify_id_list) > 0: # 推荐为空
+            elif classify_type and classify_type == 1 and len(classify_id_list) <= 0: # 推荐为空
                 q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False), Q.AND) # 没有选择推荐的用户默认 推荐系统标签的
                 order_by = '-like_num'
 
@@ -107,7 +111,6 @@ def article(request):
             ret_data = []
             # 返回的数据
             for obj in objs:
-                print('--------------> ', obj.id)
                 is_like = False # 是否点赞
                 log_obj = models.SelectClickArticleLog.objects.filter(
                     article_id=obj.id,
@@ -123,8 +126,8 @@ def article(request):
                     classify_name_list = [obj.get('name') for obj in obj.classify.values('name')]
 
                 summary = obj.summary
-                # if obj.summary:
-                #     summary = b64decode(obj.summary)
+                if obj.summary:
+                    summary = b64decode(obj.summary)
 
                 result_data = {
                     'id': obj.id,
