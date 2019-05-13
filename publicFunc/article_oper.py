@@ -48,8 +48,8 @@ def add_article_public(data, classify_id=None):
         style=data.get('style')
     )
     if not article_objs:
-        if not classify_id:
-            classify_id = 1  # 默认合众康桥
+        # if not classify_id:
+        #     classify_id = 1  # 默认合众康桥
         print('-------***不存在 创建文章*****-----')
         obj = models.Article.objects.create(**data)
         if classify_id:

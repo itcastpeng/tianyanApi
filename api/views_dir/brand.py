@@ -121,7 +121,7 @@ def brand_oper(request, oper_type, o_id):
             response.msg = "删除成功"
 
     else:
-        # 获取我的品牌列表
+        # 获取我创建的品牌 列表
         if oper_type == "get_brand_list":
             brand_objs = models.Userprofile.objects.get(id=user_id).brand_classify.all()
 
