@@ -271,9 +271,10 @@ def last_active_time(request):
     response = Response.ResponseObj()
     try:
         now = datetime.datetime.today()
-        Yesterday = (now - datetime.timedelta(days=1))
+        stop_Yesterday = (now - datetime.timedelta(days=1))
+        start_Yesterday = (now - datetime.timedelta(days=1, minutes=5))
 
-        # 最后活跃时间 至当前 差十分钟 满24小时
+        # 最后活跃时间 至当前 差5分钟 满24小时
         objs = models.Userprofile.objects.filter(
             openid__isnull=False,
             last_active_time__isnull=False,
@@ -281,28 +282,17 @@ def last_active_time(request):
         )
         for obj in objs:
             last_active_time = obj.last_active_time
-            active_time_hms = last_active_time.strftime('%H:%M:%S')
-            active_time_hms_start = datetime.datetime.strptime(active_time_hms, '%H:%M:%S')
-            start_time_active_time_hms = (active_time_hms_start - datetime.timedelta(minutes=10))
-
-            start_time = Yesterday.strftime('%Y-%m-%d') + ' ' + start_time_active_time_hms.strftime('%H:%M:%S')
-            stop_time = Yesterday.strftime('%Y-%m-%d') + ' ' + active_time_hms
-
-            start_time = datetime.datetime.strptime(start_time, '%Y-%m-%d %H:%M:%S')
-            stop_time = datetime.datetime.strptime(stop_time, '%Y-%m-%d %H:%M:%S')
-
-            if last_active_time >= start_time and last_active_time <= stop_time:
-                print(start_time, stop_time)
-                print('--------------------马上超过24小时', obj.id)
+            if last_active_time >= start_Yesterday and last_active_time <= stop_Yesterday:
                 obj.is_send_msg = 1
                 obj.save()
 
+                print('----------------e----马上超过24小时, 发送消息', obj.id)
                 emj = caidai + xiajiantou + caidai
                 post_data = {
                     "touser": obj.openid,
                     "msgtype": "text",
                     "text": {
-                        "content": """天眼将暂停为您推送消息!\n微信限制于超过24小时未互动,公众号则不能发送消息{}\n快来点击下方获客文章解除限制\n{}""".format(
+                        "content": """天眼将暂停为您推送消息!\n微信限制于超过24小时未互动,公众号则不能发送消息{}\n快来点击下方获客文章解除限制吧！！\n{}""".format(
                             nanshou, emj
                         )
                     }
