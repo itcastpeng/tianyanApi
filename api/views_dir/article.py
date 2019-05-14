@@ -10,9 +10,9 @@ from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
 from publicFunc.forwarding_article import forwarding_article
-import requests, datetime, random, json
 from publicFunc.article_oper import add_article_public
 from tianyan_celery.tasks import customer_view_articles_send_msg
+import requests, datetime, random, json, redis
 
 # token验证 文章展示模块
 @account.is_token(models.Userprofile)
@@ -21,13 +21,14 @@ def article(request):
     user_id = request.GET.get('user_id')
     team_list = request.GET.get('team_list')
     if request.method == "GET":
-        print('request.GET-----------> ', request.GET)
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
+            redis_key = 'tianyan_article_fixed_{}'.format(user_id)
+            rc = redis.StrictRedis(host='redis_host', port=6379, db=7, decode_responses=True)
+
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
-            print('forms_obj.cleaned_data -->', forms_obj.cleaned_data)
-            order = request.GET.get('order', '-create_datetime')
+
             field_dict = {
                 'id': '',
                 'title': '__contains',
@@ -39,181 +40,228 @@ def article(request):
             q = conditionCom(request, field_dict)
             user_obj = models.Userprofile.objects.get(id=user_id)
 
-            classify_type = forms_obj.cleaned_data.get('classify_type')    # 分类类型，1 => 推荐, 2 => 品牌
-            classify_id_list = []
-            if classify_type:
-                classify_objs = None
-                if classify_type == 1:  # 推荐分类
-                    classify_objs = user_obj.recommend_classify.all()
-                    classify_id_list = [obj.id for obj in classify_objs]
-                    if len(classify_id_list) > 0:
-                        q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
+            """
+            用户查看文章页面时 点击别的操作 会刷新页面  需求： 点击别的操作不刷新页面 数据还是原来的 只有点击刷新 才变页面数据
+            解决方法：{
+                每个人一个ID 如：article_fixed_{user_id}，
+                每次查询 未传 fixed_content 参数情况下 推荐查询 记录本次数据 返回查询码，
+                传递 fixed_content 参数 查询上次数据，
+                传递 fixed_content 参数 且 传递add_fixed_content参数 单做查询 插入原有固定数据 证明翻页 
+                redis-hash数据  name:tianyan_article_fixed_content  key:tianyan_article_fixed_{user_id}
+            }            
+            """
 
-                elif classify_type == 2:    # 品牌分类
-                    classify_objs = user_obj.brand_classify.all()
-                    classify_id_list = [obj.id for obj in classify_objs]
-                    q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
+            fixed_content = request.GET.get('fixed_content')  # 固定内容键  查询上次查询过的数据
+            add_fixed_content = request.GET.get('add_fixed_content')  # 下拉固定内容 添加固定内容
 
-
-            # 团队
-            if team_list and len(team_list) >= 1:
-                article_list = []
-                team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)  # 查询出该用户所有团队
-                team_list = []
-                for i in team_objs:
-                    team_list.append(i.team_id)
-
-                # 查询出该团队所有用户 去重
-                team_objs = models.UserprofileTeam.objects.filter(team_id__in=team_list).values('user_id').distinct()
-                team_user_list = []
-                for team_obj in team_objs:
-                    team_user_list.append(team_obj['user_id'])
-
-                # 查询 该团队所有用户文章
-                team_user_objs = models.Article.objects.filter(create_user_id__in=team_user_list)   # 查询该团队 所有文章
-                for i in team_user_objs:
-                    article_list.append(i.id)
-
-                q.add(Q(**{'id__in':article_list}), Q.AND)
-
-
-            print('------------------classify_id_list-----------> ', classify_id_list)
-
-            if classify_type and classify_type == 2:  # 我的品牌
-                order_by = '-like_num'
-
-            elif classify_type and classify_type == 1 and len(classify_id_list) <= 0: # 推荐为空
-                q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False), Q.AND) # 没有选择推荐的用户默认 推荐系统标签的
-                order_by = '-like_num'
-
-            elif team_list:  # 团队
-                q.add(Q(create_user_id=user_id), Q.OR)
-                order_by = '-like_num'
+            if fixed_content and not add_fixed_content: # 查询上次内容  且未下拉
+                data = rc.hget('tianyan_article_fixed_content', redis_key)
+                ret_data = eval(data)
+                count = len(ret_data)
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    ret_data = ret_data[start_line: stop_line]
 
             else:
-                order_by = '?'
-
-            objs = models.Article.objects.filter(
-                q,
-            ).order_by(order_by)
-
-            print('q -->', q, order_by)
-
-            count = objs.count()
-
-            if length != 0:
-                start_line = (current_page - 1) * length
-                stop_line = start_line + length
-                objs = objs[start_line: stop_line]
-
-            id = request.GET.get('id')
-
-            ret_data = []
-            # 返回的数据
-            for obj in objs:
-                is_like = False # 是否点赞
-                log_obj = models.SelectClickArticleLog.objects.filter(
-                    article_id=obj.id,
-                    user_id=user_id
-                )
-                if log_obj:
-                    is_like = True
-
+                classify_type = forms_obj.cleaned_data.get('classify_type')  # 分类类型，1 => 推荐, 2 => 品牌
                 classify_id_list = []
-                classify_name_list = []
-                if obj.classify:
-                    classify_id_list = [obj.get('id') for obj in obj.classify.values('id')]
-                    classify_name_list = [obj.get('name') for obj in obj.classify.values('name')]
+                if classify_type:
+                    classify_objs = None
+                    if classify_type == 1:  # 推荐分类
+                        classify_objs = user_obj.recommend_classify.all()
+                        classify_id_list = [obj.id for obj in classify_objs]
+                        if len(classify_id_list) > 0:
+                            q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
 
-                summary = obj.summary
-                if obj.summary:
-                    summary = b64decode(obj.summary)
+                    elif classify_type == 2:  # 品牌分类
+                        classify_objs = user_obj.brand_classify.all()
+                        classify_id_list = [obj.id for obj in classify_objs]
+                        q.add(Q(**{'classify__in': classify_id_list}), Q.AND)
 
-                result_data = {
-                    'id': obj.id,
-                    'title': obj.title,
-                    'summary': summary,
-                    'look_num': obj.look_num,
-                    'like_num': obj.like_num,
-                    'classify_id_list': classify_id_list,
-                    'classify_name_list': classify_name_list,
-                    'create_user_id': obj.create_user_id,
-                    'cover_img': obj.cover_img,
-                    'is_like': is_like,                         # 是否点赞
-                    'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
-                }
-                if id: # 如果查询详情 返回文章内容  查询全部不返回 否则数据过大
-                    result_data['top_advertising'] = user_obj.top_advertising # 头部广告
-                    result_data['end_advertising'] = user_obj.end_advertising # 底部广告
-                    is_oneself_article = False
-                    if user_id == obj.create_user_id:
-                        is_oneself_article = True
+                # 团队
+                if team_list and len(team_list) >= 1:
+                    article_list = []
+                    team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)  # 查询出该用户所有团队
+                    team_list = []
+                    for i in team_objs:
+                        team_list.append(i.team_id)
 
-                    result_data['is_oneself_article'] = is_oneself_article
-                    result_data['content'] = json.loads(obj.content)
-                    result_data['style'] = obj.style
-                    # 个人信息
-                    result_data['name'] = b64decode(user_obj.name)          # 用户名称
-                    result_data['phone_number'] = user_obj.phone_number     # 用户电话
-                    result_data['signature'] = user_obj.signature           # 用户签名
-                    result_data['set_avator'] = user_obj.set_avator         # 用户头像
-                    brand_name_list = []
-                    for i in user_obj.brand_classify.all():
-                        brand_name_list.append(i.name)
-                    result_data['brand_name'] = brand_name_list             # 用户品牌
-                    result_data['qr_code'] = user_obj.qr_code               # 用户微信二维码
+                    # 查询出该团队所有用户 去重
+                    team_objs = models.UserprofileTeam.objects.filter(team_id__in=team_list).values(
+                        'user_id').distinct()
+                    team_user_list = []
+                    for team_obj in team_objs:
+                        team_user_list.append(team_obj['user_id'])
+
+                    # 查询 该团队所有用户文章
+                    team_user_objs = models.Article.objects.filter(create_user_id__in=team_user_list)  # 查询该团队 所有文章
+                    for i in team_user_objs:
+                        article_list.append(i.id)
+
+                    q.add(Q(**{'id__in': article_list}), Q.AND)
 
 
-                     # 用户查看文章 客户字段为空 判断今天是否看过此文章 看过不记录
-                    now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
-                    log_objs = models.SelectArticleLog.objects.filter(
-                        article_id=id,
-                        inviter_id=user_id,
-                        create_datetime__gte=now
+                is_use_redis = False # 是否进行redis操作
+
+                if classify_type and classify_type == 2:  # 我的品牌
+                    order_by = '-like_num'
+
+                elif classify_type and classify_type == 1 and len(classify_id_list) <= 0:  # 推荐为空
+                    q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False),
+                        Q.AND)  # 没有选择推荐的用户默认 推荐系统标签的
+                    order_by = '-like_num'
+                    is_use_redis = True
+
+                elif team_list:  # 团队
+                    q.add(Q(create_user_id=user_id), Q.OR)
+                    order_by = '-like_num'
+
+                else:
+                    is_use_redis = True
+                    order_by = '?'
+
+
+                objs = models.Article.objects.filter(
+                    q,
+                ).order_by(order_by)
+
+                print('q -->', q, order_by)
+
+                count = objs.count()
+
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+
+                ret_data = []
+
+                id = request.GET.get('id')
+
+                # 返回的数据
+                for obj in objs:
+                    is_like = False  # 是否点赞
+                    log_obj = models.SelectClickArticleLog.objects.filter(
+                        article_id=obj.id,
+                        user_id=user_id
                     )
-                    if not log_objs:
-                        models.SelectArticleLog.objects.create(
+                    if log_obj:
+                        is_like = True
+
+                    classify_id_list = []
+                    classify_name_list = []
+                    if obj.classify:
+                        classify_id_list = [obj.get('id') for obj in obj.classify.values('id')]
+                        classify_name_list = [obj.get('name') for obj in obj.classify.values('name')]
+
+                    summary = obj.summary
+                    # if obj.summary:
+                    #     summary = b64decode(obj.summary)
+
+                    result_data = {
+                        'id': obj.id,
+                        'title': obj.title,
+                        'summary': summary,
+                        'look_num': obj.look_num,
+                        'like_num': obj.like_num,
+                        'classify_id_list': classify_id_list,
+                        'classify_name_list': classify_name_list,
+                        'create_user_id': obj.create_user_id,
+                        'cover_img': obj.cover_img,
+                        'is_like': is_like,  # 是否点赞
+                        'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
+                    }
+                    if id:  # 如果查询详情 返回文章内容  查询全部不返回 否则数据过大
+                        result_data['top_advertising'] = user_obj.top_advertising  # 头部广告
+                        result_data['end_advertising'] = user_obj.end_advertising  # 底部广告
+                        is_oneself_article = False
+                        if user_id == obj.create_user_id:
+                            is_oneself_article = True
+
+                        result_data['is_oneself_article'] = is_oneself_article
+                        result_data['content'] = json.loads(obj.content)
+                        result_data['style'] = obj.style
+                        # 个人信息
+                        result_data['name'] = b64decode(user_obj.name)  # 用户名称
+                        result_data['phone_number'] = user_obj.phone_number  # 用户电话
+                        result_data['signature'] = user_obj.signature  # 用户签名
+                        result_data['set_avator'] = user_obj.set_avator  # 用户头像
+                        brand_name_list = []
+                        for i in user_obj.brand_classify.all():
+                            brand_name_list.append(i.name)
+                        result_data['brand_name'] = brand_name_list  # 用户品牌
+                        result_data['qr_code'] = user_obj.qr_code  # 用户微信二维码
+
+                        # 用户查看文章 客户字段为空 判断今天是否看过此文章 看过不记录
+                        now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
+                        log_objs = models.SelectArticleLog.objects.filter(
                             article_id=id,
-                            inviter_id=user_id
+                            inviter_id=user_id,
+                            create_datetime__gte=now
                         )
-                        # 记录查看次数
-                        obj.look_num = F('look_num') + 1
-                        obj.save()
-                    # 热卖商品 我的里面设置是否展示
-                    goods_list = []
-                    if user_obj.show_product:
-                        good_objs = models.Goods.objects.filter(goods_classify__oper_user_id=user_id)
+                        if not log_objs:
+                            models.SelectArticleLog.objects.create(
+                                article_id=id,
+                                inviter_id=user_id
+                            )
+                            # 记录查看次数
+                            obj.look_num = F('look_num') + 1
+                            obj.save()
+                        # 热卖商品 我的里面设置是否展示
+                        goods_list = []
+                        if user_obj.show_product:
+                            good_objs = models.Goods.objects.filter(goods_classify__oper_user_id=user_id)
 
-                        good_count = good_objs.count()
-                        if good_count >= 2:
-                            good_objs = good_objs[0:2]
-                        elif good_count <= 0:
-                            good_objs = good_objs
-                        else:
-                            good_objs = good_objs[0:1]
+                            good_count = good_objs.count()
+                            if good_count >= 2:
+                                good_objs = good_objs[0:2]
+                            elif good_count <= 0:
+                                good_objs = good_objs
+                            else:
+                                good_objs = good_objs[0:1]
 
-                        for good_obj in good_objs:
-                            goods_list.append({
-                                'id': good_obj.id,
-                                # 'goods_describe': good_obj.goods_describe,  # 商品描述
-                                'price': good_obj.price,  # 商品价格
-                                'goods_name': good_obj.goods_name,  # 商品名称
-                                'cover_img': good_obj.cover_img,  # 封面图
-                            })
-                    result_data['goods_list'] = goods_list
+                            for good_obj in good_objs:
+                                goods_list.append({
+                                    'id': good_obj.id,
+                                    # 'goods_describe': good_obj.goods_describe,  # 商品描述
+                                    'price': good_obj.price,  # 商品价格
+                                    'goods_name': good_obj.goods_name,  # 商品名称
+                                    'cover_img': good_obj.cover_img,  # 封面图
+                                })
+                        result_data['goods_list'] = goods_list
 
-                if team_list and len(team_list) >= 1: # 如果查询 团队 则返回 文章创建人头像和名称
-                    result_data['create_user__name'] = obj.create_user.name
-                    result_data['create_user__set_avator'] = obj.create_user.set_avator
+                    if team_list and len(team_list) >= 1:  # 如果查询 团队 则返回 文章创建人头像和名称
+                        result_data['create_user__name'] = obj.create_user.name
+                        result_data['create_user__set_avator'] = obj.create_user.set_avator
 
-                #  将查询出来的数据 加入列表
-                ret_data.append(result_data)
+                    #  将查询出来的数据 加入列表
+                    ret_data.append(result_data)
+
+                if is_use_redis: # 进行redis缓存
+                    if not add_fixed_content: # 加入redis
+                        rc.hset('tianyan_article_fixed_content', redis_key, str(ret_data))
+
+                    else:
+                        data = rc.hget('tianyan_article_fixed_content', redis_key) # 查询出所有缓存数据
+                        rc_data = eval(data)
+                        for i in ret_data:              # 判断缓存是否有该数据  没有插入
+                            if i not in rc_data:
+                                rc_data.append(i)
+                        rc.hset('tianyan_article_fixed_content', redis_key, str(rc_data)) # 最终数据缓存进 redis
+                        ret_data = eval(rc.hget('tianyan_article_fixed_content', redis_key)) # 查询数据
+
+                        if length != 0:
+                            start_line = (current_page - 1) * length
+                            stop_line = start_line + length
+                            ret_data = ret_data[start_line: stop_line]
 
             response.code = 200
             response.msg = '查询成功'
             response.data = {
                 'ret_data': ret_data,
                 'data_count': count,
+                'rc': redis_key,    # redis_key
             }
 
             response.note = {

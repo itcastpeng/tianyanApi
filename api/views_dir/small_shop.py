@@ -151,7 +151,7 @@ def small_shop_oper(request, oper_type, o_id):
                 'freight': request.POST.get('freight', 0),  # 运费
                 'goods_describe': request.POST.get('goods_describe'),  # 商品描述
                 'point_origin': request.POST.get('point_origin'),  # 发货地
-                'goods_status': request.POST.get('goods_status', 2),  # 商品状态
+                'goods_status': request.POST.get('goods_status', 1),  # 商品状态
                 # 'goods_picture': request.POST.get('goods_picture'),  # 商品图片
                 'cover_img': request.POST.get('cover_img'),  # 封面图片
             }
