@@ -156,8 +156,8 @@ def article(request):
                         classify_name_list = [obj.get('name') for obj in obj.classify.values('name')]
 
                     summary = obj.summary
-                    # if obj.summary:
-                    #     summary = b64decode(obj.summary)
+                    if obj.summary:
+                        summary = b64decode(obj.summary)
 
                     result_data = {
                         'id': obj.id,
