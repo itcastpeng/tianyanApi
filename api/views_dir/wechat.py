@@ -82,6 +82,22 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
     }
 
     if user_objs:
+        user_obj = user_objs[0]
+        if int(user_obj.is_send_msg) == 1:  # 解除24小时未互动限制
+            post_data = {
+                "touser": user_obj.openid,
+                "msgtype": "text",
+                "text": {
+                    "content": """限制已解除, 天眼将继续为您推送消息!{}""".format(zhayan)
+                }
+            }
+            data = get_ent_info(user_obj.id)
+            weixin_objs = WeChatApi(data)
+
+            # 发送客服消息
+            post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+            weixin_objs.news_service(post_data)
+
         user_id = user_objs[0].id
         user_objs.update(**user_data)
     else:
