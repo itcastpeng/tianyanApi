@@ -255,22 +255,6 @@ class Posters(models.Model):
     )
     posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
 
-
-# 续费管理
-class renewal_management(models.Model):
-    price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
-    original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
-    the_length_choices = (
-        (1, '三个月'),
-        (2, '一年'),
-        (3, '三年'),
-    )
-    the_length = models.SmallIntegerField(verbose_name='时长', choices=the_length_choices, default=1)
-    renewal_number_days = models.IntegerField(verbose_name='续费天数', default=30)
-    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
-
-
 """团队相关 数据表"""
 
 # 团队表
@@ -332,6 +316,21 @@ class summary_message_reminder(models.Model):
 
 
 """钱相关"""
+
+# 续费管理
+class renewal_management(models.Model):
+    price = models.CharField(verbose_name='价格', max_length=128, null=True, blank=True)
+    original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
+    the_length_choices = (
+        (1, '三个月'),
+        (2, '一年'),
+        (3, '三年'),
+    )
+    the_length = models.SmallIntegerField(verbose_name='时长', choices=the_length_choices, default=1)
+    renewal_number_days = models.IntegerField(verbose_name='续费天数', default=30)
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
+
 # 续费日志
 class renewal_log(models.Model):
     pay_order_no = models.CharField(verbose_name='订单号', max_length=128, null=True, blank=True)
