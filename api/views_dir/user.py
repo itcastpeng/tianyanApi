@@ -388,6 +388,18 @@ def user_oper(request, oper_type, o_id):
                 'nickname': b64decode(obj.name)
             }
 
+        # 判断该用户是否到期 (到期后不能转发任何东西)
+        elif oper_type == 'is_whether':
+            obj = models.Userprofile.objects.get(id=user_id)
+            now = datetime.date.today()
+            flag = False
+            if obj.overdue_date >= now:
+                flag = True
+            response.code = 200
+            response.data = {
+                'flag': flag
+            }
+
         else:
             response.code = 402
             response.msg = '请求异常'
