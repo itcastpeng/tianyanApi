@@ -26,10 +26,6 @@ zhayan = b64decode('8J+YiQ==')
 qian = b64decode('8J+StO+4jw==')
 
 
-# 眨眼
-zhayan = b64decode('8J+YiQ==')
-
-
 
 
 

@@ -1,11 +1,10 @@
-
-from django.conf.urls import url
-
-
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
     upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article, html_oper, qiniu_oper
 
 from api.views_dir.my_celery import celery_url
+from django.conf.urls import url
+
+
 urlpatterns = [
 
     # 平台加入文章

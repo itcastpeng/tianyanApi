@@ -15,8 +15,9 @@ from publicFunc.screenshots import screenshots
 from publicFunc.emoji import zhayan
 from publicFunc.qiniu_oper import requests_img_download, update_qiniu
 from publicFunc.base64_encryption import b64decode
-import re, os, json, sys, datetime
 from publicFunc.emoji import qian
+from publicFunc.public import verify_mobile_phone_number
+import re, os, json, sys, datetime
 
 
 # cerf  token验证 用户展示模块
@@ -156,12 +157,11 @@ def user_oper(request, oper_type, o_id):
         # 修改手机号
         elif oper_type == "update_phone_number":
             phone_number = request.POST.get('phone_number')
-            phone_pat = re.compile('^(13\\d|14[5|7]|15\\d|166|17[3|6|7]|18\\d)\\d{8}$')
-            res = re.search(phone_pat, phone_number)
-            if res:
+            if verify_mobile_phone_number(phone_number):
                 models.Userprofile.objects.filter(id=user_id).update(phone_number=phone_number)
                 response.code = 200
                 response.msg = "修改成功"
+
             else:
                 response.code = 301
                 response.msg = "请填写正确手机号"
@@ -486,11 +486,16 @@ def user_login_oper(request, oper_type):
             user_objs = models.Userprofile.objects.create(**user_data)
 
 
-        redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1&page_type={page_type}'.format(
+        phone = False
+        if user_objs.phone_number:
+            phone = True
+
+        redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1&page_type={page_type}&phone={phone}'.format(
             host=host_url,
             token=user_objs.token,
             user_id=user_objs.id,
             page_type=oper_type,
+            phone=phone
         )
         return redirect(redirect_url)
 
