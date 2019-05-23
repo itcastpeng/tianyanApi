@@ -244,10 +244,14 @@ def day_eye_data(request):
                 create_date = i.get('create_date')
 
                 if eye_objs:
-                    if create_date >= eye_objs[0].last_click_customer:
-                        is_new_msg = True
+                    if eye_objs[0].last_click_customer:
+                        if create_date >= eye_objs[0].last_click_customer:
+                            is_new_msg = True
+                        else:
+                            is_new_msg = eye_objs[0].is_new_msg
                     else:
-                        is_new_msg = eye_objs[0].is_new_msg
+                        is_new_msg = True
+
                     eye_objs.update(
                         text = i.get('text'),
                         create_date = create_date,
