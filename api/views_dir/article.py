@@ -590,10 +590,6 @@ def article_customer_oper(request, oper_type):
             objs = models.Article.objects.filter(id=id)
             if objs:
                 obj = objs[0]
-                # 记录查看次数
-                obj.look_num = F('look_num') + 1
-                obj.save()
-
                 user_obj = models.Userprofile.objects.get(id=inviter_user_id)
 
                 is_like = False  # 是否点赞
@@ -654,7 +650,9 @@ def article_customer_oper(request, oper_type):
                     article_id=id,
                     inviter_id=inviter_user_id
                 )
-
+                # 记录查看次数
+                obj.look_num = F('look_num') + 1
+                obj.save()
 
                 # 给用户发送消息
                 customer_view_articles_send_msg.delay({
@@ -706,6 +704,9 @@ def article_customer_oper(request, oper_type):
                         'url': '跳转链接'
                     }
                 }
+
+                print('response.data-------. ', response.data)
+
             else:
                 response.code = 400
                 response.msg = '页面丢失'
