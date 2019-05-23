@@ -240,10 +240,18 @@ def day_eye_data(request):
                     status=i.get('status'),
                     customer_id=i.get('customer_id'),
                 )
+
+                create_date = i.get('create_date')
+
                 if eye_objs:
+                    if create_date >= eye_objs[0].last_click_customer:
+                        is_new_msg = True
+                    else:
+                        is_new_msg = eye_objs[0].is_new_msg
                     eye_objs.update(
                         text = i.get('text'),
-                        create_date = i.get('create_date'),
+                        create_date = create_date,
+                        is_new_msg = is_new_msg,
                     )
                 else:
                     models.day_eye_celery.objects.create(
@@ -251,7 +259,8 @@ def day_eye_data(request):
                         status=i.get('status'),
                         customer_id=i.get('customer_id'),
                         text=i.get('text'),
-                        create_date=i.get('create_date'),
+                        create_date=create_date,
+                        is_new_msg=True, # 新查看消息提示
                     )
 
 

@@ -303,6 +303,8 @@ class day_eye_celery(models.Model):
         (2, '商品')
     )
     status = models.SmallIntegerField(verbose_name='类别 区分文章和商品', choices=status_choices, null=True)
+    is_new_msg = models.BooleanField(verbose_name='是否有新消息', default=False) # 判断 用户最后一次点击查看 该客户时间 如果日志有大于最后一次点击的 则有新消息
+    last_click_customer = models.DateTimeField(verbose_name='最后一次点击该客户', null=True)
     create_date = models.DateTimeField(verbose_name='创建时间', null=True)
 
 # 设置消息提醒 未提醒的消息 汇总提醒消息

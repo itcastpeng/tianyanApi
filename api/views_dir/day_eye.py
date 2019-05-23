@@ -69,6 +69,7 @@ def day_eye(request):
                     'customer__set_avator': obj.customer.set_avator,
                     'text': obj.text,
                     'status': obj.status,
+                    'is_new_msg': obj.is_new_msg,
                 })
 
             #  查询成功 返回200 状态码
@@ -314,6 +315,15 @@ def day_eye_oper(request, oper_type, o_id):
             # 谁看了我 (文章详情)
             elif oper_type == 'day_eye_detail':
                 user_id = forms_obj.cleaned_data['user_id']
+
+                # 更新 用户点击客户详情时间
+                day_celery_objs = models.day_eye_celery.objects.filter(status=1, user_id=user_id, customer_id=o_id)
+                if day_celery_objs:
+                    day_celery_objs.update(
+                        last_click_customer=datetime.datetime.today(),
+                        is_new_msg=False
+                    )
+
                 article_objs = models.SelectArticleLog.objects.filter(inviter_id=user_id, customer_id=o_id)
                 info_objs = article_objs.order_by(order)
 
@@ -649,6 +659,11 @@ def day_eye_oper(request, oper_type, o_id):
 
             # 谁看了我(商品详情)
             elif oper_type == 'day_eye_goods_detail':
+                # 更新 用户点击客户详情时间
+                day_celery_objs = models.day_eye_celery.objects.filter(status=2, user_id=user_id, customer_id=o_id)
+                if day_celery_objs:
+                    day_celery_objs.update(last_click_customer=datetime.datetime.today(), is_new_msg=False)
+
                 objs = models.customer_look_goods_log.objects.filter(
                     user_id=user_id,
                     customer_id=o_id
