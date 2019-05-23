@@ -556,8 +556,8 @@ def share_article(request, oper_type):
         encode_username = b64encode(
             ret_obj['nickname']
         )
-
-        headimgurl = update_qiniu(ret_obj.get('headimgurl'))
+        headimgurl = requests_img_download(ret_obj.get('headimgurl'))
+        headimgurl = update_qiniu(headimgurl)
         user_data = {
             "sex": ret_obj.get('sex'),
             "country": ret_obj.get('country'),
