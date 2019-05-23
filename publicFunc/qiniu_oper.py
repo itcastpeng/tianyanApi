@@ -12,24 +12,8 @@ def update_qiniu(img_path):
     # 构建鉴权对象
     q = qiniu.Auth(AccessKey, SecretKey)
     bucket_name = 'bjhzkq_tianyan'
-    key = randon_str()
 
-    # zone = Zone(
-    #     up_host='https://up-z1.qiniup.com',
-    #     up_host_backup='https://upload-z1.qiniup.com',
-    #     io_host='http://iovip-z1.qbox.me',
-    #     scheme='https')
-    # set_default(default_zone=zone)
-
-    policy = {  # 指定上传文件的格式 等
-
-    }
     token = q.upload_token(bucket_name)  # 可以指定key 图片名称
-    # token = q.upload_token(bucket_name, None, 360000, policy)  # 可以指定key 图片名称
-    # print('-----------> ', datetime.datetime.today())
-    # ret, info = put_file(token, None, mime_type="text/js", file_path=img_path)
-    # print('ret-----> ', ret, info)
-    # print('--> ', datetime.datetime.today())
 
 
     headers = {

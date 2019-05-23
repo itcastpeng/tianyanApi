@@ -17,7 +17,6 @@ from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
 from publicFunc.account import str_encrypt
 from publicFunc.emoji import baiyan, xiajiantou, zhayan
-
 import json, xml.dom.minidom, datetime, time, requests, re
 
 
@@ -70,6 +69,10 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
     user_objs = models.Userprofile.objects.filter(openid=openid)
 
     encode_username = base64_encryption.b64encode(ret_obj['nickname'])
+
+    path = requests_img_download(ret_obj.get('headimgurl'))
+    set_avator = update_qiniu(path)
+
     user_data = {
         "sex": ret_obj.get('sex'),
         "country": ret_obj.get('country'),
@@ -106,8 +109,6 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
         overdue_date = datetime.datetime.now() + datetime.timedelta(days=30)
 
         subscribe = ret_obj.get('subscribe')
-        path = requests_img_download(ret_obj.get('headimgurl'))
-        set_avator = update_qiniu(path)
         # 如果没有关注，获取个人信息判断是否关注
         if not subscribe:
             data = get_ent_info(inviter_user_id)
@@ -555,13 +556,15 @@ def share_article(request, oper_type):
         encode_username = b64encode(
             ret_obj['nickname']
         )
+
+        headimgurl = update_qiniu(ret_obj.get('headimgurl'))
         user_data = {
             "sex": ret_obj.get('sex'),
             "country": ret_obj.get('country'),
             "province": ret_obj.get('province'),
             "city": ret_obj.get('city'),
             'name': encode_username,
-            'set_avator': ret_obj.get('headimgurl')
+            'set_avator':headimgurl
         }
         customer_objs = models.Customer.objects.filter(openid=openid)
         if customer_objs:   # 客户已经存在
@@ -571,7 +574,7 @@ def share_article(request, oper_type):
         else:
             subscribe = ret_obj.get('subscribe')
 
-            user_data['set_avator'] = ret_obj.get('headimgurl')
+            user_data['set_avator'] = headimgurl
             # 如果没有关注，获取个人信息判断是否关注
             if not subscribe:
                 ret_obj_subscribe = weichat_api_obj.get_user_info(openid=openid)
