@@ -245,7 +245,7 @@ def day_eye_data(request):
 
                 if eye_objs:
                     if eye_objs[0].last_click_customer:
-                        if create_date >= eye_objs[0].last_click_customer:
+                        if datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S') >= eye_objs[0].last_click_customer:
                             is_new_msg = True
                         else:
                             is_new_msg = eye_objs[0].is_new_msg
