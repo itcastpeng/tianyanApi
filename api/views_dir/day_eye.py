@@ -34,7 +34,10 @@ def get_min_s(start_time=None, stop_time=None, ms=None):
     if second:
         seconds = str(second) + '秒'
     if ms:
-        return days + hours
+        if days and hours:
+            return days + hours
+        else:
+            return mins + seconds
     else:
         return days + hours + mins + seconds
 
@@ -336,10 +339,11 @@ def day_eye_oper(request, oper_type, o_id):
 
                     create_datetime = article_obj[0].create_datetime
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
+
                     ret_data.append({
                         'article_id': article_id,
                         'article__title': obj.get('article__title'),
-                        'article_info': '看了' + str(obj.get('id__count')) + '次-' + after_time + '前',
+                        'article_info': '看了' + str(obj.get('id__count')) + '次-' +  after_time + '前',
                         'time_detail': time_detail,
                         'article__cover_img': obj.get('article__cover_img'),
                     })

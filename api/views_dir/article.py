@@ -705,8 +705,6 @@ def article_customer_oper(request, oper_type):
                     }
                 }
 
-                print('response.data-------. ', response.data)
-
             else:
                 response.code = 400
                 response.msg = '页面丢失'
