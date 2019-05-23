@@ -10,7 +10,7 @@ from publicFunc.user import is_send_msg
 from django.db.models import F
 import datetime, json, time, requests
 from publicFunc.emoji import xiajiantou, nanshou, caidai
-
+from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
 def celery_error_warning(msg):
@@ -458,10 +458,14 @@ def summary_message_reminder_celery(request):
         celery_error_warning(msg)
     return JsonResponse(response.__dict__)
 
-
-
-
-
-
+# 更新客户头像到七牛云
+def update_customer_set_avator(request):
+    objs = models.Customer.objects.filter(set_avator__isnull=False)
+    for obj in objs:
+        if 'http://tianyan.zhugeyingxiao.com' not in obj.set_avator:
+            set_avator = requests_img_download(obj.set_avator)
+            set_avator = update_qiniu(set_avator)
+            obj.set_avator = set_avator
+            obj.save()
 
 

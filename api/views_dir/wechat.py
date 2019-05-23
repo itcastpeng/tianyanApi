@@ -17,6 +17,7 @@ from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
 from publicFunc.account import str_encrypt
 from publicFunc.emoji import baiyan, xiajiantou, zhayan
+from tianyan_celery.tasks import update_customer_set_avator
 import json, xml.dom.minidom, datetime, time, requests, re
 
 
@@ -556,15 +557,13 @@ def share_article(request, oper_type):
         encode_username = b64encode(
             ret_obj['nickname']
         )
-        headimgurl = requests_img_download(ret_obj.get('headimgurl'))
-        headimgurl = update_qiniu(headimgurl)
         user_data = {
             "sex": ret_obj.get('sex'),
             "country": ret_obj.get('country'),
             "province": ret_obj.get('province'),
             "city": ret_obj.get('city'),
             'name': encode_username,
-            'set_avator':headimgurl
+            'set_avator':ret_obj.get('headimgurl')
         }
         customer_objs = models.Customer.objects.filter(openid=openid)
         if customer_objs:   # 客户已经存在
@@ -574,7 +573,7 @@ def share_article(request, oper_type):
         else:
             subscribe = ret_obj.get('subscribe')
 
-            user_data['set_avator'] = headimgurl
+            user_data['set_avator'] = ret_obj.get('headimgurl')
             # 如果没有关注，获取个人信息判断是否关注
             if not subscribe:
                 ret_obj_subscribe = weichat_api_obj.get_user_info(openid=openid)
@@ -626,6 +625,8 @@ def share_article(request, oper_type):
 
         else:
             redirect_url = ''
+
+        update_customer_set_avator.delay() # 更新客户头像到七牛云
         return redirect(redirect_url)
 
 
