@@ -9,9 +9,10 @@ from django.db.models import Q, F
 from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.article_oper import give_like
 from publicFunc.get_content_article import get_article
-from publicFunc.forwarding_article import forwarding_article
 from publicFunc.article_oper import add_article_public
 from tianyan_celery.tasks import customer_view_articles_send_msg
+from publicFunc.public import randomly_query_three_articles, get_hot_commodity
+
 import requests, datetime, random, json, redis
 
 # token验证 文章展示模块
@@ -589,6 +590,10 @@ def article_customer_oper(request, oper_type):
             objs = models.Article.objects.filter(id=id)
             if objs:
                 obj = objs[0]
+                # 记录查看次数
+                obj.look_num = F('look_num') + 1
+                obj.save()
+
                 user_obj = models.Userprofile.objects.get(id=inviter_user_id)
 
                 is_like = False  # 是否点赞
@@ -628,54 +633,13 @@ def article_customer_oper(request, oper_type):
                 result_data['qr_code'] = qr_code   # 用户微信二维码
                 result_data['is_like'] = is_like            # 是否点赞
 
-                # print('随机查询三篇文章=========================================================')
-                article_objs = models.Article.objects.filter(
-                    title__isnull=False,
-                    create_user_id=inviter_user_id
-                ).exclude(
-                    id=id
-                ).order_by('look_num')[:3]
+                # 随机获取三篇文章
+                popula_articles_list = randomly_query_three_articles(inviter_user_id, id)
 
-                popula_articles_list = []
-                for article_obj in article_objs:
-                    pub = 'article_' + str(article_obj.id)
-                    url = forwarding_article(
-                        pub=pub,
-                        user_id=inviter_user_id,
-                    )
-                    popula_articles_list.append({
-                        'title': article_obj.title,
-                        'cover_img':article_obj.cover_img + '?imageView2/2/w/200',
-                        'url':url
-                    })
-
-                goods_list = []
                 # 查询最热商品=======================
+                goods_list = []
                 if user_obj.show_product: # 如果客户 打开文章底部显示热卖
-                    good_objs = models.Goods.objects.filter(goods_classify__oper_user_id=inviter_user_id)
-
-                    good_count = good_objs.count()
-                    if good_count >= 2:
-                        good_objs = good_objs[0:2]
-                    elif good_count <= 0:
-                        good_objs = good_objs
-                    else:
-                        good_objs = good_objs[0:1]
-
-                    for good_obj in good_objs:
-                        pub = 'micro_' + str(good_obj.id)
-                        url = forwarding_article(
-                            pub=pub,
-                            user_id=good_obj.goods_classify.oper_user_id,
-                        )
-                        goods_list.append({
-                            # 'goods_describe':good_obj.goods_describe,# 商品描述
-                            'price':good_obj.price,             # 商品价格
-                            'goods_name':good_obj.goods_name,   # 商品名称
-                            'cover_img': good_obj.cover_img + '?imageView2/2/w/200',    # 封面图
-                            'url': url
-                        })
-
+                    goods_list = get_hot_commodity(inviter_user_id)
 
                 # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
                 # now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
@@ -690,18 +654,15 @@ def article_customer_oper(request, oper_type):
                     article_id=id,
                     inviter_id=inviter_user_id
                 )
-                # 记录查看次数
-                obj.look_num = F('look_num') + 1
-                obj.save()
+
 
                 # 给用户发送消息
-                celery_data = {
+                customer_view_articles_send_msg.delay({
                     'check_type': '文章',
                     'user_id': inviter_user_id,
                     'title': obj.title,
                     'customer_id': customer_id,
-                }
-                customer_view_articles_send_msg.delay(celery_data)
+                })
 
                 response.code = 200
                 response.msg = '查询成功'
@@ -890,6 +851,30 @@ def article_customer_oper(request, oper_type):
             else:
                 response.code = 301
                 response.msg = json.loads(form_objs.errors.as_json())
+
+        # 客户查询 用户名片
+        elif oper_type == 'business_card':
+            obj = models.Userprofile.objects.get(id=inviter_user_id)
+            name = b64decode(obj.name)
+            if not obj.introduction:
+                introduction = '我是{}, 欢迎来到我的名片'.format(name)
+            else:
+                introduction = obj.introduction
+
+            article_list = randomly_query_three_articles(inviter_user_id)
+            goods_list = get_hot_commodity(inviter_user_id)
+
+            data_list = {
+                'user_id': obj.id,
+                'introduction': introduction,
+                'user_name': name,
+                'set_avator': obj.set_avator + '?imageView2/2/w/100',
+                'article_list': article_list,
+                'goods_list': goods_list,
+            }
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = data_list
 
     else:
 

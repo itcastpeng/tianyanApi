@@ -6,7 +6,7 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.user import SelectForm
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
-from publicFunc import base64_encryption
+from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.account import get_token
 from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
@@ -14,7 +14,6 @@ from publicFunc.account import randon_str
 from publicFunc.screenshots import screenshots
 from publicFunc.emoji import zhayan
 from publicFunc.qiniu_oper import requests_img_download, update_qiniu
-from publicFunc.base64_encryption import b64decode
 from publicFunc.emoji import qian
 from publicFunc.public import verify_mobile_phone_number
 import re, os, json, sys, datetime
@@ -49,7 +48,6 @@ def user(request):
                 stop_line = start_line + length
                 objs = objs[start_line: stop_line]
 
-
             ret_data = []
             for obj in objs:
                 # 返回的数据
@@ -64,17 +62,21 @@ def user(request):
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
-                    'name': base64_encryption.b64decode(obj.name),
+                    'name': b64decode(obj.name),
                     'phone_number': obj.phone_number,
                     'signature': obj.signature,
                     'show_product': obj.show_product,
                     'register_date': obj.register_date.strftime('%Y-%m-%d'),
                     'overdue_date': obj.overdue_date.strftime('%Y-%m-%d'),
-                    'set_avator': obj.set_avator + '?imageView2/2/w/100',
+                    'set_avator': obj.set_avator ,
                     'qr_code': qr_code,
                     'brand_list': brand_list,
                     'team_list': team_list,
                     'vip_type': obj.get_vip_type_display(),
+
+                    'my_references_id': obj.inviter_id,                     # 邀请人ID
+                    'my_references_name': b64decode(obj.inviter.name),      # 我的推荐人名称
+                    'my_references_set': obj.inviter.set_avator + '?imageView2/2/w/100'    # 我的推荐人头像
                 })
             #  查询成功 返回200 状态码
             response.code = 200
@@ -96,6 +98,10 @@ def user(request):
                 'vip_type': "会员类型",
                 'brand_list': "公司/品牌列表",
                 'team_list': "团队ID数组",
+
+                'my_references_id': '邀请人ID',
+                'my_references_name': '我的推荐人名称',
+                'my_references_set': '我的推荐人头像',
             }
         else:
             print("forms_obj.errors -->", forms_obj.errors)
@@ -143,7 +149,7 @@ def user_oper(request, oper_type, o_id):
             name = request.POST.get('name')
             if name:
                 if len(name) <= 9:
-                    name = base64_encryption.b64encode(name)
+                    name = b64encode(name)
                     models.Userprofile.objects.filter(id=user_id).update(name=name)
                     response.code = 200
                     response.msg = "修改成功"
@@ -306,7 +312,7 @@ def user_oper(request, oper_type, o_id):
 
                     invite_number_list.append({
                         'create_user__set_avator': invite_number_obj.set_avator,
-                        'name':base64_encryption.b64decode(invite_number_obj.name),
+                        'name':b64decode(invite_number_obj.name),
                         'prepaid_text':prepaid_text,
                     })
                 response_data['invite_number_list'] = invite_number_list
@@ -429,7 +435,7 @@ def user_login_oper(request, oper_type):
         print('------------------------------获取用户信息----------->', datetime.datetime.today())
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
         print('------------------------------获取完成----------->', datetime.datetime.today())
-        encode_username = base64_encryption.b64encode(
+        encode_username = b64encode(
             ret_obj['nickname']
         )
         openid = ret_obj.get('openid')

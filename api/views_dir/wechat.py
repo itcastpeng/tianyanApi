@@ -418,9 +418,6 @@ def wechat_oper(request, oper_type):
         pass
 
     else:
-        # 推广赚钱 生成二维码
-        # if oper_type == "generate_qrcode":
-
 
         # 邀请成员页面展示信息
         if oper_type == "invite_members":
@@ -503,6 +500,26 @@ def wechat_oper(request, oper_type):
                 'open_weixin_url': open_weixin_url
             }
 
+        # 用户分享名片①
+        elif oper_type == 'share_business_card':
+            inviter_user_id = request.GET.get('inviter_user_id') # 二级以上微店宝贝转发 需要传递用户ID
+            pub = 'card'
+            if inviter_user_id:
+                open_weixin_url = forwarding_article(
+                    inviter_user_id=inviter_user_id,
+                    pub=pub,
+                )
+            else:
+                open_weixin_url = forwarding_article(
+                    user_id=user_id,
+                    pub=pub,
+                )
+            response.code = 200
+            response.msg = '转发成功'
+            response.data = {
+                'open_weixin_url': open_weixin_url
+            }
+
         # 分享的链接 跳转②
         elif oper_type == 'redirect_url':
             share_url = request.GET.get('share_url')
@@ -515,9 +532,6 @@ def wechat_oper(request, oper_type):
                 redirect_url = str(share_url) + '&redirect_uri=' + str(redirect_uri) + '&response_type=' + str(response_type) + '&scope=' + str(scope) + '&state=' + str(state)
             else:
                 redirect_url = share_url
-            # print('==================跳转链接========================================')
-            # print('request.GET========> ', request.GET)
-            # print('redirect_url-------------------> ', redirect_url)
             return redirect(redirect_url)
 
     return JsonResponse(response.__dict__)
@@ -573,8 +587,12 @@ def share_article(request, oper_type):
         objs = models.Customer.objects.filter(openid=openid)
         obj = objs[0]
 
-        _type = oper_type.split('_')[0]  # 类型
-        oid = oper_type.split('_')[1]  # ID
+        _type = oper_type
+        oid = ''
+        if '_' in oper_type:
+            _type = oper_type.split('_')[0]  # 类型
+            oid = oper_type.split('_')[1]  # ID
+
         # print('o_id---o_id--o_id--> ', oper_type)
         if _type == 'article':
             # 此处跳转到文章页面 文章
@@ -587,13 +605,22 @@ def share_article(request, oper_type):
             )
         elif _type == 'micro':
             # 此处跳转到微店宝贝页面
-            redirect_url = '{host_url}#/share_micro_store?user_id={user_id}&token={token}&id={article_id}&inviter_user_id={inviter_user_id}'.format(
+            redirect_url = '{host_url}#/share_micro_store?user_id={user_id}&token={token}&id={goods_id}&inviter_user_id={inviter_user_id}'.format(
                 host_url=host_url,
-                article_id=oid,  # 分享文章的id
+                goods_id=oid,  # 分享商品的id
                 user_id=customer_obj.id,
                 token=obj.token,
                 inviter_user_id=state,
             )
+        elif _type == 'card':
+            # 此处跳到我的名片页面
+            redirect_url = '{host_url}#/share_micro_store?user_id={user_id}&token={token}&inviter_user_id={inviter_user_id}'.format(
+                host_url=host_url,
+                user_id=customer_obj.id,
+                token=obj.token,
+                inviter_user_id=state,
+            )
+
         else:
             redirect_url = ''
         return redirect(redirect_url)

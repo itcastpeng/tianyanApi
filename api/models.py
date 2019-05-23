@@ -98,6 +98,8 @@ class Userprofile(models.Model):
     message_remind = models.SmallIntegerField(verbose_name='消息提醒', choices=message_remind_status, default=0)
     last_message_remind_time = models.DateTimeField(verbose_name='最后发送消息提醒时间', null=True)
 
+    # 我的名片 名字下边简介
+    introduction = models.CharField(verbose_name='名片简介', max_length=512, null=True)
 
 # 客户表(用户的客户)
 class Customer(models.Model):

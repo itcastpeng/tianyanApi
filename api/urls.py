@@ -1,9 +1,9 @@
 from api.views_dir import user, wechat, classify, article, posters, customer, small_shop, brand, team, goods_classify, \
-    upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article, html_oper, qiniu_oper
+    upload_file, renewal, prepaidManagement, day_eye, letter_operation, platform_add_article, html_oper, qiniu_oper, \
+    my_business_card
 
 from api.views_dir.my_celery import celery_url
 from django.conf.urls import url
-
 
 urlpatterns = [
 
@@ -49,6 +49,10 @@ urlpatterns = [
     # 品牌管理
     url(r'^brand/(?P<oper_type>\w+)/(?P<o_id>\d+)', brand.brand_oper),
     url(r'^brand', brand.brand),
+
+    # 我的名片
+    url(r'^my_business_card/(?P<oper_type>\w+)$', my_business_card.my_business_card_oper),
+    url(r'^my_business_card$', my_business_card.my_business_card),
 
     # --------------------------------微店----------------------# 微店分类
     url(r'^goods_classify/(?P<oper_type>\w+)/(?P<o_id>\d+)', goods_classify.goods_classify_oper),
@@ -109,3 +113,4 @@ urlpatterns = [
     # 创建天眼公众号 导航栏
     url(r'^create_menu$', celery_url.create_menu),
 ]
+
