@@ -12,7 +12,7 @@ from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 import datetime, json, time, requests
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
-def celery_error_warning(msg):
+def celery_error_warning(msg, external=None): #external 外部引用
     print('*********!!!!!!!!!!!!!!!!!!!!!!!!!!!!!******************!!!!!!!!!!!!!!!!!!!!!!*************!!!!!!!!!!', msg)
     user_info = get_ent_info(1)
     weixin_objs = WeChatApi(user_info)
@@ -21,6 +21,10 @@ def celery_error_warning(msg):
         'oX0xv1iqlzEtIhkeutd6f_wzAEpM', # 赵欣鹏
         'oX0xv1pmPrR24l6ezv4mI9HE0-ME', # 小明
     ]
+    if external:
+        openid_list.append(
+            'oX0xv1lvwu7ntr4dJloHtsQdlWkY', # 韩新颖
+        )
     for i in openid_list:
         post_data = {
             "touser": i,
@@ -33,6 +37,28 @@ def celery_error_warning(msg):
         # 发送客服消息
         post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
         weixin_objs.news_service(post_data)
+
+
+# 外部调用 发送消息
+def outside_calls_send_msg(request):
+    try:
+        msg = request.GET.get('msg')
+        is_external = request.GET.get('is_external')  # 是否为外部
+        celery_error_warning(msg, is_external)
+    except Exception as e:
+        msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+            'celery内 外部调用发送消息报错',
+            e,
+            datetime.datetime.today()
+        )
+        celery_error_warning(msg)
+
+    return HttpResponse('')
+
+
+
+
+
 
 # 创建天眼公众号 导航栏
 def create_menu(request):
@@ -91,6 +117,14 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/mingpian'
+    mingpian_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
+                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
+                 "&state=STATE#wechat_redirect&connect_redirect=1" \
+        .format(
+        appid=APPID,
+        redirect_uri=redirect_uri,
+    )
     button = {
         "button": [
             {
@@ -128,7 +162,7 @@ def create_menu(request):
                     {
                         "type": "view",
                         "name": "我的名片",
-                        "url": login_url
+                        "url": mingpian_url
                     },
                     {
                         "type": "view",

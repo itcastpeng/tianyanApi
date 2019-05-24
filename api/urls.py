@@ -103,8 +103,9 @@ urlpatterns = [
     url(r'^qiniu_oper/(?P<oper_type>\w+)$', qiniu_oper.qiniu_oper),
 
     # celery_--------------------------
-    url(r'^day_eye_data$', celery_url.day_eye_data),            # 天眼功能提前缓存
-    url(r'^last_active_time$', celery_url.last_active_time),    # 最后活跃时间快到24小时的用户提醒
+    url(r'^outside_calls_send_msg$', celery_url.outside_calls_send_msg),    # 发送消息
+    url(r'^day_eye_data$', celery_url.day_eye_data),                        # 天眼功能提前缓存
+    url(r'^last_active_time$', celery_url.last_active_time),                # 最后活跃时间快到24小时的用户提醒
     url(r'^customer_view_articles_send_msg$', celery_url.customer_view_articles_send_msg),# 客户查看微店/文章发送消息给用户
     url(r'^summary_message_reminder_celery$', celery_url.summary_message_reminder_celery),# 发送消息提醒汇总
     url(r'^update_customer_set_avator$', celery_url.update_customer_set_avator),# 更新客户头像

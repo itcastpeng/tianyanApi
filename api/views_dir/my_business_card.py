@@ -3,7 +3,6 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.base64_encryption import b64decode
-from publicFunc.public import randomly_query_three_articles, get_hot_commodity
 import requests, datetime, random, json
 
 
@@ -22,8 +21,31 @@ def my_business_card(request):
         else:
             introduction = obj.introduction
 
-        article_list = randomly_query_three_articles(user_id)
-        goods_list = get_hot_commodity(user_id)
+        article_list = []
+        article_objs = models.Article.objects.filter(create_user_id=user_id).order_by('-create_datetime')
+        article_count = article_objs.count()
+        if article_count > 3:
+            article_objs = article_objs[: 3]
+        for article_obj in article_objs:
+            article_list.append({
+                'article_id': article_obj.id,
+                'title': article_obj.title,
+                'cover_img': article_obj.cover_img + '?imageView2/2/w/200',
+            })
+
+
+        goods_list = []
+        goods_objs = models.Goods.objects.filter(goods_classify__oper_user_id=user_id).order_by('-create_datetime')
+        goods_objs_count = goods_objs.count()
+        if goods_objs_count > 3:
+            goods_objs = goods_objs[:3]
+        for goods_obj in goods_objs:
+            goods_list.append({
+                'goods_id': goods_obj.id,
+                'cover_img': goods_obj.cover_img + '?imageView2/2/w/200',
+                'goods_name': goods_obj.goods_name,
+            })
+
 
         data_list = {
             'user_id': obj.id,
