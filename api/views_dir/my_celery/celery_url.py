@@ -45,7 +45,7 @@ def outside_calls_send_msg(request):
         msg = request.GET.get('msg')
         if msg:
             msg = '外界消息提醒:' + msg
-            is_external = request.GET.get('is_external')  # 是否为外部
+            is_external = request.GET.get('external')  # 是否为外部
             celery_error_warning(msg, is_external)
 
     except Exception as e:
