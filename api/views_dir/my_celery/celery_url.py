@@ -43,8 +43,11 @@ def celery_error_warning(msg, external=None): #external 外部引用
 def outside_calls_send_msg(request):
     try:
         msg = request.GET.get('msg')
-        is_external = request.GET.get('is_external')  # 是否为外部
-        celery_error_warning(msg, is_external)
+        if msg:
+            msg = '外界消息提醒:' + msg
+            is_external = request.GET.get('is_external')  # 是否为外部
+            celery_error_warning(msg, is_external)
+
     except Exception as e:
         msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
             'celery内 外部调用发送消息报错',
