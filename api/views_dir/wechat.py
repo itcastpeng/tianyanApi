@@ -616,7 +616,7 @@ def share_article(request, oper_type):
             )
         elif _type == 'card':
             # 此处跳到我的名片页面
-            redirect_url = '{host_url}#/share_micro_store?user_id={user_id}&token={token}&inviter_user_id={inviter_user_id}'.format(
+            redirect_url = '{host_url}#/User/User_card?user_id={user_id}&token={token}&inviter_user_id={inviter_user_id}'.format(
                 host_url=host_url,
                 user_id=customer_obj.id,
                 token=obj.token,
