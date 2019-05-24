@@ -44,6 +44,7 @@ def my_business_card(request):
                 'goods_id': goods_obj.id,
                 'cover_img': goods_obj.cover_img + '?imageView2/2/w/200',
                 'goods_name': goods_obj.goods_name,
+                'price': goods_obj.price,
             })
 
 
