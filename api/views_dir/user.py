@@ -60,7 +60,7 @@ def user(request):
                 if obj.qr_code:
                     qr_code = obj.qr_code + '?imageView2/2/w/100'
                 inviter_name = ''
-                if obj.inviter.name:
+                if obj.inviter:
                     inviter_name = b64decode(obj.inviter.name)
                 #  将查询出来的数据 加入列表
                 ret_data.append({
