@@ -1,12 +1,10 @@
 from django.shortcuts import render, redirect
 from api import models
 from publicFunc import Response
-from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.base64_encryption import b64decode
 from publicFunc.host import host_url
 from PIL import Image,ImageFont,ImageDraw
-from api.views_dir.wechat import wechat_oper
 from publicFunc.image_color_recognition import image_color_recognition
 from publicFunc.article_oper import get_ent_info
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi

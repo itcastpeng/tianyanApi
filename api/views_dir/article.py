@@ -12,7 +12,6 @@ from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
 from tianyan_celery.tasks import customer_view_articles_send_msg
 from publicFunc.public import randomly_query_three_articles, get_hot_commodity
-
 import requests, datetime, random, json, redis
 
 # token验证 文章展示模块

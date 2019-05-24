@@ -1,18 +1,10 @@
-# from api import models
 from publicFunc import Response
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from api.forms import upload_form
-import os
-import re
-import hashlib
-import platform
-import time
-import random
-import json
-import base64
 from PIL import Image,ImageFont,ImageDraw
 from publicFunc.qiniu_oper import update_qiniu
+import base64, os, re, hashlib, platform, random, json, time
 sysstr = platform.system()
 
 # 加密名字

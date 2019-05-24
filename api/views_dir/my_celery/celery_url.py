@@ -3,14 +3,13 @@ from publicFunc import Response
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count
 from publicFunc.base64_encryption import b64decode, b64encode
-from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.article_oper import get_ent_info
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.user import is_send_msg
 from django.db.models import F
-import datetime, json, time, requests
 from publicFunc.emoji import xiajiantou, nanshou, caidai
 from publicFunc.qiniu_oper import update_qiniu, requests_img_download
+import datetime, json, time, requests
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
 def celery_error_warning(msg):

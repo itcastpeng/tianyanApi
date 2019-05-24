@@ -1,4 +1,3 @@
-# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
@@ -7,8 +6,7 @@ from publicFunc.condition_com import conditionCom
 from api.forms.day_eye import SelectForm, AddForm, UpdateForm
 from django.db.models import Count
 from publicFunc.base64_encryption import b64decode, b64encode
-import json
-import datetime
+import datetime, json
 
 
 # 放入开始和结束时间 返回 天 时 分 秒

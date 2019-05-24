@@ -1,11 +1,8 @@
-
 from publicFunc import Response
-import qiniu
 from django.http import JsonResponse
 from api import models
-import json, requests, os
-from django.db.models import F
 from publicFunc.qiniu_oper import update_qiniu, requests_img_download
+import json, requests, os, qiniu
 
 # 前端请求
 def qiniu_oper(request, oper_type):

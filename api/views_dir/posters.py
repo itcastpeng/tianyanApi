@@ -3,10 +3,8 @@ from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
-from api.forms.posters import AddForm, UpdateForm, SelectForm, posterInfoForm
 from publicFunc.play_watermark import watermark # 图片打水印
-from publicFunc.base64_encryption import b64decode
-from publicFunc.account import randon_str
+from api.forms.posters import AddForm, UpdateForm, SelectForm, posterInfoForm
 import json, os, requests
 
 # token验证 海报展示模块

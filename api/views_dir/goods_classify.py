@@ -1,13 +1,11 @@
-# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
-from django.db.models import Q
 from publicFunc.condition_com import conditionCom
 from api.forms.small_shop import AddForm, UpdateForm, SelectForm
-import json
 from publicFunc.base64_encryption import b64decode
+import json
 
 # 分组树状图（包含测试用例详情）
 # def testGroupTree(oper_user_id, parent_classify_id=None):

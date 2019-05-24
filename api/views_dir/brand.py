@@ -1,9 +1,7 @@
-# from django.shortcuts import render
 from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
-
 from publicFunc.condition_com import conditionCom
 from api.forms.brand import AddForm, SelectForm
 import json

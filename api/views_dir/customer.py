@@ -1,13 +1,9 @@
-from django.shortcuts import render, redirect
 from api import models
 from publicFunc import Response
-# from publicFunc import account
 from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from api.forms.customer import SelectForm
 import json, requests
-# from django.db.models import Q
-from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 
 # cerf  token验证 用户展示模块
 # @account.is_token(models.Userprofile)

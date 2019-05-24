@@ -1,4 +1,3 @@
-from django.shortcuts import render, redirect
 from api import models
 from publicFunc import Response
 from publicFunc import account
@@ -8,12 +7,12 @@ from api.forms.team import AddForm, UpdateForm, SelectForm, SelectUserListForm, 
 from publicFunc import base64_encryption
 from publicFunc.weixin import weixin_gongzhonghao_api
 from api.views_dir.wechat import updateUserInfo
-import requests, json
 from publicFunc.host import host_url
 from django.shortcuts import redirect
 from publicFunc.forwarding_article import forwarding_article
 from urllib.parse import unquote,quote
 from publicFunc.article_oper import get_ent_info
+import requests, json
 
 # token验证 用户展示模块
 @account.is_token(models.Userprofile)
