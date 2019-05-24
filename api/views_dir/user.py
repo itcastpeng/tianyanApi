@@ -59,6 +59,9 @@ def user(request):
                 qr_code = ''
                 if obj.qr_code:
                     qr_code = obj.qr_code + '?imageView2/2/w/100'
+                inviter_name = ''
+                if obj.inviter.name:
+                    inviter_name = b64decode(obj.inviter.name)
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
@@ -75,7 +78,7 @@ def user(request):
                     'vip_type': obj.get_vip_type_display(),
 
                     'my_references_id': obj.inviter_id,                     # 邀请人ID
-                    'my_references_name': b64decode(obj.inviter.name),      # 我的推荐人名称
+                    'my_references_name': inviter_name,      # 我的推荐人名称
                     'my_references_set': obj.inviter.set_avator + '?imageView2/2/w/100'    # 我的推荐人头像
                 })
             #  查询成功 返回200 状态码
