@@ -512,6 +512,7 @@ def user_login_oper(request, oper_type):
             page_type=oper_type,
             phone=phone
         )
+        print('redirect_url----------------------------> ', redirect_url)
         return redirect(redirect_url)
 
     else:
