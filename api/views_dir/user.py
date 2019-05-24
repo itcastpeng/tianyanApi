@@ -415,6 +415,19 @@ def user_oper(request, oper_type, o_id):
                 'flag': flag
             }
 
+        # 判断是否有手机号
+        elif oper_type == 'is_phone':
+            obj = models.Userprofile.objects.get(id=user_id)
+            flag = False
+            if obj.phone_number:
+                flag = True
+
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'phone': flag
+            }
+
         else:
             response.code = 402
             response.msg = '请求异常'
@@ -500,17 +513,11 @@ def user_login_oper(request, oper_type):
             user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
             user_objs = models.Userprofile.objects.create(**user_data)
 
-
-        phone = False
-        if user_objs.phone_number:
-            phone = True
-
-        redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1&page_type={page_type}&phone={phone}'.format(
+        redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1&page_type={page_type}'.format(
             host=host_url,
             token=user_objs.token,
             user_id=user_objs.id,
             page_type=oper_type,
-            phone=phone
         )
         print('redirect_url----------------------------> ', redirect_url)
         return redirect(redirect_url)
