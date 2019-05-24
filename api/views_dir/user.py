@@ -59,9 +59,15 @@ def user(request):
                 qr_code = ''
                 if obj.qr_code:
                     qr_code = obj.qr_code + '?imageView2/2/w/100'
+
+                set_avator = ''
+                inviter_id = ''
                 inviter_name = ''
                 if obj.inviter:
                     inviter_name = b64decode(obj.inviter.name)
+                    inviter_id = obj.inviter_id
+                    set_avator = obj.inviter.set_avator + '?imageView2/2/w/100'
+
                 #  将查询出来的数据 加入列表
                 ret_data.append({
                     'id': obj.id,
@@ -77,9 +83,9 @@ def user(request):
                     'team_list': team_list,
                     'vip_type': obj.get_vip_type_display(),
 
-                    'my_references_id': obj.inviter_id,                     # 邀请人ID
+                    'my_references_id': inviter_id,                     # 邀请人ID
                     'my_references_name': inviter_name,      # 我的推荐人名称
-                    'my_references_set': obj.inviter.set_avator + '?imageView2/2/w/100'    # 我的推荐人头像
+                    'my_references_set': set_avator    # 我的推荐人头像
                 })
             #  查询成功 返回200 状态码
             response.code = 200
