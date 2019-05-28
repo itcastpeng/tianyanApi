@@ -1,5 +1,15 @@
 from django.db import models
 
+
+
+# 后台 OEM 客户
+class OEM_admin_customer(models.Model):
+    name = models.CharField(verbose_name="姓名", max_length=256)
+    password = models.CharField(verbose_name='密码', max_length=256)
+    token = models.CharField(verbose_name="token值", max_length=128)
+    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+
 # 企业
 class Enterprise(models.Model):
     name = models.CharField(verbose_name='企业名称', max_length=64)

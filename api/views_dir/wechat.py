@@ -262,13 +262,15 @@ def wechat(request):
             # 客户发送消息
             elif msg_type == 'text':
                 print('---------用户发送消息')
-                user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
+                user_objs = models.Userprofile.objects.filter(openid=openid)  # 获取用户ID
 
-                if not user_obj: # 如果没有这个用户
+                if not user_objs: # 如果没有这个用户
                     weichat_api_obj = WeChatApi(data)
                     ret_obj = weichat_api_obj.get_user_info(openid=openid)
                     updateUserInfo(openid, inviter_user_id, ret_obj)
                     user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
+                else:
+                    user_obj = user_objs[0]
 
                 user_obj.last_active_time = datetime.datetime.today() # 最后活跃时间
                 user_id = user_obj.id
