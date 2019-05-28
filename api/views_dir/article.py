@@ -105,7 +105,7 @@ def article(request):
                 is_use_redis = False # 是否进行redis操作
 
                 if classify_type and classify_type == 2:  # 我的品牌
-                    order_by = '-like_num'
+                    order_by = '-create_datetime'
 
                 elif classify_type and classify_type == 1 and len(classify_id_list) <= 0:  # 推荐为空
                     q.add(Q(classify__create_user__isnull=True) & Q(classify__isnull=False),
