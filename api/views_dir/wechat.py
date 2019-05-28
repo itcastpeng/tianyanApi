@@ -139,7 +139,8 @@ def wechat(request):
     timestamp = request.GET.get("timestamp")
     nonce = request.GET.get("nonce")
     echostr = request.GET.get("echostr")
-
+    appid = request.GET.get("appid")
+    print('appid------------> ', appid)
     # 该值做消息解密使用，当前未使用加密模式，参考微信开发文档 https://mp.weixin.qq.com/wiki?t=resource/res_main&id=mp1421135319
     # EncodingAESKey = 'LFYzOBp42g5kwgSUWhGC9uRugSmpyetKfAsJa5FdFHX'
 
@@ -253,152 +254,158 @@ def wechat(request):
             elif msg_type == 'text':
                 print('---------用户发送消息')
                 user_obj = models.Userprofile.objects.get(openid=openid)  # 获取用户ID
-                user_obj.last_active_time = datetime.datetime.today() # 最后活跃时间
-                user_id = user_obj.id
-                token = user_obj.token
-                data = get_ent_info(user_id)  # 获取该用户appid等
-                weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
 
-                # 判断该人在同一时刻 发送多条只接受一条
-                send_msg_duplicate_obj = models.send_msg_duplicate.objects.filter(
-                    user_id=user_id,
-                    create_date_time=CreateTime
-                )
-                if not send_msg_duplicate_obj:
-                    models.send_msg_duplicate.objects.create(
+                if not user_obj: # 如果没有这个用户
+                    print('-')
+
+
+                else:
+                    user_obj.last_active_time = datetime.datetime.today() # 最后活跃时间
+                    user_id = user_obj.id
+                    token = user_obj.token
+                    data = get_ent_info(user_id)  # 获取该用户appid等
+                    weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
+
+                    # 判断该人在同一时刻 发送多条只接受一条
+                    send_msg_duplicate_obj = models.send_msg_duplicate.objects.filter(
                         user_id=user_id,
                         create_date_time=CreateTime
                     )
-                else:
-                    return HttpResponse('')
-
-                Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
-                if 'http' in Content:  # 获取文章内容 返回文章
-                    print('Content=-===========》', Content)
-                    # 判断 链接是否正常
-                    post_data = {
-                        "touser": openid,
-                        "msgtype": "text",
-                        "text": {
-                            "content": '解码中,请稍等······'
-                        }
-                    }
-                    weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')) # 发送客服消息
-                    try:
-                        ret = requests.get(Content, timeout=5)
-                        status_code = ret.status_code
-                    except Exception:
-                        post_data = {
-                            "touser": openid,
-                            "msgtype": "text",
-                            "text": {
-                                "content": '链接请求不到了······{}'.format(b64decode('4p2V4p2X'))
-                            }
-                        }
-                        weichat_api_obj.news_service(
-                            bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
+                    if not send_msg_duplicate_obj:
+                        models.send_msg_duplicate.objects.create(
+                            user_id=user_id,
+                            create_date_time=CreateTime
+                        )
+                    else:
                         return HttpResponse('')
 
-                    if status_code != 200:
+                    Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
+                    if 'http' in Content:  # 获取文章内容 返回文章
+                        print('Content=-===========》', Content)
+                        # 判断 链接是否正常
                         post_data = {
                             "touser": openid,
                             "msgtype": "text",
                             "text": {
-                                "content": '该链接存在异常请求状态码>{}'.format(status_code)
+                                "content": '解码中,请稍等······'
                             }
                         }
+                        weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')) # 发送客服消息
+                        try:
+                            ret = requests.get(Content, timeout=5)
+                            status_code = ret.status_code
+                        except Exception:
+                            post_data = {
+                                "touser": openid,
+                                "msgtype": "text",
+                                "text": {
+                                    "content": '链接请求不到了······{}'.format(b64decode('4p2V4p2X'))
+                                }
+                            }
+                            weichat_api_obj.news_service(
+                                bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
+                            return HttpResponse('')
 
-                    else:
-                        # try:
-                        #     ret = requests.get(Content, timeout=5)
-                        #     ret.encoding = 'utf-8'
-                        # except Exception:
-                        #     post_data = {
-                        #         "touser": openid,
-                        #         "msgtype": "text",
-                        #         "text": {
-                        #             "content": '这个链接没有文章{}'.format(b64decode('4p2X'))
-                        #         }
-                        #     }
-                        #     weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
-                        #     return HttpResponse('')
-
-                        title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
-
-                        article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
-
-                        if not article_objs:  # 判断数据库是否有 该文章
-                            data_dict = get_article(Content)  # 获取文章
-                            summary = data_dict.get('summary')              # 摘要
-                            data_dict['create_user_id'] = user_id           # 增加创建人
-                            id = add_article_public(data_dict, 39)          # 创建文章 第二个参数为 classify_id 默认为其他
-                            cover_img = data_dict.get('cover_img')          # 封面
+                        if status_code != 200:
+                            post_data = {
+                                "touser": openid,
+                                "msgtype": "text",
+                                "text": {
+                                    "content": '该链接存在异常请求状态码>{}'.format(status_code)
+                                }
+                            }
 
                         else:
-                            article_obj = article_objs[0]
-                            id = article_obj.id
-                            summary = article_obj.summary
-                            cover_img = article_obj.cover_img
+                            # try:
+                            #     ret = requests.get(Content, timeout=5)
+                            #     ret.encoding = 'utf-8'
+                            # except Exception:
+                            #     post_data = {
+                            #         "touser": openid,
+                            #         "msgtype": "text",
+                            #         "text": {
+                            #             "content": '这个链接没有文章{}'.format(b64decode('4p2X'))
+                            #         }
+                            #     }
+                            #     weichat_api_obj.news_service(bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8'))  # 发送客服消息
+                            #     return HttpResponse('')
 
-                        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
-                            id,
-                            token,
+                            title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
+
+                            article_objs = models.Article.objects.filter(title=title, create_user_id=user_id)
+
+                            if not article_objs:  # 判断数据库是否有 该文章
+                                data_dict = get_article(Content)  # 获取文章
+                                summary = data_dict.get('summary')              # 摘要
+                                data_dict['create_user_id'] = user_id           # 增加创建人
+                                id = add_article_public(data_dict, 39)          # 创建文章 第二个参数为 classify_id 默认为其他
+                                cover_img = data_dict.get('cover_img')          # 封面
+
+                            else:
+                                article_obj = article_objs[0]
+                                id = article_obj.id
+                                summary = article_obj.summary
+                                cover_img = article_obj.cover_img
+
+                            url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
+                                id,
+                                token,
+                                user_id
+                            )
+
+                            post_data = {
+                                "touser":openid,
+                                "msgtype":"news", # 图文消息 图文消息条数限制在1条以内，注意，如果图文数超过1，则将会返回错误码45008。
+                                "news":{
+                                    "articles": [
+                                     {
+                                         "title":title,
+                                         "description":b64decode(summary),
+                                         "url":url,
+                                         "picurl":cover_img + '?imageView2/2/w/200'
+                                     }
+                                     ]
+                                }
+                            }
+
+                    else: # 收到其他文字 发送随机五篇文章
+                        timestamp = str(int(time.time()))
+                        rand_str = str_encrypt(timestamp + token)
+                        share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=5&rand_str={}&timestamp={}&user_id={}'.format(
+                            rand_str,
+                            timestamp,
                             user_id
                         )
+                        ret = requests.get(share_url) # 请求随机文章五篇
+                        ret.encoding = 'utf8'
+                        ret_json = ret.json().get('data')
+                        content = ''
+                        for i in ret_json.get('ret_data'): # 循环出推荐文章 链接为文章详情链接
+                            url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
+                                i.get('id'),
+                                token,
+                                user_id
+                            )
+                            pinjie_content = '{}<a href="{url}">{title}</a>'.format(
+                                b64decode('4p6h'),  # emoji解码  →箭头
+                                title=i.get('title'),
+                                url=url
+                            )
+                            content += ' \n{} \n'.format(pinjie_content)  # 拼接A标签 跳转链接
 
                         post_data = {
                             "touser":openid,
-                            "msgtype":"news", # 图文消息 图文消息条数限制在1条以内，注意，如果图文数超过1，则将会返回错误码45008。
-                            "news":{
-                                "articles": [
-                                 {
-                                     "title":title,
-                                     "description":b64decode(summary),
-                                     "url":url,
-                                     "picurl":cover_img + '?imageView2/2/w/200'
-                                 }
-                                 ]
+                            "msgtype": "text",
+                            "text": {
+                                "content":'天眼将一直为您推送消息 \n{} \n点击下方天眼,更多内容等你哦!'.format(
+                                    content
+                                )
                             }
                         }
-
-                else: # 收到其他文字 发送随机五篇文章
-                    timestamp = str(int(time.time()))
-                    rand_str = str_encrypt(timestamp + token)
-                    share_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/article/popula_articles/0?length=5&rand_str={}&timestamp={}&user_id={}'.format(
-                        rand_str,
-                        timestamp,
-                        user_id
-                    )
-                    ret = requests.get(share_url) # 请求随机文章五篇
-                    ret.encoding = 'utf8'
-                    ret_json = ret.json().get('data')
-                    content = ''
-                    for i in ret_json.get('ret_data'): # 循环出推荐文章 链接为文章详情链接
-                        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
-                            i.get('id'),
-                            token,
-                            user_id
-                        )
-                        pinjie_content = '{}<a href="{url}">{title}</a>'.format(
-                            b64decode('4p6h'),  # emoji解码  →箭头
-                            title=i.get('title'),
-                            url=url
-                        )
-                        content += ' \n{} \n'.format(pinjie_content)  # 拼接A标签 跳转链接
-
-                    post_data = {
-                        "touser":openid,
-                        "msgtype": "text",
-                        "text": {
-                            "content":'天眼将一直为您推送消息 \n{} \n点击下方天眼,更多内容等你哦!'.format(
-                                content
-                            )
-                        }
-                    }
-                print('--------------------post_data-----> ', post_data)
-                # 发送客服消息
-                post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-                weichat_api_obj.news_service(post_data)
+                    print('--------------------post_data-----> ', post_data)
+                    # 发送客服消息
+                    post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+                    weichat_api_obj.news_service(post_data)
 
             return HttpResponse("")
 
