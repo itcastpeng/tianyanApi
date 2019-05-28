@@ -12,7 +12,7 @@ from publicFunc.get_content_article import get_article
 from publicFunc.article_oper import add_article_public
 from tianyan_celery.tasks import customer_view_articles_send_msg
 from publicFunc.public import randomly_query_three_articles, get_hot_commodity
-import requests, datetime, random, json, redis
+import requests, datetime, random, json, redis, re
 
 # token验证 文章展示模块
 @account.is_token(models.Userprofile)
@@ -315,10 +315,20 @@ def article_oper(request, oper_type, o_id):
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                data_dict = get_article(article_url)
-                cleaned_data = forms_obj.cleaned_data
-                classify_id = cleaned_data.get('classify_id')
-                id = add_article_public(data_dict, classify_id) # 创建文章
+                ret = requests.get(article_url)
+                title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
+                is_article = models.Article.objects.filter(
+                    create_user_id=user_id,
+                    title=title
+                )
+                if not is_article:
+                    data_dict = get_article(article_url)
+                    cleaned_data = forms_obj.cleaned_data
+                    classify_id = cleaned_data.get('classify_id')
+                    id = add_article_public(data_dict, classify_id) # 创建文章
+                else:
+                    id = is_article[0].id
+
                 response.code = 200
                 response.msg = "添加成功"
                 response.data = {'id': id}

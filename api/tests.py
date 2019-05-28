@@ -122,28 +122,21 @@
 #
 # print(title, summary, cover_url, content)
 
-import datetime
-now = '2019-05-13 09:05:00'
-now_date = datetime.datetime.strptime(now, '%Y-%m-%d %H:%M:%S')
-
-print(type(now_date))
-
-start_time = (now_date - datetime.timedelta(days=1, minutes=10))
-stop_time = (now_date - datetime.timedelta(days=1))
-
-print(start_time, stop_time)
-p = '2019-05-12 09:03:56'
 
 
 
 
+shipin_url = 'https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&action=mpvideo&auto=0&vid=wxv_800489262956412928'
+
+
+if '&' in shipin_url and 'vid=' in shipin_url:
+    vid_num = shipin_url.split('vid=')[1]
+    _url = shipin_url.split('?')[0]
+    shipin_url = _url + '?vid=' + vid_num
 
 
 
-
-
-
-
+print('shipin_url------> ', shipin_url)
 
 
 
