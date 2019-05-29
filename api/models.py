@@ -2,21 +2,24 @@ from django.db import models
 
 
 
-# 后台 OEM 客户
-class OEM_admin_customer(models.Model):
-    name = models.CharField(verbose_name="姓名", max_length=256)
-    password = models.CharField(verbose_name='密码', max_length=256)
-    token = models.CharField(verbose_name="token值", max_length=128)
-    create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-
 
 # 企业
 class Enterprise(models.Model):
     name = models.CharField(verbose_name='企业名称', max_length=64)
-    appid = models.CharField(verbose_name='公众号APPID', max_length=128)
-    appsecret = models.CharField(verbose_name='公众号APPSECRET', max_length=256)
-    access_token = models.CharField(verbose_name='公众号access_token', max_length=256)
-    create_datetime = models.CharField(verbose_name="创建时间", max_length=32)
+    password = models.CharField(verbose_name='密码', max_length=256)
+    token = models.CharField(verbose_name="token值", max_length=128)
+    phone = models.CharField(verbose_name="电话", max_length=16)
+    role_choices = (
+        (1, "OEM用户"),
+        (2, "超级管理员"),
+    )
+    role = models.SmallIntegerField(verbose_name='角色', choices=role_choices, default=1)
+    appid = models.CharField(verbose_name='公众号APPID', max_length=128, null=True)
+    appsecret = models.CharField(verbose_name='公众号APPSECRET', max_length=256, null=True)
+    access_token = models.CharField(verbose_name='公众号access_token', max_length=256, null=True)
+    oper_user = models.ForeignKey('Enterprise', verbose_name='创建人')
+    create_datetime = models.CharField(verbose_name="access_token更新时间", max_length=32)
+    create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
 
 # 微商用户表

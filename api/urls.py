@@ -7,7 +7,7 @@ from django.conf.urls import url, include
 
 urlpatterns = [
     # 后台
-    url(r'^admin/', include('api.urls_dir.admin_urls')),
+    url(r'^admin/', include('api.views_dir.admin.admin_urls')),
 
     # 平台加入文章
     url(r'^platform_add_article/(?P<oper_type>\w+)', platform_add_article.article_oper),

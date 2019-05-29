@@ -274,7 +274,7 @@ def small_shop_oper(request, oper_type, o_id):
                 response.msg = '非法用户'
 
         # 下架商品
-        elif oper_type == '':
+        elif oper_type == 'shelves_goods':
             obj = models.Goods.objects.get(id=o_id)
             if obj and obj.goods_status == 1:
                 obj.goods_status = 2

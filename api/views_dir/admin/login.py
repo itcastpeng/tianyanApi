@@ -12,7 +12,7 @@ def login(request):
     password = request.POST.get('password')
 
     # 查询数据库
-    userprofile_objs = models.OEM_admin_customer.objects.filter(
+    userprofile_objs = models.Enterprise.objects.filter(
         username=username,
         # md5加密 密码
         password=account.str_encrypt(password),

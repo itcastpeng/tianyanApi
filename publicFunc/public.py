@@ -84,5 +84,3 @@ def get_hot_commodity(user_id):
 
 
 
-
-
