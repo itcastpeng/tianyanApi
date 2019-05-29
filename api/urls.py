@@ -3,9 +3,11 @@ from api.views_dir import user, wechat, classify, article, posters, customer, sm
     my_business_card
 
 from api.views_dir.my_celery import celery_url
-from django.conf.urls import url
+from django.conf.urls import url, include
 
 urlpatterns = [
+    # 后台
+    url(r'^admin/', include('api.urls_dir.admin_urls')),
 
     # 平台加入文章
     url(r'^platform_add_article/(?P<oper_type>\w+)', platform_add_article.article_oper),
@@ -114,5 +116,6 @@ urlpatterns = [
 
     # 创建天眼公众号 导航栏
     url(r'^create_menu$', celery_url.create_menu),
+
 ]
 

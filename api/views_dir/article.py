@@ -315,14 +315,14 @@ def article_oper(request, oper_type, o_id):
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                ret = requests.get(article_url)
-                title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
+
+                data_dict = get_article(article_url)
                 is_article = models.Article.objects.filter(
                     create_user_id=user_id,
-                    title=title
+                    title=data_dict.get('title')
                 )
+
                 if not is_article:
-                    data_dict = get_article(article_url)
                     cleaned_data = forms_obj.cleaned_data
                     classify_id = cleaned_data.get('classify_id')
                     id = add_article_public(data_dict, classify_id) # 创建文章
