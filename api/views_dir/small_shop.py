@@ -276,17 +276,22 @@ def small_shop_oper(request, oper_type, o_id):
         # 下架商品
         elif oper_type == 'shelves_goods':
             obj = models.Goods.objects.get(id=o_id)
-            if obj and obj.goods_status == 1:
-                obj.goods_status = 2
+            if obj:
+                if obj.goods_status == 1:
+                    title = '下架'
+                    goods_status = 2
+                else:
+                    goods_status = 1
+                    title = '上架'
+
+                obj.goods_status = goods_status
                 obj.save()
                 response.code = 200
-                response.msg = '下架成功'
+                response.msg = '{}成功'.format(title)
+
             else:
                 response.code = 301
-                if obj:
-                    response.msg = '该商品已下架'
-                else:
-                    response.msg = '该商品不存在'
+                response.msg = '该商品不存在'
 
         else:
             response.code = 402

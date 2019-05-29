@@ -133,7 +133,6 @@ def user_oper(request, oper_type, o_id):
 
         # 添加用户
         if oper_type == "add":
-
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
                 models.Enterprise.objects.create(**forms_obj.cleaned_data)

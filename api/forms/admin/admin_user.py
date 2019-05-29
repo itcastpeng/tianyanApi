@@ -79,21 +79,6 @@ class AddForm(forms.Form):
         password = self.data['password']
         return account.get_token(password + str(int(time.time()) * 1000))
 
-    # def clean_department_id(self):
-    #     department_id = self.data.get('department_id')
-    #     objs = models.department.objects.filter(id=department_id)
-    #     if objs:
-    #         return department_id
-    #     else:
-    #         self.add_error('department_id', '该部门不存在')
-    def clean_signature(self):
-        signature = self.data.get('signature')
-        if signature:
-            signature_len = len(signature)
-            if signature_len > 50:
-                self.add_error('signature', '个性签名长度不能超过50')
-            else:
-                return signature
     def clean_phone(self):
         phone = self.data.get('phone')
         if phone:
@@ -101,6 +86,27 @@ class AddForm(forms.Form):
                 return phone
             else:
                 self.add_error('phone', '请输入正确手机号')
+
+    def clean_role(self):
+        role = int(self.data.get('role'))
+        appid = self.data.get('appid')
+        appsecret = self.data.get('appsecret')
+
+        if role == 1:
+            if appid and appsecret:
+                pass
+            else:
+                self.add_error('role', 'appid 和 appsecret 为必填字段')
+        else:
+            return role
+
+
+
+
+
+
+
+
 
 # 更新
 class UpdateForm(forms.Form):
