@@ -317,11 +317,14 @@ def article_oper(request, oper_type, o_id):
             if forms_obj.is_valid():
 
                 data_dict = get_article(article_url)
+
+                print("data_dict.get('title')----------------> ", data_dict.get('title'))
+
                 is_article = models.Article.objects.filter(
                     create_user_id=user_id,
                     title=data_dict.get('title')
                 )
-
+                data_dict['create_user_id'] = user_id
                 if not is_article:
                     cleaned_data = forms_obj.cleaned_data
                     classify_id = cleaned_data.get('classify_id')

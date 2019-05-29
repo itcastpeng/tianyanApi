@@ -140,14 +140,13 @@ print('shipin_url------> ', shipin_url)
 
 
 
+title_list = ['雷达测试文章同步', '雷达测试文章', '雷达测试同步文章2', '雷达测试文章同步1', '两次隆鼻、一次注射玻尿酸！人的鼻子到底能折腾多少次？', '没【留量】比没流量更可怕—合众康桥']
+media_id_list = ['ivcZrCjmhDznUrwcjIReREEIGxlxRyrfrht82iEgw0Q', 'ivcZrCjmhDznUrwcjIReRNzPw1zYXT2aP43r0HGEj-c', 'ivcZrCjmhDznUrwcjIReRGzR15rom5lbwxRvMlHM8Vc', 'ivcZrCjmhDznUrwcjIReRPoDiI2Fke3LVhHU7hNXTXE', 'ivcZrCjmhDznUrwcjIReRKw072mb7eq1Kn9MNz7oAxA']
+title = '雷达文章测试3'
+media_id = 'ivcZrCjmhDznUrwcjIReRNzPw1zYXT2aP43r0HGEj-c'
 
-
-
-
-
-
-
-
+if (title not in title_list) or (media_id not in media_id_list): # 如果不存在创建
+    print('========')
 
 
 
