@@ -163,7 +163,7 @@ def get_article(article_url):
                 _url = shipin_url.split('?')[0]
                 shipin_url = _url + '?vid=' + vid_num
 
-            iframe_tag.attrs['data-src'] = url
+            iframe_tag.attrs['data-src'] = shipin_url
             iframe_tag.attrs['allowfullscreen'] = True
             iframe_tag.attrs['data-cover'] = data_cover_url
 
