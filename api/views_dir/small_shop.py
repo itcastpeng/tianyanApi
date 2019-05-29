@@ -272,6 +272,22 @@ def small_shop_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = '非法用户'
+
+        # 下架商品
+        elif oper_type == '':
+            obj = models.Goods.objects.get(id=o_id)
+            if obj and obj.goods_status == 1:
+                obj.goods_status = 2
+                obj.save()
+                response.code = 200
+                response.msg = '下架成功'
+            else:
+                response.code = 301
+                if obj:
+                    response.msg = '该商品已下架'
+                else:
+                    response.msg = '该商品不存在'
+
         else:
             response.code = 402
             response.msg = "请求异常"
