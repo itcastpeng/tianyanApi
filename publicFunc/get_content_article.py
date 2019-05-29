@@ -4,7 +4,7 @@ from urllib.parse import unquote
 from bs4 import BeautifulSoup
 from publicFunc.base64_encryption import b64encode
 from publicFunc.replace_chinese_character import replace_chinese_character
-from publicFunc.qiniu_oper import update_qiniu
+from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 from tianyanApi import settings
 
 pcRequestHeader = [
@@ -131,20 +131,30 @@ def get_article(article_url):
 
     # print('body--->', body)
     ## 处理视频的URL
-    # iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
-    # for iframe_tag in iframe:
-    #     shipin_url = iframe_tag.get('data-src')
-    #     data_cover_url = iframe_tag.get('data-cover')
-    #     if data_cover_url:
-    #         data_cover_url = unquote(data_cover_url, 'utf-8')
-    #     if '&' in shipin_url and 'vid=' in shipin_url:
-    #         vid_num = shipin_url.split('vid=')[1]
-    #         _url = shipin_url.split('?')[0]
-    #         shipin_url = _url + '?vid=' + vid_num
-    #
-    #     iframe_tag.attrs['data-src'] = shipin_url
-    #     iframe_tag.attrs['allowfullscreen'] = True
-    #     iframe_tag.attrs['data-cover'] = data_cover_url
+    iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
+    for iframe_tag in iframe:
+        shipin_url = iframe_tag.get('data-src')
+        data_cover_url = iframe_tag.get('data-cover') # 封面
+        if data_cover_url:
+            data_cover_url = unquote(data_cover_url, 'utf-8')
+        data_cover_url = requests_img_download(data_cover_url) # 下载到本地
+        data_cover_url = update_qiniu(data_cover_url)
+
+
+        iframe_url = 'https://mp.weixin.qq.com/mp/videoplayer?vid={}&action=get_mp_video_play_url'.format(
+            shipin_url.split('vid=')[1]
+        )
+        ret = requests.get(iframe_url)
+        url = ret.json().get('url_info')[0].get('url')
+
+        # if '&' in shipin_url and 'vid=' in shipin_url:
+        #     vid_num = shipin_url.split('vid=')[1]
+        #     _url = shipin_url.split('?')[0]
+        #     shipin_url = _url + '?vid=' + vid_num
+
+        iframe_tag.attrs['data-src'] = url
+        iframe_tag.attrs['allowfullscreen'] = True
+        iframe_tag.attrs['data-cover'] = data_cover_url
 
 
     # 生成css 文件
