@@ -140,32 +140,30 @@ def get_article(article_url):
         data_cover_url = requests_img_download(data_cover_url) # 下载到本地
         data_cover_url = update_qiniu(data_cover_url)
 
-        print('data_cover_url-----------> ', data_cover_url)
         iframe_url = 'https://mp.weixin.qq.com/mp/videoplayer?vid={}&action=get_mp_video_play_url'.format(
             shipin_url.split('vid=')[1]
         )
         ret = requests.get(iframe_url)
-        # try:
-        url = ret.json().get('url_info')[0].get('url')
-        video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
-                                   <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls"></video>
-                               </div>""".format(
-            url,
-            data_cover_url,
-        )
+        try:
+            url = ret.json().get('url_info')[0].get('url')
+            video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
+                                       <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls"></video>
+                                   </div>""".format(
+                url,
+                data_cover_url,
+            )
 
-        body = str(body).replace(str(iframe_tag), video_tag)
-        body = BeautifulSoup(body, 'html.parser')
-        print('--------------------------> ', type(body))
-        # except Exception:
-        #     if '&' in shipin_url and 'vid=' in shipin_url:
-        #         vid_num = shipin_url.split('vid=')[1]
-        #         _url = shipin_url.split('?')[0]
-        #         shipin_url = _url + '?vid=' + vid_num
-        #
-        #     iframe_tag.attrs['data-src'] = shipin_url
-        #     iframe_tag.attrs['allowfullscreen'] = True
-        #     iframe_tag.attrs['data-cover'] = data_cover_url
+            body = str(body).replace(str(iframe_tag), video_tag)
+            body = BeautifulSoup(body, 'html.parser')
+        except Exception:
+            if '&' in shipin_url and 'vid=' in shipin_url:
+                vid_num = shipin_url.split('vid=')[1]
+                _url = shipin_url.split('?')[0]
+                shipin_url = _url + '?vid=' + vid_num
+
+            iframe_tag.attrs['data-src'] = shipin_url
+            iframe_tag.attrs['allowfullscreen'] = True
+            iframe_tag.attrs['data-cover'] = data_cover_url
 
 
     # 生成css 文件
