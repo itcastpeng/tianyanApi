@@ -74,7 +74,6 @@ def eliminate_label(i):
 
 # 放入微信文章 获取全部内容
 def get_article(article_url):
-    print('----------------------------------------------------------------------------------')
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
     ret.encoding = 'utf-8'
@@ -128,24 +127,24 @@ def get_article(article_url):
                 file.write(html.content)
             img_url = update_qiniu(file_dir)
             img_tag.attrs['data-src'] = img_url
-            # img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
+            #  img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
 
     # print('body--->', body)
     ## 处理视频的URL
-    iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
-    for iframe_tag in iframe:
-        shipin_url = iframe_tag.get('data-src')
-        data_cover_url = iframe_tag.get('data-cover')
-        if data_cover_url:
-            data_cover_url = unquote(data_cover_url, 'utf-8')
-        if '&' in shipin_url and 'vid=' in shipin_url:
-            vid_num = shipin_url.split('vid=')[1]
-            _url = shipin_url.split('?')[0]
-            shipin_url = _url + '?vid=' + vid_num
-
-        iframe_tag.attrs['data-src'] = shipin_url
-        iframe_tag.attrs['allowfullscreen'] = True
-        iframe_tag.attrs['data-cover'] = data_cover_url
+    # iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
+    # for iframe_tag in iframe:
+    #     shipin_url = iframe_tag.get('data-src')
+    #     data_cover_url = iframe_tag.get('data-cover')
+    #     if data_cover_url:
+    #         data_cover_url = unquote(data_cover_url, 'utf-8')
+    #     if '&' in shipin_url and 'vid=' in shipin_url:
+    #         vid_num = shipin_url.split('vid=')[1]
+    #         _url = shipin_url.split('?')[0]
+    #         shipin_url = _url + '?vid=' + vid_num
+    #
+    #     iframe_tag.attrs['data-src'] = shipin_url
+    #     iframe_tag.attrs['allowfullscreen'] = True
+    #     iframe_tag.attrs['data-cover'] = data_cover_url
 
 
     # 生成css 文件
@@ -158,10 +157,6 @@ def get_article(article_url):
 
     # 分布标签
     data_list = []
-    # for i in body.children:
-    #     flag = eliminate_label(str(i))  # 剔除A标签
-    #     if flag:
-    #         continue
     for i in body:
         content = convert_content(s, str(i)) # 替换内容
         data_list.append(content)
