@@ -145,7 +145,6 @@ def get_article(article_url):
             shipin_url.split('vid=')[1]
         )
         ret = requests.get(iframe_url)
-        print(ret.json())
         # try:
         url = ret.json().get('url_info')[0].get('url')
         video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
@@ -154,6 +153,7 @@ def get_article(article_url):
             url,
             data_cover_url,
         )
+        print('--------------------------> ', type(body))
 
         body = str(body).replace(str(iframe_tag), video_tag)
 
