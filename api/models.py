@@ -20,7 +20,11 @@ class Enterprise(models.Model):
     oper_user = models.ForeignKey('Enterprise', verbose_name='创建人')
     create_datetime = models.CharField(verbose_name="access_token更新时间", max_length=32)
     create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-
+    status_choices = (
+        (1, "启用"),
+        (2, "不启用"),
+    )
+    status = models.SmallIntegerField(verbose_name='是否启用', choices=status_choices, default=1)
 
 # 微商用户表
 class Userprofile(models.Model):

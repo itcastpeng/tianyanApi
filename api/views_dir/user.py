@@ -450,13 +450,9 @@ def user_login_oper(request, oper_type):
         models.save_code.objects.create(
             save_code=code
         )
-        print('------------------------------获取用户信息--> ', datetime.datetime.today())
         data = get_ent_info(1)
-        print('------------------------------实例化微信接口----------->', datetime.datetime.today())
         weichat_api_obj = WeChatApi(data)
-        print('------------------------------获取用户信息----------->', datetime.datetime.today())
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
-        print('------------------------------获取完成----------->', datetime.datetime.today())
         encode_username = b64encode(
             ret_obj['nickname']
         )
@@ -474,6 +470,7 @@ def user_login_oper(request, oper_type):
         user_objs = models.Userprofile.objects.filter(openid=openid)
         if user_objs:  # 客户已经存在
             user_obj = user_objs[0]
+            # uf user_obj.enterprise.status == 1: # 如果后台开启
             if int(user_obj.is_send_msg) == 1: # 解除24小时未互动限制
                 post_data = {
                     "touser": user_obj.openid,

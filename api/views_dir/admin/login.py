@@ -8,13 +8,14 @@ import datetime, time
 @csrf_exempt
 def login(request):
     response = Response.ResponseObj()
-    username = request.POST.get('username')
+    name = request.POST.get('name')
     password = request.POST.get('password')
+
+    print(password)
 
     # 查询数据库
     userprofile_objs = models.Enterprise.objects.filter(
-        username=username,
-        # md5加密 密码
+        name=name,
         password=account.str_encrypt(password),
         status=1
     )
@@ -34,9 +35,8 @@ def login(request):
             response.data = {
                 'token': token,
                 'user_id': userprofile_obj.id,
-                'set_avator': userprofile_obj.set_avator,
-                'username': userprofile_obj.username,
-                'role_id': userprofile_obj.role_id,
+                'name': userprofile_obj.name,
+                'role': userprofile_obj.role,
             }
 
         userprofile_obj.last_login_date = datetime.datetime.now()

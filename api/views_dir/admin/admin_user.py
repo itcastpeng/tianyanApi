@@ -17,17 +17,20 @@ def user(request):
         current_page = forms_obj.cleaned_data['current_page']
         length = forms_obj.cleaned_data['length']
         order = request.GET.get('order', '-create_date')
+
         field_dict = {
             'id': '',
             'status': '',
-            'role_id': '',
+            'role': '',
             'create_date': '',
-            'oper_user__username': '__contains',
+            'oper_user__name': '__contains',
         }
 
         q = conditionCom(request, field_dict)
 
-        objs = models.userprofile.objects.select_related('role').filter(q).order_by(order)
+        objs = models.Enterprise.objects.filter(
+            q,
+        ).order_by(order)
 
         count = objs.count()
 
@@ -38,24 +41,17 @@ def user(request):
 
         # 返回的数据
         ret_data = []
-        now = datetime.date.today()
         for obj in objs:
-            last_login_time = ''
-            if obj.last_login_time:
-                last_login_time = obj.last_login_time.strftime('%Y-%m-%d %H:%M:%S')
-            #  将查询出来的数据 加入列表
             ret_data.append({
-                'id': obj.id,
-                'username': obj.username,                           # 用户名称
-                'role_id': obj.role_id,                             # 角色ID
-                'role__name': obj.role.name,                        # 角色名称
-                'oper_user__username':obj.oper_user.username,       # 操作人
-                'oper_user_id': obj.oper_user_id,                   # 操作人ID
-                'status': obj.status,                               # 用户状态ID
-                'get_status_display': obj.get_status_display(),     # 用户状态 (审核, 未审核)
-                'set_avator': obj.set_avator,                       # 头像
-                'phone': obj.phone,                                 # 电话
-                'last_login_time': last_login_time,                 # 最后一次登录时间
+                'id': obj.id,                                               # 用户ID
+                'name': obj.name,                                           # 用户名称
+                'role': obj.role,                                           # 角色ID
+                'role_name': obj.get_role_display(),                        # 角色名称
+                'status':obj.status,                                        # 状态ID
+                'status_name':obj.get_status_display(),                     # 状态
+                'appid': obj.appid,                                         # appid
+                'appsecret': obj.appsecret,                                 # appsecret
+                'phone': obj.phone,                                         # 电话
                 'create_time': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
             })
 
@@ -65,7 +61,7 @@ def user(request):
         response.data = {
             'ret_data': ret_data,
             'data_count': count,
-            'status':models.userprofile.status_choices
+            'status':models.Enterprise.status_choices
             }
 
     else:
@@ -113,22 +109,29 @@ def updatePwd(request):
 
 
 @csrf_exempt
-# @account.is_token(models.Enterprise)
+@account.is_token(models.Enterprise)
 def user_oper(request, oper_type, o_id):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
     if request.method == "POST":
         # 获取需要修改的信息
+
+        role = int(request.POST.get('role', 1))
+        appid = request.POST.get('appid')
+        appsecret = request.POST.get('appsecret')
+        if role == 2: # 超級管理员
+            appid = ''
+            appsecret = ''
+
         form_data = {
             'o_id': o_id,
+            'oper_user_id': request.GET.get('user_id', 1),      # 操作人
             'name': request.POST.get('name'),                   # 用户名
             'password': request.POST.get('password'),           # 密码
-
-            'role': request.POST.get('role', 1),                # 角色 默认用户
-            'oper_user_id': request.GET.get('oper_user_id'),    # 操作人
+            'role': role,                                       # 角色 默认用户
             'phone': request.POST.get('phone'),                 # 电话
-            'appid': request.POST.get('appid'),                 # appid
-            'appsecret': request.POST.get('appsecret'),         # appsecret
+            'appid': appid,                                     # appid
+            'appsecret': appsecret,                             # appsecret
         }
 
         # 添加用户
@@ -146,30 +149,21 @@ def user_oper(request, oper_type, o_id):
 
         # 修改用户
         elif oper_type == "update":
-
             forms_obj = UpdateForm(form_data)
             if forms_obj.is_valid():
-
                 o_id = forms_obj.cleaned_data['o_id']
-                username = forms_obj.cleaned_data['username']           # 用户名
-                role_id = forms_obj.cleaned_data['role_id']             # 角色ID
-                oper_user_id = forms_obj.cleaned_data['oper_user_id']   # 操作人
-                set_avator = forms_obj.cleaned_data['set_avator']       # 头像
-                phone = forms_obj.cleaned_data['phone']                 # 电话
+                name = forms_obj.cleaned_data['name']       # 用户名
+                phone = forms_obj.cleaned_data['phone']     # 电话
 
-                objs = models.userprofile.objects.filter(
+                objs = models.Enterprise.objects.filter(
                     id=o_id
                 )
                 #  更新 数据
                 if objs:
                     objs.update(
-                        username=username,
-                        role_id=role_id,
-                        oper_user_id=oper_user_id,
+                        name=name,
                         phone=phone,
-                        set_avator=set_avator
                     )
-
                     response.code = 200
                     response.msg = "修改成功"
 
@@ -181,54 +175,10 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
-        # 删除 用户
-        elif oper_type == "delete":
-            if o_id == user_id:
-                response.code = 301
-                response.msg = '不能删除自己'
-            else:
-                objs = models.userprofile.objects.get(id=o_id)
-                if objs:
-                    objs.delete()
-                    response.code = 200
-                    response.msg = "删除成功"
-                else:
-                    response.code = 302
-                    response.msg = '删除ID不存在'
-            response.data = {}
-
     else:
-        # 用户审核
-        if oper_type == 'user_audit':
-            objs = models.userprofile.objects.filter(id=o_id)
-            if objs:
-                if int(objs[0].status) == 1:
-                    objs[0].status = 2
-                else:
-                    objs[0].status = 1
-                objs[0].save()
-                response.code = 200
-                response.msg = '修改成功'
 
-            else:
-                response.code = 301
-                response.msg = '无此用户'
-
-        # 获取用户信息
-        elif oper_type == 'get_user_info':
-            obj = models.userprofile.objects.get(id=user_id)
-
-            response.code = 200
-            response.msg = '查询个人信息成功'
-            response.data = {
-                'set_avator': obj.set_avator,
-                'username': obj.username,
-                'role_id': obj.role_id,
-            }
-
-        else:
-            response.code = 402
-            response.msg = "请求异常"
+        response.code = 402
+        response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)
 

@@ -148,6 +148,9 @@ media_id = 'ivcZrCjmhDznUrwcjIReRNzPw1zYXT2aP43r0HGEj-c'
 if (title not in title_list) or (media_id not in media_id_list): # 如果不存在创建
     print('========')
 
+from publicFunc import  account
+
+print(account.str_encrypt(123))
 
 
 

@@ -7,7 +7,7 @@ import time
 
 
 
-# 普通用户添加
+# 添加用户
 class AddForm(forms.Form):
     oper_user_id = forms.IntegerField(
         required=True,
@@ -72,11 +72,11 @@ class AddForm(forms.Form):
             return name
 
     def clean_password(self):
-        password = self.data['password']
+        password = self.data.get('password')
         return account.str_encrypt(password)
 
     def clean_token(self):
-        password = self.data['password']
+        password = self.data.get('password')
         return account.get_token(password + str(int(time.time()) * 1000))
 
     def clean_phone(self):
@@ -94,17 +94,11 @@ class AddForm(forms.Form):
 
         if role == 1:
             if appid and appsecret:
-                pass
+                return role
             else:
                 self.add_error('role', 'appid 和 appsecret 为必填字段')
         else:
             return role
-
-
-
-
-
-
 
 
 
@@ -117,29 +111,10 @@ class UpdateForm(forms.Form):
         }
     )
 
-    username = forms.CharField(
+    name = forms.CharField(
         required=True,
         error_messages={
             'required': "用户名不能为空"
-        }
-    )
-
-    role_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "角色名称不能为空"
-        }
-    )
-    oper_user_id = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': '操作人不能为空'
-        }
-    )
-    set_avator = forms.CharField(
-        required=False,
-        error_messages={
-            'required': "头像类型错误"
         }
     )
 
@@ -150,35 +125,20 @@ class UpdateForm(forms.Form):
         }
     )
 
-    def clean_signature(self):
-        signature = self.data.get('signature')
-        if signature:
-            signature_len = len(signature)
-            if signature_len > 50:
-                self.add_error('signature', '个性签名长度不能超过50')
-            else:
-                return signature
-
     # 判断名称是否存在
-    def clean_username(self):
+    def clean_name(self):
         o_id = self.data['o_id']
-        username = self.data['username']
-        objs = models.userprofile.objects.filter(
-            username=username,
+        name = self.data.get('name')
+        objs = models.Enterprise.objects.filter(
+            name=name,
         ).exclude(
             id=o_id
         )
         if objs:
-            self.add_error('username', '用户名已存在')
+            self.add_error('name', '用户名已存在')
         else:
-            return username
-    # def clean_department_id(self):
-    #     department_id = self.data.get('department_id')
-    #     objs = models.department.objects.filter(id=department_id)
-    #     if objs:
-    #         return department_id
-    #     else:
-    #         self.add_error('department_id', '该部门不存在')
+            return name
+
 
     def clean_phone(self):
         phone = self.data.get('phone')
@@ -226,6 +186,12 @@ class SelectForm(forms.Form):
             length = int(self.data['length'])
         return length
 
-
+    def clean_user_id(self):
+        user_id = self.data.get('user_id')
+        obj = models.Enterprise.objects.get(id=user_id)
+        if int(obj.role) == 2:
+            return user_id
+        else:
+            self.add_error('user_id', '非法请求')
 
 
