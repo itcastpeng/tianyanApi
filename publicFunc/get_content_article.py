@@ -153,10 +153,10 @@ def get_article(article_url):
             url,
             data_cover_url,
         )
-        print('--------------------------> ', type(body))
 
         body = str(body).replace(str(iframe_tag), video_tag)
-
+        body = BeautifulSoup(body, 'html.parser')
+        print('--------------------------> ', type(body))
         # except Exception:
         #     if '&' in shipin_url and 'vid=' in shipin_url:
         #         vid_num = shipin_url.split('vid=')[1]
