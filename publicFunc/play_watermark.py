@@ -47,6 +47,7 @@ class watermark():
         #     poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
         # path = screenshots(poster_url, path)  # 截图
         # 正能量海报水印
+        linshi_path = ''
         if posters_status == 1:
 
             linshi_path = os.path.join('statics', 'poster_img', randon_str() + '.png')
@@ -102,6 +103,9 @@ class watermark():
             image_draw.text((place_width, img_hight-85), place, font=font, fill=color)
             image_draw.text((text_width, img_hight-40), text, font=font, fill=color)
         image.save(path)
+
+        if linshi_path:
+            os.remove(linshi_path)
         return path
 
 if __name__ == '__main__':
