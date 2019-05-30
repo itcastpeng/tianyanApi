@@ -146,8 +146,10 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
-            print('-----------------------新-----------------')
-            url = ret.json().get('url_info')[0].get('url')
+            url = shipin_url
+            if len(ret.json().get('url_info')) >= 1:
+                url = ret.json().get('url_info')[0].get('url')
+
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls"></video>
                                    </div>""".format(
@@ -158,8 +160,6 @@ def get_article(article_url):
             body = str(body).replace(str(iframe_tag), video_tag)
             body = BeautifulSoup(body, 'html.parser')
         except Exception as e:
-            print('----------=============旧======================', e)
-            print('shipin_url-------------> ', shipin_url)
             if '&' in shipin_url and 'vid=' in shipin_url:
                 vid_num = shipin_url.split('vid=')[1]
                 _url = shipin_url.split('?')[0]
