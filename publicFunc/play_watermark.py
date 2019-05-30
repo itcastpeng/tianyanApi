@@ -66,10 +66,10 @@ class watermark():
             image.paste(heading_path, (100, height)) # 张贴头像
 
             text_width = heading_path.size[0]+150 # 字体宽度
-            image_draw.text((text_width, height), self.name, font=font, fill=(0, 0, 0))
+            image_draw.text((text_width, height), self.name, font=font, fill=color)
 
             height = (image_height - (heading_path.size[1] / 2 + 100))
-            image_draw.text((text_width, height), self.phone, font=font, fill=(0, 0, 0))
+            image_draw.text((text_width, height), self.phone, font=font, fill=color)
 
 
         # 邀请函海报水印
