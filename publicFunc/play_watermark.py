@@ -60,8 +60,8 @@ class watermark():
             ret = requests.get(self.heading)
             with open(linshi_path, 'wb') as f:
                 f.write(ret.content)
-            linshi_path = Image.open(linshi_path)
-            heading_path = linshi_path.resize((150, 150)) # 头像固定大小
+            heading_draw = Image.open(linshi_path)
+            heading_path = heading_draw.resize((150, 150)) # 头像固定大小
 
             height = (image_height - (heading_path.size[1] + 100))
             image.paste(heading_path, (100, height)) # 张贴头像
