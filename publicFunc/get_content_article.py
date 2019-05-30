@@ -146,16 +146,7 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
-
-            if len(ret.json().get('url_info')) >= 1:
-                url = ret.json().get('url_info')[0].get('url')
-            else:
-                if '&' in shipin_url and 'vid=' in shipin_url:
-                    vid_num = shipin_url.split('vid=')[1]
-                    _url = shipin_url.split('?')[0]
-                    shipin_url = _url + '?vid=' + vid_num
-                url = shipin_url
-
+            url = ret.json().get('url_info')[0].get('url')
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
                                    </div>""".format(
@@ -170,7 +161,7 @@ def get_article(article_url):
                 vid_num = shipin_url.split('vid=')[1]
                 _url = shipin_url.split('?')[0]
                 shipin_url = _url + '?vid=' + vid_num
-
+            print('data_cover_url=================> ', data_cover_url)
             iframe_tag.attrs['data-src'] = shipin_url
             iframe_tag.attrs['allowfullscreen'] = True
             iframe_tag.attrs['data-cover'] = data_cover_url
