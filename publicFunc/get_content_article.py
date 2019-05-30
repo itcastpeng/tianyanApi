@@ -146,7 +146,13 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
-            url = ret.json().get('url_info')[0].get('url')
+            if len(ret.json().get('url_info')) >= 1:
+                url = ret.json().get('url_info')[0].get('url')
+            else:
+                url = iframe_tag.get('src')  # 封面
+                if 'http' not in url:
+                    url = 'http:' + url
+
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
                                    </div>""".format(
@@ -165,7 +171,7 @@ def get_article(article_url):
             iframe_tag.attrs['data-src'] = shipin_url
             iframe_tag.attrs['allowfullscreen'] = True
             iframe_tag.attrs['data-cover'] = data_cover_url
-
+        print('iframe_tag-----> ', iframe_tag)
 
     # 生成css 文件
     now = time.time()
