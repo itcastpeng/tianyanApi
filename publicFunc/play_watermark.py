@@ -37,8 +37,7 @@ class watermark():
             img_url = self.img_path
             if 'zhugeyingxiao.com/tianyan' in self.img_path:
                 img_url = self.img_path.split(host_url)[1]  # 切除域名
-            path = './2.png'
-            img_url = '1.jpg'
+
             image = Image.open(img_url).convert('RGBA')
             color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
 
