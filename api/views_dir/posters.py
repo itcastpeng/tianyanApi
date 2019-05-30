@@ -185,7 +185,7 @@ def posters_oper(request, oper_type, o_id):
                         'heading':obj.set_avator + '?imageView2/2/w/300',
                         'name':b64decode(obj.name),
                         'phone':obj.phone_number,
-                        'posters_status':posters_status
+                        'posters_status':posters_status,
                     }
                     watermark_objs = watermark(data)  # 实例化
                     path = watermark_objs.posters_play_watermark()
