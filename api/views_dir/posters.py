@@ -182,7 +182,7 @@ def posters_oper(request, oper_type, o_id):
                     obj = models.Userprofile.objects.get(id=user_id)
                     data = {
                         'img_path': img_path,
-                        'heading':obj.set_avator + '?imageView2/2/w/100',
+                        'heading':obj.set_avator + '?imageView2/2/w/300',
                         'name':b64decode(obj.name),
                         'phone':obj.phone_number,
                         'posters_status':posters_status
