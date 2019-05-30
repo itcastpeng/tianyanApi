@@ -133,6 +133,7 @@ def get_article(article_url):
     ## 处理视频的URL
     iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
     for iframe_tag in iframe:
+        print('----------------------------------获取到视频-------------------')
         shipin_url = iframe_tag.get('data-src')
         data_cover_url = iframe_tag.get('data-cover') # 封面
         if data_cover_url:
@@ -145,6 +146,7 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
+            print('-----------------------新-----------------')
             url = ret.json().get('url_info')[0].get('url')
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls"></video>
@@ -156,6 +158,7 @@ def get_article(article_url):
             body = str(body).replace(str(iframe_tag), video_tag)
             body = BeautifulSoup(body, 'html.parser')
         except Exception:
+            print('----------=============旧======================')
             if '&' in shipin_url and 'vid=' in shipin_url:
                 vid_num = shipin_url.split('vid=')[1]
                 _url = shipin_url.split('?')[0]
