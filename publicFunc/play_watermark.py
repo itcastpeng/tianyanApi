@@ -52,11 +52,11 @@ class watermark():
             place = self.data.get('place')
 
             text = '详询:' + text
-            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
+            # zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
+            # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
 
-            # zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
-            # font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
+            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
 
             zhu_title_x, zhu_title_y = image_draw.textsize(zhu_title, font=zhu_title_font)
             fu_title_x, fu_title_y = image_draw.textsize(fu_title, font=font)
