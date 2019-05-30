@@ -24,7 +24,7 @@ def randomly_query_three_articles(user_id, id=None):
         create_user_id=user_id
     ).exclude(
         id=id
-    ).order_by('look_num')[:3]
+    ).order_by('-look_num')[:3]
 
     popula_articles_list = []
     for article_obj in article_objs:
