@@ -77,7 +77,7 @@ def user(request):
 def updatePwd(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
-    user_objs = models.userprofile.objects.filter(id=user_id)
+    user_objs = models.Enterprise.objects.filter(id=user_id)
 
     if user_objs:
         user_obj = user_objs[0]
@@ -125,7 +125,7 @@ def user_oper(request, oper_type, o_id):
 
         form_data = {
             'o_id': o_id,
-            'oper_user_id': request.GET.get('user_id', 1),      # 操作人
+            'oper_user_id': request.GET.get('user_id'),         # 操作人
             'name': request.POST.get('name'),                   # 用户名
             'password': request.POST.get('password'),           # 密码
             'role': role,                                       # 角色 默认用户

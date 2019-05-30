@@ -71,9 +71,6 @@ class AddForm(forms.Form):
         else:
             return name
 
-    def clean_password(self):
-        password = self.data.get('password')
-        return account.str_encrypt(password)
 
     def clean_token(self):
         password = self.data.get('password')
@@ -99,7 +96,9 @@ class AddForm(forms.Form):
                 self.add_error('role', 'appid 和 appsecret 为必填字段')
         else:
             return role
-
+    def clean_password(self):
+        password = self.data.get('password')
+        return account.str_encrypt(password)
 
 
 # 更新
