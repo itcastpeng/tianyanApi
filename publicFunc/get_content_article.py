@@ -33,33 +33,34 @@ URL = 'http://zhugeleida.zhugeyingxiao.com/tianyan/'
 
 # 替换内容
 def convert_content(s, content):
-    # print('content----> ', type(content), content)
-    dict = {'url': '', 'data-src': 'src', '?wx_fmt=jpg': '', '?wx_fmt=png': '', '?wx_fmt=jpeg': '', '?wx_fmt=gif': ''}
-    for key, value in dict.items():
-        if key == 'url':
-            pattern1 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+\?\w+=\w+', re.I)  # 通过 re.compile 获得一个正则表达式对象
-            pattern2 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+', re.I)
-            results_url_list_1 = pattern1.findall(content)
-            results_url_list_2 = pattern2.findall(content)
-            results_url_list_1.extend(results_url_list_2)
-            for pattern_url in results_url_list_1:
-                # print('pattern_url------> ', pattern_url)
-                now_time = time.time()
-                ## 把图片下载到本地
-                html = s.get(pattern_url)
-                if 'wx_fmt=gif' in pattern_url:
-                    filename = "/article_%s.gif" % (now_time)
-                else:
-                    filename = "/article_%s.jpg" % (now_time)
+    print('content----> ', type(content), content)
+    if 'iframe' not in content:
+        dict = {'url': '', 'data-src': 'src', '?wx_fmt=jpg': '', '?wx_fmt=png': '', '?wx_fmt=jpeg': '', '?wx_fmt=gif': ''}
+        for key, value in dict.items():
+            if key == 'url':
+                pattern1 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+\?\w+=\w+', re.I)  # 通过 re.compile 获得一个正则表达式对象
+                pattern2 = re.compile(r'https:\/\/mmbiz.qpic.cn\/\w+\/\w+\/\w+', re.I)
+                results_url_list_1 = pattern1.findall(content)
+                results_url_list_2 = pattern2.findall(content)
+                results_url_list_1.extend(results_url_list_2)
+                for pattern_url in results_url_list_1:
+                    # print('pattern_url------> ', pattern_url)
+                    now_time = time.time()
+                    ## 把图片下载到本地
+                    html = s.get(pattern_url)
+                    if 'wx_fmt=gif' in pattern_url:
+                        filename = "/article_%s.gif" % (now_time)
+                    else:
+                        filename = "/article_%s.jpg" % (now_time)
 
-                file_dir = os.path.join('statics', 'img') + filename
-                with open(file_dir, 'wb') as file:
-                    file.write(html.content)
-                sub_url = URL + file_dir
-                # sub_url = URL + '/statics/img' + filename
-                content = content.replace(pattern_url, sub_url)
-        else:
-            content = content.replace(key, value)
+                    file_dir = os.path.join('statics', 'img') + filename
+                    with open(file_dir, 'wb') as file:
+                        file.write(html.content)
+                    sub_url = URL + file_dir
+                    # sub_url = URL + '/statics/img' + filename
+                    content = content.replace(pattern_url, sub_url)
+            else:
+                content = content.replace(key, value)
     return content
 
 # 剔除A标签
@@ -146,13 +147,7 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
-            if len(ret.json().get('url_info')) >= 1:
-                url = ret.json().get('url_info')[0].get('url')
-            else:
-                url = iframe_tag.get('src')  # 封面
-                if 'http' not in url:
-                    url = 'http:' + url
-
+            url = ret.json().get('url_info')[0].get('url')
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
                                    </div>""".format(
@@ -167,7 +162,7 @@ def get_article(article_url):
                 vid_num = shipin_url.split('vid=')[1]
                 _url = shipin_url.split('?')[0]
                 shipin_url = _url + '?vid=' + vid_num
-            print('data_cover_url=================> ', data_cover_url)
+
             iframe_tag.attrs['data-src'] = shipin_url
             iframe_tag.attrs['allowfullscreen'] = True
             iframe_tag.attrs['data-cover'] = data_cover_url
