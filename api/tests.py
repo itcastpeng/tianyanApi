@@ -125,40 +125,19 @@
 
 
 
+from urllib.parse import unquote
 
-shipin_url = 'https://mp.weixin.qq.com/mp/readtemplate?t=pages/video_player_tmpl&action=mpvideo&auto=0&vid=wxv_800489262956412928'
+print(unquote('https://www.baidu.com/s?ie=UTF-8&wd=http%253A%252F%252Fshp.qpic.cn%252Fqqvideo_ori%252F0%252Fo0876ujgqpe_496_280%252F0'))
+print(unquote('https://v.qq.com/iframe/preview.html?width=500&amp;height=375&amp;auto=0&amp;vid=o0876ujgqpe'))
 
+
+shipin_url = 'https://v.qq.com/iframe/preview.html?width=500&amp;height=375&amp;auto=0&amp;vid=o0876ujgqpe'
 
 if '&' in shipin_url and 'vid=' in shipin_url:
     vid_num = shipin_url.split('vid=')[1]
     _url = shipin_url.split('?')[0]
     shipin_url = _url + '?vid=' + vid_num
-
-
-
-print('shipin_url------> ', shipin_url)
-
-
-
-title_list = ['雷达测试文章同步', '雷达测试文章', '雷达测试同步文章2', '雷达测试文章同步1', '两次隆鼻、一次注射玻尿酸！人的鼻子到底能折腾多少次？', '没【留量】比没流量更可怕—合众康桥']
-media_id_list = ['ivcZrCjmhDznUrwcjIReREEIGxlxRyrfrht82iEgw0Q', 'ivcZrCjmhDznUrwcjIReRNzPw1zYXT2aP43r0HGEj-c', 'ivcZrCjmhDznUrwcjIReRGzR15rom5lbwxRvMlHM8Vc', 'ivcZrCjmhDznUrwcjIReRPoDiI2Fke3LVhHU7hNXTXE', 'ivcZrCjmhDznUrwcjIReRKw072mb7eq1Kn9MNz7oAxA']
-title = '雷达文章测试3'
-media_id = 'ivcZrCjmhDznUrwcjIReRNzPw1zYXT2aP43r0HGEj-c'
-
-if (title not in title_list) or (media_id not in media_id_list): # 如果不存在创建
-    print('========')
-
-from publicFunc import  account
-
-print(account.str_encrypt(123))
-
-
-
-
-
-
-
-
+print('shipin_url->< ', shipin_url)
 
 
 
