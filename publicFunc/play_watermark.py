@@ -3,7 +3,7 @@ from publicFunc.account import randon_str
 import os
 from publicFunc.host import host_url
 from publicFunc.image_color_recognition import image_color_recognition
-import sys
+import sys, requests
 from publicFunc.screenshots import screenshots
 
 # 图片打水印
@@ -14,7 +14,7 @@ class watermark():
         self.name = data.get('name')
         self.phone = data.get('phone')
         self.user_id = data.get('user_id')
-        self.posters = data.get('posters')
+        self.heading = data.get('heading')
 
     # 海报水印
     def posters_play_watermark(self):
@@ -23,28 +23,58 @@ class watermark():
         # 绘图句柄
         posters_status = int(self.data.get('posters_status'))  # 水印类型
 
-        # color = (0, 0, 0)
+        img_url = self.img_path
+        if 'zhugeyingxiao.com/tianyan' in self.img_path:
+            img_url = self.img_path.split(host_url)[1]  # 切除域名
+        # img_url = '1.jpg'
+        image = Image.open(img_url).convert('RGBA')
+        color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
+
+        image = Image.open(img_url).convert('RGBA')
+        image_draw = ImageDraw.Draw(image)
+
+
+        if 'linux' in sys.platform:  # 获取平台
+            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
+            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
+
+        #     poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
+        else:
+            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
+            path = './2.png'
+
+        #     poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
+        # path = screenshots(poster_url, path)  # 截图
         # 正能量海报水印
         if posters_status == 1:
-            if 'linux' in sys.platform:  # 获取平台
-                poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
-            else:
-                poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
-            path = screenshots(poster_url, path)  # 截图
+
+            linshi_path = os.path.join('statics', 'poster_img', randon_str() + '.png')
+            # linshi_path = './5.jpg'
+
+            image_width = image.size[0]
+            image_height = image.size[1]
+
+            # 把头像取下来
+            ret = requests.get(self.heading)
+            with open(linshi_path, 'wb') as f:
+                f.write(ret.content)
+            linshi_path = Image.open(linshi_path)
+            heading_path = linshi_path.resize((150, 150)) # 头像固定大小
+
+            height = (image_height - (heading_path.size[1] + 100))
+            image.paste(heading_path, (100, height)) # 张贴头像
+
+            text_width = heading_path.size[0]+150 # 字体宽度
+            image_draw.text((text_width, height), self.name, font=font, fill=(0, 0, 0))
+
+            height = (image_height - (heading_path.size[1] / 2 + 100))
+            image_draw.text((text_width, height), self.phone, font=font, fill=(0, 0, 0))
+
 
         # 邀请函海报水印
         else:
-            img_url = self.img_path
-            if 'zhugeyingxiao.com/tianyan' in self.img_path:
-                img_url = self.img_path.split(host_url)[1]  # 切除域名
-
-            image = Image.open(img_url).convert('RGBA')
-            color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
-
-            image = Image.open(img_url).convert('RGBA')
-            image_draw = ImageDraw.Draw(image)
             text = str(self.name) + ' ' + str(self.phone)
-
 
             zhu_title = self.data.get('zhu_title')
             fu_title = self.data.get('fu_title')
@@ -52,11 +82,6 @@ class watermark():
             place = self.data.get('place')
 
             text = '详询:' + text
-            # zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
-            # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
-
-            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
 
             zhu_title_x, zhu_title_y = image_draw.textsize(zhu_title, font=zhu_title_font)
             fu_title_x, fu_title_y = image_draw.textsize(fu_title, font=font)
@@ -76,7 +101,7 @@ class watermark():
             image_draw.text((time_width, img_hight-120), time, font=font, fill=color)
             image_draw.text((place_width, img_hight-85), place, font=font, fill=color)
             image_draw.text((text_width, img_hight-40), text, font=font, fill=color)
-            image.save(path)
+        image.save(path)
         return path
 
 if __name__ == '__main__':

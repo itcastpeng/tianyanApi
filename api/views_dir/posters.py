@@ -5,6 +5,7 @@ from django.http import JsonResponse
 from publicFunc.condition_com import conditionCom
 from publicFunc.play_watermark import watermark # 图片打水印
 from api.forms.posters import AddForm, UpdateForm, SelectForm, posterInfoForm
+from publicFunc.base64_encryption import b64decode
 import json, os, requests
 
 # token验证 海报展示模块
@@ -178,9 +179,12 @@ def posters_oper(request, oper_type, o_id):
 
                 posters_status = int(posters_status)
                 if posters_status == 1:
+                    obj = models.Userprofile.objects.get(id=user_id)
                     data = {
-                        'user_id': user_id,
-                        'posters':o_id,
+                        'img_path': img_path,
+                        'heading':obj.set_avator + '?imageView2/2/w/100',
+                        'name':b64decode(obj.name),
+                        'phone':obj.phone_number,
                         'posters_status':posters_status
                     }
                     watermark_objs = watermark(data)  # 实例化
