@@ -36,12 +36,14 @@ class watermark():
 
         if 'linux' in sys.platform:  # 获取平台
             font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
+            status_1_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 50)
             zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
 
         #     poster_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
         else:
             zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
             font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
+            status_1_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)
             path = './2.png'
 
         #     poster_url = 'http://127.0.0.1:8008/api/html_oper/zhengnengliang?user_id={}&posters={}'.format(self.user_id, self.posters)
@@ -67,10 +69,10 @@ class watermark():
             image.paste(heading_path, (100, height)) # 张贴头像
 
             text_width = heading_path.size[0]+150 # 字体宽度
-            image_draw.text((text_width, height), self.name, font=font, fill=color)
+            image_draw.text((text_width, height), self.name, font=status_1_font, fill=color)
 
             height = (image_height - (heading_path.size[1] / 2 + 100))
-            image_draw.text((text_width, height), self.phone, font=font, fill=color)
+            image_draw.text((text_width, height), self.phone, font=status_1_font, fill=color)
 
 
         # 邀请函海报水印
