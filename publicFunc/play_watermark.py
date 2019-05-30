@@ -37,6 +37,8 @@ class watermark():
             img_url = self.img_path
             if 'zhugeyingxiao.com/tianyan' in self.img_path:
                 img_url = self.img_path.split(host_url)[1]  # 切除域名
+            path = './2.png'
+            img_url = '1.jpg'
             image = Image.open(img_url).convert('RGBA')
             color = image_color_recognition(image)  # 识别图片颜色 给出对应文字颜色
 
@@ -51,11 +53,11 @@ class watermark():
             place = self.data.get('place')
 
             text = '详询:' + text
-            # zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
-            # font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
+            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 50)  # 使用自定义的字体，第二个参数表示字符大小
+            font = ImageFont.truetype('/usr/share/fonts/chinese/msyh.ttc', 30)
 
-            zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
-            font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
+            # zhu_title_font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 40)  # 使用自定义的字体，第二个参数表示字符大小
+            # font = ImageFont.truetype('/usr/share/fonts/chinese/SIMHEI.TTF', 30)
 
             zhu_title_x, zhu_title_y = image_draw.textsize(zhu_title, font=zhu_title_font)
             fu_title_x, fu_title_y = image_draw.textsize(fu_title, font=font)
@@ -70,10 +72,10 @@ class watermark():
             text_width = int(image.size[0] / 2 - (text_x / 2))
 
             img_hight = image.size[1]
-            image_draw.text((zhu_title_width, img_hight-180), zhu_title, font=zhu_title_font, fill=color)
-            image_draw.text((fu_title_width, img_hight-140), fu_title, font=font, fill=color)
-            image_draw.text((time_width, img_hight-110), time, font=font, fill=color)
-            image_draw.text((place_width, img_hight-80), place, font=font, fill=color)
+            image_draw.text((zhu_title_width, img_hight-200), zhu_title, font=zhu_title_font, fill=color)
+            image_draw.text((fu_title_width, img_hight-150), fu_title, font=font, fill=color)
+            image_draw.text((time_width, img_hight-120), time, font=font, fill=color)
+            image_draw.text((place_width, img_hight-85), place, font=font, fill=color)
             image_draw.text((text_width, img_hight-40), text, font=font, fill=color)
             image.save(path)
         return path

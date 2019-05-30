@@ -220,7 +220,9 @@ def posters_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = '海报被删除'
+
         else:
             response.code = 402
             response.msg = "请求异常"
+
     return JsonResponse(response.__dict__)
