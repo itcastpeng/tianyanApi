@@ -105,6 +105,7 @@ class watermark():
         image.save(path)
 
         if linshi_path:
+            print('----------------------> ', linshi_path)
             os.remove(linshi_path)
         return path
 
