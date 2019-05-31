@@ -144,15 +144,15 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
-            if len(ret.json().get('url_info')) >= 1:
-                url = ret.json().get('url_info')[0].get('url')
-            else:
-                url = shipin_url
+            # if len(ret.json().get('url_info')) >= 1:
+            #     url = ret.json().get('url_info')[0].get('url')
+            # else:
+            #     url = shipin_url
 
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
                                    </div>""".format(
-                url,
+                shipin_url,
                 data_cover_url,
             )
             body = str(body).replace(str(iframe_tag), video_tag)
