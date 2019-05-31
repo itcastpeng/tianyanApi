@@ -148,9 +148,10 @@ def get_article(article_url):
                 url = ret.json().get('url_info')[0].get('url')
             else:
                 url = shipin_url
+
             url = requests_img_download(url)  # 下载到本地
             url = update_qiniu(url)
-
+            print('url ---------> ', url )
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
                                    </div>""".format(
