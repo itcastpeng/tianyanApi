@@ -168,7 +168,6 @@ def article(request):
                         'classify_id_list': classify_id_list,
                         'classify_name_list': classify_name_list,
                         'create_user_id': obj.create_user_id,
-                        'create_user__name': b64decode(obj.create_user.name),
                         'cover_img': obj.cover_img,
                         'is_like': is_like,  # 是否点赞
                         'create_datetime': obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
