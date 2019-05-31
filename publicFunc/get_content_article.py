@@ -181,7 +181,7 @@ def get_article(article_url):
     except Exception as e:
         print('e-------e--------e-------------e---------e------> ', e)
         content = style + body
-
+    content = BeautifulSoup(content, 'html.parser')
     # 生成css 文件
     now = time.time()
     style = style.replace('<style>', '').replace('</style>', '')
