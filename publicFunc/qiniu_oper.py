@@ -1,7 +1,7 @@
 from publicFunc.account import randon_str
 from qiniu import put_file, Zone, set_default
 import qiniu, requests, os, base64, datetime
-
+from urllib import request
 
 # 上传七牛云
 def update_qiniu(img_path, key=None):
@@ -52,9 +52,21 @@ def requests_img_download(old_url):
         e.write(ret.content)
     return path
 
+def requests_video_download(url):
+    img_save_path = randon_str() + '.mp4'
+    # img_save_path = '2.mp4'
+    r = requests.get(url, stream=True)
+
+    with open(img_save_path, "wb") as mp4:
+        for chunk in r.iter_content(chunk_size=1024 * 1024):
+            if chunk:
+                mp4.write(chunk)
+
+    return img_save_path
 
 if __name__ == '__main__':
-    update_qiniu('1.MP4', 'asdasdasda.mp4')
+    # update_qiniu('1.MP4', 'asdasdasda.mp4')
+    requests_video_download('http://mpvideo.qpic.cn/tjg_3523130350_50000_a72c3222182c46c1bfc29949deb88b99.f10002.mp4?dis_k=8d2501bc244b93ec0059fe6b1476ee1c&dis_t=1559272651')
 
     # url = 'http://thirdwx.qlogo.cn/mmopen/PeW1cmicnQppB7nYSsEKoR2HzTic5eMpTeMPEqmMtnLoXgt3Ro0z5nSNbbpL5fV6gzDWZbudSMrRleZDeAyKTNoZyKzd4YriafO/132'
     # requests_img_download(url)
