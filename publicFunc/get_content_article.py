@@ -127,7 +127,7 @@ def get_article(article_url):
             img_url = update_qiniu(file_dir)
             img_tag.attrs['data-src'] = img_url
             #  img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
-    print('body--------------> ', body)
+
     ## 处理视频的URL
     iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
     for iframe_tag in iframe:
@@ -144,14 +144,11 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
-            # if len(ret.json().get('url_info')) >= 1:
-            url = ret.json().get('url_info')[0].get('url')
-            # else:
-            #     if '&' in shipin_url and 'vid=' in shipin_url:
-            #         vid_num = shipin_url.split('vid=')[1]
-            #         _url = shipin_url.split('?')[0]
-            #         shipin_url = _url + '?vid=' + vid_num
-            #     url = shipin_url
+            if len(ret.json().get('url_info')) >= 1:
+                url = ret.json().get('url_info')[0].get('url')
+            else:
+                print('-----------------> ', iframe_tag.find('video'))
+                url = iframe_tag.find('video').attrs.get('src')
 
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
@@ -159,7 +156,6 @@ def get_article(article_url):
                 url,
                 data_cover_url,
             )
-
             body = str(body).replace(str(iframe_tag), video_tag)
             body = BeautifulSoup(body, 'html.parser')
         except Exception as e:
@@ -187,7 +183,6 @@ def get_article(article_url):
         content = convert_content(s, str(i)) # 替换内容
         data_list.append(content)
 
-    print('data_list----------------->', data_list)
     data = {
         'title': title,
         'summary':b64encode(summary),
