@@ -162,12 +162,12 @@ def get_article(article_url):
             body = BeautifulSoup(body, 'html.parser')
         except Exception as e:
             print(';ERROR-------------------->', e)
-            # if '&' in shipin_url and 'vid=' in shipin_url:
-            #     vid_num = shipin_url.split('vid=')[1]
-            #     _url = shipin_url.split('?')[0]
-            #     shipin_url = _url + '?vid=' + vid_num
+            if '&' in shipin_url and 'vid=' in shipin_url:
+                vid_num = shipin_url.split('vid=')[1]
+                _url = shipin_url.split('?')[0]
+                shipin_url = _url + '?vid=' + vid_num
 
-            iframe_tag.attrs['data-src'] = shipin_url
+            iframe_tag.attrs['data-src'] = iframe_tag.get('src')
             iframe_tag.attrs['allowfullscreen'] = True      # 是否允许全屏
             iframe_tag.attrs['data-cover'] = data_cover_url
 
