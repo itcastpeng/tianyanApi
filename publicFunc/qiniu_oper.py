@@ -53,10 +53,10 @@ def requests_img_download(old_url):
     return path
 
 def requests_video_download(url):
-    img_save_path = randon_str() + '.mp4'
-    # img_save_path = '2.mp4'
+    # img_save_path = randon_str() + '.mp4'
+    img_save_path = '2.mp4'
     r = requests.get(url, stream=True)
-
+    print('r----> ', r.text)
     with open(img_save_path, "wb") as mp4:
         for chunk in r.iter_content(chunk_size=1024 * 1024):
             if chunk:
@@ -66,7 +66,7 @@ def requests_video_download(url):
 
 if __name__ == '__main__':
     # update_qiniu('1.MP4', 'asdasdasda.mp4')
-    requests_video_download('http://mpvideo.qpic.cn/tjg_3523130350_50000_a72c3222182c46c1bfc29949deb88b99.f10002.mp4?dis_k=8d2501bc244b93ec0059fe6b1476ee1c&dis_t=1559272651')
+    requests_video_download('https://v.qq.com/iframe/preview.html?vid=e0860980hd3')
 
     # url = 'http://thirdwx.qlogo.cn/mmopen/PeW1cmicnQppB7nYSsEKoR2HzTic5eMpTeMPEqmMtnLoXgt3Ro0z5nSNbbpL5fV6gzDWZbudSMrRleZDeAyKTNoZyKzd4YriafO/132'
     # requests_img_download(url)

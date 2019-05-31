@@ -147,10 +147,7 @@ def get_article(article_url):
         )
         ret = requests.get(iframe_url)
         try:
-            if len(ret.json().get('url_info')) >= 1:
-                url = ret.json().get('url_info')[0].get('url')
-            else:
-                url = shipin_url
+            url = ret.json().get('url_info')[0].get('url')
             video_path = randon_str() + '.mp4' # 生成七牛KEY
             qiniu_celery_upload_video.delay(url, video_path) # 异步下载视频
 
