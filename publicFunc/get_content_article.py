@@ -151,7 +151,7 @@ def get_article(article_url):
                 url = ret.json().get('url_info')[0].get('url')
             else:
                 url = shipin_url
-            video_path = randon_str()
+            video_path = randon_str() + '.mp4'
             qiniu_celery_upload_video.delay(url, video_path)
             print('url ---------> ', url )
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">

@@ -4,7 +4,7 @@ import qiniu, requests, os, base64, datetime
 
 
 # 上传七牛云
-def update_qiniu(img_path, path=None):
+def update_qiniu(img_path, key=None):
     # 需要填写你的 Access Key 和 Secret Key
     SecretKey = 'wVig2MgDzTmN_YqnL-hxVd6ErnFhrWYgoATFhccu'
     AccessKey = 'a1CqK8BZm94zbDoOrIyDlD7_w7O8PqJdBHK-cOzz'
@@ -13,10 +13,17 @@ def update_qiniu(img_path, path=None):
     q = qiniu.Auth(AccessKey, SecretKey)
     bucket_name = 'bjhzkq_tianyan'
 
-    if not path:
+    if not key:
         token = q.upload_token(bucket_name)  # 可以指定key 图片名称
+        data = {
+            'token': token
+        }
     else:
-        token = q.upload_token(bucket_name, path)  # 可以指定key 图片名称
+        token = q.upload_token(bucket_name, key, 3600)  # 可以指定key 图片名称
+        data = {
+            'token': token,
+            'key': key,
+        }
 
     headers = {
         'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
@@ -24,9 +31,6 @@ def update_qiniu(img_path, path=None):
 
     url = 'https://up-z1.qiniup.com/'
 
-    data = {
-        'token': token
-    }
     files = {
         'file':open(img_path, 'rb')
     }
@@ -34,17 +38,7 @@ def update_qiniu(img_path, path=None):
     print('----------------上传七牛k云--------------')
     ret = requests.post(url, data=data, files=files, headers=headers)
 
-    # zone = Zone(
-    #     up_host='https://up-z1.qiniup.com/',
-    #     up_host_backup='https://upload-z1.qiniup.com',
-    #     io_host='http://iovip-z1.qbox.me',
-    #     scheme='https')
-    # set_default(default_zone=zone)
-    #
-
-
-
-    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret)
+    print('###############@@@@@@@@@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret.text)
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片
     img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')
@@ -60,7 +54,7 @@ def requests_img_download(old_url):
 
 
 if __name__ == '__main__':
-    update_qiniu('1.png')
+    update_qiniu('1.MP4', 'asdasdasda.mp4')
 
     # url = 'http://thirdwx.qlogo.cn/mmopen/PeW1cmicnQppB7nYSsEKoR2HzTic5eMpTeMPEqmMtnLoXgt3Ro0z5nSNbbpL5fV6gzDWZbudSMrRleZDeAyKTNoZyKzd4YriafO/132'
     # requests_img_download(url)
