@@ -170,12 +170,17 @@ def get_article(article_url):
             data_src = shipin_url
             if vid_num:
                 data_src = 'https://v.qq.com/txp/iframe/player.html?origin=https%3A%2F%2Fmp.weixin.qq.com&vid={}&autoplay=false&full=true&show1080p=false&isDebugIframe=false'.format(
-                    vid_num)
+                    vid_num
+                )
             iframe_tag.attrs['data-src'] = data_src
             iframe_tag.attrs['allowfullscreen'] = True      # 是否允许全屏
             iframe_tag.attrs['data-cover'] = data_cover_url
-            iframe_tag.attrs['style'] = 'width: 100%;'
 
+    try:
+        content = str(style) + str(body)
+    except Exception as e:
+        print('e-------e--------e-------------e---------e------> ', e)
+        content = style + body
 
     # 生成css 文件
     now = time.time()
@@ -187,7 +192,7 @@ def get_article(article_url):
 
     # 分布标签
     data_list = []
-    for i in body:
+    for i in content:
         content = convert_content(s, str(i)) # 替换内容
         data_list.append(content)
 
