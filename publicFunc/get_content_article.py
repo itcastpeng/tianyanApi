@@ -174,6 +174,7 @@ def get_article(article_url):
             iframe_tag.attrs['data-src'] = data_src
             iframe_tag.attrs['allowfullscreen'] = True      # 是否允许全屏
             iframe_tag.attrs['data-cover'] = data_cover_url
+            iframe_tag.attrs['style'] = 'width: 100%;'
 
 
     # 生成css 文件

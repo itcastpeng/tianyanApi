@@ -125,19 +125,26 @@
 
 
 
-from urllib.parse import unquote
+# from urllib.parse import unquote
+#
+# print(unquote('https://www.baidu.com/s?ie=UTF-8&wd=http%253A%252F%252Fshp.qpic.cn%252Fqqvideo_ori%252F0%252Fo0876ujgqpe_496_280%252F0'))
+# print(unquote('https://v.qq.com/iframe/preview.html?width=500&amp;height=375&amp;auto=0&amp;vid=o0876ujgqpe'))
+#
+#
+# shipin_url = 'https://v.qq.com/iframe/preview.html?width=500&amp;height=375&amp;auto=0&amp;vid=o0876ujgqpe'
+#
+# if '&' in shipin_url and 'vid=' in shipin_url:
+#     vid_num = shipin_url.split('vid=')[1]
+#     _url = shipin_url.split('?')[0]
+#     shipin_url = _url + '?vid=' + vid_num
+# print('shipin_url->< ', shipin_url)
+#
 
-print(unquote('https://www.baidu.com/s?ie=UTF-8&wd=http%253A%252F%252Fshp.qpic.cn%252Fqqvideo_ori%252F0%252Fo0876ujgqpe_496_280%252F0'))
-print(unquote('https://v.qq.com/iframe/preview.html?width=500&amp;height=375&amp;auto=0&amp;vid=o0876ujgqpe'))
 
-
-shipin_url = 'https://v.qq.com/iframe/preview.html?width=500&amp;height=375&amp;auto=0&amp;vid=o0876ujgqpe'
-
-if '&' in shipin_url and 'vid=' in shipin_url:
-    vid_num = shipin_url.split('vid=')[1]
-    _url = shipin_url.split('?')[0]
-    shipin_url = _url + '?vid=' + vid_num
-print('shipin_url->< ', shipin_url)
+import requests, datetime
+print('--> ', datetime.datetime.today())
+r = requests.get('http://mmbiz.qpic.cn/mmbiz_jpg/4cvFUlD45w9Aa47MibuwnMHG7Dcciaic4Gb7vD5ibUQVn23YzZwvnFH0lXx6xvMvk1lH7wtvKc0YyxSmUaPVbog0IQ/0?wx_fmt=jpeg')
+print('--> ', datetime.datetime.today())
 
 
 
