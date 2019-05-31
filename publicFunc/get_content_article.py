@@ -136,9 +136,8 @@ def get_article(article_url):
         data_cover_url = iframe_tag.get('data-cover') # 封面
         if data_cover_url:
             data_cover_url = unquote(data_cover_url, 'utf-8')
-            data_cover_url = requests_img_download(data_cover_url) # 下载到本地
-            data_cover_url = update_qiniu(data_cover_url)
-            data_cover_url = quote(data_cover_url)
+        data_cover_url = requests_img_download(data_cover_url) # 下载到本地
+        data_cover_url = update_qiniu(data_cover_url)
 
         iframe_url = 'https://mp.weixin.qq.com/mp/videoplayer?vid={}&action=get_mp_video_play_url'.format(
             shipin_url.split('vid=')[1]
