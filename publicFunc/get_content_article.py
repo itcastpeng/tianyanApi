@@ -127,7 +127,7 @@ def get_article(article_url):
             img_url = update_qiniu(file_dir)
             img_tag.attrs['data-src'] = img_url
             #  img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
-
+    print('body--------------> ', body)
     ## 处理视频的URL
     iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
     for iframe_tag in iframe:
@@ -163,10 +163,10 @@ def get_article(article_url):
             body = str(body).replace(str(iframe_tag), video_tag)
             body = BeautifulSoup(body, 'html.parser')
         except Exception as e:
-            # if '&' in shipin_url and 'vid=' in shipin_url:
-            #     vid_num = shipin_url.split('vid=')[1]
-            #     _url = shipin_url.split('?')[0]
-            #     shipin_url = _url + '?vid=' + vid_num
+            if '&' in shipin_url and 'vid=' in shipin_url:
+                vid_num = shipin_url.split('vid=')[1]
+                _url = shipin_url.split('?')[0]
+                shipin_url = _url + '?vid=' + vid_num
 
             iframe_tag.attrs['data-src'] = shipin_url
             iframe_tag.attrs['allowfullscreen'] = True      # 是否允许全屏
