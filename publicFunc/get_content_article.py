@@ -147,8 +147,7 @@ def get_article(article_url):
             if len(ret.json().get('url_info')) >= 1:
                 url = ret.json().get('url_info')[0].get('url')
             else:
-                print('-----------------> ', iframe_tag.find('video'))
-                url = iframe_tag.find('video').attrs.get('src')
+                url = shipin_url
 
             video_tag = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
                                        <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
@@ -159,6 +158,7 @@ def get_article(article_url):
             body = str(body).replace(str(iframe_tag), video_tag)
             body = BeautifulSoup(body, 'html.parser')
         except Exception as e:
+            print(';ERROR-------------------->', e)
             if '&' in shipin_url and 'vid=' in shipin_url:
                 vid_num = shipin_url.split('vid=')[1]
                 _url = shipin_url.split('?')[0]
