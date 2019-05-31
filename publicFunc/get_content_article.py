@@ -172,7 +172,7 @@ def get_article(article_url):
             iframe_tag.attrs['data-src'] = shipin_url
             iframe_tag.attrs['allowfullscreen'] = True
             iframe_tag.attrs['data-cover'] = data_cover_url
-        print('iframe_tag-----> ', iframe_tag)
+
 
     # 生成css 文件
     now = time.time()
@@ -181,13 +181,14 @@ def get_article(article_url):
     with open(style_path, 'w') as e:
         e.write(style)
     # style_path = URL + '/statics/article_css/{}.css'.format(now)
-
+    print('body----------------->', body)
     # 分布标签
     data_list = []
     for i in body:
         content = convert_content(s, str(i)) # 替换内容
         data_list.append(content)
 
+    print('data_list----------------->', data_list)
     data = {
         'title': title,
         'summary':b64encode(summary),
