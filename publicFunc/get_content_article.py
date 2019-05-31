@@ -128,7 +128,7 @@ def get_article(article_url):
             img_tag.attrs['data-src'] = img_url
             #  img_tag.attrs['data-src'] = URL + '/statics/img' + img_name
 
-    # print('body--->', body)
+    print('body--->', body)
     ## 处理视频的URL
     iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
     for iframe_tag in iframe:
@@ -181,7 +181,7 @@ def get_article(article_url):
     with open(style_path, 'w') as e:
         e.write(style)
     # style_path = URL + '/statics/article_css/{}.css'.format(now)
-    print('body----------------->', body)
+
     # 分布标签
     data_list = []
     for i in body:
