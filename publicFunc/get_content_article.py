@@ -167,7 +167,7 @@ def get_article(article_url):
                 _url = shipin_url.split('?')[0]
                 shipin_url = _url + '?vid=' + vid_num
 
-            iframe_tag.attrs['data-src'] = iframe_tag.get('src')
+            iframe_tag.attrs['data-src'] = 'https://v.qq.com/txp/iframe/player.html?origin=https%3A%2F%2Fmp.weixin.qq.com&vid={}&autoplay=false&full=true&show1080p=false&isDebugIframe=false'.format(vid_num)
             iframe_tag.attrs['allowfullscreen'] = True      # 是否允许全屏
             iframe_tag.attrs['data-cover'] = data_cover_url
 
