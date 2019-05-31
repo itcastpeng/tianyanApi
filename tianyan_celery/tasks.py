@@ -2,6 +2,7 @@ from __future__ import absolute_import, unicode_literals
 from .celery import app
 from publicFunc.host import host_url
 import requests, datetime
+from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 
 # 定时刷新 天眼谁看了我
 @app.task
@@ -36,9 +37,11 @@ def update_customer_set_avator():
     url = '{}/api/update_customer_set_avator'.format(host_url)
     requests.get(url)
 
-
-
-
+@app.task
+def qiniu_celery_upload_video(url, video_path):
+    print('-----------------------------celery--------------------下载视频=-----------> ', datetime.datetime.today())
+    url = requests_img_download(url)  # 下载到本地
+    update_qiniu(url, video_path)
 
 
 

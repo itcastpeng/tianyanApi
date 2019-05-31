@@ -4,7 +4,7 @@ import qiniu, requests, os, base64, datetime
 
 
 # 上传七牛云
-def update_qiniu(img_path):
+def update_qiniu(img_path, path=None):
     # 需要填写你的 Access Key 和 Secret Key
     SecretKey = 'wVig2MgDzTmN_YqnL-hxVd6ErnFhrWYgoATFhccu'
     AccessKey = 'a1CqK8BZm94zbDoOrIyDlD7_w7O8PqJdBHK-cOzz'
@@ -13,8 +13,10 @@ def update_qiniu(img_path):
     q = qiniu.Auth(AccessKey, SecretKey)
     bucket_name = 'bjhzkq_tianyan'
 
-    token = q.upload_token(bucket_name)  # 可以指定key 图片名称
-
+    if not path:
+        token = q.upload_token(bucket_name)  # 可以指定key 图片名称
+    else:
+        token = q.upload_token(bucket_name, path)  # 可以指定key 图片名称
 
     headers = {
         'User-Agent':'Mozilla/5.0 (Windows NT 6.1; Win64; x64; rv:2.0b13pre) Gecko/20110307 Firefox/4.0b13'
