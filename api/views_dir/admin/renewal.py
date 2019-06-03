@@ -91,54 +91,47 @@ def renewal_oper(request, oper_type, o_id):
         'original_price': request.POST.get('original_price'),   # 原价
         'the_length': request.POST.get('the_length')            # 时长ID
     }
-    print('form_data------> ', form_data)
-    if request.method == "POST":
 
-        # 添加续费
-        # if oper_type == "add":
-        #     form_obj = AddForm(form_data)
-        #     if form_obj.is_valid():
-        #         the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
-        #
-        #         models.renewal_management.objects.create(**{
-        #             'price': form_obj.cleaned_data.get('price'),
-        #             'original_price': form_obj.cleaned_data.get('original_price'),
-        #             'the_length': the_length,
-        #             'renewal_number_days': renewal_number_days,
-        #             'create_user_id': form_obj.cleaned_data.get('user_id')
-        #         })
-        #         response.code = 200
-        #         response.msg = '添加成功'
-        #     else:
-        #         response.code = 301
-        #         response.msg = json.loads(form_obj.errors.as_json())
+    if request.method == "POST":
 
         # 修改续费
         if oper_type == "update":
             form_obj = UpdateForm(form_data)
             if form_obj.is_valid():
                 o_id, objs = form_obj.cleaned_data.get('o_id')
-                objs.update(**{
-                    'price': form_obj.cleaned_data.get('price'),
-                    'original_price': form_obj.cleaned_data.get('original_price'),
-                })
-                response.code = 200
-                response.msg = '修改成功'
+                user_id = request.GET.get('user_id')
+
+                try:
+                    obj = models.renewal_management.objects.get(
+                        id=o_id,
+                        create_user_id=user_id
+                    )
+
+                    renewal_log_objs = models.update_renewal_log.objects.filter(
+                        renewal__create_user_id=user_id,
+                        status=3
+                    )
+                    if renewal_log_objs:
+                        response.code = 301
+                        response.msg = '修改金额申请中, 请勿重复操作！'
+                    else:
+                        models.update_renewal_log.objects.create(
+                            renewal_id=o_id,
+                            price=obj.price,                    # 原 价格
+                            original_price=obj.original_price,  # 原 原价
+                            update_price=form_obj.cleaned_data.get('price'),                    # 现价格
+                            update_original_price=form_obj.cleaned_data.get('original_price'),  # 现原价
+                        )
+
+                        response.code = 200
+                        response.msg = '已申请, 请耐心等待!~'
+                except Exception as e:
+                    response.code = 301
+                    response.msg = '操作异常'
             else:
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
-        # 删除续费
-        # elif oper_type == "delete":
-        #     form_obj = DeleteForm(form_data)
-        #     if form_obj.is_valid():
-        #         o_id, objs = form_obj.cleaned_data.get('o_id')
-        #         objs.delete()
-        #         response.code = 200
-        #         response.msg = '删除成功'
-        #     else:
-        #         response.code = 301
-        #         response.msg = json.loads(form_obj.errors.as_json())
 
     else:
         response.code = 402

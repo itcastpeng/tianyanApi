@@ -37,6 +37,7 @@ def login(request):
                 'user_id': userprofile_obj.id,
                 'name': userprofile_obj.name,
                 'role': userprofile_obj.role,
+                'phone': userprofile_obj.phone,
             }
 
         userprofile_obj.last_login_date = datetime.datetime.now()

@@ -365,6 +365,23 @@ class renewal_management(models.Model):
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
     create_user = models.ForeignKey('Enterprise', verbose_name='创建人', null=True, blank=True)
 
+# 修改续费日志
+class update_renewal_log(models.Model):
+    price = models.CharField(verbose_name='修改前价格', max_length=128, null=True, blank=True)
+    original_price = models.CharField(verbose_name='修改前原价格', max_length=128, null=True, blank=True)
+
+    update_price = models.CharField(verbose_name='修改后价格', max_length=128, null=True, blank=True)
+    update_original_price = models.CharField(verbose_name='修改后原价格', max_length=128, null=True, blank=True)
+    renewal = models.ForeignKey('renewal_management', verbose_name='对应续费')
+    status_choices = (
+        (1, '审核通过'),
+        (2, '审核驳回'),
+        (3, '未审核')
+    )
+    status = models.SmallIntegerField(verbose_name='审核状态', choices=status_choices, default=3)
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+
+
 # 续费日志
 class renewal_log(models.Model):
     pay_order_no = models.CharField(verbose_name='订单号', max_length=128, null=True, blank=True)

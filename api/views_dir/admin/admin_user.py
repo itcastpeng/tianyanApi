@@ -283,15 +283,35 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = '审核异常'
 
-    else:
+        # 审核 修改续费
+        elif oper_type == 'revise_renewal_review':
+            status = request.GET.get('status')
+            if status:
+                status = int(status)
+                obj = models.update_renewal_log.objects.get(id=o_id)
+                if status == 1:
+                    print('=-')
+                else:
+                    print('')
 
-        # 修改分销 记录
-        if oper_type == 'get_distribution':
-            response = Response.ResponseObj()
-            forms_obj = SelectForm(request.GET)
-            if forms_obj.is_valid():
-                current_page = forms_obj.cleaned_data['current_page']
-                length = forms_obj.cleaned_data['length']
+
+
+            else:
+                response.code = 301
+                response.msg = '审核异常'
+
+
+
+    else:
+        forms_obj = SelectForm(request.GET)
+        if forms_obj.is_valid():
+            current_page = forms_obj.cleaned_data['current_page']
+            length = forms_obj.cleaned_data['length']
+
+
+            # 修改分销 记录
+            if oper_type == 'get_distribution':
+
                 order = request.GET.get('order', '-create_date')
 
                 objs = models.distribution_log.objects.filter(
@@ -325,37 +345,76 @@ def user_oper(request, oper_type, o_id):
                     'secondary_distribution': '二级分销占比',
                 }
 
+
+            # 查询待审核用户
+            elif oper_type == 'get_review_user':
+                objs = models.Enterprise.objects.filter(status=2)
+                count = objs.count()
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+
+                ret_data = []
+                for obj in objs:
+                    ret_data.append({
+                        'id': obj.id,
+                        'name': obj.name,
+                        'phone': obj.phone,
+                        'appid': obj.appid,
+                        'oper_user_id':obj.oper_user_id,
+                        'oper_user___name':obj.oper_user.name,
+                        'create_date':obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
+                    })
+
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data': ret_data,
+                    'count': count
+                }
+
+            # 查询待审核 修改续费
+            elif oper_type == 'get_revise_renewal_review':
+                objs = models.update_renewal_log.objects.filter(status=3).order_by('-create_date')
+                count = objs.count()
+                if length != 0:
+                    start_line = (current_page - 1) * length
+                    stop_line = start_line + length
+                    objs = objs[start_line: stop_line]
+
+                ret_data = []
+                for obj in objs:
+                    ret_data.append({
+                        'update_before_price': obj.price,
+                        'update_before_original_price': obj.original_price,
+                        'update_after_price': obj.update_price,
+                        'update_after_original_price': obj.update_original_price,
+                        'status': obj.get_status_display(),
+                        'oper_user_name': obj.renewal.create_user.name,
+                    })
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data': ret_data,
+                    'count': count
+                }
+                response.note = {
+                    'update_before_price': '修改前价格',
+                    'update_before_original_price': '修改前 原价',
+                    'update_after_price': '修改后价格',
+                    'update_after_original_price': '修改后 原价',
+                    'status': '审核状态',
+                    'oper_user_name': '操作人',
+                }
+
             else:
-                response.code = 301
-                response.msg = json.loads(forms_obj.errors.as_json())
-
-        # 查询待审核用户
-        elif oper_type == 'get_review_user':
-            objs = models.Enterprise.objects.filter(status=2)
-            count = objs.count()
-            ret_data = []
-            for obj in objs:
-                ret_data.append({
-                    'id': obj.id,
-                    'name': obj.name,
-                    'phone': obj.phone,
-                    'appid': obj.appid,
-                    'oper_user_id':obj.oper_user_id,
-                    'oper_user___name':obj.oper_user.name,
-                    'create_date':obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
-                })
-
-            response.code = 200
-            response.msg = '查询成功'
-            response.data = {
-                'ret_data': ret_data,
-                'count': count
-            }
+                response.code = 402
+                response.msg = "请求异常"
 
         else:
-            response.code = 402
-            response.msg = "请求异常"
-
+            response.code = 301
+            response.msg = json.loads(forms_obj.errors.as_json())
     return JsonResponse(response.__dict__)
 
 
