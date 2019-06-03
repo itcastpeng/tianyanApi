@@ -32,7 +32,6 @@ def get_min_s(start_time=None, stop_time=None, ms=None):
     if second:
         seconds = str(second) + '秒'
     if ms:
-        days = '369天'
         if days and hours:
             if int(days.split('天')[0]) >= 365:
                 days = '一年'
