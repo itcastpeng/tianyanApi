@@ -33,7 +33,7 @@ def user(request):
         q = conditionCom(request, field_dict)
         q1 = Q()
         if int(role) == 1: # 普通用户
-            q1.add(Q(oper_user_id=user_id), Q.AND)
+            q1.add(Q(oper_user_id=user_id) | Q(id=user_id), Q.AND)
 
         objs = models.Enterprise.objects.filter(
             q,
