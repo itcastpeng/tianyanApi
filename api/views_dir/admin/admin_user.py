@@ -390,7 +390,8 @@ def user_oper(request, oper_type, o_id):
                 role = int(user_obj.role)
                 q = Q()
                 if role == 1:
-                    q.add(Q(), Q.AND)
+                    q.add(Q(renewal__create_user_id=user_id), Q.AND)
+
                 objs = models.update_renewal_log.objects.filter(status=3).order_by('-create_date')
                 count = objs.count()
                 if length != 0:
