@@ -34,14 +34,14 @@ def get_min_s(start_time=None, stop_time=None, ms=None):
     if ms:
         if days and hours:
             if int(days.split('天')[0]) >= 365:
-                days = '一年'
+                return '一年'
             return days + hours
         else:
             return mins + seconds
     else:
         if days:
             if int(days.split('天')[0]) >= 365:
-                days = '一年'
+                return '一年'
         return days + hours + mins + seconds
 
 
