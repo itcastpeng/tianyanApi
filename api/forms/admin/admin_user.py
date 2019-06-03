@@ -188,9 +188,8 @@ class SelectForm(forms.Form):
     def clean_user_id(self):
         user_id = self.data.get('user_id')
         obj = models.Enterprise.objects.get(id=user_id)
-        if int(obj.role) == 2:
-            return user_id
-        else:
-            self.add_error('user_id', '非法请求')
+
+        return user_id, obj.role
+
 
 

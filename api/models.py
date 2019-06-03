@@ -21,13 +21,15 @@ class Enterprise(models.Model):
     create_datetime = models.CharField(verbose_name="access_token更新时间", max_length=32)
     create_date = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     status_choices = (
-        (1, "启用"),
-        (2, "不启用"),
+        (1, "已审核"),
+        (2, "未审核"),
+        (3, "已驳回"),
     )
-    status = models.SmallIntegerField(verbose_name='是否启用', choices=status_choices, default=1)
+    status = models.SmallIntegerField(verbose_name='是否审核', choices=status_choices, default=2)
 
     primary_distribution = models.IntegerField(verbose_name='一级分销占比', default=30)
     secondary_distribution = models.IntegerField(verbose_name='二级分销占比', default=15)
+    working_days = models.IntegerField(verbose_name='创建天数时长', default=1)
 
 # 修改 分销记录
 class distribution_log(models.Model):

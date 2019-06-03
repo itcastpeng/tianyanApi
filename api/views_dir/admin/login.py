@@ -17,7 +17,7 @@ def login(request):
     userprofile_objs = models.Enterprise.objects.filter(
         name=name,
         password=account.str_encrypt(password),
-        status=1
+        status=1 # 已审核
     )
     if userprofile_objs:
         # 如果有数据 查询第一条对象

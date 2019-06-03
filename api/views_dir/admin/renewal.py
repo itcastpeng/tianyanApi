@@ -95,26 +95,26 @@ def renewal_oper(request, oper_type, o_id):
     if request.method == "POST":
 
         # 添加续费
-        if oper_type == "add":
-            form_obj = AddForm(form_data)
-            if form_obj.is_valid():
-                the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
-
-                models.renewal_management.objects.create(**{
-                    'price': form_obj.cleaned_data.get('price'),
-                    'original_price': form_obj.cleaned_data.get('original_price'),
-                    'the_length': the_length,
-                    'renewal_number_days': renewal_number_days,
-                    'create_user_id': form_obj.cleaned_data.get('user_id')
-                })
-                response.code = 200
-                response.msg = '添加成功'
-            else:
-                response.code = 301
-                response.msg = json.loads(form_obj.errors.as_json())
+        # if oper_type == "add":
+        #     form_obj = AddForm(form_data)
+        #     if form_obj.is_valid():
+        #         the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
+        #
+        #         models.renewal_management.objects.create(**{
+        #             'price': form_obj.cleaned_data.get('price'),
+        #             'original_price': form_obj.cleaned_data.get('original_price'),
+        #             'the_length': the_length,
+        #             'renewal_number_days': renewal_number_days,
+        #             'create_user_id': form_obj.cleaned_data.get('user_id')
+        #         })
+        #         response.code = 200
+        #         response.msg = '添加成功'
+        #     else:
+        #         response.code = 301
+        #         response.msg = json.loads(form_obj.errors.as_json())
 
         # 修改续费
-        elif oper_type == "update":
+        if oper_type == "update":
             form_obj = UpdateForm(form_data)
             if form_obj.is_valid():
                 o_id, objs = form_obj.cleaned_data.get('o_id')

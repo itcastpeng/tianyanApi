@@ -1,16 +1,6 @@
 from api import models
 from django import forms
-
-
-def length_the_days(the_length):
-    if int(the_length) == 1:  # 三个月
-        renewal_number_days = 90
-    elif int(the_length) == 2: # 一年
-        renewal_number_days = 365
-    else:  # 三年
-        renewal_number_days = 1095
-
-    return the_length, renewal_number_days
+from publicFunc.public import length_the_days
 
 
 # 添加
