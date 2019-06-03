@@ -141,14 +141,14 @@ def user_oper(request, oper_type, o_id):
     user_id = request.GET.get('user_id')
     if request.method == "POST":
         # 获取需要修改的信息
-        role = int(request.POST.get('role', 1))
+        role = request.POST.get('role', 1)
 
         form_data = {
             'o_id': o_id,
             'oper_user_id': request.GET.get('user_id'),         # 操作人
             'name': request.POST.get('name'),                   # 用户名
             'password': request.POST.get('password'),           # 密码
-            'role': role,                                       # 角色 默认用户
+            'role': int(role),                                       # 角色 默认用户
             'phone': request.POST.get('phone'),                 # 电话
         }
 
@@ -317,6 +317,12 @@ def user_oper(request, oper_type, o_id):
                 response.data = {
                     'ret_data': ret_data,
                     'count': count
+                }
+                response.note = {
+                    'create_date': '开始使用时间',
+                    'stop_time': '结束时间',
+                    'primary_distribution': '一级分销占比',
+                    'secondary_distribution': '二级分销占比',
                 }
 
             else:
