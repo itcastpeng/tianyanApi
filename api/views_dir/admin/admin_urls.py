@@ -1,5 +1,5 @@
 from django.conf.urls import url
-from api.views_dir.admin import login, admin_user
+from api.views_dir.admin import login, admin_user, renewal
 
 urlpatterns = [
     # 账号密码登录
@@ -10,6 +10,9 @@ urlpatterns = [
     url(r'^user$', admin_user.user),
     url(r'^update_pwd$', admin_user.updatePwd),
 
+    # 续费管理
+    url(r'^renewal/(?P<oper_type>\w+)/(?P<o_id>\d+)$', renewal.renewal_oper),
+    url(r'^renewal$', renewal.renewal),
 
 
 

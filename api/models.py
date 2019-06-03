@@ -26,6 +26,17 @@ class Enterprise(models.Model):
     )
     status = models.SmallIntegerField(verbose_name='是否启用', choices=status_choices, default=1)
 
+    primary_distribution = models.IntegerField(verbose_name='一级分销占比', default=30)
+    secondary_distribution = models.IntegerField(verbose_name='二级分销占比', default=15)
+
+# 修改 分销记录
+class distribution_log(models.Model):
+    create_user = models.ForeignKey('Enterprise', verbose_name='创建人')
+    create_date = models.DateField(verbose_name='创建时间', auto_now_add=True)
+    primary_distribution = models.IntegerField(verbose_name='一级分销占比')
+    secondary_distribution = models.IntegerField(verbose_name='二级分销占比')
+    stop_time = models.CharField(verbose_name='截止时间', max_length=64)
+
 # 微商用户表
 class Userprofile(models.Model):
     name = models.CharField(verbose_name="姓名", max_length=128)
@@ -350,7 +361,7 @@ class renewal_management(models.Model):
     the_length = models.SmallIntegerField(verbose_name='时长', choices=the_length_choices, default=1)
     renewal_number_days = models.IntegerField(verbose_name='续费天数', default=30)
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
-    create_user = models.ForeignKey('Userprofile', verbose_name='创建人', null=True, blank=True)
+    create_user = models.ForeignKey('Enterprise', verbose_name='创建人', null=True, blank=True)
 
 # 续费日志
 class renewal_log(models.Model):

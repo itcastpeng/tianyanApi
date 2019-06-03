@@ -2,14 +2,14 @@ from api import models
 from publicFunc import Response
 from publicFunc import account
 from django.http import JsonResponse
+from api.forms.admin.renewal import  AddForm, UpdateForm, DeleteForm, SelectForm
 from publicFunc.condition_com import conditionCom
-from api.forms.renewal import  SelectForm
 from publicFunc.base64_encryption import b64decode
+
 import json
 
 
-# cerf  token验证 用户展示模块
-@account.is_token(models.Userprofile)
+@account.is_token(models.Enterprise)
 def renewal(request):
     response = Response.ResponseObj()
     if request.method == "GET":
@@ -28,15 +28,11 @@ def renewal(request):
                 'create_date': '',
                 'create_user_id': '',
             }
-            user_obj = models.Userprofile.objects.get(id=user_id)
             q = conditionCom(request, field_dict)
-
-
-
             print('q -->', q)
             objs = models.renewal_management.objects.filter(
                 q,
-                create_user_id=user_obj.enterprise_id
+                create_user_id=user_id
             ).order_by(order)
             count = objs.count()
 
@@ -85,4 +81,67 @@ def renewal(request):
     return JsonResponse(response.__dict__)
 
 
+@account.is_token(models.Enterprise)
+def renewal_oper(request, oper_type, o_id):
+    response = Response.ResponseObj()
+    form_data = {
+        'o_id': o_id,
+        'user_id': request.GET.get('user_id'),
+        'price': request.POST.get('price'),
+        'original_price': request.POST.get('original_price'),   # 原价
+        'the_length': request.POST.get('the_length')            # 时长ID
+    }
+    print('form_data------> ', form_data)
+    if request.method == "POST":
 
+        # 添加续费
+        if oper_type == "add":
+            form_obj = AddForm(form_data)
+            if form_obj.is_valid():
+                the_length, renewal_number_days = form_obj.cleaned_data.get('the_length')
+
+                models.renewal_management.objects.create(**{
+                    'price': form_obj.cleaned_data.get('price'),
+                    'original_price': form_obj.cleaned_data.get('original_price'),
+                    'the_length': the_length,
+                    'renewal_number_days': renewal_number_days,
+                    'create_user_id': form_obj.cleaned_data.get('user_id')
+                })
+                response.code = 200
+                response.msg = '添加成功'
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
+
+        # 修改续费
+        elif oper_type == "update":
+            form_obj = UpdateForm(form_data)
+            if form_obj.is_valid():
+                o_id, objs = form_obj.cleaned_data.get('o_id')
+                objs.update(**{
+                    'price': form_obj.cleaned_data.get('price'),
+                    'original_price': form_obj.cleaned_data.get('original_price'),
+                })
+                response.code = 200
+                response.msg = '修改成功'
+            else:
+                response.code = 301
+                response.msg = json.loads(form_obj.errors.as_json())
+
+        # 删除续费
+        # elif oper_type == "delete":
+        #     form_obj = DeleteForm(form_data)
+        #     if form_obj.is_valid():
+        #         o_id, objs = form_obj.cleaned_data.get('o_id')
+        #         objs.delete()
+        #         response.code = 200
+        #         response.msg = '删除成功'
+        #     else:
+        #         response.code = 301
+        #         response.msg = json.loads(form_obj.errors.as_json())
+
+    else:
+        response.code = 402
+        response.msg = '请求异常'
+
+    return JsonResponse(response.__dict__)

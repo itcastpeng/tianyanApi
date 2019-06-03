@@ -47,18 +47,18 @@ class AddForm(forms.Form):
             'required': "电话号码不能为空"
         }
     )
-    appid = forms.CharField(
-        required=False,
-        error_messages={
-            'required': "appid类型错误"
-        }
-    )
-    appsecret = forms.CharField(
-        required=False,
-        error_messages={
-            'required': "appsecret类型错误"
-        }
-    )
+    # appid = forms.CharField(
+    #     required=False,
+    #     error_messages={
+    #         'required': "appid类型错误"
+    #     }
+    # )
+    # appsecret = forms.CharField(
+    #     required=False,
+    #     error_messages={
+    #         'required': "appsecret类型错误"
+    #     }
+    # )
 
     # 查询名称是否存在
     def clean_name(self):
@@ -84,18 +84,18 @@ class AddForm(forms.Form):
             else:
                 self.add_error('phone', '请输入正确手机号')
 
-    def clean_role(self):
-        role = int(self.data.get('role'))
-        appid = self.data.get('appid')
-        appsecret = self.data.get('appsecret')
+    # def clean_role(self):
+    #     role = int(self.data.get('role'))
+        # appid = self.data.get('appid')
+        # appsecret = self.data.get('appsecret')
 
-        if role == 1:
-            if appid and appsecret:
-                return role
-            else:
-                self.add_error('role', 'appid 和 appsecret 为必填字段')
-        else:
-            return role
+        # if role == 1:
+        #     if appid and appsecret:
+        # return role
+            # else:
+            #     self.add_error('role', 'appid 和 appsecret 为必填字段')
+        # else:
+        #     return role
     def clean_password(self):
         password = self.data.get('password')
         return account.str_encrypt(password)

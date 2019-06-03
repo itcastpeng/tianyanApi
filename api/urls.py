@@ -84,7 +84,6 @@ urlpatterns = [
     # url(r'^weichat_generate_qrcode$', wechat.weichat_generate_qrcode),    # 微信获取带参数的二维码
 
     # ----------------续费管理---------------------
-    url(r'^renewal/(?P<oper_type>\w+)/(?P<o_id>\d+)$', renewal.renewal_oper),
     url(r'^renewal$', renewal.renewal),
 
     # ----------------支付管理--------------------

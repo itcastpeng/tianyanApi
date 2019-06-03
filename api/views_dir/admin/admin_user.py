@@ -45,14 +45,16 @@ def user(request):
             ret_data.append({
                 'id': obj.id,                                               # 用户ID
                 'name': obj.name,                                           # 用户名称
-                'role': obj.role,                                           # 角色ID
-                'role_name': obj.get_role_display(),                        # 角色名称
+                # 'role': obj.role,                                           # 角色ID
+                # 'role_name': obj.get_role_display(),                        # 角色名称
                 'status':obj.status,                                        # 状态ID
                 'status_name':obj.get_status_display(),                     # 状态
-                'appid': obj.appid,                                         # appid
-                'appsecret': obj.appsecret,                                 # appsecret
+                # 'appid': obj.appid,                                         # appid
+                # 'appsecret': obj.appsecret,                                 # appsecret
                 'phone': obj.phone,                                         # 电话
                 'create_time': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
+                'primary_distribution': obj.primary_distribution,           # 一级占比
+                'secondary_distribution': obj.secondary_distribution,       # 二级占比
             })
 
         #  查询成功 返回200 状态码
@@ -117,11 +119,11 @@ def user_oper(request, oper_type, o_id):
         # 获取需要修改的信息
 
         role = int(request.POST.get('role', 1))
-        appid = request.POST.get('appid')
-        appsecret = request.POST.get('appsecret')
-        if role == 2: # 超級管理员
-            appid = ''
-            appsecret = ''
+        # appid = request.POST.get('appid')
+        # appsecret = request.POST.get('appsecret')
+        # if role == 2: # 超級管理员
+        #     appid = ''
+        #     appsecret = ''
 
         form_data = {
             'o_id': o_id,
@@ -130,8 +132,8 @@ def user_oper(request, oper_type, o_id):
             'password': request.POST.get('password'),           # 密码
             'role': role,                                       # 角色 默认用户
             'phone': request.POST.get('phone'),                 # 电话
-            'appid': appid,                                     # appid
-            'appsecret': appsecret,                             # appsecret
+            # 'appid': appid,                                     # appid
+            # 'appsecret': appsecret,                             # appsecret
         }
 
         # 添加用户
@@ -175,10 +177,56 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = json.loads(forms_obj.errors.as_json())
 
+        # 修改 分销占比
+        elif oper_type  == 'distribution':
+            primary_distribution = request.POST.get('primary_distribution') # 一级占比
+            secondary_distribution = request.POST.get('secondary_distribution') # 二级占比
+            if primary_distribution and secondary_distribution:
+                models.Enterprise.objects.filter(id=user_id).update(
+                    primary_distribution=primary_distribution,
+                    secondary_distribution=secondary_distribution,
+                )
+                response.code = 200
+                response.msg = '修改成功'
+
+                # 记录日志
+                now = datetime.datetime.today()
+                objs = models.distribution_log.objects.filter(
+                    create_user_id=user_id
+                ).order_by(
+                    '-create_date'
+                )
+
+                if objs:
+                    obj = objs[0]
+                    obj.stop_time = now.strftime('%Y-%m-%d %H:%M:%S')
+
+                models.distribution_log.objects.filter(
+                    create_user_id=user_id
+                ).order_by(
+                    '-create_date'
+                )
+
+            else:
+                response.code = 301
+                if primary_distribution:
+                    msg = '二级分销不能为空'
+                else:
+                    msg = '一级分销不能为空'
+                response.msg = msg
+
     else:
 
-        response.code = 402
-        response.msg = "请求异常"
+        # 修改分销 记录
+        if oper_type == 'get_distribution':
+            print('')
+
+        else:
+            response.code = 402
+            response.msg = "请求异常"
 
     return JsonResponse(response.__dict__)
+
+
+
 
