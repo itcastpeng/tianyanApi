@@ -46,3 +46,33 @@ def login(request):
         response.code = 401
         response.msg = "账号或密码错误"
     return JsonResponse(response.__dict__)
+
+
+
+@csrf_exempt
+@account.is_token(models.Enterprise)
+def index_info(request, oper_type):
+    user_id = request.GET.get('user_id')
+
+    # 数据概览
+    if oper_type == 'overview_data':
+        now = datetime.datetime.today().strftime('%Y-%m-%d')
+
+        objs = models.Userprofile.objects.filter(
+            enterprise_id=user_id,
+            last_active_time__gte=now
+        )
+
+        number_visitors = objs.count()
+
+
+    else:
+        print('--')
+
+
+
+
+
+
+
+

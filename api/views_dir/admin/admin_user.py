@@ -38,7 +38,7 @@ def user(request):
         objs = models.Enterprise.objects.filter(
             q,
             q1
-        ).order_by(order).exclude(id=user_id)
+        ).order_by(order)
 
         count = objs.count()
 
@@ -385,6 +385,12 @@ def user_oper(request, oper_type, o_id):
 
             # 查询待审核 修改续费
             elif oper_type == 'get_revise_renewal_review':
+
+                user_obj = models.Enterprise.objects.get(id=user_id)
+                role = int(user_obj.role)
+                q = Q()
+                if role == 1:
+                    q.add(Q(), Q.AND)
                 objs = models.update_renewal_log.objects.filter(status=3).order_by('-create_date')
                 count = objs.count()
                 if length != 0:
@@ -424,6 +430,8 @@ def user_oper(request, oper_type, o_id):
         else:
             response.code = 301
             response.msg = json.loads(forms_obj.errors.as_json())
+
+
     return JsonResponse(response.__dict__)
 
 
