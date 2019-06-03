@@ -32,11 +32,16 @@ def get_min_s(start_time=None, stop_time=None, ms=None):
     if second:
         seconds = str(second) + '秒'
     if ms:
+        days = '369天'
         if days and hours:
+            if int(days.split('天')[0]) >= 365:
+                days = '一年'
             return days + hours
         else:
             return mins + seconds
     else:
+        if int(days.split('天')[0]) >= 365:
+            days = '一年'
         return days + hours + mins + seconds
 
 
@@ -354,12 +359,13 @@ def day_eye_oper(request, oper_type, o_id):
                         'article_info': '看了' + str(obj.get('id__count')) + '次-' +  after_time + '前',
                         'time_detail': time_detail,
                         'article__cover_img': obj.get('article__cover_img'),
+                        'create_datetime': create_datetime, # 排序用
                     })
-
+                data_list = sorted(ret_data, key=lambda x: x['create_datetime'], reverse=True)
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'ret_data': ret_data,
+                    'ret_data': data_list,
                     'data_count': count,
                 }
                 response.note = {
