@@ -27,6 +27,7 @@ def user(request):
             'role': '',
             'create_date': '',
             'oper_user__name': '__contains',
+            'oper_user_id': '',
         }
 
         q = conditionCom(request, field_dict)
