@@ -285,16 +285,24 @@ def user_oper(request, oper_type, o_id):
 
         # 审核 修改续费
         elif oper_type == 'revise_renewal_review':
-            status = request.GET.get('status')
+            status = request.POST.get('status')
             if status:
                 status = int(status)
                 obj = models.update_renewal_log.objects.get(id=o_id)
+                response.code = 200
+
+                response.msg = '审核驳回'
                 if status == 1:
-                    print('=-')
-                else:
-                    print('')
+                    renewal_objs = models.renewal_management.objects.filter(id=obj.renewal_id)
+                    if renewal_objs:
+                        renewal_obj = renewal_objs[0]
+                        renewal_obj.price = obj.update_price
+                        renewal_obj.original_price = obj.update_original_price
+                        renewal_obj.save()
+                        response.msg = '审核通过'
 
-
+                obj.status = status
+                obj.save()
 
             else:
                 response.code = 301
