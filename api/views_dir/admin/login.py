@@ -68,13 +68,11 @@ def index_info(request, oper_type):
             the_number_visitors_q = Q()             # 访客人数条件
             num_visitors_q = Q()                    # 访客次数条件
             number_people_placing_orders_q = Q()    # 下订单人数
-            order_amount_q = Q()                    # 下订单金额
 
             if role == 1: # OEM
                 the_number_visitors_q.add(Q(enterprise_id=user_id), Q.AND)
                 num_visitors_q.add(Q(oper_user__enterprise_id=user_id), Q.AND)
                 number_people_placing_orders_q.add(Q(create_user__enterprise_id=user_id), Q.AND)
-                order_amount_q.add(Q(), Q.AND)
 
 
             # 访客人数查询
