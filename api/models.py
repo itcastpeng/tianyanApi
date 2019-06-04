@@ -392,6 +392,11 @@ class distribute_money_log(models.Model):
     price = models.CharField(verbose_name='充值钱数', max_length=128)
     money = models.CharField(verbose_name='钱数', max_length=128)
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    status_choices = (
+        (1, '一级分销'),
+        (2, '二级分销')
+    )
+    status = models.SmallIntegerField(verbose_name='分销等级', choices=status_choices, default=1)
 
 # 记录天眼 用户 访问日志
 class log_access(models.Model):

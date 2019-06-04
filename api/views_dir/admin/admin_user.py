@@ -33,12 +33,12 @@ def user(request):
         q = conditionCom(request, field_dict)
         q1 = Q()
         if int(role) == 1: # 普通用户
-            q1.add(Q(oper_user_id=user_id) | Q(id=user_id), Q.AND)
+            q1.add(Q(oper_user_id=user_id), Q.AND)
 
         objs = models.Enterprise.objects.filter(
             q,
             q1
-        ).order_by(order)
+        ).order_by(order).exclude(id=user_id)
 
         count = objs.count()
 
@@ -458,6 +458,25 @@ def user_oper(request, oper_type, o_id):
                     'update_after_original_price': '修改后 原价',
                     'status': '审核状态',
                     'oper_user_name': '操作人',
+                }
+
+            # 获取自己信息
+            elif oper_type == 'get_user_info':
+                obj = models.Enterprise.objects.get(id=user_id)
+                ret_data = {
+                    'id': obj.id,  # 用户ID
+                    'name': obj.name,  # 用户名称
+                    'role': obj.role,  # 角色ID
+                    'role_name': obj.get_role_display(),  # 角色名称
+                    'status': obj.status,  # 审核ID
+                    'status_name': obj.get_status_display(),  # 是否审核
+                    'phone': obj.phone,  # 电话
+                    'create_time': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
+                }
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data': ret_data
                 }
 
             else:
