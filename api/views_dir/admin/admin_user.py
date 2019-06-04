@@ -391,11 +391,11 @@ def user_oper(request, oper_type, o_id):
                 q = Q()
                 if role == 1:
                     q.add(Q(renewal__create_user_id=user_id), Q.AND)
-
+                print('q-> ', q)
                 objs = models.update_renewal_log.objects.filter(
                     q, status=3
                 ).order_by('-create_date')
-
+                print('objs--------------> ', objs)
                 count = objs.count()
                 if length != 0:
                     start_line = (current_page - 1) * length
