@@ -344,7 +344,6 @@ def weixin_pay(request, oper_type, o_id):
 
 # 微信回调
 def payback(request):
-    print('------------------微信回调000000000000000000000000000000000000000000000000', request.body)
     weixin_pay_api_obj = weixin_pay_api()  # 实例 公共函数
     response = Response.ResponseObj()
     isSuccess = 0
@@ -354,7 +353,7 @@ def payback(request):
     data = ['mch_id', 'return_code', 'appid', 'openid', 'cash_fee', 'out_trade_no']
     resultData = xmldom_parsing.xmldom(collection, data)
     renewal_log_objs = models.renewal_log.objects.filter(pay_order_no=resultData['out_trade_no'])
-    if resultData['return_code'] == 'SUCCESS' and renewal_log_objs:
+    if resultData['return_code'] == 'SUCCESS' and renewal_log_objs:   # 如果支付成功 和 有订单
         renewal_log_obj = renewal_log_objs[0]
         if not renewal_log_obj.isSuccess:
             # 查询订单是否付款成功
@@ -378,50 +377,47 @@ def payback(request):
                     vip_type=2, # 更改为高级会员
                 )
 
+                enter_obj = models.Enterprise.objects.get(id=user_objs[0].enterprise_id)
+                primary_distribution = float(enter_obj.primary_distribution) / 100       # 一级分销占比
+                secondary_distribution = float(enter_obj.secondary_distribution) /100   # 二级分销占比
+
+
+
                 inviter_id = None  # 父级 推广人
                 if user_objs[0].inviter:
                     inviter_id = user_objs[0].inviter_id
 
-                # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增钱
-                renewal_objs = models.renewal_log.objects.filter(
+                # 判断是否首次充值 判断是否有邀请人 首次充值给 邀请人增加钱
+                renewal_objs = models.renewal_log.objects.filter( # 充值人为自己 且充值成功
                     create_user_id=pay_user_id,
                     isSuccess=1
-                ) # 充值人为自己 且充值成功
-                print('----------------------判断是否首次充值 和 是否有 上线人')
+                )
                 if renewal_objs.count() == 1 and inviter_id:  # 判断 是否首次充值 和 是否有 上线人
-                    print('================================条件满足')
-                    price = float(renewal_objs[0].price) / 100  # 首次充值钱数
-
+                    price = float(renewal_objs[0].price) / 100                                              # 首次充值钱数
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
-                    if inviter_id_user_obj.vip_type == 2: # 推广人当前为 高级会员
-                        print('=-----------------上线人充值 -->', renewal_objs[0].price)
-                        cumulative_amount = float(price) * 0.3  # 一级分享人应加钱数  30%  保留小数点后两位
-                        print('=-----------------上线人充值 -->', cumulative_amount)
-                        inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30%
-                        inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30%
+                    if inviter_id_user_obj.vip_type == 2:                                                   # 判断 推广人当前是否为 高级会员
+                        cumulative_amount = float(price) * primary_distribution                             # 一级分享人应加钱数  30%  保留小数点后两位
+                        inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30% # 默认
+                        inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30% # 默认
                         inviter_id_user_obj.save()
 
-                        # 创建充值分销人应得钱数日志
-                        models.distribute_money_log.objects.create(
+                        models.distribute_money_log.objects.create( # 创建充值分销人应得钱数日志
                             user_id=renewal_log_obj.create_user_id,
                             inviter_id=inviter_id,
                             price=price,
                             money=cumulative_amount
                         )
 
-                        if inviter_id_user_obj.inviter:
-                            two_inviter_id = inviter_id_user_obj.inviter_id
-
-                            print('=-========================二级分享人========================')
+                        if inviter_id_user_obj.inviter:                     # 判断是否有二级分享人
+                            two_inviter_id = inviter_id_user_obj.inviter_id # 二级 分享人ID
                             two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
-                            if two_user_obj.vip_type == 2:
-                                cumulative_amount = float(price) * 0.15  # 二级分享人应加钱数, 保留小数点后两位
-                                print('============================================支付钱数', cumulative_amount)
+                            if two_user_obj.vip_type == 2:                                  # 判断 二级分享人 是否为高级会员
+                                cumulative_amount = float(price) * secondary_distribution   # 二级分享人应加钱数, 保留小数点后两位
                                 two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
                                 two_user_obj.make_money = F('make_money') + cumulative_amount
                                 two_user_obj.save()
-                                # 创建充值分销人应得钱数日志
-                                models.distribute_money_log.objects.create(
+
+                                models.distribute_money_log.objects.create( # 创建充值分销人应得钱数日志
                                     user_id=renewal_log_obj.create_user_id,
                                     inviter_id=two_inviter_id,
                                     price=price,

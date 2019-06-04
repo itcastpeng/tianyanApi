@@ -7,15 +7,13 @@ from publicFunc.condition_com import conditionCom
 from api.forms.user import SelectForm
 from publicFunc.weixin.weixin_gongzhonghao_api import WeChatApi
 from publicFunc.base64_encryption import b64decode, b64encode
-from publicFunc.account import get_token
+from publicFunc.account import get_token, randon_str
 from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
-from publicFunc.account import randon_str
 from publicFunc.screenshots import screenshots
-from publicFunc.emoji import zhayan
+from publicFunc.emoji import zhayan, qian
 from publicFunc.qiniu_oper import requests_img_download, update_qiniu
-from publicFunc.emoji import qian
-from publicFunc.public import verify_mobile_phone_number
+from publicFunc.public import verify_mobile_phone_number, pub_log_access
 import re, os, json, sys, datetime
 
 
@@ -509,11 +507,13 @@ def user_login_oper(request, oper_type):
             user_data['token'] = get_token()
             user_data['overdue_date'] = datetime.datetime.now() + datetime.timedelta(days=30)
             user_objs = models.Userprofile.objects.create(**user_data)
+        user_id = user_objs.id
 
+        pub_log_access(user_id, msg='用户点击公众号菜单栏登录') # 记录访问日志
         redirect_url = '{host}?user_id={user_id}&token={token}&classify_type=1&page_type={page_type}'.format(
             host=host_url,
             token=user_objs.token,
-            user_id=user_objs.id,
+            user_id=user_id,
             page_type=oper_type,
         )
         print('redirect_url----------------------------> ', redirect_url)

@@ -13,10 +13,6 @@ def verify_mobile_phone_number(phone):
 
     return flag
 
-
-
-
-
 # 随机查询 该用户三篇文章
 def randomly_query_three_articles(user_id, id=None):
     article_objs = models.Article.objects.filter(
@@ -40,7 +36,6 @@ def randomly_query_three_articles(user_id, id=None):
         })
 
     return popula_articles_list
-
 
 # 查询商品
 def get_hot_commodity(user_id):
@@ -69,8 +64,6 @@ def get_hot_commodity(user_id):
         })
     return goods_list
 
-
-
 # 续费 时长计算
 def length_the_days(the_length):
     if int(the_length) == 1:  # 三个月
@@ -82,9 +75,12 @@ def length_the_days(the_length):
 
     return the_length, renewal_number_days
 
-
-
-
+# 记录 用户和公众号互动 日志 (某个客户什么时间做了什么)
+def pub_log_access(user_id, msg):
+    models.log_access.objects.create(
+        oper_user_id=user_id,
+        message=msg,
+    )
 
 
 

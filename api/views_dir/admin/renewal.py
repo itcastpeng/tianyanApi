@@ -53,7 +53,7 @@ def renewal(request):
                     'the_length_id': obj.the_length,
                     'the_length': obj.get_the_length_display(),
                     'create_user_id': obj.create_user_id,
-                    'create_user__name': b64decode(obj.create_user.name),
+                    'create_user__name': obj.create_user.name,
                     'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S')
                 })
             #  查询成功 返回200 状态码

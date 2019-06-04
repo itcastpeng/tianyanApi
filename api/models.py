@@ -1,8 +1,6 @@
 from django.db import models
 
 
-
-
 # 企业
 class Enterprise(models.Model):
     name = models.CharField(verbose_name='企业名称', max_length=64)
@@ -156,7 +154,6 @@ class Customer(models.Model):
     openid = models.CharField(verbose_name="openid", max_length=64)
     subscribe = models.BooleanField(verbose_name="是否关注公众号", default=False)
 
-
 # 客户信息备注 对应 用户
 class customer_information_the_user(models.Model):
     user = models.ForeignKey(to='Userprofile', verbose_name='用户', null=True, blank=True)
@@ -178,8 +175,6 @@ class user_comments_customer_information(models.Model):
     customer_info = models.TextField(verbose_name='客户信息', null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-"""文章相关 数据表"""
-
 # 文章管理
 class Article(models.Model):
     title = models.CharField(verbose_name="文章标题", max_length=256, null=True)
@@ -193,7 +188,6 @@ class Article(models.Model):
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
     style = models.TextField(verbose_name='文章样式', null=True, blank=True)
-
 
 # 文章/品牌 分类
 class Classify(models.Model):
@@ -236,16 +230,12 @@ class SelectClickArticleLog(models.Model):
     article = models.ForeignKey('Article', verbose_name="点赞文章")
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-
-"""商品相关 数据表"""
-
 # 商品分类
 class GoodsClassify(models.Model):
     oper_user = models.ForeignKey(to='Userprofile', verbose_name='归属人')
     # parent_classify = models.ForeignKey(to='self', verbose_name='父级分类名称', null=True, blank=True)
     goods_classify = models.CharField(verbose_name='分类名称', max_length=16)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
-
 
 # 商品
 class Goods(models.Model):
@@ -273,9 +263,6 @@ class customer_look_goods_log(models.Model):
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
     close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
 
-
-"""海报相关 数据表"""
-
 # 海报管理
 class Posters(models.Model):
     create_user = models.ForeignKey('Userprofile', verbose_name='创建用户', related_name="posters_create_user")
@@ -286,8 +273,6 @@ class Posters(models.Model):
         (2, '邀请函')
     )
     posters_status = models.SmallIntegerField(verbose_name='海报类型', choices=posters_choices, default=1)
-
-"""团队相关 数据表"""
 
 # 团队表
 class Team(models.Model):
@@ -306,10 +291,6 @@ class UserprofileTeam(models.Model):
     type = models.SmallIntegerField(verbose_name="成员类型", choices=type_choices, default=1)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
 
-
-
-"""微信问题 数据表"""
-
 # 保存微信回调code用 (获取用户信息 微信会回调多次 code一致 多次请求微信同样code获取不到用户信息)
 class save_code(models.Model):
     save_code = models.CharField(verbose_name='存在的code', max_length=128, null=True, blank=True)
@@ -319,9 +300,6 @@ class save_code(models.Model):
 class send_msg_duplicate(models.Model):
     user_id = models.IntegerField(verbose_name='记录user_id避免重复', null=True)
     create_date_time = models.CharField(verbose_name='创建时间', max_length=64, null=True)
-
-
-"""celery跑出来的数据 """
 
 # 天眼谁看了我
 class day_eye_celery(models.Model):
@@ -347,9 +325,6 @@ class summary_message_reminder(models.Model):
     select_num = models.IntegerField(verbose_name='查看次数', default=1)
 
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
-
-
-"""钱相关"""
 
 # 续费管理
 class renewal_management(models.Model):
@@ -381,7 +356,6 @@ class update_renewal_log(models.Model):
     status = models.SmallIntegerField(verbose_name='审核状态', choices=status_choices, default=3)
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
 
-
 # 续费日志
 class renewal_log(models.Model):
     pay_order_no = models.CharField(verbose_name='订单号', max_length=128, null=True, blank=True)
@@ -412,4 +386,16 @@ class distribute_money_log(models.Model):
     price = models.CharField(verbose_name='充值钱数', max_length=128)
     money = models.CharField(verbose_name='钱数', max_length=128)
     create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+
+# 记录天眼 用户 访问日志
+class log_access(models.Model):
+    oper_user = models.ForeignKey('Userprofile', verbose_name='访问人')
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    message = models.CharField(verbose_name='记录做了什么操作', max_length=256, null=True, blank=True)
+
+
+
+
+
+
 

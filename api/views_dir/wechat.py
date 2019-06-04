@@ -18,12 +18,13 @@ from publicFunc.article_oper import add_article_public
 from publicFunc.account import str_encrypt
 from publicFunc.emoji import baiyan, xiajiantou, zhayan
 from tianyan_celery.tasks import update_customer_set_avator
+from publicFunc.public import pub_log_access
 import json, xml.dom.minidom, datetime, time, requests, re
 
 
 
 # 创建或更新用户信息
-def updateUserInfo(openid, inviter_user_id, ret_obj):
+def updateUserInfo(openid, inviter_user_id, ret_obj, msg=None): # msg访问日志记录
     """
     :param openid:  微信openid
     :param inviter_user_id: 邀请人id
@@ -130,6 +131,8 @@ def updateUserInfo(openid, inviter_user_id, ret_obj):
         print("user_data --->", user_data)
         user_obj = models.Userprofile.objects.create(**user_data)
         user_id = user_obj.id
+
+    pub_log_access(user_id, msg)  # 记录访问日志
     return user_id
 
 
@@ -197,7 +200,7 @@ def wechat(request):
 
                     weichat_api_obj = WeChatApi(data)
                     ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                    updateUserInfo(openid, inviter_user_id, ret_obj)
+                    updateUserInfo(openid, inviter_user_id, ret_obj, msg='关注公众号')
 
                     if event == 'subscribe':  # 首次关注
                         nickname = ret_obj.get('nickname')  # 关注人名称
@@ -261,7 +264,8 @@ def wechat(request):
 
             # 客户发送消息
             elif msg_type == 'text':
-                print('---------用户发送消息')
+                Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
+
                 user_objs = models.Userprofile.objects.filter(openid=openid)  # 获取用户ID
 
                 if not user_objs: # 如果没有这个用户
@@ -274,6 +278,7 @@ def wechat(request):
 
                 user_obj.last_active_time = datetime.datetime.today() # 最后活跃时间
                 user_id = user_obj.id
+                pub_log_access(user_id, msg='用户给公众号发送消息:{}'.format(Content))  # 记录访问日志
                 token = user_obj.token
                 data = get_ent_info(user_id)  # 获取该用户appid等
                 weichat_api_obj = WeChatApi(data)  # 实例化公众号操作
@@ -291,7 +296,6 @@ def wechat(request):
                 else:
                     return HttpResponse('')
 
-                Content = collection.getElementsByTagName("Content")[0].childNodes[0].data
                 if 'http' in Content:  # 获取文章内容 返回文章
                     print('Content=-===========》', Content)
                     # 判断 链接是否正常

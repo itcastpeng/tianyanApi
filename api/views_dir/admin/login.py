@@ -3,7 +3,10 @@ from api import models
 from publicFunc import account, Response
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt, csrf_protect
-import datetime, time
+from api.forms.admin.index_info import SelectForm
+from django.db.models import Q, Count, Sum
+import datetime, time, json
+
 
 @csrf_exempt
 def login(request):
@@ -52,24 +55,86 @@ def login(request):
 @csrf_exempt
 @account.is_token(models.Enterprise)
 def index_info(request, oper_type):
-    user_id = request.GET.get('user_id')
+    response = Response.ResponseObj()
 
-    # 数据概览
-    if oper_type == 'overview_data':
-        now = datetime.datetime.today().strftime('%Y-%m-%d')
+    form_obj = SelectForm(request.GET)
+    if form_obj.is_valid():
+        user_id, role = form_obj.cleaned_data.get('user_id') # 用户ID 用户角色
+        now = datetime.datetime.today().strftime('%Y-%m-%d') # 当前时间 年月日
 
-        objs = models.Userprofile.objects.filter(
-            enterprise_id=user_id,
-            last_active_time__gte=now
-        )
+        # 数据概览
+        if oper_type == 'overview_data':
+            the_number_visitors_q = Q()             # 访客人数条件
+            num_visitors_q = Q()                    # 访客次数条件
+            number_people_placing_orders_q = Q()    # 下订单人数
+            order_amount_q = Q()                    # 下订单金额
 
-        number_visitors = objs.count()
+            if role == 1: # OEM
+                the_number_visitors_q.add(Q(enterprise_id=user_id), Q.AND)
+                num_visitors_q.add(Q(oper_user__enterprise_id=user_id), Q.AND)
+                number_people_placing_orders_q.add(Q(create_user__enterprise_id=user_id), Q.AND)
+                order_amount_q.add(Q(), Q.AND)
 
+
+            # 访客人数查询
+            the_number_visitors_objs = models.Userprofile.objects.filter(
+                the_number_visitors_q,
+                last_active_time__gte=now
+            )
+
+            # 访客次数查询
+            num_visitors_objs = models.log_access.objects.filter(
+                num_visitors_q,
+                create_date__gte=now,
+
+            )
+
+
+            # 订单公共查询
+            orders_objs = models.renewal_log.objects.select_related(
+                'create_user'
+            ).filter(
+                number_people_placing_orders_q,
+                create_date__gte=now
+            )
+
+            # 下订单人数
+            number_people_placing_orders_objs = orders_objs.values('create_user').annotate(Count('create_user_id'))
+
+            for i in orders_objs.annotate(Sum('price')):
+                print(i.price)
+
+
+            the_number_visitors = the_number_visitors_objs.count()
+            num_visitors = num_visitors_objs.count()
+            number_people_placing_orders = number_people_placing_orders_objs.count()
+
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'the_number_visitors': the_number_visitors,
+                'num_visitors': num_visitors,
+                'number_people_placing_orders': number_people_placing_orders,
+            }
+
+            response.note = {
+                'the_number_visitors': '访客人数',
+                'num_visitors': '访客次数',
+                'number_people_placing_orders': '下订单人数',
+            }
+
+        # 折线图
+        elif oper_type == 'line_chart':
+            print('-')
+
+        else:
+            print('--')
 
     else:
-        print('--')
+        response.code = 301
+        response.msg = json.loads(form_obj.errors.as_json())
 
-
+    return JsonResponse(response.__dict__)
 
 
 
