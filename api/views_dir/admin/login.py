@@ -61,6 +61,7 @@ def index_info(request, oper_type):
     if form_obj.is_valid():
         user_id, role = form_obj.cleaned_data.get('user_id') # 用户ID 用户角色
         now = datetime.datetime.today().strftime('%Y-%m-%d') # 当前时间 年月日
+        role = int(role)
 
         # 数据概览
         if oper_type == 'overview_data':
@@ -129,6 +130,13 @@ def index_info(request, oper_type):
         elif oper_type == 'line_chart':
             days = request.GET.get('days') # 天数
             if days and days.isdigit():
+                traffic_q = Q()
+                order_quantity_q = Q()
+
+                if role == 1:
+                    traffic_q.add(Q(enterprise_id=user_id), Q.AND)
+                    order_quantity_q.add(Q(create_user__enterprise_id=user_id), Q.AND)
+
                 data_list = []
                                 # 遍历 ↓开始 ↓结束 ↓步长
                 for day in range(int(days), 0, -1):
@@ -137,10 +145,38 @@ def index_info(request, oper_type):
                     start_time = pub_time + ' 00:00:00'
                     stop_time = pub_time + ' 23:59:59'
 
-                    print('start_time, stop_time------------> ', start_time, stop_time)
+                    traffic_objs = models.Userprofile.objects.filter(
+                        traffic_q,
+                        last_active_time__gte=start_time,
+                        last_active_time__lte=stop_time
+                    )
 
+                    order_quantity_objs = models.renewal_log.objects.select_related(
+                        'create_user'
+                    ).filter(
+                        order_quantity_q,
+                        create_date__gte=start_time,
+                        create_date__lte=stop_time,
+                    )
 
+                    data_list.append(
+                        {
+                            'time': pub_time,
+                            'traffic': traffic_objs.count(),
+                            'order_quantity': order_quantity_objs.count()
+                        }
+                    )
 
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data':data_list,
+                }
+                response.note = {
+                    'time': '时间',
+                    'traffic': '访问量',
+                    'order_quantity': '下单量'
+                }
 
             else:
                 response.code = 301
