@@ -110,13 +110,16 @@ def index_info(request, oper_type):
             num_visitors = num_visitors_objs.count()
             number_people_placing_orders = number_people_placing_orders_objs.count()
 
+            price__sum = 0
+            if order_amount_objs.get('price__sum'):
+                price__sum = order_amount_objs.get('price__sum')
             response.code = 200
             response.msg = '查询成功'
             response.data = {
                 'the_number_visitors': the_number_visitors,
                 'num_visitors': num_visitors,
                 'number_people_placing_orders': number_people_placing_orders,
-                'order_amount': order_amount_objs.get('price__sum'),
+                'order_amount': price__sum,
             }
 
             response.note = {
