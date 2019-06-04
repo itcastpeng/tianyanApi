@@ -392,7 +392,10 @@ def user_oper(request, oper_type, o_id):
                 if role == 1:
                     q.add(Q(renewal__create_user_id=user_id), Q.AND)
 
-                objs = models.update_renewal_log.objects.filter(status=3).order_by('-create_date')
+                objs = models.update_renewal_log.objects.filter(
+                    q, status=3
+                ).order_by('-create_date')
+
                 count = objs.count()
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -402,6 +405,7 @@ def user_oper(request, oper_type, o_id):
                 ret_data = []
                 for obj in objs:
                     ret_data.append({
+                        'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                         'update_before_price': obj.price,
                         'update_before_original_price': obj.original_price,
                         'update_after_price': obj.update_price,

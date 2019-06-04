@@ -101,8 +101,8 @@ def index_info(request, oper_type):
             # 下订单人数
             number_people_placing_orders_objs = orders_objs.values('create_user').annotate(Count('create_user_id'))
 
-            for i in orders_objs.annotate(Sum('price')):
-                print(i.price)
+            # 下订单金额
+            order_amount_objs = orders_objs.aggregate(Sum('price'))
 
 
             the_number_visitors = the_number_visitors_objs.count()
@@ -115,20 +115,39 @@ def index_info(request, oper_type):
                 'the_number_visitors': the_number_visitors,
                 'num_visitors': num_visitors,
                 'number_people_placing_orders': number_people_placing_orders,
+                'order_amount': order_amount_objs.get('price__sum'),
             }
 
             response.note = {
                 'the_number_visitors': '访客人数',
                 'num_visitors': '访客次数',
                 'number_people_placing_orders': '下订单人数',
+                'order_amount': '下订单金额',
             }
 
         # 折线图
         elif oper_type == 'line_chart':
-            print('-')
+            days = request.GET.get('days') # 天数
+            if days and days.isdigit():
+                                # 遍历 ↓开始 ↓结束 ↓步长
+                for day in range(int(days), 0, -1):
+                    now_time = datetime.datetime.today()
+                    pub_time = (now_time - datetime.timedelta(days=day - 1)).strftime("%Y-%m-%d")
+                    start_time = pub_time + ' 00:00:00'
+                    stop_time = pub_time + ' 23:59:59'
+
+                    print('start_time, stop_time------------> ', start_time, stop_time)
+
+
+
+
+            else:
+                response.code = 301
+                response.msg = '折线图异常'
 
         else:
-            print('--')
+            response.code = 402
+            response.msg = '查询异常'
 
     else:
         response.code = 301

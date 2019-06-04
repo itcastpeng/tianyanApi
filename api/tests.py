@@ -141,10 +141,10 @@
 #
 
 
-import requests, datetime
-print('--> ', datetime.datetime.today())
-r = requests.get('http://mmbiz.qpic.cn/mmbiz_jpg/4cvFUlD45w9Aa47MibuwnMHG7Dcciaic4Gb7vD5ibUQVn23YzZwvnFH0lXx6xvMvk1lH7wtvKc0YyxSmUaPVbog0IQ/0?wx_fmt=jpeg')
-print('--> ', datetime.datetime.today())
+for day in range(int(7), 5, -1):
+    print(day)
 
+for day in range(7):
+    print('day------> ', day)
 
 
