@@ -199,12 +199,10 @@ def user_oper(request, oper_type, o_id):
             primary_distribution = request.POST.get('primary_distribution') # 一级占比
             secondary_distribution = request.POST.get('secondary_distribution') # 二级占比
             if primary_distribution and secondary_distribution:
-                models.Enterprise.objects.filter(id=user_id).update(
-                    primary_distribution=primary_distribution,
-                    secondary_distribution=secondary_distribution,
-                )
-                response.code = 200
-                response.msg = '修改成功'
+                # models.Enterprise.objects.filter(id=user_id).update(
+                #     primary_distribution=primary_distribution,
+                #     secondary_distribution=secondary_distribution,
+                # )
 
                 # 记录日志
                 now = datetime.datetime.today()
@@ -214,17 +212,23 @@ def user_oper(request, oper_type, o_id):
                     '-create_date'
                 )
 
-                if objs:
-                    obj = objs[0]
-                    obj.stop_time = now.strftime('%Y-%m-%d')
-                    obj.save()
+                if objs.filter(status=3).count() >= 1:
+                    response.code = 301
+                    response.msg = '请勿重复操作, 审核中！'
+                else:
+                    if objs:
+                        obj = objs[0]
+                        obj.stop_time = now.strftime('%Y-%m-%d')
+                        obj.save()
 
-                models.distribution_log.objects.create(
-                    create_user_id=user_id,
-                    primary_distribution=primary_distribution,
-                    secondary_distribution=secondary_distribution,
-                    stop_time='至今'
-                )
+                    models.distribution_log.objects.create(
+                        create_user_id=user_id,
+                        primary_distribution=primary_distribution,
+                        secondary_distribution=secondary_distribution,
+                        stop_time='至今'
+                    )
+                    response.code = 200
+                    response.msg = '等待审核, 请耐心等待'
 
             else:
                 response.code = 301
@@ -309,22 +313,42 @@ def user_oper(request, oper_type, o_id):
                 response.code = 301
                 response.msg = '审核异常'
 
-
+        # 审核 修改分销占比
+        elif oper_type == 'review_distribution':
+            status = int(request.GET.get('status'))
+            obj = models.distribution_log.objects.get(id=o_id)
+            obj.status = status
+            obj.save()
+            models.Enterprise.objects.filter(
+                id=user_id
+            ).update(
+                primary_distribution=obj.primary_distribution,
+                secondary_distribution=obj.secondary_distribution,
+            )
+            response.code = 200
+            if status == 1:
+                response.msg = '审核成功'
+            else:
+                response.msg = '驳回成功'
 
     else:
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
-
+            user_id, role = forms_obj.cleaned_data.get('user_id')
 
             # 修改分销 记录
             if oper_type == 'get_distribution':
-
+                q = Q()
                 order = request.GET.get('order', '-create_date')
+                if int(role) == 1:
+                    q.add(Q(create_user_id=user_id), Q.AND)
+                else:
+                    q.add(Q(status=3), Q.AND)
 
                 objs = models.distribution_log.objects.filter(
-                    create_user_id=user_id
+                    q,
                 ).order_by(order)
 
                 count = objs.count()
@@ -333,13 +357,21 @@ def user_oper(request, oper_type, o_id):
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
 
+                user_obj = models.Enterprise.objects.get(id=user_id)
+                old_primary_distribution = user_obj.primary_distribution
+                old_secondary_distribution = user_obj.secondary_distribution
+
                 ret_data = []
                 for obj in objs:
                     ret_data.append({
+                        'id': obj.id,
                         'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                         'stop_time': obj.stop_time,
                         'primary_distribution': obj.primary_distribution, # 一级分销占比
                         'secondary_distribution': obj.secondary_distribution, # 二级分销占比
+                        'old_primary_distribution': old_primary_distribution, # 原一级分销占比
+                        'old_secondary_distribution': old_secondary_distribution, # 原二级分销占比
+                        'status': obj.get_status_display(), # 审核状态
                     })
                 response.code = 200
                 response.msg = '查询成功'
@@ -353,7 +385,6 @@ def user_oper(request, oper_type, o_id):
                     'primary_distribution': '一级分销占比',
                     'secondary_distribution': '二级分销占比',
                 }
-
 
             # 查询待审核用户
             elif oper_type == 'get_review_user':
@@ -385,17 +416,18 @@ def user_oper(request, oper_type, o_id):
 
             # 查询待审核 修改续费
             elif oper_type == 'get_revise_renewal_review':
-
                 user_obj = models.Enterprise.objects.get(id=user_id)
                 role = int(user_obj.role)
                 q = Q()
                 if role == 1:
                     q.add(Q(renewal__create_user_id=user_id), Q.AND)
-                print('q-> ', q)
+                else:
+                    q.add(Q(status=3), Q.AND)
+
                 objs = models.update_renewal_log.objects.filter(
-                    q, status=3
+                    q,
                 ).order_by('-create_date')
-                print('objs--------------> ', objs)
+
                 count = objs.count()
                 if length != 0:
                     start_line = (current_page - 1) * length

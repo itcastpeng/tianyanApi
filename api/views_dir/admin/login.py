@@ -129,6 +129,7 @@ def index_info(request, oper_type):
         elif oper_type == 'line_chart':
             days = request.GET.get('days') # 天数
             if days and days.isdigit():
+                data_list = []
                                 # 遍历 ↓开始 ↓结束 ↓步长
                 for day in range(int(days), 0, -1):
                     now_time = datetime.datetime.today()

@@ -36,6 +36,12 @@ class distribution_log(models.Model):
     primary_distribution = models.IntegerField(verbose_name='一级分销占比')
     secondary_distribution = models.IntegerField(verbose_name='二级分销占比')
     stop_time = models.CharField(verbose_name='截止时间', max_length=64)
+    status_choices = (
+        (1, '已审核'),
+        (2, '已驳回'),
+        (3, '未审核'),
+    )
+    status = models.SmallIntegerField(verbose_name='审核状态', choices=status_choices, default=3)
 
 # 微商用户表
 class Userprofile(models.Model):
