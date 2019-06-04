@@ -406,7 +406,8 @@ def payback(request):
                             inviter_id=inviter_id,
                             price=price,
                             money=cumulative_amount,
-                            status=1
+                            status=1,
+                            renewal_id=renewal_log_obj.id
                         )
 
                         if inviter_id_user_obj.inviter:                     # 判断是否有二级分享人
@@ -423,7 +424,8 @@ def payback(request):
                                     inviter_id=two_inviter_id,
                                     price=price,
                                     money=cumulative_amount,
-                                    status=2
+                                    status=2,
+                                    renewal_id=renewal_log_obj.id
                                 )
 
                 print('--------------------支付成功-------------')

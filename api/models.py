@@ -397,6 +397,7 @@ class distribute_money_log(models.Model):
         (2, '二级分销')
     )
     status = models.SmallIntegerField(verbose_name='分销等级', choices=status_choices, default=1)
+    renewal = models.ForeignKey('renewal_log', verbose_name='有关续费(哪个续费创建的数据)', null=True)
 
 # 记录天眼 用户 访问日志
 class log_access(models.Model):
