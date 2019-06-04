@@ -359,24 +359,24 @@ class UpdateGoodForm(forms.Form):
             'required': '商品名称不能为空'
         }
     )
-    # price = forms.CharField(
-    #     required=True,
-    #     error_messages={
-    #         'required': '商品价格不能为空'
-    #     }
-    # )
+    price = forms.CharField(
+        required=True,
+        error_messages={
+            'required': '商品价格不能为空'
+        }
+    )
     inventory = forms.IntegerField(
         required=False,
         error_messages={
             'required': '商品库存不能为空'
         }
     )
-    # freight = forms.IntegerField(
-    #     required=False,
-    #     error_messages={
-    #         'required': '商品运费不能为空'
-    #     }
-    # )
+    freight = forms.IntegerField(
+        required=False,
+        error_messages={
+            'required': '商品运费不能为空'
+        }
+    )
     goods_describe = forms.CharField(
         required=True,
         error_messages={
@@ -407,6 +407,25 @@ class UpdateGoodForm(forms.Form):
             'required': '封面图片不能为空'
         }
     )
+
+    def clean_price(self):
+        price = self.data.get('price')
+        if price.isdigit():
+            if len(price) < 5:
+                return price
+            else:
+                self.add_error('price', '价格不得超于五位数')
+        else:
+            self.add_error('price', '价格请输入整数')
+    def clean_freight(self):
+        freight = self.data.get('freight')
+        if freight.isdigit():
+            if len(freight) < 5:
+                return freight
+            else:
+                self.add_error('freight', '运费不得超于五位数')
+        else:
+            self.add_error('freight', '运费请输入整数')
     def clean_price(self):
         price = self.data.get('price')
         if price.isdigit():

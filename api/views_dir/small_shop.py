@@ -222,13 +222,13 @@ def small_shop_oper(request, oper_type, o_id):
                 models.Goods.objects.filter(id=o_id).update(**{
                     'goods_classify_id': form_obj.get('goods_classify_id'),
                     'goods_name': form_obj.get('goods_name'),
-                    # 'price': form_obj.get('price'),
+                    'price': form_obj.get('price'),
                     'inventory': form_obj.get('inventory'),
-                    # 'freight': form_obj.get('freight'),
+                    'freight': form_obj.get('freight'),
                     'goods_describe': goods_describe,
                     'point_origin': form_obj.get('point_origin'),
                     'goods_status': form_obj.get('goods_status'),
-                    # 'goods_picture': form_obj.get('goods_picture'),
+                    'goods_picture': form_obj.get('goods_picture'),
                     'cover_img':cover_img
                 })
                 response.code = 200
