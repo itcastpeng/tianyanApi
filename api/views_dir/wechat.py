@@ -19,7 +19,7 @@ from publicFunc.account import str_encrypt
 from publicFunc.emoji import baiyan, xiajiantou, zhayan
 from tianyan_celery.tasks import update_customer_set_avator
 from publicFunc.public import pub_log_access
-import json, xml.dom.minidom, datetime, time, requests, re
+import json, xml.dom.minidom, datetime, time, requests, re, redis
 
 
 
@@ -138,6 +138,8 @@ def updateUserInfo(openid, inviter_user_id, ret_obj, msg=None): # msg访问日�
 
 # 有人(关注/取关)公众号 微信服务器调用的接口
 def wechat(request):
+    rc = redis.StrictRedis(host='redis_host', port=6379, db=7, decode_responses=True)
+
     signature = request.GET.get("signature")
     timestamp = request.GET.get("timestamp")
     nonce = request.GET.get("nonce")
@@ -161,11 +163,18 @@ def wechat(request):
             DOMTree = xml.dom.minidom.parseString(body_text)
             collection = DOMTree.documentElement
 
-            # 事件类型
-            msg_type = collection.getElementsByTagName("MsgType")[0].childNodes[0].data
-
             # 用户的 openid
             openid = collection.getElementsByTagName("FromUserName")[0].childNodes[0].data
+
+            is_timestamp = rc.get(openid) # 查询redis 这个用户 是否回调过 如果有 判断时间戳是否一致 有效期 30秒
+            if is_timestamp and is_timestamp == timestamp: # 重复回调
+                return HttpResponse('')
+
+            rc.set(openid, timestamp) # 插入数据
+            rc.expire(openid, 30) # 设置过期时间 30 秒
+
+            # 事件类型
+            msg_type = collection.getElementsByTagName("MsgType")[0].childNodes[0].data
 
             # 发送消息时候时间戳
             CreateTime = collection.getElementsByTagName("CreateTime")[0].childNodes[0].data

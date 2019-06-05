@@ -139,4 +139,23 @@
 #     shipin_url = _url + '?vid=' + vid_num
 # print('shipin_url->< ', shipin_url)
 #
+import redis
+rc = redis.StrictRedis(host='redis_host', port=6379, db=7, decode_responses=True)
+
+
+data = rc.get(222)
+print('data--> ', data)
+
+
+
+
+
+
+
+
+
+
+
+
+
 
