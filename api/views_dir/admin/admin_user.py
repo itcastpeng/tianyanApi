@@ -208,7 +208,6 @@ def user_oper(request, oper_type, o_id):
             if primary_distribution and secondary_distribution:
 
                 # 记录日志
-                now = datetime.datetime.today()
                 objs = models.distribution_log.objects.filter(
                     create_user_id=user_id
                 ).order_by(
@@ -225,15 +224,28 @@ def user_oper(request, oper_type, o_id):
                     #     obj.save()
 
                     user_obj = models.Enterprise.objects.get(id=user_id)
+                    data = {
+                        'create_user_id':user_id,
+                        'old_primary_distribution':user_obj.primary_distribution, # 旧数据
+                        'old_secondary_distribution':user_obj.secondary_distribution, #  旧数据
+                        'primary_distribution':primary_distribution,
+                        'secondary_distribution':secondary_distribution,
+                        'stop_time':'至今'
+                    }
+                    if role == 2:
+                        data['status'] = 1
+                        models.Enterprise.objects.filter(
+                            id=user_id
+                        ).update(
+                            primary_distribution=primary_distribution,
+                            secondary_distribution=secondary_distribution,
+                        )
+                        if objs:
+                            obj = objs[0]
+                            obj.stop_time = datetime.datetime.today()
+                            obj.save()
 
-                    models.distribution_log.objects.create(
-                        create_user_id=user_id,
-                        old_primary_distribution=user_obj.primary_distribution, # 旧数据
-                        old_secondary_distribution=user_obj.secondary_distribution, #  旧数据
-                        primary_distribution=primary_distribution,
-                        secondary_distribution=secondary_distribution,
-                        stop_time='至今'
-                    )
+                    models.distribution_log.objects.create(**data)
                     response.code = 200
                     response.msg = '等待审核, 请耐心等待'
 
