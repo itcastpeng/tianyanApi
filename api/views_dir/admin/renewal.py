@@ -100,12 +100,21 @@ def renewal_oper(request, oper_type, o_id):
             if form_obj.is_valid():
                 o_id, objs = form_obj.cleaned_data.get('o_id')
                 user_id = request.GET.get('user_id')
+                user_obj = models.Userprofile.objects.get(id=user_id)
+
+                price = form_obj.cleaned_data.get('price')
+                original_price = form_obj.cleaned_data.get('original_price')
 
                 try:
                     obj = models.renewal_management.objects.get(
                         id=o_id,
                         create_user_id=user_id
                     )
+
+                    if int(user_obj.role) == 2:
+                        obj.price = price
+                        obj.original_price = original_price
+                        obj.save()
 
                     renewal_log_objs = models.update_renewal_log.objects.filter(
                         renewal__create_user_id=user_id,
@@ -119,8 +128,8 @@ def renewal_oper(request, oper_type, o_id):
                             renewal_id=o_id,
                             price=obj.price,                    # 原 价格
                             original_price=obj.original_price,  # 原 原价
-                            update_price=form_obj.cleaned_data.get('price'),                    # 现价格
-                            update_original_price=form_obj.cleaned_data.get('original_price'),  # 现原价
+                            update_price=price,                    # 现价格
+                            update_original_price=original_price,  # 现原价
                         )
 
                         response.code = 200
