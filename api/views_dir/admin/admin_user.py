@@ -318,7 +318,17 @@ def user_oper(request, oper_type, o_id):
                 # 审核 修改分销占比
                 elif oper_type == 'review_distribution':
                     status = int(request.POST.get('status'))
+                    objs = models.distribution_log.objects.filter(
+                        create_user_id=user_id
+                    ).order_by(
+                        '-create_date'
+                    )
                     obj = models.distribution_log.objects.get(id=o_id)
+
+                    if objs:
+                        objs[0].stop_time = obj.create_date
+                        objs[0].save()
+
                     obj.status = status
                     obj.save()
                     models.Enterprise.objects.filter(
@@ -374,7 +384,7 @@ def user_oper(request, oper_type, o_id):
                 for obj in objs:
                     ret_data.append({
                         'id': obj.id,
-                        'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
+                        'create_date': obj.create_date.strftime('%Y-%m-%d'),
                         'stop_time': obj.stop_time,
                         'primary_distribution': obj.primary_distribution, # 一级分销占比
                         'secondary_distribution': obj.secondary_distribution, # 二级分销占比
