@@ -359,8 +359,6 @@ def day_eye_oper(request, oper_type, o_id):
                             })
 
                     create_datetime = article_obj[0].create_datetime
-                    print('create_datetime-------> ', create_datetime)
-                    # create_datetime = datetime.datetime.strptime('2019-06-04 18:48:25', '%Y-%m-%d %H:%M:%S')
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
 
                     ret_data.append({

@@ -411,7 +411,7 @@ class UpdateGoodForm(forms.Form):
     def clean_price(self):
         price = self.data.get('price')
         if price.isdigit():
-            if len(price) < 5:
+            if len(price) <= 5:
                 return price
             else:
                 self.add_error('price', '价格不得超于五位数')
@@ -420,21 +420,12 @@ class UpdateGoodForm(forms.Form):
     def clean_freight(self):
         freight = self.data.get('freight')
         if freight.isdigit():
-            if len(freight) < 5:
+            if len(freight) <= 5:
                 return freight
             else:
                 self.add_error('freight', '运费不得超于五位数')
         else:
             self.add_error('freight', '运费请输入整数')
-    def clean_price(self):
-        price = self.data.get('price')
-        if price.isdigit():
-            if len(price) < 5:
-                return price
-            else:
-                self.add_error('price', '价格不得超于五位数')
-        else:
-            self.add_error('price', '价格请输入整数')
 
     def clean_inventory(self):
         inventory = self.data.get('inventory')
@@ -445,16 +436,6 @@ class UpdateGoodForm(forms.Form):
                 self.add_error('inventory', '库存不得超于五位数')
         else:
             self.add_error('inventory', '库存请输入整数')
-
-    def clean_freight(self):
-        freight = self.data.get('freight')
-        if freight.isdigit():
-            if len(freight) < 5:
-                return freight
-            else:
-                self.add_error('freight', '运费不得超于五位数')
-        else:
-            self.add_error('freight', '运费请输入整数')
 
 
     def clean_goods_classify_id(self):
