@@ -158,10 +158,14 @@ def user_oper(request, oper_type, o_id):
             flag = False
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
-                models.Enterprise.objects.create(**forms_obj.cleaned_data)
-
+                msg = '提交审核成功, 请耐心等待'
+                data = forms_obj.cleaned_data
+                if role == 2: # 如果是管理员 不需要审核
+                    msg = '添加成功'
+                    data['status'] = 1
+                models.Enterprise.objects.create(**data)
                 response.code = 200
-                response.msg = "添加成功"
+                response.msg = msg
 
             else:
                 response.code = 301

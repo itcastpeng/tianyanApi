@@ -138,6 +138,7 @@ class Userprofile(models.Model):
     # 我的名片 名字下边简介
     introduction = models.CharField(verbose_name='名片简介', max_length=512, null=True)
 
+
 # 客户表(用户的客户)
 class Customer(models.Model):
     name = models.CharField(verbose_name="微信姓名", max_length=128)

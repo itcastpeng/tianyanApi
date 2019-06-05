@@ -356,6 +356,10 @@ def user_oper(request, oper_type, o_id):
 
         # 推广赚钱 二维码截图
         elif oper_type == 'affiliate_screenshots':
+            # user_obj = models.Userprofile.objects.get(id=user_id)
+            # if user_obj.invitation_qr_code:
+            #     img_path = user_obj.invitation_qr_code
+            # else:
             path = os.path.join('statics', 'poster_img', randon_str() + '.png')
             if 'linux' in sys.platform:  # 获取平台
                 img_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/tuiguang?user_id={}'.format(user_id)
@@ -363,6 +367,9 @@ def user_oper(request, oper_type, o_id):
                 img_url = 'http://127.0.0.1:8008/api/html_oper/tuiguang?user_id={}'.format(user_id)
 
             img_path = screenshots(img_url, path)
+            # user_obj.invitation_qr_code = img_path
+            # user_obj.save()
+
             response.code = 200
             response.msg = '生成成功'
             response.data = {
