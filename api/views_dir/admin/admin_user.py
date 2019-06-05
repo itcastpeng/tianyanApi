@@ -381,6 +381,7 @@ def user_oper(request, oper_type, o_id):
                         'old_primary_distribution': old_primary_distribution, # 原一级分销占比
                         'old_secondary_distribution': old_secondary_distribution, # 原二级分销占比
                         'status': obj.get_status_display(), # 审核状态
+                        'create_user__name': obj.create_user.name, # 审核状态
                     })
                 response.code = 200
                 response.msg = '查询成功'
