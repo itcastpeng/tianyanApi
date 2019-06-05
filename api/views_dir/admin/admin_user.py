@@ -217,11 +217,15 @@ def user_oper(request, oper_type, o_id):
                 else:
                     if objs:
                         obj = objs[0]
-                        obj.stop_time = now.strftime('%Y-%m-%d')
+                        obj.stop_time = now.strftime('%Y-%m-%d %H:%M:%S')
                         obj.save()
+
+                    user_obj = models.Enterprise.objects.get(id=user_id)
 
                     models.distribution_log.objects.create(
                         create_user_id=user_id,
+                        old_primary_distribution=user_obj.primary_distribution, # 旧数据
+                        old_secondary_distribution=user_obj.secondary_distribution, #  旧数据
                         primary_distribution=primary_distribution,
                         secondary_distribution=secondary_distribution,
                         stop_time='至今'
@@ -378,10 +382,6 @@ def user_oper(request, oper_type, o_id):
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
 
-                user_obj = models.Enterprise.objects.get(id=user_id)
-                old_primary_distribution = user_obj.primary_distribution
-                old_secondary_distribution = user_obj.secondary_distribution
-
                 ret_data = []
                 for obj in objs:
                     ret_data.append({
@@ -390,8 +390,8 @@ def user_oper(request, oper_type, o_id):
                         'stop_time': obj.stop_time,
                         'primary_distribution': obj.primary_distribution, # 一级分销占比
                         'secondary_distribution': obj.secondary_distribution, # 二级分销占比
-                        'old_primary_distribution': old_primary_distribution, # 原一级分销占比
-                        'old_secondary_distribution': old_secondary_distribution, # 原二级分销占比
+                        'old_primary_distribution': obj.old_primary_distribution, # 原一级分销占比
+                        'old_secondary_distribution': obj.old_secondary_distribution, # 原二级分销占比
                         'status': obj.get_status_display(), # 审核状态
                         'create_user__name': obj.create_user.name, # 审核状态
                     })

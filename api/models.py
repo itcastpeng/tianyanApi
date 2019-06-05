@@ -32,7 +32,10 @@ class Enterprise(models.Model):
 # 修改 分销记录
 class distribution_log(models.Model):
     create_user = models.ForeignKey('Enterprise', verbose_name='创建人')
-    create_date = models.DateField(verbose_name='创建时间', auto_now_add=True)
+    create_date = models.DateTimeField(verbose_name='创建时间', auto_now_add=True)
+    old_primary_distribution = models.IntegerField(verbose_name='原一级分销占比')
+    old_secondary_distribution = models.IntegerField(verbose_name='原二级分销占比')
+
     primary_distribution = models.IntegerField(verbose_name='一级分销占比')
     secondary_distribution = models.IntegerField(verbose_name='二级分销占比')
     stop_time = models.CharField(verbose_name='截止时间', max_length=64)
