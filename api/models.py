@@ -414,4 +414,3 @@ class log_access(models.Model):
 
 
 
-

@@ -392,15 +392,17 @@ def payback(request):
                     create_user_id=pay_user_id,
                     isSuccess=1
                 )
+                print('renewal_objs.count()-----> ', renewal_objs.count(), inviter_id)
                 if renewal_objs.count() == 1 and inviter_id:  # 判断 是否首次充值 和 是否有 上线人
                     price = float(renewal_objs[0].price) / 100                                              # 首次充值钱数
+                    print('--------------------------------------------=====================================', price)
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
                     if inviter_id_user_obj.vip_type == 2:                                                   # 判断 推广人当前是否为 高级会员
                         cumulative_amount = float(price) * primary_distribution                             # 一级分享人应加钱数  30%  保留小数点后两位
                         inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30% # 默认
                         inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30% # 默认
                         inviter_id_user_obj.save()
-
+                        print('--------chaungjian =')
                         models.distribute_money_log.objects.create( # 创建充值分销人应得钱数日志
                             user_id=renewal_log_obj.create_user_id,
                             inviter_id=inviter_id,
