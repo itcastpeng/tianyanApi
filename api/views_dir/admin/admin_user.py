@@ -376,14 +376,18 @@ def user_oper(request, oper_type, o_id):
             length = forms_obj.cleaned_data['length']
             user_id, role = forms_obj.cleaned_data.get('user_id')
             admin = request.GET.get('admin') # 管理员查询
+            if admin:
+                admin = int(admin)
 
             # 修改分销 记录
             if oper_type == 'get_distribution':
                 q = Q()
                 order = request.GET.get('order', '-create_date')
 
-                if admin:
+                if admin == 1:
                     q.add(Q(status=3), Q.AND)
+                elif admin == 2: # 管理员查询全部数据
+                    pass
                 else:
                     q.add(Q(create_user_id=user_id), Q.AND)
 
@@ -427,7 +431,15 @@ def user_oper(request, oper_type, o_id):
             # 查询待审核用户
             elif oper_type == 'get_review_user':
                 if role == 2:
-                    objs = models.Enterprise.objects.filter(status=2)
+                    q = Q()
+                    if admin == 1:
+                        q.add(Q(status=2), Q.AND)
+
+                    objs = models.Enterprise.objects.filter(
+                        q
+                    ).order_by(
+                        '-create_date'
+                    )
                     count = objs.count()
                     if length != 0:
                         start_line = (current_page - 1) * length
@@ -443,6 +455,7 @@ def user_oper(request, oper_type, o_id):
                             'appid': obj.appid,
                             'oper_user_id':obj.oper_user_id,
                             'oper_user___name':obj.oper_user.name,
+                            'status':obj.get_status_display(),
                             'create_date':obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                         })
 
@@ -459,8 +472,10 @@ def user_oper(request, oper_type, o_id):
             # 查询待审核 修改续费
             elif oper_type == 'get_revise_renewal_review':
                 q = Q()
-                if admin:
+                if admin == 1:
                     q.add(Q(status=3), Q.AND)
+                elif admin == 2:
+                    pass
                 else:
                     q.add(Q(renewal__create_user_id=user_id), Q.AND)
 
