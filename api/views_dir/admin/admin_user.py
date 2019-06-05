@@ -323,18 +323,6 @@ def user_oper(request, oper_type, o_id):
                 elif oper_type == 'review_distribution':
                     status = int(request.POST.get('status'))
                     obj = models.distribution_log.objects.get(id=o_id)
-
-                    objs = models.distribution_log.objects.filter(
-                        create_user_id=obj.create_user_id,
-                        status=1
-                    ).order_by(
-                        '-create_date'
-                    )
-
-                    if objs:
-                        objs[1].stop_time = obj.create_date
-                        objs[1].save()
-
                     obj.status = status
                     obj.save()
                     models.Enterprise.objects.filter(
