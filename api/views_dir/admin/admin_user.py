@@ -321,14 +321,15 @@ def user_oper(request, oper_type, o_id):
                     obj = models.distribution_log.objects.get(id=o_id)
 
                     objs = models.distribution_log.objects.filter(
-                        create_user_id=obj.create_user_id
+                        create_user_id=obj.create_user_id,
+                        status=1
                     ).order_by(
                         '-create_date'
                     )
 
                     if objs:
-                        objs[0].stop_time = obj.create_date
-                        objs[0].save()
+                        objs[1].stop_time = obj.create_date
+                        objs[1].save()
 
                     obj.status = status
                     obj.save()
