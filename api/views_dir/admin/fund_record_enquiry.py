@@ -110,6 +110,7 @@ def fund_record_enquiry_oper(request, oper_type):
                     renewal_list.extend(withdrawal_amount_list)
                     data_list = sorted(renewal_list, key=lambda x: x['create_date'], reverse=True)
 
+                count = len(data_list)
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
@@ -119,7 +120,7 @@ def fund_record_enquiry_oper(request, oper_type):
                     'total_amount_funds': total_amount_funds,
                     'total_number_orders': total_number_orders,
                     'data_list': data_list,
-                    'count': len(data_list),
+                    'count':count,
                 }
 
                 ret_data = {}
@@ -165,7 +166,7 @@ def fund_record_enquiry_oper(request, oper_type):
                         'money': obj.money,
                         'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                     })
-
+                count = len(data_list)
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
@@ -176,7 +177,7 @@ def fund_record_enquiry_oper(request, oper_type):
                     'primary_distribution_orders': primary_distribution_orders,
                     'Secondary_distribution_orders': Secondary_distribution_orders,
                     'data_list': data_list,
-                    'count': len(data_list),
+                    'count': count,
                 }
 
                 response.code = 200
@@ -223,7 +224,7 @@ def fund_record_enquiry_oper(request, oper_type):
                         'name': b64decode(obj.user.name),
                         'order_number': obj.dingdanhao
                     })
-
+                count = len(data_list)
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
@@ -234,7 +235,7 @@ def fund_record_enquiry_oper(request, oper_type):
                 response.data = {
                     'total_amount_withdrawal': total_amount_withdrawal,
                     'data_list': data_list,
-                    'count': len(data_list),
+                    'count': count,
                 }
                 response.note = {
                     'total_amount_withdrawal': '销售总额',
