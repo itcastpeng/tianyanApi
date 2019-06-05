@@ -332,7 +332,7 @@ def user_oper(request, oper_type, o_id):
 
                     if objs.count() >= 2:
                         dis_obj = objs[1]
-                        dis_obj.stop_time = obj.create_date.strptime('%Y-%m-%d %H:%M:%S')
+                        dis_obj.stop_time = obj.create_date.strftime('%Y-%m-%d %H:%M:%S')
                         dis_obj.save()
 
                     obj.status = status
