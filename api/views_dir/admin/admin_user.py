@@ -258,7 +258,7 @@ def user_oper(request, oper_type, o_id):
                             data = [
                                 {
                                     'the_length':1,
-                                    'price':90,
+                                    'price':99,
                                     'original_price':199,
                                 },
                                 {
