@@ -270,7 +270,8 @@ def day_eye_data(request):
                     'status': 2,  # 代表商品
                     'create_date': goods_objs.order_by('-create_datetime')[0].create_datetime.strftime('%Y-%m-%d %H:%M:%S')  # 代表文章
                 })
-            for i in data_list:
+
+            for i in data_list:  # 加入数据库
                 eye_objs = models.day_eye_celery.objects.filter(
                     user_id=user_id,
                     status=i.get('status'),
@@ -281,6 +282,8 @@ def day_eye_data(request):
 
                 if eye_objs:
                     if eye_objs[0].last_click_customer:
+
+                        # 如果 查看时间 大于 用户最后一次点击 该客户时间  为新消息
                         if datetime.datetime.strptime(create_date, '%Y-%m-%d %H:%M:%S') >= eye_objs[0].last_click_customer:
                             is_new_msg = True
                         else:

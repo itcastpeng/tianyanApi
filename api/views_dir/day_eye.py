@@ -56,7 +56,11 @@ def day_eye(request):
             length = forms_obj.cleaned_data['length']
             user_id, message = forms_obj.cleaned_data['user_id']
 
-            objs = models.day_eye_celery.objects.filter(user_id=user_id)
+            objs = models.day_eye_celery.objects.filter(
+                user_id=user_id
+            ).order_by(
+                '-create_date'
+            )
             count = objs.count()
 
             if length != 0:
