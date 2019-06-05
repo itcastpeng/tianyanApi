@@ -13,10 +13,11 @@ import datetime, json
 def get_min_s(start_time=None, stop_time=None, ms=None):
     date_time = stop_time - start_time
     day = date_time.days
+    print('day-----> ', day)
     hour, date_time = divmod(date_time.seconds, 3600)
     min, date_time = divmod(date_time, 60)
     second = date_time
-
+    print('hour----> ', hour)
     days = ''
     hours = ''
     mins = ''
@@ -32,10 +33,16 @@ def get_min_s(start_time=None, stop_time=None, ms=None):
     if second:
         seconds = str(second) + '秒'
     if ms:
-        if days and hours:
+        print('hours------> ', hours)
+        if days or hours:
             if int(days.split('天')[0]) >= 365:
                 return '一年'
-            return days + hours
+            if not hours:
+                return days
+            elif not days:
+                return hours
+            else:
+                return days + hours
         else:
             return mins + seconds
     else:
@@ -400,6 +407,7 @@ def day_eye_oper(request, oper_type, o_id):
                     article_obj = models.SelectArticleLog.objects.filter(article_id=obj['article_id']).order_by(order)
                     cover_img = article_obj[0].article.cover_img    # 文章封面
                     create_datetime = article_obj[0].create_datetime
+                    create_datetime = datetime.datetime.strptime('2019-05-09 14:33:36', '%Y-%m-%d %H:%M:%S')
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
 
                     ret_data.append({
