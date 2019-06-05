@@ -215,10 +215,10 @@ def user_oper(request, oper_type, o_id):
                     response.code = 301
                     response.msg = '请勿重复操作, 审核中！'
                 else:
-                    if objs:
-                        obj = objs[0]
-                        obj.stop_time = now.strftime('%Y-%m-%d %H:%M:%S')
-                        obj.save()
+                    # if objs:
+                    #     obj = objs[0]
+                    #     obj.stop_time = now.strftime('%Y-%m-%d %H:%M:%S')
+                    #     obj.save()
 
                     user_obj = models.Enterprise.objects.get(id=user_id)
 
@@ -323,6 +323,18 @@ def user_oper(request, oper_type, o_id):
                 elif oper_type == 'review_distribution':
                     status = int(request.POST.get('status'))
                     obj = models.distribution_log.objects.get(id=o_id)
+
+                    objs = models.distribution_log.objects.filter(
+                        create_user_id=obj.create_user_id,
+                        status=1
+                    ).order_by(
+                        '-create_date'
+                    )
+
+                    if objs.count() >= 2:
+                        objs[1].stop_time = obj.create_date.strptime('%Y-%m-%d %H:%M:%S')
+                        objs[1].save()
+
                     obj.status = status
                     obj.save()
                     models.Enterprise.objects.filter(
