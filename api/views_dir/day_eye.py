@@ -407,7 +407,6 @@ def day_eye_oper(request, oper_type, o_id):
                     article_obj = models.SelectArticleLog.objects.filter(article_id=obj['article_id']).order_by(order)
                     cover_img = article_obj[0].article.cover_img    # 文章封面
                     create_datetime = article_obj[0].create_datetime
-                    create_datetime = datetime.datetime.strptime('2019-05-09 14:33:36', '%Y-%m-%d %H:%M:%S')
                     after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
 
                     ret_data.append({
