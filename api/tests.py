@@ -139,12 +139,3 @@
 #     shipin_url = _url + '?vid=' + vid_num
 # print('shipin_url->< ', shipin_url)
 #
-
-
-for day in range(int(7), 5, -1):
-    print(day)
-
-for day in range(7):
-    print('day------> ', day)
-
-

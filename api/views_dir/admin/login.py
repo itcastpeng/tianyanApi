@@ -65,25 +65,16 @@ def index_info(request, oper_type):
 
         # 数据概览
         if oper_type == 'overview_data':
-            the_number_visitors_q = Q()             # 访客人数条件
-            num_visitors_q = Q()                    # 访客次数条件
-            number_people_placing_orders_q = Q()    # 下订单人数
-
-            if role == 1: # OEM
-                the_number_visitors_q.add(Q(enterprise_id=user_id), Q.AND)
-                num_visitors_q.add(Q(oper_user__enterprise_id=user_id), Q.AND)
-                number_people_placing_orders_q.add(Q(create_user__enterprise_id=user_id), Q.AND)
-
 
             # 访客人数查询
             the_number_visitors_objs = models.Userprofile.objects.filter(
-                the_number_visitors_q,
+                enterprise_id=user_id,
                 last_active_time__gte=now
             )
 
             # 访客次数查询
             num_visitors_objs = models.log_access.objects.filter(
-                num_visitors_q,
+                oper_user__enterprise_id=user_id,
                 create_date__gte=now,
 
             )
@@ -93,7 +84,7 @@ def index_info(request, oper_type):
             orders_objs = models.renewal_log.objects.select_related(
                 'create_user'
             ).filter(
-                number_people_placing_orders_q,
+                create_user__enterprise_id=user_id,
                 create_date__gte=now
             )
 
@@ -131,13 +122,6 @@ def index_info(request, oper_type):
         elif oper_type == 'line_chart':
             days = request.GET.get('days') # 天数
             if days and days.isdigit():
-                traffic_q = Q()
-                order_quantity_q = Q()
-
-                if role == 1:
-                    traffic_q.add(Q(enterprise_id=user_id), Q.AND)
-                    order_quantity_q.add(Q(create_user__enterprise_id=user_id), Q.AND)
-
                 data_list = []
                                 # 遍历 ↓开始 ↓结束 ↓步长
                 for day in range(int(days), 0, -1):
@@ -147,7 +131,7 @@ def index_info(request, oper_type):
                     stop_time = pub_time + ' 23:59:59'
 
                     traffic_objs = models.Userprofile.objects.filter(
-                        traffic_q,
+                        enterprise_id=user_id,
                         last_active_time__gte=start_time,
                         last_active_time__lte=stop_time
                     )
@@ -155,7 +139,7 @@ def index_info(request, oper_type):
                     order_quantity_objs = models.renewal_log.objects.select_related(
                         'create_user'
                     ).filter(
-                        order_quantity_q,
+                        create_user__enterprise_id=user_id,
                         create_date__gte=start_time,
                         create_date__lte=stop_time,
                     )

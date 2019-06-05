@@ -143,7 +143,7 @@ def user_oper(request, oper_type, o_id):
     role = int(models.Enterprise.objects.get(id=user_id).role)
     if request.method == "POST":
         # 获取需要修改的信息
-
+        flag = True
         form_data = {
             'o_id': o_id,
             'oper_user_id': request.GET.get('user_id'),         # 操作人
@@ -155,6 +155,7 @@ def user_oper(request, oper_type, o_id):
 
         # 添加用户
         if oper_type == "add":
+            flag = False
             forms_obj = AddForm(form_data)
             if forms_obj.is_valid():
                 models.Enterprise.objects.create(**forms_obj.cleaned_data)
@@ -168,6 +169,7 @@ def user_oper(request, oper_type, o_id):
 
         # 修改用户
         elif oper_type == "update":
+            flag = False
             forms_obj = UpdateForm(form_data)
             if forms_obj.is_valid():
                 o_id = forms_obj.cleaned_data['o_id']
@@ -196,6 +198,7 @@ def user_oper(request, oper_type, o_id):
 
         # 修改 分销占比
         elif oper_type  == 'distribution':
+            flag = False
             primary_distribution = request.POST.get('primary_distribution') # 一级占比
             secondary_distribution = request.POST.get('secondary_distribution') # 二级占比
             if primary_distribution and secondary_distribution:
@@ -234,104 +237,105 @@ def user_oper(request, oper_type, o_id):
                     msg = '一级分销不能为空'
                 response.msg = msg
 
-        if role == 2: # (管理员 role=2)
+        if flag:
+            if role == 2: # (管理员 role=2)
 
-            # 审核用户
-            if oper_type == 'review_user':
-                status = int(request.POST.get('status'))
-                if status in [1, 3]:
-                    objs = models.Enterprise.objects.filter(
-                        id=o_id,
-                        status__in=[2, 3]
-                    )
-                    obj = objs[0]
-                    objs.update(status=status)
-                    msg = '审核驳回'
-                    if status == 1:
-                        msg = '审核通过'
+                # 审核用户
+                if oper_type == 'review_user':
+                    status = int(request.POST.get('status'))
+                    if status in [1, 3]:
+                        objs = models.Enterprise.objects.filter(
+                            id=o_id,
+                            status__in=[2, 3]
+                        )
+                        obj = objs[0]
+                        objs.update(status=status)
+                        msg = '审核驳回'
+                        if status == 1:
+                            msg = '审核通过'
 
-                        # 创建默认会员价格
-                        data = [
-                            {
-                                'the_length':1,
-                                'price':90,
-                                'original_price':199,
-                            },
-                            {
-                                'the_length': 2,
-                                'price': 299,
-                                'original_price': 499,
-                            },
-                            {
-                                'the_length': 3,
-                                'price': 599,
-                                'original_price': 999,
-                            },
-                        ]
-                        for i in data:
-                            the_length, renewal_number_days = length_the_days(i.get('the_length'))
-                            models.renewal_management.objects.create(
-                                create_user_id=obj.id,
-                                price=i.get('price'),
-                                original_price=i.get('original_price'),
-                                renewal_number_days=renewal_number_days,
-                                the_length=the_length,
-                            )
+                            # 创建默认会员价格
+                            data = [
+                                {
+                                    'the_length':1,
+                                    'price':90,
+                                    'original_price':199,
+                                },
+                                {
+                                    'the_length': 2,
+                                    'price': 299,
+                                    'original_price': 499,
+                                },
+                                {
+                                    'the_length': 3,
+                                    'price': 599,
+                                    'original_price': 999,
+                                },
+                            ]
+                            for i in data:
+                                the_length, renewal_number_days = length_the_days(i.get('the_length'))
+                                models.renewal_management.objects.create(
+                                    create_user_id=obj.id,
+                                    price=i.get('price'),
+                                    original_price=i.get('original_price'),
+                                    renewal_number_days=renewal_number_days,
+                                    the_length=the_length,
+                                )
 
 
-                    response.code = 200
-                    response.msg = msg
+                        response.code = 200
+                        response.msg = msg
 
-                else:
-                    response.code = 301
-                    response.msg = '审核异常'
+                    else:
+                        response.code = 301
+                        response.msg = '审核异常'
 
-            # 审核 修改续费
-            elif oper_type == 'revise_renewal_review':
-                status = request.POST.get('status')
-                if status:
-                    status = int(status)
-                    obj = models.update_renewal_log.objects.get(id=o_id)
-                    response.code = 200
+                # 审核 修改续费
+                elif oper_type == 'revise_renewal_review':
+                    status = request.POST.get('status')
+                    if status:
+                        status = int(status)
+                        obj = models.update_renewal_log.objects.get(id=o_id)
+                        response.code = 200
 
-                    response.msg = '审核驳回'
-                    if status == 1:
-                        renewal_objs = models.renewal_management.objects.filter(id=obj.renewal_id)
-                        if renewal_objs:
-                            renewal_obj = renewal_objs[0]
-                            renewal_obj.price = obj.update_price
-                            renewal_obj.original_price = obj.update_original_price
-                            renewal_obj.save()
-                            response.msg = '审核通过'
+                        response.msg = '审核驳回'
+                        if status == 1:
+                            renewal_objs = models.renewal_management.objects.filter(id=obj.renewal_id)
+                            if renewal_objs:
+                                renewal_obj = renewal_objs[0]
+                                renewal_obj.price = obj.update_price
+                                renewal_obj.original_price = obj.update_original_price
+                                renewal_obj.save()
+                                response.msg = '审核通过'
 
+                        obj.status = status
+                        obj.save()
+
+                    else:
+                        response.code = 301
+                        response.msg = '审核异常'
+
+                # 审核 修改分销占比
+                elif oper_type == 'review_distribution':
+                    status = int(request.GET.get('status'))
+                    obj = models.distribution_log.objects.get(id=o_id)
                     obj.status = status
                     obj.save()
+                    models.Enterprise.objects.filter(
+                        id=user_id
+                    ).update(
+                        primary_distribution=obj.primary_distribution,
+                        secondary_distribution=obj.secondary_distribution,
+                    )
+                    response.code = 200
+                    if status == 1:
+                        response.msg = '审核成功'
+                    else:
+                        response.msg = '驳回成功'
 
-                else:
-                    response.code = 301
-                    response.msg = '审核异常'
-
-            # 审核 修改分销占比
-            elif oper_type == 'review_distribution':
-                status = int(request.GET.get('status'))
-                obj = models.distribution_log.objects.get(id=o_id)
-                obj.status = status
-                obj.save()
-                models.Enterprise.objects.filter(
-                    id=user_id
-                ).update(
-                    primary_distribution=obj.primary_distribution,
-                    secondary_distribution=obj.secondary_distribution,
-                )
-                response.code = 200
-                if status == 1:
-                    response.msg = '审核成功'
-                else:
-                    response.msg = '驳回成功'
-
-        else:
-            response.code = 301
-            response.msg = '权限不足'
+            else:
+                response.code = 301
+                response.msg = '权限不足'
     else:
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
