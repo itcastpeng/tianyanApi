@@ -100,7 +100,7 @@ def renewal_oper(request, oper_type, o_id):
             if form_obj.is_valid():
                 o_id, objs = form_obj.cleaned_data.get('o_id')
                 user_id = request.GET.get('user_id')
-                user_obj = models.Userprofile.objects.get(id=user_id)
+                user_obj = models.Enterprise.objects.get(id=user_id)
 
                 price = form_obj.cleaned_data.get('price')
                 original_price = form_obj.cleaned_data.get('original_price')
