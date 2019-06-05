@@ -450,6 +450,7 @@ def user_oper(request, oper_type, o_id):
                     the_length = obj.renewal.get_the_length_display()
 
                     ret_data.append({
+                        'id': obj.id,
                         'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                         'update_before_price': obj.price,
                         'update_before_original_price': obj.original_price,
