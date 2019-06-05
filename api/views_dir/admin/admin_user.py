@@ -317,7 +317,7 @@ def user_oper(request, oper_type, o_id):
 
                 # 审核 修改分销占比
                 elif oper_type == 'review_distribution':
-                    status = int(request.GET.get('status'))
+                    status = int(request.POST.get('status'))
                     obj = models.distribution_log.objects.get(id=o_id)
                     obj.status = status
                     obj.save()
