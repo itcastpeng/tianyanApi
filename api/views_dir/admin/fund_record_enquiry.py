@@ -77,13 +77,13 @@ def fund_record_enquiry_oper(request, oper_type):
                 renewal_objs = models.renewal_log.objects.filter(
                     create_user__enterprise_id=user_id,
                     isSuccess=1
-                )
+                ).order_by('-create_date')
 
                 # 提现记录
                 withdrawal_amount_objs = models.withdrawal_log.objects.filter(
                     user__enterprise_id=user_id,
                     is_success=1
-                )
+                ).order_by('-create_date')
 
                 total_amount_renewal = 0
                 total_withdrawal_amount = 0
