@@ -108,7 +108,7 @@ def fund_record_enquiry_oper(request, oper_type):
 
                 # 全部数据 (订单 提现)
                 else:
-                    total_amount_funds = total_withdrawal_amount + total_amount_renewal # 资金总额
+                    total_amount_funds = total_amount_renewal - total_withdrawal_amount  # 资金总额
                     total_number_orders = renewal_objs.count() + withdrawal_amount_objs.count() # 订单总数
                     withdrawal_amount_list = purchase_membership(renewal_objs)
                     renewal_list = withdrawal(withdrawal_amount_objs)
