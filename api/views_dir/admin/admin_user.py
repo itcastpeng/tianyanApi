@@ -336,6 +336,7 @@ def user_oper(request, oper_type, o_id):
             else:
                 response.code = 301
                 response.msg = '权限不足'
+
     else:
         forms_obj = SelectForm(request.GET)
         if forms_obj.is_valid():
@@ -482,6 +483,8 @@ def user_oper(request, oper_type, o_id):
                     'status_name': obj.get_status_display(),  # 是否审核
                     'phone': obj.phone,  # 电话
                     'create_time': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
+                    'primary_distribution': obj.primary_distribution,  # 一级占比
+                    'secondary_distribution': obj.secondary_distribution,  # 二级占比
                 }
                 response.code = 200
                 response.msg = '查询成功'
