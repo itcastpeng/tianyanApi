@@ -85,9 +85,14 @@ def fund_record_enquiry_oper(request, oper_type):
                     is_success=1
                 )
 
-
-                total_amount_renewal = renewal_objs.aggregate(Sum('price')).get('price__sum') # 续费总金额
-                total_withdrawal_amount = withdrawal_amount_objs.aggregate(Sum('withdrawal_amount')).get('withdrawal_amount__sum') # 提现总金额
+                total_amount_renewal = 0
+                total_withdrawal_amount = 0
+                total_amount_renewal_num = renewal_objs.aggregate(Sum('price')).get('price__sum') # 续费总金额
+                total_withdrawal_amount_num = withdrawal_amount_objs.aggregate(Sum('withdrawal_amount')).get('withdrawal_amount__sum') # 提现总金额
+                if total_amount_renewal_num:
+                    total_amount_renewal = total_amount_renewal_num
+                if total_withdrawal_amount_num:
+                    total_withdrawal_amount = total_withdrawal_amount_num
 
                 # 提现 数据
                 if status == 'withdrawal':
