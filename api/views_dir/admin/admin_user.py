@@ -343,7 +343,7 @@ def user_oper(request, oper_type, o_id):
             current_page = forms_obj.cleaned_data['current_page']
             length = forms_obj.cleaned_data['length']
             user_id, role = forms_obj.cleaned_data.get('user_id')
-            admin = request.GET.get('admin')
+            admin = request.GET.get('admin') # 管理员查询
 
             # 修改分销 记录
             if oper_type == 'get_distribution':
@@ -447,6 +447,8 @@ def user_oper(request, oper_type, o_id):
 
                 ret_data = []
                 for obj in objs:
+                    the_length = obj.renewal.get_the_length_display()
+
                     ret_data.append({
                         'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                         'update_before_price': obj.price,
@@ -455,6 +457,7 @@ def user_oper(request, oper_type, o_id):
                         'update_after_original_price': obj.update_original_price,
                         'status': obj.get_status_display(),
                         'oper_user_name': obj.renewal.create_user.name,
+                        'the_length': the_length,
                     })
                 response.code = 200
                 response.msg = '查询成功'
@@ -469,6 +472,7 @@ def user_oper(request, oper_type, o_id):
                     'update_after_original_price': '修改后 原价',
                     'status': '审核状态',
                     'oper_user_name': '操作人',
+                    'the_length': '续费时长',
                 }
 
             # 获取自己信息
