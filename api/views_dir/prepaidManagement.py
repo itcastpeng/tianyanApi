@@ -397,7 +397,7 @@ def payback(request):
                     price = float(renewal_objs[0].price) / 100                                              # 首次充值钱数
                     print('--------------------------------------------=====================================', price)
                     inviter_id_user_obj = models.Userprofile.objects.get(id=inviter_id)
-                    if inviter_id_user_obj.vip_type == 2:                                                   # 判断 推广人当前是否为 高级会员
+                    if inviter_id_user_obj.vip_type in [1, 2]:                                                   # 判断 推广人当前是否为 高级会员
                         cumulative_amount = float(price) * primary_distribution                             # 一级分享人应加钱数  30%  保留小数点后两位
                         inviter_id_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount  # 累计钱数 + 30% # 默认
                         inviter_id_user_obj.make_money = F('make_money') + cumulative_amount                # 待提钱数 + 30% # 默认
@@ -415,7 +415,7 @@ def payback(request):
                         if inviter_id_user_obj.inviter:                     # 判断是否有二级分享人
                             two_inviter_id = inviter_id_user_obj.inviter_id # 二级 分享人ID
                             two_user_obj = models.Userprofile.objects.get(id=two_inviter_id)
-                            if two_user_obj.vip_type == 2:                                  # 判断 二级分享人 是否为高级会员
+                            if two_user_obj.vip_type in [1, 2]:                                  # 判断 二级分享人 是否为高级会员
                                 cumulative_amount = float(price) * secondary_distribution   # 二级分享人应加钱数, 保留小数点后两位
                                 two_user_obj.cumulative_amount = F('cumulative_amount') + cumulative_amount
                                 two_user_obj.make_money = F('make_money') + cumulative_amount
