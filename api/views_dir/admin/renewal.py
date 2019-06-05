@@ -110,8 +110,15 @@ def renewal_oper(request, oper_type, o_id):
                         id=o_id,
                         create_user_id=user_id
                     )
-
+                    data = {
+                        'renewal_id':o_id,
+                        'price':obj.price,                    # 原 价格
+                        'original_price':obj.original_price,  # 原 原价
+                        'update_price':price,                    # 现价格
+                        'update_original_price':original_price,  # 现原价
+                    }
                     if int(user_obj.role) == 2:
+                        data['status'] = 1
                         obj.price = price
                         obj.original_price = original_price
                         obj.save()
@@ -124,13 +131,7 @@ def renewal_oper(request, oper_type, o_id):
                         response.code = 301
                         response.msg = '修改金额申请中, 请勿重复操作！'
                     else:
-                        models.update_renewal_log.objects.create(
-                            renewal_id=o_id,
-                            price=obj.price,                    # 原 价格
-                            original_price=obj.original_price,  # 原 原价
-                            update_price=price,                    # 现价格
-                            update_original_price=original_price,  # 现原价
-                        )
+                        models.update_renewal_log.objects.create(**data)
 
                         response.code = 200
                         response.msg = '已申请, 请耐心等待!~'
