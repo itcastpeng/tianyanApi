@@ -139,3 +139,4 @@
 #     shipin_url = _url + '?vid=' + vid_num
 # print('shipin_url->< ', shipin_url)
 #
+

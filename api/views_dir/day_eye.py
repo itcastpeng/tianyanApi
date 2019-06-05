@@ -388,12 +388,12 @@ def day_eye_oper(request, oper_type, o_id):
                 objs = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id
                 ).values('article_id', 'article__title').distinct().annotate(Count('id')).exclude(customer_id__isnull=True)
+                count = objs.count()
 
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
                     objs = objs[start_line: stop_line]
-                count = objs.count()
 
                 ret_data = []
                 for obj in objs:
@@ -408,8 +408,10 @@ def day_eye_oper(request, oper_type, o_id):
                         'id__count': obj['id__count'],
                         'after_time': after_time + '前',
                         'cover_img': cover_img + '?imageView2/2/w/200',
+                        'create_datetime': create_datetime,
                     })
 
+                ret_data = sorted(ret_data, key=lambda x: x['create_datetime'], reverse=True)
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
