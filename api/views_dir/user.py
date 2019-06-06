@@ -361,7 +361,8 @@ def user_oper(request, oper_type, o_id):
             if img_path and expire_date > datetime.date.today(): # 如果有 图片
                 pass
             else:
-                os.remove(img_path) # 删除原图
+                if img_path:
+                    os.remove(img_path) # 删除原图
                 img_path, expire_date = tuiguang(user_id)
                 user_obj.promote_earning_qr_code_pictures = img_path
                 user_obj.generate_models_qr_code_pictures_time = expire_date
