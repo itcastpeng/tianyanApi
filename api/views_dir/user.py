@@ -10,10 +10,9 @@ from publicFunc.base64_encryption import b64decode, b64encode
 from publicFunc.account import get_token, randon_str
 from publicFunc.host import host_url
 from publicFunc.article_oper import get_ent_info
-from publicFunc.screenshots import screenshots
 from publicFunc.emoji import zhayan, qian
 from publicFunc.qiniu_oper import requests_img_download, update_qiniu
-from publicFunc.public import verify_mobile_phone_number, pub_log_access
+from publicFunc.public import verify_mobile_phone_number, pub_log_access, tuiguang
 import re, os, json, sys, datetime
 
 
@@ -356,20 +355,15 @@ def user_oper(request, oper_type, o_id):
 
         # 推广赚钱 二维码截图
         elif oper_type == 'affiliate_screenshots':
-            # user_obj = models.Userprofile.objects.get(id=user_id)
-            # if user_obj.invitation_qr_code:
-            #     img_path = user_obj.invitation_qr_code
+            # path = os.path.join('statics', 'poster_img', randon_str() + '.png')
+            # if 'linux' in sys.platform:  # 获取平台
+            #     img_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/tuiguang?user_id={}'.format(user_id)
             # else:
-            path = os.path.join('statics', 'poster_img', randon_str() + '.png')
-            if 'linux' in sys.platform:  # 获取平台
-                img_url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/html_oper/tuiguang?user_id={}'.format(user_id)
-            else:
-                img_url = 'http://127.0.0.1:8008/api/html_oper/tuiguang?user_id={}'.format(user_id)
-
-            img_path = screenshots(img_url, path)
-            # user_obj.invitation_qr_code = img_path
-            # user_obj.save()
-
+            #     img_url = 'http://127.0.0.1:8008/api/html_oper/tuiguang?user_id={}'.format(user_id)
+            #
+            # img_path = screenshots(img_url, path)
+            img_path, expire_date = tuiguang(user_id)
+            # user_obj = models.Userprofile.objects.get(id=user_id)
             response.code = 200
             response.msg = '生成成功'
             response.data = {
