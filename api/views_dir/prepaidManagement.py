@@ -36,8 +36,7 @@ def weixin_pay(request, oper_type, o_id):
                     price = int(fee_obj.price)                                                  # 支付钱数
                     get_the_length_display = fee_obj.get_the_length_display()                   # 续费时长 (几个月/几年)
                     renewal_number_days = fee_obj.renewal_number_days                           # 续费天数
-                    now_date = datetime.datetime.now()
-                    overdue_date = (now_date + datetime.timedelta(days=renewal_number_days))  # 续费后 到期时间
+                    overdue_date = (user_obj.overdue_date + datetime.timedelta(days=renewal_number_days))  # 续费后 到期时间
                     dingdanhao = weixin_pay_api_obj.shengcheng_dingdanhao()                     # 订单号
 
                     order_objs = models.renewal_log.objects.filter(pay_order_no=dingdanhao)  # 查询订单日志

@@ -138,7 +138,7 @@ def tuiguang(user_id):
         f.write(ret.content)
 
     # 下载头像
-        linshi_user_set_avator_path = os.path.join('statics', 'img', randon_str() + '.png')
+    linshi_user_set_avator_path = os.path.join('statics', 'img', randon_str() + '.png')
     print('---------------------------下载头像=--------------------', datetime.datetime.today(), user_set_avator)
     ret = requests.get(user_set_avator)
     print('---------------------------下载头像=--------------------', datetime.datetime.today())
