@@ -115,6 +115,8 @@ def circle(img, path):
 
 # 生成推广二维码
 def tuiguang(user_id):
+    print('-0-------------------------------------------------------------生成图片二维码')
+
     # 获取用户数据
     data = get_ent_info(user_id)
     weichat_api_obj = WeChatApi(data)
@@ -129,13 +131,17 @@ def tuiguang(user_id):
 
     # 下载二维码
     linshi_qc_code_url_path = os.path.join('statics', 'img', randon_str() + '.png')
+    print('---------------------------下载二维码=--------------------', datetime.datetime.today())
     ret = requests.get(qc_code_url)
+    print('---------------------------下载二维码=--------------------', datetime.datetime.today())
     with open(linshi_qc_code_url_path, 'wb') as f:
         f.write(ret.content)
 
     # 下载头像
     old_linshi_user_set_avator_path = os.path.join('statics', 'img', randon_str() + '.png')
+    print('---------------------------下载头像=--------------------', datetime.datetime.today())
     ret = requests.get(user_set_avator)
+    print('---------------------------下载头像=--------------------', datetime.datetime.today())
     with open(old_linshi_user_set_avator_path, 'wb') as f:
         f.write(ret.content)
 
@@ -163,8 +169,8 @@ def tuiguang(user_id):
         font2 = ImageFont.truetype('/usr/share/fonts/chinese/msyhl.ttc', 12)
         font3 = ImageFont.truetype('/usr/share/fonts/chinese/msyhl.ttc', 15)
 
-    circle(old_linshi_user_set_avator_path, new_linshi_user_set_avator_path)
-    touxiang_img = Image.open(new_linshi_user_set_avator_path)
+    # circle(old_linshi_user_set_avator_path, new_linshi_user_set_avator_path) # 生成圆头像
+    touxiang_img = Image.open(old_linshi_user_set_avator_path)
     touxiang_img = touxiang_img.resize((70, 70))
     p.paste(touxiang_img, (int((huabu_x - 50) / 2), 30))
     name_x, name_y = image_draw.textsize(name, font=font)
@@ -237,6 +243,7 @@ def tuiguang(user_id):
     os.remove(old_linshi_user_set_avator_path)
     os.remove(linshi_qc_code_url_path)          # 删除下载的二维码
     os.remove(new_linshi_user_set_avator_path)
+    print('-0-------------------------------------------------------------结束生成图片二维码')
     return img_path, expire_date
 
 
