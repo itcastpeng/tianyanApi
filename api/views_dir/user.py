@@ -355,9 +355,16 @@ def user_oper(request, oper_type, o_id):
 
         # 推广赚钱 二维码截图
         elif oper_type == 'affiliate_screenshots':
-            # user_obj = models.Userprofile.objects.get(id=user_id)
-
-            img_path, expire_date = tuiguang(user_id)
+            user_obj = models.Userprofile.objects.get(id=user_id)
+            img_path = user_obj.promote_earning_qr_code_pictures
+            expire_date = user_obj.generate_models_qr_code_pictures_time
+            if img_path and expire_date > datetime.date.today(): # 如果有 图片
+                pass
+            else:
+                img_path, expire_date = tuiguang(user_id)
+                user_obj.promote_earning_qr_code_pictures = img_path
+                user_obj.generate_models_qr_code_pictures_time = expire_date
+                user_obj.save()
 
             response.code = 200
             response.msg = '生成成功'

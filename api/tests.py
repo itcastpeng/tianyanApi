@@ -180,7 +180,7 @@ title2 = '客户追踪、分 享 事 业 机 会'
 title3 = '伙伴们一起来吧 !'
 title4 = '客 户 追 踪 神 器'
 title5 = '关注微商天眼公众号'
-
+expire_date = '有效期: 2019-05-05'
 
 
 # 新建画布纯白色           宽度↓   ↓高度    ↓ 颜色
@@ -240,6 +240,11 @@ image_draw.text((ziti_x, touxiangweizhi + title1_y + 5), title2, font=font1, fil
 image_draw.text((ziti_x, touxiangweizhi + title1_y + title2_y + 15), title3, font=font, fill=(248,248,242))
 image_draw.text((25, huabu_y - 130), title4, font=font1, fill=(248,248,242))
 image_draw.text((25, (huabu_y - 130) + title4_y), title5, font=font2, fill=(248,248,242))
+
+
+expire_date_x, expire_date_y = image_draw.textsize(expire_date, font=font)
+print(expire_date_x)
+image_draw.text((huabu_x - 130, huabu_y - (expire_date_y / 2 + 17)), expire_date, font=font2, fill=(248,248,242))
 
 
 

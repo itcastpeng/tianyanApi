@@ -126,26 +126,24 @@ def tuiguang(user_id):
     expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
     name = data.get('user_name') # 用户名
     user_set_avator = data.get('user_set_avator') # 用户头像
-
+    expire_date_title = '有效期至: {}'.format(expire_date)
     img_path = os.path.join('statics', 'img', randon_str() + '.png') # 推广二维码图片 保存位置
 
     # 下载二维码
     linshi_qc_code_url_path = os.path.join('statics', 'img', randon_str() + '.png')
-    print('---------------------------下载二维码=--------------------', datetime.datetime.today())
+    print('---------------------------下载二维码=--------------------', datetime.datetime.today(), qc_code_url)
     ret = requests.get(qc_code_url)
     print('---------------------------下载二维码=--------------------', datetime.datetime.today())
     with open(linshi_qc_code_url_path, 'wb') as f:
         f.write(ret.content)
 
     # 下载头像
-    old_linshi_user_set_avator_path = os.path.join('statics', 'img', randon_str() + '.png')
-    print('---------------------------下载头像=--------------------', datetime.datetime.today())
+        linshi_user_set_avator_path = os.path.join('statics', 'img', randon_str() + '.png')
+    print('---------------------------下载头像=--------------------', datetime.datetime.today(), user_set_avator)
     ret = requests.get(user_set_avator)
     print('---------------------------下载头像=--------------------', datetime.datetime.today())
-    with open(old_linshi_user_set_avator_path, 'wb') as f:
+    with open(linshi_user_set_avator_path, 'wb') as f:
         f.write(ret.content)
-
-    new_linshi_user_set_avator_path = os.path.join('statics', 'img', randon_str() + '.png') # 圆形头像 保存位置
 
     huabu_x = 375  # 画布宽度
     huabu_y = 550  # 画布高度
@@ -170,7 +168,7 @@ def tuiguang(user_id):
         font3 = ImageFont.truetype('/usr/share/fonts/chinese/msyhl.ttc', 15)
 
     # circle(old_linshi_user_set_avator_path, new_linshi_user_set_avator_path) # 生成圆头像
-    touxiang_img = Image.open(old_linshi_user_set_avator_path)
+    touxiang_img = Image.open(linshi_user_set_avator_path)
     touxiang_img = touxiang_img.resize((70, 70))
     p.paste(touxiang_img, (int((huabu_x - 50) / 2), 30))
     name_x, name_y = image_draw.textsize(name, font=font)
@@ -217,6 +215,10 @@ def tuiguang(user_id):
     image_draw.text((25, huabu_y - 130), title4, font=font1, fill=(248, 248, 242))
     image_draw.text((25, (huabu_y - 130) + title4_y), title5, font=font2, fill=(248, 248, 242))
 
+    # 有效期
+    expire_date_x, expire_date_y = image_draw.textsize(expire_date_title, font=font)
+    image_draw.text((huabu_x - 130, huabu_y - (expire_date_y / 2 + 17)), expire_date_title, font=font2, fill=(248, 248, 242))
+
     # 画箭头
     image_draw.line(((50 + title4_x, huabu_y - 130 + title4_y), (70 + title4_x, huabu_y - 130 + title4_y)),
         fill=(248, 248, 242), width=10)
@@ -240,9 +242,8 @@ def tuiguang(user_id):
         num_y2 += 1
 
     p.save(img_path)
-    os.remove(old_linshi_user_set_avator_path)
+    os.remove(linshi_user_set_avator_path)
     os.remove(linshi_qc_code_url_path)          # 删除下载的二维码
-    os.remove(new_linshi_user_set_avator_path)
     print('-0-------------------------------------------------------------结束生成图片二维码')
     return img_path, expire_date
 

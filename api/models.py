@@ -138,6 +138,8 @@ class Userprofile(models.Model):
     # 我的名片 名字下边简介
     introduction = models.CharField(verbose_name='名片简介', max_length=512, null=True)
 
+    promote_earning_qr_code_pictures = models.CharField(verbose_name='推广赚钱二维码图片', max_length=512, null=True)
+    generate_models_qr_code_pictures_time = models.DateField(verbose_name='生成推广赚钱二维码图片时间', null=True)
 
 # 客户表(用户的客户)
 class Customer(models.Model):
