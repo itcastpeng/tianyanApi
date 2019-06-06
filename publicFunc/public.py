@@ -118,7 +118,9 @@ def tuiguang(user_id):
     # 获取用户数据
     data = get_ent_info(user_id)
     weichat_api_obj = WeChatApi(data)
+    print('-----------------开始生成二维码=-==========================', datetime.datetime.today())
     qc_code_url = weichat_api_obj.generate_qrcode({'inviter_user_id': user_id}) # 生成二维码
+    print('-----------------结束生成二维码=-==========================', datetime.datetime.today())
     expire_date = (datetime.datetime.now().date() + datetime.timedelta(days=30)).strftime("%Y-%m-%d")
     name = data.get('user_name') # 用户名
     user_set_avator = data.get('user_set_avator') # 用户头像
@@ -162,7 +164,7 @@ def tuiguang(user_id):
         font3 = ImageFont.truetype('/usr/share/fonts/chinese/msyhl.ttc', 15)
 
     circle(old_linshi_user_set_avator_path, new_linshi_user_set_avator_path)
-    touxiang_img = Image.open('2.png')
+    touxiang_img = Image.open(new_linshi_user_set_avator_path)
     touxiang_img = touxiang_img.resize((70, 70))
     p.paste(touxiang_img, (int((huabu_x - 50) / 2), 30))
     name_x, name_y = image_draw.textsize(name, font=font)
