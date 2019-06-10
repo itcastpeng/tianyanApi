@@ -506,5 +506,5 @@ def update_customer_set_avator(request):
             set_avator = update_qiniu(set_avator)
             obj.set_avator = set_avator
             obj.save()
-
+    return HttpResponse('')
 

@@ -98,7 +98,7 @@ urlpatterns = [
     url(r'^letter_operation/(?P<oper_type>\w+)$', letter_operation.letter_operation),
 
     # 页面 截图
-    url(r'^html_oper/(?P<oper_type>\w+)$', html_oper.html_oper),
+    # url(r'^html_oper/(?P<oper_type>\w+)$', html_oper.html_oper),
 
     # 七牛云操作
     url(r'^qiniu_oper/(?P<oper_type>\w+)$', qiniu_oper.qiniu_oper),
