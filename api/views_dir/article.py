@@ -807,11 +807,21 @@ def article_customer_oper(request, oper_type):
                 # 查询详情记录
                 id = request.GET.get('id')
                 if id:
+                    goods_obj = models.Goods.objects.get(id=id)
                     models.customer_look_goods_log.objects.create(
                         goods_id=id,
                         customer_id=customer_id,
                         user_id=inviter_user_id
                     )
+
+                    # 给用户发送消息
+                    customer_view_articles_send_msg.delay({
+                        'check_type': '商品',
+                        'user_id': inviter_user_id,
+                        'title': goods_obj.goods_name,
+                        'customer_id': customer_id,
+                    })
+
 
                 response.code = 200
                 response.msg = '查询成功'
