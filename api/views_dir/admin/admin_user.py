@@ -406,7 +406,7 @@ def user_oper(request, oper_type, o_id):
                 for obj in objs:
                     ret_data.append({
                         'id': obj.id,
-                        'create_date': obj.create_date.strftime('%Y-%m-%d'),
+                        'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),
                         'stop_time': obj.stop_time,
                         'primary_distribution': obj.primary_distribution, # 一级分销占比
                         'secondary_distribution': obj.secondary_distribution, # 二级分销占比

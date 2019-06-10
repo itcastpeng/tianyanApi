@@ -258,15 +258,10 @@
 # num_x = 65
 # num_y1 = 140
 # num_y2 = 120
-# for i in range(10):
+# for i in range(10):i
 #     image_draw.line(((num_x + title4_x,  huabu_y - num_y1 + title4_y), (num_x + title4_x, huabu_y - num_y2 + title4_y)), fill=(248,248,242), width=1)
 #     num_x += 1
 #     num_y1 -= 1
 #     num_y2 += 1
 
-import datetime
-
-overdue_date = '2019-05-01'
-overdue_date = datetime.datetime.strptime(overdue_date, '%Y-%m-%d')
-print(overdue_date + datetime.timedelta(days=5))
 

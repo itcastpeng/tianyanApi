@@ -114,7 +114,7 @@ def article(request):
                     is_use_redis = True
 
                 elif team_list:  # 团队
-                    q.add(Q(create_user_id=user_id), Q.OR)
+                    q.add(Q(create_user_id=user_id), Q.AND)
                     order_by = '-like_num'
 
                 else:
@@ -156,8 +156,8 @@ def article(request):
                         classify_name_list = [obj.get('name') for obj in obj.classify.values('name')]
 
                     summary = obj.summary
-                    if obj.summary:
-                        summary = b64decode(obj.summary)
+                    # if obj.summary:
+                    #     summary = b64decode(obj.summary)
 
                     result_data = {
                         'id': obj.id,
