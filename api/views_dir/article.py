@@ -239,7 +239,7 @@ def article(request):
                         team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)
                         for team_obj in team_objs:
                             team_list_name.append(team_obj.team.name)
-                        result_data['team_list_name'] = team_list
+                        result_data['team_list_name'] = team_list_name
 
                     #  将查询出来的数据 加入列表
                     ret_data.append(result_data)
