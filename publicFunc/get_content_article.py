@@ -85,8 +85,8 @@ def get_article(article_url):
     title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
     summary = re.compile(r'var msg_desc = (.*);').findall(ret.text)[0].replace('"', '')  # 摘要
     cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
-    if summary:
-        summary = replace_chinese_character(summary) # 替换中文符号
+    # if summary:
+    #     summary = replace_chinese_character(summary) # 替换中文符号
 
     ## 把封面图片下载到本地
     now_time = time.time()

@@ -231,9 +231,15 @@ def article(request):
                                 })
                         result_data['goods_list'] = goods_list
 
+
                     if team_list and len(team_list) >= 1:  # 如果查询 团队 则返回 文章创建人头像和名称
                         result_data['create_user__name'] = obj.create_user.name
                         result_data['create_user__set_avator'] = obj.create_user.set_avator
+                        team_list_name = []
+                        team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)
+                        for team_obj in team_objs:
+                            team_list_name.append(team_obj.team.name)
+                        result_data['team_list_name'] = team_list
 
                     #  将查询出来的数据 加入列表
                     ret_data.append(result_data)
