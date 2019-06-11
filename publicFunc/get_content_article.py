@@ -147,15 +147,20 @@ def get_article(article_url):
             iframe_url = 'https://mp.weixin.qq.com/mp/videoplayer?vid={}&action=get_mp_video_play_url'.format(vid)
             ret = requests.get(iframe_url)
             video_path = ret.json().get('url_info')[0].get('url')
+            iframe_tag_new = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
+                                       <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
+                                   </div>""".format(video_path, data_cover_url)
 
         else:
-            video_path = 'https://v.qq.com/txp/iframe/player.html?origin=https%3A%2F%2Fmp.weixin.qq.com&vid={}&autoplay=false&full=true&show1080p=false&isDebugIframe=false'.format(
+            shipin_url = 'https://v.qq.com/txp/iframe/player.html?origin=https%3A%2F%2Fmp.weixin.qq.com&vid={}&autoplay=false&full=true&show1080p=false&isDebugIframe=false'.format(
                 vid
             )
+            iframe_tag.attrs['data-src'] = shipin_url
+            iframe_tag.attrs['allowfullscreen'] = True  # 是否允许全屏
+            iframe_tag.attrs['data-cover'] = data_cover_url
 
-        iframe_tag_new = """<div style="width: 100%; background: #000; position:relative; height: 0; padding-bottom:75%;">
-                                   <video style="width: 100%; height: 100%; position:absolute;left:0;top:0;" id="videoBox" src="{}" poster="{}" controls="controls" allowfullscreen=""></video>
-                               </div>""".format(video_path, data_cover_url)
+            iframe_tag_new = str(iframe_tag).replace('></iframe>', ' width="100%" height="500px"></iframe>')
+
 
         body = str(body).replace(str(iframe_tag), iframe_tag_new)
         body = BeautifulSoup(body, 'html.parser')
