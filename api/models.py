@@ -201,6 +201,8 @@ class Article(models.Model):
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
     style = models.TextField(verbose_name='文章样式', null=True, blank=True)
 
+    original_link = models.TextField(verbose_name="原文链接", null=True)
+
 # 文章/品牌 分类
 class Classify(models.Model):
     last_update_time = models.DateField(verbose_name='最后更新时间', null=True) # 爬取数据最后一次时间 只限创建人为空的
