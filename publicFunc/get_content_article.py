@@ -135,7 +135,6 @@ def get_article(article_url):
     flag = False # 判断是否有 视频
     iframe = body.find_all('iframe', attrs={'class': 'video_iframe'})
     for iframe_tag in iframe:
-        flag = True
         shipin_url = iframe_tag.get('data-src')
         data_cover_url = iframe_tag.get('data-cover') # 封面
         if data_cover_url:
@@ -144,6 +143,7 @@ def get_article(article_url):
         data_cover_url = update_qiniu(data_cover_url)
         vid = shipin_url.split('vid=')[1]
         if 'wxv' in vid:  # 下载
+            flag = True
             iframe_url = 'https://mp.weixin.qq.com/mp/videoplayer?vid={}&action=get_mp_video_play_url'.format(vid)
             ret = requests.get(iframe_url)
             video_path = ret.json().get('url_info')[0].get('url')
