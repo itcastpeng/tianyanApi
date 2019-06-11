@@ -163,7 +163,7 @@ def get_article(article_url):
             iframe_tag.attrs['data-src'] = shipin_url
             iframe_tag.attrs['allowfullscreen'] = True      # 是否允许全屏
             iframe_tag.attrs['data-cover'] = data_cover_url
-            iframe_tag_new = str(iframe_tag).replace('></iframe>', ' width="100%" height="500px"></iframe>')
+            iframe_tag_new = str(iframe_tag).replace('></iframe>', ' width="100%" height="300px"></iframe>')
 
         body = str(body).replace(str(iframe_tag), iframe_tag_new)
         body = BeautifulSoup(body, 'html.parser')
