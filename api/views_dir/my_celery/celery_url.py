@@ -516,5 +516,5 @@ def celery_regularly_update_articles(request):
         data = get_article(obj.original_link)
         obj.content = data.get('content')
         obj.save()
-
+    return HttpResponse('')
 
