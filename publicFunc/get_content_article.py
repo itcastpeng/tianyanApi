@@ -75,30 +75,30 @@ def eliminate_label(i):
 
 
 # 放入微信文章 获取全部内容
-def get_article(article_url):
+def get_article(article_url, get_content=None):
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
     ret = requests.get(article_url, headers=headers, timeout=5)
     ret.encoding = 'utf-8'
     s = requests.session()
     is_video_original_link = None # 是否有视频 如果有则返回原文链接
     soup = BeautifulSoup(ret.text, 'lxml')
-    title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
-    summary = re.compile(r'var msg_desc = (.*);').findall(ret.text)[0].replace('"', '')  # 摘要
-    cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
-    # if summary:
-    #     summary = replace_chinese_character(summary) # 替换中文符号
 
-    ## 把封面图片下载到本地
-    now_time = time.time()
-    html = s.get(cover_url)
-    if 'wx_fmt=gif' in cover_url:
-        cover_name = "/cover_%s.gif" % (now_time)
-    else:
-        cover_name = "/cover_%s.jpg" % (now_time)
-    cover_url = os.path.join('statics', 'img') + cover_name
-    with open(cover_url, 'wb') as file:
-        file.write(html.content)
-    cover_url = update_qiniu(cover_url)
+    if not get_content:
+        title = re.compile(r'var msg_title = (.*);').findall(ret.text)[0].replace('"', '')  # 标题
+        summary = re.compile(r'var msg_desc = (.*);').findall(ret.text)[0].replace('"', '')  # 摘要
+        cover_url = re.compile(r'var msg_cdn_url = (.*);').findall(ret.text)[0].replace('"', '')  # 封面
+
+        ## 把封面图片下载到本地
+        now_time = time.time()
+        html = s.get(cover_url)
+        if 'wx_fmt=gif' in cover_url:
+            cover_name = "/cover_%s.gif" % (now_time)
+        else:
+            cover_name = "/cover_%s.jpg" % (now_time)
+        cover_url = os.path.join('statics', 'img') + cover_name
+        with open(cover_url, 'wb') as file:
+            file.write(html.content)
+        cover_url = update_qiniu(cover_url)
 
     # 获取所有样式
     style = ""
@@ -159,7 +159,7 @@ def get_article(article_url):
             iframe_tag.attrs['allowfullscreen'] = True  # 是否允许全屏
             iframe_tag.attrs['data-cover'] = data_cover_url
 
-            iframe_tag_new = str(iframe_tag).replace('></iframe>', ' width="100%" height="500px"></iframe>')
+            iframe_tag_new = str(iframe_tag).replace('></iframe>', ' width="100%" height="300px"></iframe>')
 
 
         body = str(body).replace(str(iframe_tag), iframe_tag_new)
@@ -167,14 +167,14 @@ def get_article(article_url):
 
     content = str(style) + str(body)
     content = BeautifulSoup(content, 'html.parser')
-
-    # 生成css 文件
-    now = time.time()
-    style = style.replace('<style>', '').replace('</style>', '')
-    style_path = os.path.join('statics', 'article_css') + '/{}.css'.format(now)
-    with open(style_path, 'w') as e:
-        e.write(style)
-    # style_path = URL + '/statics/article_css/{}.css'.format(now)
+    if not get_content:
+        # 生成css 文件
+        now = time.time()
+        style = style.replace('<style>', '').replace('</style>', '')
+        style_path = os.path.join('statics', 'article_css') + '/{}.css'.format(now)
+        with open(style_path, 'w') as e:
+            e.write(style)
+        # style_path = URL + '/statics/article_css/{}.css'.format(now)
 
     # 分布标签
     data_list = []
@@ -183,15 +183,21 @@ def get_article(article_url):
         data_list.append(content)
 
     if flag:
-        is_video_original_link = article_url
-    data = {
-        'title': title,
-        'summary':b64encode(summary),
-        'cover_img':cover_url,
-        'content': json.dumps(data_list),
-        'style': style_path,
-        'original_link': is_video_original_link,
-    }
+        is_video_original_link = article_url # 原文链接
+
+    if not get_content:
+        data = {
+            'title': title,
+            'summary':b64encode(summary),
+            'cover_img':cover_url,
+            'content': json.dumps(data_list),
+            'style': style_path,
+            'original_link': is_video_original_link,
+        }
+    else:
+        data = {
+            'content': json.dumps(data_list),
+        }
     return data
 
 

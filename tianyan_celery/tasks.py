@@ -43,7 +43,11 @@ def qiniu_celery_upload_video(url, video_path):
     url = requests_video_download(url)  # 下载到本地
     update_qiniu(url, video_path)
 
-
+@app.task
+def celery_regularly_update_articles():
+    print('-----------------------------celery--------------------更新文章=-----------> ', datetime.datetime.today())
+    url = '{}/api/celery_regularly_update_articles'.format(host_url)
+    requests.get(url)
 
 
 
