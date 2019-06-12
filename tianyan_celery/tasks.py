@@ -28,8 +28,8 @@ def customer_view_articles_send_msg(data):
 
 @app.task
 def summary_message_reminder_celery():
-    print('-----------------------------------celery---------汇总消息 发送--------> ', datetime.datetime.today())
     url = '{}/api/summary_message_reminder_celery'.format(host_url)
+    print('-----------------------------------celery---------汇总消息 发送--------> ', datetime.datetime.today(), url)
     requests.get(url)
 
 @app.task
