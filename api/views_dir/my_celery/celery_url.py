@@ -513,6 +513,7 @@ def update_customer_set_avator(request):
 def celery_regularly_update_articles(request):
     objs = models.Article.objects.filter(original_link__isnull=False)
     for obj in objs:
+        print('----更新文章-----> ', obj.id, obj.title)
         data = get_article(obj.original_link, get_content=1)
         obj.content = data.get('content')
         obj.save()
