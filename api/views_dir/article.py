@@ -102,7 +102,7 @@ def article(request):
                     for i in team_user_objs:
                         article_list.append(i.id)
 
-                    q.add(Q(**{'id__in': article_list}), Q.AND)
+                    q.add(Q(**{'id__in': article_list}), Q.OR)
 
 
                 is_use_redis = False # 是否进行redis操作
