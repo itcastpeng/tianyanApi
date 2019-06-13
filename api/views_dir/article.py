@@ -102,7 +102,7 @@ def article(request):
                     for i in team_user_objs:
                         article_list.append(i.id)
 
-                    q.add(Q(**{'id__in': article_list}), Q.OR)
+                    q.add(Q(**{'id__in': article_list}), Q.AND)
 
 
                 is_use_redis = False # 是否进行redis操作
@@ -117,7 +117,7 @@ def article(request):
                     is_use_redis = True
 
                 elif team_list:  # 团队
-                    q.add(Q(create_user_id=user_id), Q.AND)
+                    q.add(Q(create_user_id=user_id), Q.OR)
                     order_by = '-like_num'
 
                 else:
