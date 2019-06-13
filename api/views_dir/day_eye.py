@@ -267,11 +267,12 @@ def day_eye_oper(request, oper_type, o_id):
                 ret_data = []
                 num = 0
                 for obj in objs:
-                    print('num------> ', num, obj.remote, obj.id)
                     create_datetime = obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S')
+                    ret_data.append({
+                        'create_datetime': create_datetime
+                    })
                     ret_data[num]['remote'] = obj.remote
                     ret_data[num]['id'] = obj.id
-                    ret_data[num]['create_datetime'] = create_datetime
                     num += 1
 
                 response.code = 200
