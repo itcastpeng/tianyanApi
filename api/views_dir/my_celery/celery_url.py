@@ -275,7 +275,7 @@ def day_eye_data(request):
             for i in data_list:  # 加入数据库
                 eye_objs = models.day_eye_celery.objects.filter(
                     user_id=user_id,
-                    status=i.get('status'),
+                    # status=i.get('status'),
                     customer_id=i.get('customer_id'),
                 )
 
