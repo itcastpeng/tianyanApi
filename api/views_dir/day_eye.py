@@ -334,11 +334,19 @@ def day_eye_oper(request, oper_type, o_id):
                         'create_datetime': create_datetime, # 排序用
                     })
                 data_list = sorted(ret_data, key=lambda x: x['create_datetime'], reverse=True)
+
+                is_new_goods_msg = False
+                goods_objs = models.day_eye_celery.objects.filter(status=2, user_id=user_id, customer_id=o_id)
+                if goods_objs:
+                    if goods_objs[0].is_new_msg:
+                        is_new_goods_msg = True
+
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
                     'ret_data': data_list,
                     'data_count': count,
+                    'is_new_goods_msg': is_new_goods_msg,
                 }
                 response.note = {
                     'article_id': "文章ID",
@@ -348,6 +356,7 @@ def day_eye_oper(request, oper_type, o_id):
                     'select_datetime': "查看时间",
                     'article__cover_img': "文章图片",
                     'create_datetime': "创建时间",
+                    'is_new_goods_msg': "是否有商品新消息",
                 }
 
             # 按文章查看(天眼功能)列表页
