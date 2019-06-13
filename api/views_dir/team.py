@@ -328,7 +328,7 @@ def customer_invite_members(request, oper_type, o_id):
 
         obj = models.Userprofile.objects.get(id=user_id)
         # 此处跳转到天眼首页
-        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/?token={token}&user_id={user_id}'.format(
+        url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/?token={token}&user_id={user_id}&classify_type=1'.format(
             token=obj.token,
             user_id=user_id
         )
