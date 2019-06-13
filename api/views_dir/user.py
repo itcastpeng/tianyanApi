@@ -431,6 +431,21 @@ def user_oper(request, oper_type, o_id):
                 'phone': flag
             }
 
+        # 查询我的所有团队
+        elif oper_type == 'get_my_team':
+            objs = models.UserprofileTeam.objects.filter(user_id=user_id).values('team_id', 'team__name')
+            data_list = []
+            for obj in objs:
+                data_list.append({
+                    'id': obj.get('team_id'),
+                    'team__name': obj.get('team__name')
+                })
+            response.code = 200
+            response.msg = '查询成功'
+            response.data = {
+                'ret_data': data_list
+            }
+
         else:
             response.code = 402
             response.msg = '请求异常'
