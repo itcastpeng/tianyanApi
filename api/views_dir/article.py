@@ -97,7 +97,7 @@ def article(request):
                     # 查询 该团队所有用户文章
                     team_user_objs = models.Article.objects.filter(
                         create_user_id__in=team_user_list,
-                        ownership_team_id=team_list
+                        ownership_team_id__in=team_list
                     )  # 查询该团队 所有文章
                     for i in team_user_objs:
                         article_list.append(i.id)
