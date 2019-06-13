@@ -1,13 +1,9 @@
-
-import requests, random, time, os, re, json
 from urllib.parse import unquote, quote
 from bs4 import BeautifulSoup
 from publicFunc.base64_encryption import b64encode
-from publicFunc.replace_chinese_character import replace_chinese_character
 from publicFunc.qiniu_oper import update_qiniu, requests_img_download
-from tianyanApi import settings
-from tianyan_celery.tasks import qiniu_celery_upload_video
-from publicFunc.account import randon_str
+import requests, random, time, os, re, json, datetime
+
 
 
 pcRequestHeader = [
@@ -90,7 +86,9 @@ def get_article(article_url, get_content=None):
 
         ## 把封面图片下载到本地
         now_time = time.time()
+        print('--------------------请求封面-0-----------> ', datetime.datetime.today(), cover_url)
         html = s.get(cover_url)
+        print('--------------------结束请求封面-0-----------> ', datetime.datetime.today())
         if 'wx_fmt=gif' in cover_url:
             cover_name = "/cover_%s.gif" % (now_time)
         else:
@@ -117,7 +115,9 @@ def get_article(article_url, get_content=None):
                 img_tag.attrs['style'] = img_tag.attrs.get('style')
 
             now_time = time.time()
+            print('------------------开始请求图片----------->', datetime.datetime.today(), data_src)
             html = s.get(data_src)
+            print('------------------结束请求图片----------->', datetime.datetime.today())
 
             if 'wx_fmt=gif' in data_src:
                 img_name = "/article_%s.gif" % (now_time)
