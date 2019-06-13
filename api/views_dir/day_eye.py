@@ -73,8 +73,11 @@ def day_eye(request):
                 objs = objs[start_line: stop_line]
 
             ret_data = []
+            data_list = []
             for obj in objs:
-                customer_id = obj.customer_id
+                if obj.customer_id not in data_list:
+                    data_list.append(obj.customer_id)
+            for customer_id in data_list:
                 eye_objs = models.day_eye_celery.objects.filter(user_id=user_id, customer_id=customer_id).order_by('-create_date')
                 flag = False
                 for eye_obj in eye_objs:
