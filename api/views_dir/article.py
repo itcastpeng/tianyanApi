@@ -95,7 +95,10 @@ def article(request):
                         team_user_list.append(team_obj['user_id'])
 
                     # 查询 该团队所有用户文章
-                    team_user_objs = models.Article.objects.filter(create_user_id__in=team_user_list)  # 查询该团队 所有文章
+                    team_user_objs = models.Article.objects.filter(
+                        create_user_id__in=team_user_list,
+                        ownership_team_id=team_list
+                    )  # 查询该团队 所有文章
                     for i in team_user_objs:
                         article_list.append(i.id)
 
@@ -236,9 +239,11 @@ def article(request):
                         result_data['create_user__name'] = obj.create_user.name
                         result_data['create_user__set_avator'] = obj.create_user.set_avator
                         team_list_name = []
-                        team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)
-                        for team_obj in team_objs:
-                            team_list_name.append(team_obj.team.name)
+                        if obj.ownership_team:
+                            team_list_name.append(obj.ownership_team.name)
+                        else:
+                            team_list_name.append('创建')
+
                         result_data['team_list_name'] = team_list_name
 
                     #  将查询出来的数据 加入列表

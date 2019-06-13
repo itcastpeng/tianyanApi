@@ -200,6 +200,7 @@ class Article(models.Model):
     like_num = models.IntegerField(verbose_name="点赞(喜欢)次数", default=0)
     cover_img = models.CharField(verbose_name='封面图', max_length=256, null=True, blank=True)
     style = models.TextField(verbose_name='文章样式', null=True, blank=True)
+    ownership_team = models.ForeignKey('Team', verbose_name='归属团队', null=True)
 
     original_link = models.TextField(verbose_name="原文链接", null=True)
 
