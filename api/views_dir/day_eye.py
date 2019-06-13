@@ -679,8 +679,8 @@ def day_eye_oper(request, oper_type, o_id):
                             'create_datetime': detail_obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S'),
                             'time_length': time_length
                         })
-
-                    time_length = get_min_s(detail_objs[0].create_datetime, datetime.datetime.today())
+                    create_datetime = detail_objs[0].create_datetime
+                    time_length = get_min_s(create_datetime, datetime.datetime.today())
                     data_list.append({
                         'goods_id': goods_id,
                         'goods__cover_img': obj.get('goods__cover_img'),
@@ -689,9 +689,10 @@ def day_eye_oper(request, oper_type, o_id):
                             obj.get('id__count'),
                             time_length
                         ),
-                        'time_detail':time_detail
+                        'time_detail':time_detail,
+                        'create_datetime': create_datetime
                     })
-
+                    data_list = sorted(data_list, key=lambda x: x['create_datetime'], reverse=True)
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
