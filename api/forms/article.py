@@ -27,7 +27,12 @@ class AddForm(forms.Form):
                 'required': "分类id不能为空"
             }
         )
-
+    ownership_team= forms.IntegerField(
+            required=True,
+            error_messages={
+                'required': "团队不能为空"
+            }
+        )
     # 查询分类Id是否存在
     def clean_classify_id(self):
         classify_id = self.data['classify_id']
@@ -44,6 +49,22 @@ class AddForm(forms.Form):
                 return classify_id
             else:
                 self.add_error('classify_id', '标签最多不超过五个')
+    # 团队
+    def clean_ownership_team(self):
+        create_user_id = self.data.get('create_user_id')
+        ownership_team = self.data.get('ownership_team')
+        objs = models.Team.objects.filter(id=ownership_team)
+        if not objs:
+            self.add_error('ownership_team', '该团队不存在')
+        else:
+            team_objs = models.UserprofileTeam.objects.filter(
+                team_id=ownership_team,
+                user_id=create_user_id
+            )
+            if team_objs:
+                return ownership_team
+            else:
+                self.add_error('ownership_team', '可能加入到该团队')
 
 # 更新
 class UpdateForm(forms.Form):

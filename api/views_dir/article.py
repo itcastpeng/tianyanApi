@@ -317,11 +317,13 @@ def article_oper(request, oper_type, o_id):
         # 添加文章
         if oper_type == "add":
             article_url = request.POST.get('article_url')
+            ownership_team = request.POST.get('ownership_team') # 归属团队
             classify_id = request.POST.get('classify_id')
             form_data = {
                 'create_user_id': user_id,
                 'article_url': article_url,
-                'classify_id': classify_id
+                'ownership_team': ownership_team,
+                'classify_id': classify_id,
             }
             #  创建 form验证 实例（参数默认转成字典）
             forms_obj = AddForm(form_data)
@@ -331,13 +333,16 @@ def article_oper(request, oper_type, o_id):
 
                 print("data_dict.get('title')----------------> ", data_dict.get('title'))
 
+                cleaned_data = forms_obj.cleaned_data
+                ownership_team_id = cleaned_data.get('ownership_team')
                 is_article = models.Article.objects.filter(
                     create_user_id=user_id,
-                    title=data_dict.get('title')
+                    title=data_dict.get('title'),
+                    ownership_team_id=ownership_team_id
                 )
                 data_dict['create_user_id'] = user_id
+                data_dict['ownership_team_id'] = ownership_team_id
                 if not is_article:
-                    cleaned_data = forms_obj.cleaned_data
                     classify_id = cleaned_data.get('classify_id')
                     id = add_article_public(data_dict, classify_id) # 创建文章
                 else:
