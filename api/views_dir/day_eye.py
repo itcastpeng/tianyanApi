@@ -74,13 +74,21 @@ def day_eye(request):
 
             ret_data = []
             for obj in objs:
+                customer_id = obj.customer_id
+                eye_objs = models.day_eye_celery.objects.filter(user_id=user_id, customer_id=customer_id).order_by('-create_date')
+                flag = False
+                for eye_obj in eye_objs:
+                    if eye_obj.is_new_msg:
+                        flag = True
+
+                obj = eye_objs[0]
                 ret_data.append({
                     'customer_id': obj.customer_id,
                     'customer__name': b64decode(obj.customer.name),
                     'customer__set_avator': obj.customer.set_avator,
                     'text': obj.text,
                     'status': obj.status,
-                    'is_new_msg': obj.is_new_msg,
+                    'is_new_msg': flag,
                 })
 
             #  查询成功 返回200 状态码
@@ -131,23 +139,13 @@ def day_eye_oper(request, oper_type, o_id):
             if oper_type == "add":
                 form_obj = AddForm(form_data)
                 if form_obj.is_valid():
-                    remote_type = form_obj.cleaned_data.get('remote_type')
-                    title = form_obj.cleaned_data.get('title')
                     remote = form_obj.cleaned_data.get('remote')
                     customer_id = form_obj.cleaned_data.get('customer_id')
-                    create_date = form_obj.cleaned_data.get('create_date')
-
-                    remote_text = {
-                        'create_date': create_date,
-                        'title': title,
-                        'remote': remote
-                    }
 
                     data = {
                         'user_id': user_id,
                         'customer_id': customer_id,
-                        'remote_type': remote_type,
-                        'remote': remote_text
+                        'remote': remote
                     }
                     models.customer_information_the_user.objects.create(**data)
                     response.code = 200
@@ -161,18 +159,11 @@ def day_eye_oper(request, oper_type, o_id):
             elif oper_type == 'update':
                 form_obj = UpdateForm(form_data)
                 if form_obj.is_valid():
-                    o_id, remote_type = form_obj.cleaned_data.get('o_id')
-                    title = form_obj.cleaned_data.get('title')
+                    o_id = form_obj.cleaned_data.get('o_id')
                     remote = form_obj.cleaned_data.get('remote')
-                    create_date = form_obj.cleaned_data.get('create_date')
-                    remote_text = {
-                        'create_date': create_date,
-                        'title': title,
-                        'remote': remote
-                    }
 
                     models.customer_information_the_user.objects.filter(id=o_id).update(
-                        remote=remote_text
+                        remote=remote
                     )
                     response.code = 200
                     response.msg = '保存成功'
@@ -184,7 +175,7 @@ def day_eye_oper(request, oper_type, o_id):
             # 删除客户信息备注
             elif oper_type == 'delete':
                 customer_id = request.POST.get('customer_id')
-                print(user_id,customer_id)
+
                 if customer_id:
                     objs = models.customer_information_the_user.objects.filter(
                         user_id=user_id,
@@ -192,7 +183,7 @@ def day_eye_oper(request, oper_type, o_id):
                     )
                 else:
                     objs = models.customer_information_the_user.objects.filter(id=o_id)
-                print('user-----> ', objs)
+
                 if not objs:
                     response.code = 301
                     response.msg = '刪除数据不存在'
@@ -257,7 +248,6 @@ def day_eye_oper(request, oper_type, o_id):
             if oper_type == 'get_customer_note':
                 field_dict = {
                     'id': '',
-                    'remote_type': '',
                     'customer_id': '',
                     'user_id': '',
                 }
@@ -272,45 +262,17 @@ def day_eye_oper(request, oper_type, o_id):
                 count = objs.count()
 
                 ret_data = []
-                remote_type = request.GET.get('remote_type')
-
                 num = 0
                 for obj in objs:
                     create_datetime = obj.create_datetime.strftime('%Y-%m-%d %H:%M:%S')
-                    remote_obj = eval(obj.remote)
-                    remote = remote_obj.get('remote')
-                    title = remote_obj.get('title')
-                    create_date = remote_obj.get('create_date')
-
-                    if int(remote_type) == 2:
-                        ret_data.append({
-                            'create_date': create_date,
-                            'title': title,
-                        })
-                    elif int(remote_type) == 3:
-                        ret_data.append({
-                            'title': title,
-                        })
-                    else:
-                        ret_data.append({
-
-                        })
-
-                    ret_data[num]['create_datetime'] = create_datetime
-                    ret_data[num]['remote'] = remote
+                    ret_data[num]['remote'] = obj.remote
                     ret_data[num]['id'] = obj.id
+                    ret_data[num]['create_datetime'] = create_datetime
                     num += 1
-                remote_type_choices = []
-                for i in models.customer_information_the_user.remote_type_choices:
-                    remote_type_choices.append({
-                        'id': i[0],
-                        'name': i[1]
-                    })
 
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
-                    'remote_type': remote_type_choices,
                     'count': count,
                     'ret_data': ret_data,
                 }
@@ -318,9 +280,6 @@ def day_eye_oper(request, oper_type, o_id):
                 response.note = {
                     'create_datetime':'创建时间',
                     'remote':'备注',
-                    'id':'备注ID',
-                    'create_date':'用户自定时间',
-                    'title':'标题',
                 }
 
             # 谁看了我 (文章详情)

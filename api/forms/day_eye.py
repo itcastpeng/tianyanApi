@@ -79,31 +79,10 @@ class SelectForm(forms.Form):
 
 # 添加客户备注
 class AddForm(forms.Form):
-    remote_type = forms.IntegerField(
-        required=True,
-        error_messages={
-            'required': "备注类型不能为空"
-        }
-    )
-
     remote = forms.CharField(
         required=True,
         error_messages={
             'required': "备注不能为空"
-        }
-    )
-
-    title = forms.CharField(
-        required=False,
-        error_messages={
-            'required': "标题类型错误"
-        }
-    )
-
-    create_date = forms.CharField(
-        required=False,
-        error_messages={
-            'required': "创建时间类型错误"
         }
     )
     customer_id = forms.IntegerField(
@@ -112,19 +91,7 @@ class AddForm(forms.Form):
             'required': "客户不能为空"
         }
     )
-    def clean_remote_type(self):
-        remote_type = int(self.data.get('remote_type'))
-        title = self.data.get('title')
-        create_date = self.data.get('create_date')
 
-        if remote_type in [2, 3]:
-            if not title:
-                self.add_error('remote_type', '请备注产品名称')
-        if remote_type == 2:
-            if not create_date:
-                self.add_error('remote_type', '请填写产品购买时间')
-
-        return remote_type
 
 
 # 修改客户备注
@@ -150,19 +117,6 @@ class UpdateForm(forms.Form):
         }
     )
 
-    title = forms.CharField(
-        required=False,
-        error_messages={
-            'required': "标题类型错误"
-        }
-    )
-
-    create_date = forms.CharField(
-        required=False,
-        error_messages={
-            'required': "创建时间类型错误"
-        }
-    )
     customer_id = forms.IntegerField(
         required=True,
         error_messages={
@@ -171,25 +125,9 @@ class UpdateForm(forms.Form):
     )
     def clean_o_id(self):
         o_id = self.data.get('o_id')
-        user_id = int(self.data.get('user_id'))
-
         objs = models.customer_information_the_user.objects.filter(id=o_id)
         if objs:
-            if objs[0].user_id == user_id:
-                remote_type = int(objs[0].remote_type)
-                title = self.data.get('title')
-                create_date = self.data.get('create_date')
-
-                if remote_type in [2, 3]:
-                    if not title:
-                        self.add_error('o_id', '请备注产品名称')
-                if remote_type == 2:
-                    if not create_date:
-                        self.add_error('o_id', '请填写产品购买时间')
-
-                return o_id, remote_type
-            else:
-                self.add_error('o_id', '暂无权限')
+            return o_id
         else:
             self.add_error('o_id', '数据异常')
 

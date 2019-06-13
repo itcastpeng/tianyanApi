@@ -170,12 +170,12 @@ class Customer(models.Model):
 class customer_information_the_user(models.Model):
     user = models.ForeignKey(to='Userprofile', verbose_name='用户', null=True, blank=True)
     customer = models.ForeignKey(to='Customer', verbose_name='客户', null=True, blank=True)
-    remote_type_choices = (
-        (1, "跟进状态"),
-        (2, "产品购买"),
-        (3, "课程活动"),
-    )
-    remote_type = models.SmallIntegerField(verbose_name="备注类型", choices=remote_type_choices, default=1)
+    # remote_type_choices = (
+    #     (1, "跟进状态"),
+    #     (2, "产品购买"),
+    #     (3, "课程活动"),
+    # )
+    # remote_type = models.SmallIntegerField(verbose_name="备注类型", choices=remote_type_choices, default=1)
 
     remote = models.TextField(verbose_name="记录信息，存json格式", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
