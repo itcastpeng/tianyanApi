@@ -83,12 +83,12 @@ def article(request):
                 if team_list and len(team_list) >= 1:
                     article_list = []
                     team_objs = models.UserprofileTeam.objects.filter(user_id=user_id)  # 查询出该用户所有团队
-                    team_list = []
+                    team_id_list = []
                     for i in team_objs:
-                        team_list.append(i.team_id)
+                        team_id_list.append(i.team_id)
 
                     # 查询出该团队所有用户 去重
-                    team_objs = models.UserprofileTeam.objects.filter(team_id__in=team_list).values(
+                    team_objs = models.UserprofileTeam.objects.filter(team_id__in=team_id_list).values(
                         'user_id').distinct()
                     team_user_list = []
                     for team_obj in team_objs:
@@ -97,7 +97,7 @@ def article(request):
                     # 查询 该团队所有用户文章
                     team_user_objs = models.Article.objects.filter(
                         create_user_id__in=team_user_list,
-                        ownership_team_id__in=team_list
+                        ownership_team_id__in=team_id_list
                     )  # 查询该团队 所有文章
                     for i in team_user_objs:
                         article_list.append(i.id)
