@@ -217,6 +217,7 @@ def team_oper(request, oper_type, o_id):
         elif oper_type == 'delete':
             member_objs = models.UserprofileTeam.objects.filter(team_id=o_id)
             user_id_list = [i.get('user_id') for i in member_objs.filter(type=2).values('user_id')]
+            user_list = [i.get('user_id') for i in member_objs.filter(type=1).values('user_id')] # 普通用户
             print('user_id_list===================. >', user_id_list)
             if int(user_id) in user_id_list: # 该团队管理员列表
                 member_objs.delete()
@@ -224,8 +225,14 @@ def team_oper(request, oper_type, o_id):
                 response.code = 200
                 response.msg = '删除团队成功'
             else:
-                response.code = 301
-                response.msg = '权限不足'
+                if int(user_id) in user_list:
+                    member_objs.filter(user_id=user_id).delete()
+                    response.code = 200
+                    response.msg = '退出团队成功'
+                else:
+                    response.code = 301
+                    response.msg = '权限不足'
+
     else:
         # 查看团队人员列表
         if oper_type == "select_user_list":
