@@ -24,7 +24,7 @@ import json, xml.dom.minidom, datetime, time, requests, re, redis
 
 
 # 创建或更新用户信息
-def updateUserInfo(openid, inviter_user_id, ret_obj, msg=None): # msg访问日志记录
+def updateUserInfo(openid, inviter_user_id, ret_obj, msg=None, enterprise_id=1): # msg访问日志记录 enterprise_id 公司ID
     """
     :param openid:  微信openid
     :param inviter_user_id: 邀请人id
@@ -118,6 +118,7 @@ def updateUserInfo(openid, inviter_user_id, ret_obj, msg=None): # msg访问日�
             ret_obj = weichat_api_obj.get_user_info(openid=openid)
             subscribe = ret_obj.get('subscribe')
 
+        user_data['enterprise_id'] = enterprise_id
         user_data['last_active_time'] = datetime.datetime.today()
         user_data['wechat_name'] = encode_username
         user_data['headimgurl'] = ret_obj.get('headimgurl')
@@ -209,7 +210,61 @@ def wechat(request):
 
                     weichat_api_obj = WeChatApi(data)
                     ret_obj = weichat_api_obj.get_user_info(openid=openid)
-                    updateUserInfo(openid, inviter_user_id, ret_obj, msg='关注公众号')
+
+                    flag = False # 是否点过修改 成 我的名片 如果有创建文章 推送给用户
+                    article_id = ''
+                    if not inviter_user_id:  # 如果没有推荐人 则查询 是否查看过文章  最后一次查看 该公司的用户
+                        select_article_objs = models.SelectArticleLog.objects.filter(
+                            inviter__enterprise__appid=appid,
+                            customer__openid=openid
+                        ).order_by('-create_datetime')
+                        if select_article_objs:
+                            select_article_obj = select_article_objs[0]
+                            if select_article_obj.click_modify:
+                                flag = True
+                                article_id = select_article_obj.article_id
+                                inviter_user_id = select_article_obj.inviter_id
+
+                    updateUserInfo(openid, inviter_user_id, ret_obj, msg='关注公众号', enterprise_id=data.get('id'))
+
+                    if flag:
+                        user_obj = models.Userprofile.objects.get(openid=openid)
+                        article_objs = models.Article.objects.filter(id=article_id)
+                        if article_objs:
+                            article_obj = article_objs[0]
+                            create_article_obj = models.Article.objects.create(
+                                title=article_obj.title,
+                                summary=article_obj.summary,
+                                content=article_obj.content,
+                                create_user_id=user_obj.id,
+                                source_link=article_obj.source_link,
+                                cover_img=article_obj.cover_img,
+                                style=article_obj.style,
+                                original_link=article_obj.original_link,
+                            )
+                            create_article_obj.classify = [39]
+                            create_article_obj.save()
+                            url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
+                                create_article_obj.id,
+                                user_obj.token,
+                                user_obj.user_id
+                            )
+                            post_data = {
+                                "touser": openid,
+                                "msgtype": "news",  # 图文消息 图文消息条数限制在1条以内，注意，如果图文数超过1，则将会返回错误码45008。
+                                "news": {
+                                    "articles": [
+                                        {
+                                            "title": create_article_obj.title,
+                                            "description": b64decode(create_article_obj.summary),
+                                            "url": url,
+                                            "picurl": create_article_obj.cover_img + '?imageView2/2/w/200'
+                                        }
+                                    ]
+                                }
+                            }
+                            post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+                            weichat_api_obj.news_service(post_data)
 
                     if event == 'subscribe':  # 首次关注
                         nickname = ret_obj.get('nickname')  # 关注人名称

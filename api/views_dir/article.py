@@ -609,8 +609,8 @@ def article_oper(request, oper_type, o_id):
 def article_customer_oper(request, oper_type):
     response = Response.ResponseObj()
     inviter_user_id = request.GET.get('inviter_user_id') # 用户ID
+    customer_id = request.GET.get('user_id')    # 客户ID
     if request.method == 'GET':
-        customer_id = request.GET.get('user_id')    # 客户ID
 
         # 客户查询文章详情
         if oper_type == 'article':
@@ -665,15 +665,7 @@ def article_customer_oper(request, oper_type):
                 if user_obj.show_product: # 如果客户 打开文章底部显示热卖
                     goods_list = get_hot_commodity(inviter_user_id)
 
-                # 如果是客户查看记录查看次数 判断今天是否看过此文章 看过不记录
-                # now = datetime.datetime.today().strftime('%Y-%m-%d') + ' 00:00:00'
-                # log_objs = models.SelectArticleLog.objects.filter(
-                #     customer_id=customer_id,
-                #     inviter_id=inviter_user_id,
-                #     create_datetime__gte=now
-                # )
-                # if not log_objs:
-                models.SelectArticleLog.objects.create(
+                article_log_obj = models.SelectArticleLog.objects.create(
                     customer_id=customer_id,
                     article_id=id,
                     inviter_id=inviter_user_id
@@ -690,12 +682,21 @@ def article_customer_oper(request, oper_type):
                     'customer_id': customer_id,
                 })
 
+                is_own_article = False
+                # 判断是否是自己的文章
+                customer_openid = article_log_obj.customer.openid
+                user_objs = models.Userprofile.objects.filter(openid=customer_openid)
+                if user_objs:
+                    if int(user_objs[0].id) == int(inviter_user_id):
+                        is_own_article = True
+
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
                     'goods_list': goods_list,
                     'popula_articles': popula_articles_list,
                     'result_data': result_data,
+                    'is_own_article': is_own_article,
                 }
                 response.note = {
                     'popula_articles热门文章': {
@@ -730,7 +731,8 @@ def article_customer_oper(request, oper_type):
                         'goods_name': '商品名称',
                         'cover_img': '封面图',
                         'url': '跳转链接'
-                    }
+                    },
+                    'is_own_article': '是否为自己的文章',
                 }
 
             else:
@@ -931,11 +933,103 @@ def article_customer_oper(request, oper_type):
                 response.code = 301
                 response.msg = json.loads(form_obj.errors.as_json())
 
+        # 客户 点击 更换成我的名片
+        elif oper_type == 'change_my_business_card':
+            obj = models.Customer.objects.get(id=customer_id)
+            article_id = request.POST.get('article_id')
+            article_objs = models.Article.objects.filter(id=article_id)
+            if article_objs:
+                article_obj = article_objs[0]
+
+                if obj.subscribe:  # 已关注公众号
+
+                    user_obj = models.Userprofile.objects.get(openid=obj.openid)
+
+                    if_article_objs = models.Article.objects.filter(
+                        create_user_id=user_obj.id,
+                        title=article_obj.title
+                    )
+
+                    if not if_article_objs: # 没有创建
+                        create_article_obj = models.Article.objects.create(
+                            title=article_obj.title,
+                            summary=article_obj.summary,
+                            content=article_obj.content,
+                            create_user_id=user_obj.id,
+                            source_link=article_obj.source_link,
+                            cover_img=article_obj.cover_img,
+                            style=article_obj.style,
+                            original_link=article_obj.original_link,
+                        )
+                        create_article_obj.classify = [39]
+                        create_article_obj.save()
+
+                        article_id = create_article_obj.id
+                    else:
+                        if_article_obj = if_article_objs[0]
+                        article_id = if_article_obj.id
+
+                    msg = '跳转页面'
+                    code = 200
+                    response.data = {
+                        'article_id': article_id,
+                        'user_id': user_obj.id,
+                        'token': user_obj.token,
+                    }
+
+                else:  # 未关注公众号
+                    select_article_objs = models.SelectArticleLog.objects.filter(
+                        customer_id=customer_id,
+                        article_id=article_id
+                    ).order_by('-create_datetime')
+                    if select_article_objs:
+                        select_article_obj = select_article_objs[0]
+                        select_article_obj.click_modify = 1
+                        select_article_obj.save()
+
+                    msg = '未关注公众号'
+                    code = 301
+                    response.data = {
+                        'weChat_qr_code': article_obj.create_user.enterprise.weChat_qr_code
+                    }
+
+            else:
+                code = 301
+                msg = '该文章已被删除'
+
+            response.code = code
+            response.msg = msg
+
+        # 获取自己 用户 的 token （以客户身份进入自己分享的文章 可直接修改 点击修改 获取自己用户token 登录天眼）
+        elif oper_type == 'get_my_token':
+            obj = models.Customer.objects.get(id=customer_id)
+            user_objs = models.Userprofile.objects.filter(openid=obj.openid)
+            if user_objs:
+                user_obj = user_objs[0]
+                data = {
+                    'id': user_obj.id,
+                    'token': user_obj.token,
+                }
+                response.code = 200
+                response.msg = '查询成功'
+                response.data = {
+                    'ret_data': data
+                }
+
+            else:
+                response.code = 301
+                response.msg = '修改失败'
+
         else:
             response.code = 402
             response.msg = '请求异常'
 
     return JsonResponse(response.__dict__)
+
+
+
+
+
 
 
 # 客户打开 用户分享的文章 (嵌入微信url 获取用户信息 匹配openid 判断数据库是否存在 跳转文章页)

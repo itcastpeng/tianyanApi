@@ -28,6 +28,7 @@ class Enterprise(models.Model):
     primary_distribution = models.IntegerField(verbose_name='一级分销占比', default=30)
     secondary_distribution = models.IntegerField(verbose_name='二级分销占比', default=15)
     working_days = models.IntegerField(verbose_name='创建天数时长', default=1)
+    weChat_qr_code = models.CharField(verbose_name='微信二维码', max_length=512, null=True)
 
 # 修改 分销记录
 class distribution_log(models.Model):
@@ -237,6 +238,8 @@ class SelectArticleLog(models.Model):
     article = models.ForeignKey('Article', verbose_name="查看文章")
     close_datetime = models.DateTimeField(verbose_name="关闭页面时间", null=True, blank=True)
     create_datetime = models.DateTimeField(verbose_name="创建时间", auto_now_add=True)
+
+    click_modify = models.BooleanField(verbose_name='客户 是否点击了修改成我的名片', default=0)
 
 # 客户点赞文章日志表
 class SelectClickArticleLog(models.Model):

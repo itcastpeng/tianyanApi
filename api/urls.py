@@ -23,7 +23,7 @@ urlpatterns = [
     # 客户打开 用户分享的文章/微店宝贝
     url(r'^share_article/(?P<oper_type>\w+)$', wechat.share_article),
 
-    # 客户操作(文章/微店)
+    # 客户操作(文章/微店 等。。)
     url(r'^article_customer/(?P<oper_type>\w+)$', article.article_customer_oper),
 
 
