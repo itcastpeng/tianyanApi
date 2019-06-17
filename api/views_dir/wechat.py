@@ -198,6 +198,7 @@ def wechat(request):
                     # subscribe = 首次关注
                     # SCAN = 已关注
                     # 事件 Key 值
+                    models.Customer.objects.filter(openid=openid).update(subscribe=1) # 更改客户 是否关注
 
                     if collection.getElementsByTagName("EventKey")[0].childNodes:
                         event_key = collection.getElementsByTagName("EventKey")[0].childNodes[0].data
