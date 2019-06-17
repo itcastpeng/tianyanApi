@@ -117,7 +117,7 @@ def article(request):
                     is_use_redis = True
 
                 elif team_list:  # 团队
-                    q.add(Q(create_user_id=user_id), Q.OR)
+                    # q.add(Q(create_user_id=user_id), Q.OR)
                     order_by = '-like_num'
 
                 else:
@@ -239,10 +239,10 @@ def article(request):
                         result_data['create_user__name'] = obj.create_user.name
                         result_data['create_user__set_avator'] = obj.create_user.set_avator
                         team_list_name = []
-                        if obj.ownership_team:
-                            team_list_name.append(obj.ownership_team.name)
-                        else:
-                            team_list_name.append('创建')
+                        # if obj.ownership_team:
+                        team_list_name.append(obj.ownership_team.name)
+                        # else:
+                        #     team_list_name.append('创建')
 
                         result_data['team_list_name'] = team_list_name
 

@@ -500,22 +500,49 @@ def summary_message_reminder_celery(request):
 
 # 更新客户头像到七牛云
 def update_customer_set_avator(request):
-    objs = models.Customer.objects.filter(set_avator__isnull=False)
-    for obj in objs:
-        if 'http://tianyan.zhugeyingxiao.com' not in obj.set_avator:
-            set_avator = requests_img_download(obj.set_avator)
-            set_avator = update_qiniu(set_avator)
-            obj.set_avator = set_avator
-            obj.save()
+    try:
+        objs = models.Customer.objects.filter(set_avator__isnull=False)
+        for obj in objs:
+            if 'http://tianyan.zhugeyingxiao.com' not in obj.set_avator:
+                set_avator = requests_img_download(obj.set_avator)
+                set_avator = update_qiniu(set_avator)
+                obj.set_avator = set_avator
+                obj.save()
+    except Exception as e:
+        msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+            'celery_更新客户头像到七牛云 发送---警告',
+            e,
+            datetime.datetime.today()
+        )
+        celery_error_warning(msg)
     return HttpResponse('')
 
 # 定时更新文章 (主要更新视频)
 def celery_regularly_update_articles(request):
-    objs = models.Article.objects.filter(original_link__isnull=False)
-    for obj in objs:
-        print('----更新文章-----> ', obj.id, obj.title)
-        data = get_article(obj.original_link, get_content=1)
-        obj.content = data.get('content')
-        obj.save()
+    try:
+        objs = models.Article.objects.filter(original_link__isnull=False)
+        for obj in objs:
+            print('----更新文章-----> ', obj.id, obj.title)
+            data = get_article(obj.original_link, get_content=1)
+            obj.content = data.get('content')
+            obj.save()
+    except Exception as e:
+        msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+            'celery_定时更新文章 发送---警告',
+            e,
+            datetime.datetime.today()
+        )
+        celery_error_warning(msg)
     return HttpResponse('')
 
+
+
+# """
+#     except Exception as e:
+#         msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
+#             'celery_汇总消息 发送---警告',
+#             e,
+#             datetime.datetime.today()
+#         )
+#         celery_error_warning(msg)
+#         """
