@@ -450,8 +450,8 @@ def user_login_oper(request, oper_type):
     code = request.GET.get('code')
     objs = models.save_code.objects.filter(save_code=code)
     if not objs:
-        oper_type = oper_type.split('_')[0]
         appid = oper_type.split('_')[1]
+        oper_type = oper_type.split('_')[0]
 
         models.save_code.objects.create(
             save_code=code

@@ -182,7 +182,7 @@ def create_menu(request):
         ]
     }
     print('button-button---button--------> ', button)
-    weixin_objs.createMenu(button)
+    # weixin_objs.createMenu(button)
 
 
     response.code = 200
