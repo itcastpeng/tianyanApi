@@ -450,15 +450,23 @@ def user_login_oper(request, oper_type):
     code = request.GET.get('code')
     objs = models.save_code.objects.filter(save_code=code)
     if not objs:
+        oper_type = oper_type.split('_')[0]
+        appid = oper_type.split('_')[1]
+
         models.save_code.objects.create(
             save_code=code
         )
-        data = get_ent_info(1)
+        data = get_ent_info(1, appid)
         weichat_api_obj = WeChatApi(data)
         ret_obj = weichat_api_obj.get_openid(code)  # 获取用户信息
-        encode_username = b64encode(
-            ret_obj['nickname']
-        )
+        print("ret_obj['nickname']------------> ", ret_obj['nickname'])
+        try:
+            encode_username = b64encode(
+                ret_obj['nickname']
+            )
+        except Exception:
+            encode_username = ''
+
         openid = ret_obj.get('openid')
         user_data = {
             "sex": ret_obj.get('sex'),

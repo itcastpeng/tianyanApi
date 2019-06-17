@@ -73,7 +73,7 @@ def create_menu(request):
     # weixin_objs.getMenu() # 获取自定义菜单栏列表
 
 
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/user_login_get_info_{}'.format(APPID)
     login_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                  "&state=STATE#wechat_redirect&connect_redirect=1" \
@@ -81,7 +81,7 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/wodepinpai'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/wodepinpai_{}'.format(APPID)
     pinpai_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                 "&state=STATE#wechat_redirect&connect_redirect=1" \
@@ -89,7 +89,7 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/wodedianpu'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/wodedianpu_{}'.format(APPID)
     dianpu_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                 "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                 "&state=STATE#wechat_redirect&connect_redirect=1" \
@@ -97,7 +97,7 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tuiguang'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tuiguang_{}'.format(APPID)
     tuiguang_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                  "&state=STATE#wechat_redirect&connect_redirect=1" \
@@ -105,7 +105,7 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tianyan'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/tianyan_{}'.format(APPID)
     tianyan_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                    "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                    "&state=STATE#wechat_redirect&connect_redirect=1" \
@@ -113,7 +113,7 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/shezhi'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/shezhi_{}'.format(APPID)
     shezhi_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                   "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                   "&state=STATE#wechat_redirect&connect_redirect=1" \
@@ -121,7 +121,7 @@ def create_menu(request):
         appid=APPID,
         redirect_uri=redirect_uri,
     )
-    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/mingpian'
+    redirect_uri = 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/user_login/mingpian_{}'.format(APPID)
     mingpian_url = "https://open.weixin.qq.com/connect/oauth2/authorize?" \
                  "appid={appid}&redirect_uri={redirect_uri}&response_type=code&scope=snsapi_userinfo" \
                  "&state=STATE#wechat_redirect&connect_redirect=1" \
@@ -182,7 +182,7 @@ def create_menu(request):
         ]
     }
     print('button-button---button--------> ', button)
-    # weixin_objs.createMenu(button)
+    weixin_objs.createMenu(button)
 
 
     response.code = 200

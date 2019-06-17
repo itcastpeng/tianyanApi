@@ -68,21 +68,32 @@ def add_article_public(data, classify_id=None):
 
 
 # 获取用户 企业的 appid等信息
-def get_ent_info(user_id):
+def get_ent_info(user_id, appid=None):
     print('---------# 获取用户 企业的 appid等信息-------------> ', user_id)
-    if not user_id:
-        user_id = 1
-    user_obj = models.Userprofile.objects.get(id=user_id)
-    ent_obj = models.Enterprise.objects.get(id=user_obj.enterprise_id)
+    if appid:
+        ent_obj = models.Enterprise.objects.get(appid=appid)
+        name = ''
+        set_avator = ''
+        openid = ''
+
+    else:
+        if not user_id:
+            user_id = 1
+        user_obj = models.Userprofile.objects.get(id=user_id)
+        name = b64decode(user_obj.name)
+        set_avator = user_obj.set_avator
+        openid = user_obj.openid
+        ent_obj = models.Enterprise.objects.get(id=user_obj.enterprise_id)
+
     data = {
         'id': ent_obj.id,
         'APPID': ent_obj.appid,
         'APPSECRET': ent_obj.appsecret,
         'access_token': ent_obj.access_token,
         'create_datetime': ent_obj.create_datetime,
-        'user_name': b64decode(user_obj.name),
-        'user_set_avator': user_obj.set_avator,
-        'openid': user_obj.openid,
+        'user_name': name,
+        'user_set_avator': set_avator,
+        'openid': openid,
     }
     return data
 
