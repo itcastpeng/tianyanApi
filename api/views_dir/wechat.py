@@ -247,7 +247,7 @@ def wechat(request):
                             url = 'http://zhugeleida.zhugeyingxiao.com/tianyan/#/Article/Article_Detail?id={}&token={}&user_id={}&classify_type=1'.format(
                                 create_article_obj.id,
                                 user_obj.token,
-                                user_obj.user_id
+                                user_obj.id
                             )
                             post_data = {
                                 "touser": openid,
