@@ -222,6 +222,10 @@ def wechat(request):
                             select_article_obj = select_article_objs[0]
                             if select_article_obj.click_modify:
                                 flag = True
+
+                                select_article_obj.click_modify=0 # 避免下次判断
+                                select_article_obj.save()
+
                                 article_id = select_article_obj.article_id
                                 inviter_user_id = select_article_obj.inviter_id
 
