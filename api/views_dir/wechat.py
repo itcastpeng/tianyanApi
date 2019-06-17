@@ -227,7 +227,52 @@ def wechat(request):
 
                     updateUserInfo(openid, inviter_user_id, ret_obj, msg='关注公众号', enterprise_id=data.get('id'))
 
-                    if flag:
+
+                    if event == 'subscribe':  # 首次关注
+                        nickname = ret_obj.get('nickname')  # 关注人名称
+                        sex_obj = ret_obj.get('sex')  # 性别
+                        if sex_obj and int(sex_obj) == 2: # 女
+                            sex = '美女'
+                        else: # 男 未知
+                            sex = '靓仔'
+
+                        post_data = {
+                            "touser": openid,
+                            "msgtype": "text",
+                            "text": {
+                                "content": '欢迎关注微商天眼公众号！\n\n<{sex}-{name}>你终于来了!天眼已经在此等候多时!{emj_1}\n\n'
+                                           '分享文章后我会告诉您谁看了您的文章, 精准追踪客户\n\n'
+                                           '快进入天眼客户追踪神器吧！{emj_2}\n\n'
+                                           '点击下方【天眼】{emj_3}'.format(
+                                    name=nickname,
+                                    emj_1=baiyan,
+                                    emj_2=zhayan,
+                                    emj_3=xiajiantou,
+                                    sex=sex
+                                )
+                            }
+                        }
+                        if flag:
+                            post_data = {
+                                "touser": openid,
+                                "msgtype": "text",
+                                "text": {
+                                    "content": '欢迎关注微商天眼公众号！\n\n<{sex}-{name}>你终于来了!天眼已经在此等候多时!{emj_1}\n\n'
+                                               '分享文章后我会告诉您谁看了您的文章, 精准追踪客户\n\n'
+                                               '快进入天眼客户追踪神器吧！{emj_2}\n\n'
+                                               '您要修改的名片文章{emj_3}点击修改吧!'.format(
+                                        name=nickname,
+                                        emj_1=baiyan,
+                                        emj_2=zhayan,
+                                        emj_3=xiajiantou,
+                                        sex=sex
+                                    )
+                                }
+                            }
+                        post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
+                        weichat_api_obj.news_service(post_data)
+
+                    if flag: # 查看了别人的文章
                         user_obj = models.Userprofile.objects.get(openid=openid)
                         article_objs = models.Article.objects.filter(id=article_id)
                         if article_objs:
@@ -266,59 +311,6 @@ def wechat(request):
                             post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
                             weichat_api_obj.news_service(post_data)
 
-                    if event == 'subscribe':  # 首次关注
-                        nickname = ret_obj.get('nickname')  # 关注人名称
-                        sex_obj = ret_obj.get('sex')  # 性别
-                        if sex_obj and int(sex_obj) == 2: # 女
-                            sex = '美女'
-                        else: # 男 未知
-                            sex = '靓仔'
-
-
-                        post_data = {
-                            "touser": openid,
-                            "msgtype": "text",
-                            "text": {
-                                "content": '欢迎关注微商天眼公众号！\n\n<{sex}-{name}>你终于来了!天眼已经在此等候多时!{emj_1}\n\n'
-                                           '分享文章后我会告诉您谁看了您的文章, 精准追踪客户\n\n'
-                                           '快进入天眼客户追踪神器吧！{emj_2}\n\n'
-                                           '点击下方【天眼】{emj_3}'.format(
-                                    name=nickname,
-                                    emj_1=baiyan,
-                                    emj_2=zhayan,
-                                    emj_3=xiajiantou,
-                                    sex=sex
-                                )
-                            }
-                        }
-                        post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
-                        weichat_api_obj.news_service(post_data)
-
-
-                        # post_data = {
-                        #     "touser": openid,
-                        #     "template_id": "gwB4lxYzpWhtyFSFs3Pj0ZrMweHY0-GCTvS4b0ZeTmI",  # 登录提醒模板
-                        #     # "url": "http://wenda.zhugeyingxiao.com/",
-                        #     "data": {
-                        #         "first": {
-                        #             "value": "欢迎关注微商天眼公众号!",
-                        #             "color": "#173177"
-                        #         },
-                        #         "keyword1": {
-                        #             "value": nickname,
-                        #             "color": "#173177"
-                        #         },
-                        #         "keyword2": {
-                        #             "value": datetime.datetime.now().strftime("%y-%m-%d %H:%M:%S"),
-                        #             "color": "#173177"
-                        #         },
-                        #         "remark": {
-                        #             "value": "感谢使用,请注意账号安全!\n进入天眼请点击最下方↓↓↓",
-                        #             "color": "#173177"
-                        #         }
-                        #     }
-                        # }
-                        # weichat_api_obj.sendTempMsg(post_data)
 
                 # 取消关注
                 elif event == "unsubscribe":
