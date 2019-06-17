@@ -323,7 +323,7 @@ def wechat(request):
                 # 取消关注
                 elif event == "unsubscribe":
                     print('-------------取关')
-                    # models.Userprofile.objects.filter(openid=openid).update(openid=None)
+                    models.Userprofile.objects.filter(openid=openid).update(subscribe=False)
                     # we_chat_public_send_msg_obj.sendTempMsg(post_data)
 
             # 客户发送消息
