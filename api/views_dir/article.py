@@ -459,6 +459,8 @@ def article_oper(request, oper_type, o_id):
         elif oper_type == 'add_article':
             top_advertising = request.POST.get('top_advertising')
             end_advertising = request.POST.get('end_advertising')
+            ownership_team = request.POST.get('ownership_team')  # 归属团队
+
             models.Userprofile.objects.filter(id=user_id).update(
                 top_advertising=top_advertising,
                 end_advertising=end_advertising
@@ -474,6 +476,7 @@ def article_oper(request, oper_type, o_id):
                     'summary': obj.summary,
                     'style': obj.style,
                     'create_user_id': user_id,
+                    'ownership_team_id': ownership_team,
                 }
                 id = add_article_public(data) # 创建文章
 
