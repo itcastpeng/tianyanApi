@@ -989,11 +989,13 @@ def article_customer_oper(request, oper_type):
                         select_article_obj = select_article_objs[0]
                         select_article_obj.click_modify = 1
                         select_article_obj.save()
-
+                        weChat_qr_code = select_article_obj.inviter.enterprise.weChat_qr_code
+                    else:
+                        weChat_qr_code = article_obj.create_user.enterprise.weChat_qr_code
                     msg = '未关注公众号'
                     code = 301
                     response.data = {
-                        'weChat_qr_code': article_obj.create_user.enterprise.weChat_qr_code
+                        'weChat_qr_code': weChat_qr_code
                     }
 
             else:
