@@ -10,7 +10,10 @@ from django.db.models import F
 from publicFunc.emoji import xiajiantou, nanshou, caidai
 from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 from publicFunc.get_content_article import get_article
+from requests import ConnectTimeout
 import datetime, json, time, requests
+
+
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
 def celery_error_warning(msg, external=None): #external 外部引用
@@ -524,10 +527,17 @@ def celery_regularly_update_articles(request):
         objs = models.Article.objects.filter(original_link__isnull=False)
         for obj in objs:
             article_id = obj.id
+
             print('----更新文章-----> ', obj.id, obj.title)
-            data = get_article(obj.original_link, get_content=1)
-            obj.content = data.get('content')
-            obj.save()
+            try:
+                data = get_article(obj.original_link, get_content=1)
+                obj.content = data.get('content')
+                obj.save()
+            except ConnectTimeout:
+                data = get_article(obj.original_link, get_content=1)
+                obj.content = data.get('content')
+                obj.save()
+
     except Exception as e:
         msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
             'celery_定时更新文章 发送---警告{}'.format(article_id),
