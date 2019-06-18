@@ -519,16 +519,18 @@ def update_customer_set_avator(request):
 
 # 定时更新文章 (主要更新视频)
 def celery_regularly_update_articles(request):
+    article_id = ''
     try:
         objs = models.Article.objects.filter(original_link__isnull=False)
         for obj in objs:
+            article_id = obj.id
             print('----更新文章-----> ', obj.id, obj.title)
             data = get_article(obj.original_link, get_content=1)
             obj.content = data.get('content')
             obj.save()
     except Exception as e:
         msg = '警告:{}, \n错误:{}, \n时间:{}'.format(
-            'celery_定时更新文章 发送---警告',
+            'celery_定时更新文章 发送---警告{}'.format(article_id),
             e,
             datetime.datetime.today()
         )
