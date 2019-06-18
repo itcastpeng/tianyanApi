@@ -5,7 +5,7 @@ from urllib import request
 
 # 上传七牛云
 def update_qiniu(img_path, key=None):
-    print('------------**************开始上传七牛云--> ',datetime.datetime.today())
+    # print('------------**************开始上传七牛云--> ',datetime.datetime.today())
     # 需要填写你的 Access Key 和 Secret Key
     SecretKey = 'wVig2MgDzTmN_YqnL-hxVd6ErnFhrWYgoATFhccu'
     AccessKey = 'a1CqK8BZm94zbDoOrIyDlD7_w7O8PqJdBHK-cOzz'
@@ -38,7 +38,7 @@ def update_qiniu(img_path, key=None):
 
     ret = requests.post(url, data=data, files=files, headers=headers)
 
-    print('###############@@@@@@@@上传七牛云@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret.text, datetime.datetime.today())
+    # print('###############@@@@@@@@上传七牛云@@@@@@@@@@@@@@@@@@@@@#################_------------> ', ret.text, datetime.datetime.today())
     if 'http://tianyan.zhugeyingxiao.com/' not in img_path and os.path.exists(img_path):
         os.remove(img_path)  # 删除本地图片
     img_path = 'http://tianyan.zhugeyingxiao.com/' + ret.json().get('key')

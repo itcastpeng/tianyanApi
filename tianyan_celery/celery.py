@@ -27,21 +27,21 @@ app.conf.beat_schedule = {
     # 马上超过二十四小时活跃的用户发送消息(1分钟执行一次)
     'last_active_time':{
         'task':'tianyan_celery.tasks.last_active_time',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab("*/1", '*', '*', '*', '*'),
         'args':[]
     },
 
     # 汇总消息 发送(1分钟执行一次)
     'summary_message_reminder_celery': {
         'task': 'tianyan_celery.tasks.summary_message_reminder_celery',
-        'schedule': crontab(minute='*/1'),
+        'schedule': crontab("*/1", '*', '*', '*', '*'),
         'args': []
     },
 
     # 定时更新 文章 (10分钟更新一次)
     'celery_regularly_update_articles': {
         'task': 'tianyan_celery.tasks.celery_regularly_update_articles',
-        'schedule': crontab(minute='*/60'),
+        'schedule': crontab("*/10", '*', '*', '*', '*'),
         'args': []
     },
 
