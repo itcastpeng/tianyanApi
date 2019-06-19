@@ -221,6 +221,7 @@ def team_oper(request, oper_type, o_id):
             if int(user_id) in user_id_list: # 该团队管理员列表
                 member_objs.delete()
                 models.Team.objects.filter(id=o_id).delete()
+                models.Article.objects.filter(ownership_team_id=o_id).update(ownership_team_id=None)
                 response.code = 200
                 response.msg = '删除团队成功'
             else:
