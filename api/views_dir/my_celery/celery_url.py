@@ -11,8 +11,7 @@ from publicFunc.emoji import xiajiantou, nanshou, caidai
 from publicFunc.qiniu_oper import update_qiniu, requests_img_download
 from publicFunc.get_content_article import get_article
 from requests import ConnectTimeout
-import datetime, json, time, requests
-
+import datetime, json, time, requests, logging
 
 
 # 报错警告  celery捕获异常 发送客服消息 到管理员
@@ -522,6 +521,7 @@ def update_customer_set_avator(request):
 
 # 定时更新文章 (主要更新视频)
 def celery_regularly_update_articles(request):
+    logging.captureWarnings(True)
     article_id = ''
     try:
         objs = models.Article.objects.filter(original_link__isnull=False)
