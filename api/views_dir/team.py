@@ -219,9 +219,9 @@ def team_oper(request, oper_type, o_id):
             user_id_list = [i.get('user_id') for i in member_objs.filter(type=2).values('user_id')]
             user_list = [i.get('user_id') for i in member_objs.filter(type=1).values('user_id')] # 普通用户
             if int(user_id) in user_id_list: # 该团队管理员列表
+                models.Article.objects.filter(ownership_team_id=o_id).update(ownership_team_id=None)
                 member_objs.delete()
                 models.Team.objects.filter(id=o_id).delete()
-                models.Article.objects.filter(ownership_team_id=o_id).update(ownership_team_id=None)
                 response.code = 200
                 response.msg = '删除团队成功'
             else:
