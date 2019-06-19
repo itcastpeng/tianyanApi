@@ -263,8 +263,23 @@
 #     num_x += 1
 #     num_y1 -= 1
 #     num_y2 += 1
+p = 'user_login_get_info_555'
 
-p = ''
+app = p.split('_')[-1]
+print(p.split('_' + app)[0])
 
-if not p :
-    print('==')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
