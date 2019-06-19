@@ -38,10 +38,10 @@ app.conf.beat_schedule = {
         'args': []
     },
 
-    # 定时更新 文章 (10分钟更新一次)
+    # 定时更新 文章 (30分钟更新一次)
     'celery_regularly_update_articles': {
         'task': 'tianyan_celery.tasks.celery_regularly_update_articles',
-        'schedule': crontab("*/10", '*', '*', '*', '*'),
+        'schedule': crontab("*/30", '*', '*', '*', '*'),
         'args': []
     },
 
