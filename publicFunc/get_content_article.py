@@ -73,7 +73,7 @@ def eliminate_label(i):
 # 放入微信文章 获取全部内容
 def get_article(article_url, get_content=None):
     headers = {'User-Agent': pcRequestHeader[random.randint(0, len(pcRequestHeader) - 1)]}
-    ret = requests.get(article_url, headers=headers, timeout=10)
+    ret = requests.get(article_url, headers=headers, timeout=10, verify=False)
     ret.encoding = 'utf-8'
     s = requests.session()
     is_video_original_link = None # 是否有视频 如果有则返回原文链接
