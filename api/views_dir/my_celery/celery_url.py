@@ -71,7 +71,8 @@ def outside_calls_send_msg(request):
 def create_menu(request):
     response = Response.ResponseObj()
     user_id = request.GET.get('user_id')
-    data = get_ent_info(user_id)
+    obj = models.Enterprise.objects.get(id=user_id)
+    data = get_ent_info(1, appid=obj.appid)
     weixin_objs = WeChatApi(data)
     APPID = weixin_objs.APPID
     # weixin_objs.getMenu() # 获取自定义菜单栏列表
