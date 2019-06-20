@@ -109,8 +109,8 @@ class weixin_pay_api(WeixinApiPublic):
         apiclient_key = os.path.join('statics', 'zhengshu', 'apiclient_key.pem')
         apiclient_cert = os.path.join('statics', 'zhengshu', 'apiclient_cert.pem')
 
-        apiclient_key = 'statics/zhengshu/apiclient_key.pem'
-        apiclient_cert = 'statics/zhengshu/apiclient_cert.pem'
+        # apiclient_key = 'statics/zhengshu/apiclient_key.pem'
+        # apiclient_cert = 'statics/zhengshu/apiclient_cert.pem'
 
         ret = requests.post(url, data=xml_data, verify=False, cert=(apiclient_cert, apiclient_key))
         ret.encoding = 'utf-8'

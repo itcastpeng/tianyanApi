@@ -5,7 +5,7 @@ from django.views.decorators.csrf import csrf_exempt, csrf_protect
 from publicFunc.condition_com import conditionCom
 from api.forms.admin.admin_user import AddForm, UpdateForm, SelectForm
 from django.db.models import Q
-from publicFunc.public import length_the_days
+from publicFunc.admin.public import create_member_price
 import json, datetime, time
 
 
@@ -163,7 +163,9 @@ def user_oper(request, oper_type, o_id):
                 if role == 2: # 如果是管理员 不需要审核
                     msg = '添加成功'
                     data['status'] = 1
-                models.Enterprise.objects.create(**data)
+                obj = models.Enterprise.objects.create(**data)
+                if role == 2:
+                    create_member_price(obj.id) # 创建会员价格
                 response.code = 200
                 response.msg = msg
 
@@ -273,36 +275,7 @@ def user_oper(request, oper_type, o_id):
                         msg = '审核驳回'
                         if status == 1:
                             msg = '审核通过'
-
-                            # 创建默认会员价格
-                            data = [
-                                {
-                                    'the_length':1,
-                                    'price':99,
-                                    'original_price':199,
-                                },
-                                {
-                                    'the_length': 2,
-                                    'price': 299,
-                                    'original_price': 499,
-                                },
-                                {
-                                    'the_length': 3,
-                                    'price': 599,
-                                    'original_price': 999,
-                                },
-                            ]
-                            for i in data:
-                                the_length, renewal_number_days = length_the_days(i.get('the_length'))
-                                models.renewal_management.objects.create(
-                                    create_user_id=obj.id,
-                                    price=i.get('price'),
-                                    original_price=i.get('original_price'),
-                                    renewal_number_days=renewal_number_days,
-                                    the_length=the_length,
-                                )
-
-
+                            create_member_price(obj.id) # 创建用户会员
                         response.code = 200
                         response.msg = msg
 
