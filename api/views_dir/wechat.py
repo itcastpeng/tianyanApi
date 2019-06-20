@@ -233,7 +233,7 @@ def wechat(request):
                     user_id = updateUserInfo(openid, inviter_user_id, ret_obj, msg='关注公众号', enterprise_id=data.get('id'))
 
 
-                    user_obj = models.Userprofile.objects.get(user_id=user_id)
+                    user_obj = models.Userprofile.objects.get(id=user_id)
                     if event == 'subscribe':  # 首次关注
                         nickname = ret_obj.get('nickname')  # 关注人名称
                         sex_obj = ret_obj.get('sex')  # 性别
