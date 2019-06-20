@@ -80,12 +80,11 @@ class WeChatApi(WeixinApiPublic):
 
     # 获取access_token
     def get_access_token(self):
-        print("-" * 30 + "获取 access_token" + "-" * 30)
         url = "https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid={APPID}&secret={APPSECRET}".format(
             APPID=self.APPID,
             APPSECRET=self.APPSECRET
         )
-
+        print("-" * 30 + "获取 access_token" + "-" * 30, url)
         ret = requests.get(url)
         print('ret.text===--------======--------------> ', ret.text)
         self.access_token = json.loads(ret.text)["access_token"]
