@@ -1,5 +1,5 @@
 from api import models
-from publicFunc import Response
+from publicFunc import Response, account
 from django.http import JsonResponse, HttpResponse
 from django.db.models import Count
 from publicFunc.base64_encryption import b64decode, b64encode
@@ -67,9 +67,11 @@ def outside_calls_send_msg(request):
 
 
 # 创建天眼公众号 导航栏
+@account.is_token(models.Enterprise)
 def create_menu(request):
     response = Response.ResponseObj()
-    data = get_ent_info(1)
+    user_id = request.GET.get('user_id')
+    data = get_ent_info(user_id)
     weixin_objs = WeChatApi(data)
     APPID = weixin_objs.APPID
     # weixin_objs.getMenu() # 获取自定义菜单栏列表

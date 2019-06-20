@@ -264,7 +264,23 @@
 #     num_y1 -= 1
 #     num_y2 += 1
 
-p = ''
 
-if not p :
-    print('==')
+
+
+
+print('............', 'sssssssssssssssss' , 'ssssssssssssssssssssssssssssssssssssss', 'dasdsadasd')
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
