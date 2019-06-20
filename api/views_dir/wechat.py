@@ -230,9 +230,10 @@ def wechat(request):
                                 article_id = select_article_obj.article_id
                                 inviter_user_id = select_article_obj.inviter_id
 
-                    updateUserInfo(openid, inviter_user_id, ret_obj, msg='关注公众号', enterprise_id=data.get('id'))
+                    user_id = updateUserInfo(openid, inviter_user_id, ret_obj, msg='关注公众号', enterprise_id=data.get('id'))
 
 
+                    user_obj = models.Userprofile.objects.get(user_id=user_id)
                     if event == 'subscribe':  # 首次关注
                         nickname = ret_obj.get('nickname')  # 关注人名称
                         sex_obj = ret_obj.get('sex')  # 性别
@@ -241,44 +242,32 @@ def wechat(request):
                         else: # 男 未知
                             sex = '靓仔'
 
+                        text = '点击下方【天眼】{emj_3}'.format(emj_3=xiajiantou)
+                        if flag:   # 客户未关注公众号情况下 点击了 修改成我的名片文章  关注公众号后 发送点击的文章
+                            text = '您要修改的名片文章{emj_3}点击修改吧!'.format(emj_3=xiajiantou)
+
                         post_data = {
                             "touser": openid,
                             "msgtype": "text",
                             "text": {
-                                "content": '欢迎关注微商天眼公众号！\n\n<{sex}-{name}>你终于来了!天眼已经在此等候多时!{emj_1}\n\n'
+                                "content": '欢迎关注{user_name}公众号！\n\n<{sex}-{name}>你终于来了!天眼已经在此等候多时!{emj_1}\n\n'
                                            '分享文章后我会告诉您谁看了您的文章, 精准追踪客户\n\n'
                                            '快进入天眼客户追踪神器吧！{emj_2}\n\n'
-                                           '点击下方【天眼】{emj_3}'.format(
+                                           '{text}'.format(
+                                    user_name=user_obj.enterprise.name,
                                     name=nickname,
                                     emj_1=baiyan,
                                     emj_2=zhayan,
-                                    emj_3=xiajiantou,
+                                    text=text,
                                     sex=sex
                                 )
                             }
                         }
-                        if flag:
-                            post_data = {
-                                "touser": openid,
-                                "msgtype": "text",
-                                "text": {
-                                    "content": '欢迎关注微商天眼公众号！\n\n<{sex}-{name}>你终于来了!天眼已经在此等候多时!{emj_1}\n\n'
-                                               '分享文章后我会告诉您谁看了您的文章, 精准追踪客户\n\n'
-                                               '快进入天眼客户追踪神器吧！{emj_2}\n\n'
-                                               '您要修改的名片文章{emj_3}点击修改吧!'.format(
-                                        name=nickname,
-                                        emj_1=baiyan,
-                                        emj_2=zhayan,
-                                        emj_3=xiajiantou,
-                                        sex=sex
-                                    )
-                                }
-                            }
+
                         post_data = bytes(json.dumps(post_data, ensure_ascii=False), encoding='utf-8')
                         weichat_api_obj.news_service(post_data)
 
                     if flag: # 查看了别人的文章
-                        user_obj = models.Userprofile.objects.get(openid=openid)
                         article_objs = models.Article.objects.filter(id=article_id)
                         if article_objs:
                             article_obj = article_objs[0]
