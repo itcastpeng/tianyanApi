@@ -53,6 +53,7 @@ def weixin_pay(request, oper_type, o_id):
                                 price=price,
                                 original_price=fee_obj.original_price,  # 原价
                                 overdue_date=overdue_date,
+                                status=2,
                             )
                             if float(user_obj.make_money) >= price:
                                 userObjs.update(make_money=F('make_money') - price)
@@ -99,6 +100,7 @@ def weixin_pay(request, oper_type, o_id):
                                     price=price,
                                     original_price=fee_obj.original_price,  # 原价
                                     overdue_date=overdue_date,
+                                    status=1
                                 )
 
                                 # 返回数据
@@ -301,7 +303,8 @@ def weixin_pay(request, oper_type, o_id):
                     data_list.append({
                         'pay_order_no': obj.pay_order_no,               # 订单号
                         'price':obj.price,                              # 价钱
-                        # 'original_price':obj.original_price,            # 原价
+                        'status_id':obj.status,                         # 支付方式ID
+                        'status':obj.get_status_display(),              # 支付方式
                         'the_length':obj.the_length,                    # 时长
                         # 'overdue_date':obj.overdue_date.strftime('%Y-%m-%d %H:%M:%S'),  # 过期时间
                         'create_date': obj.create_date.strftime('%Y-%m-%d %H:%M:%S'),  # 创建时间

@@ -385,6 +385,12 @@ class renewal_log(models.Model):
     original_price = models.CharField(verbose_name='原价格', max_length=128, null=True, blank=True)
     overdue_date = models.DateField(verbose_name="过期时间", null=True, blank=True)
     isSuccess = models.IntegerField(verbose_name='是否成功', default=0)
+    status_choices = (
+        (1, '微信支付'),
+        (2, '余额支付')
+    )
+    status = models.SmallIntegerField(verbose_name='支付方式', choices=status_choices, default=1)
+
 
 # 提现日志
 class withdrawal_log(models.Model):
