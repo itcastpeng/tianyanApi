@@ -362,9 +362,15 @@ def day_eye_oper(request, oper_type, o_id):
             # 按文章查看(天眼功能)列表页
             elif oper_type == 'view_by_article':
                 user_id, message = forms_obj.cleaned_data['user_id']
+                # objs = models.SelectArticleLog.objects.filter(
+                #     inviter_id=user_id
+                # ).values('article_id', 'article__title').distinct().annotate(Count('id')).exclude(customer_id__isnull=True)
+
                 objs = models.SelectArticleLog.objects.filter(
                     inviter_id=user_id
-                ).values('article_id', 'article__title').distinct().annotate(Count('id')).exclude(customer_id__isnull=True)
+                ).exclude(
+                    customer_id__isnull=True
+                ).distinct().order_by('-create_datetime')
                 count = objs.count()
 
                 if length != 0:
@@ -373,22 +379,26 @@ def day_eye_oper(request, oper_type, o_id):
                     objs = objs[start_line: stop_line]
 
                 ret_data = []
+                article_id_list = []
                 for obj in objs:
-                    article_obj = models.SelectArticleLog.objects.filter(article_id=obj['article_id']).order_by(order)
-                    cover_img = article_obj[0].article.cover_img    # 文章封面
-                    create_datetime = article_obj[0].create_datetime
-                    after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
+                    if obj.article_id not in article_id_list:
+                        article_id_list.append(obj.article_id)
 
-                    ret_data.append({
-                        'article_id': obj['article_id'],
-                        'article__title': obj['article__title'],
-                        'id__count': obj['id__count'],
-                        'after_time': after_time + '前',
-                        'cover_img': cover_img + '?imageView2/2/w/200',
-                        'create_datetime': create_datetime,
-                    })
+                        article_obj = models.SelectArticleLog.objects.filter(article_id=obj.article_id).order_by(order)
+                        cover_img = article_obj[0].article.cover_img    # 文章封面
+                        create_datetime = article_obj[0].create_datetime
+                        after_time = get_min_s(create_datetime, datetime.datetime.today(), ms=1)
 
-                ret_data = sorted(ret_data, key=lambda x: x['create_datetime'], reverse=True)
+                        ret_data.append({
+                            'article_id': obj.article_id,
+                            'article__title': obj.article.title,
+                            'id__count': article_obj.count(),
+                            'after_time': after_time + '前',
+                            'cover_img': cover_img + '?imageView2/2/w/200',
+                            # 'create_datetime': create_datetime,
+                        })
+
+                # ret_data = sorted(ret_data, key=lambda x: x['create_datetime'], reverse=True)
                 response.code = 200
                 response.msg = '查询成功'
                 response.data = {
