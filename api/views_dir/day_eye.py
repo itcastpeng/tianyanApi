@@ -371,7 +371,7 @@ def day_eye_oper(request, oper_type, o_id):
                 ).exclude(
                     customer_id__isnull=True
                 ).distinct().order_by('-create_datetime')
-                count = objs.count()
+                # count = objs.count()
 
                 if length != 0:
                     start_line = (current_page - 1) * length
@@ -397,7 +397,7 @@ def day_eye_oper(request, oper_type, o_id):
                             'cover_img': cover_img + '?imageView2/2/w/200',
                             # 'create_datetime': create_datetime,
                         })
-
+                count = len(article_id_list)
                 # ret_data = sorted(ret_data, key=lambda x: x['create_datetime'], reverse=True)
                 response.code = 200
                 response.msg = '查询成功'
