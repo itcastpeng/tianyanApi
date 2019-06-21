@@ -373,10 +373,12 @@ def day_eye_oper(request, oper_type, o_id):
                 ).distinct().order_by('-create_datetime')
                 # count = objs.count()
 
+                start_line = 1
+                stop_line = 10
                 if length != 0:
                     start_line = (current_page - 1) * length
                     stop_line = start_line + length
-                    objs = objs[start_line: stop_line]
+                    # objs = objs[start_line: stop_line]
 
                 ret_data = []
                 article_id_list = []
@@ -397,6 +399,7 @@ def day_eye_oper(request, oper_type, o_id):
                             'cover_img': cover_img + '?imageView2/2/w/200',
                             # 'create_datetime': create_datetime,
                         })
+                ret_data = ret_data[start_line:stop_line]
                 count = len(article_id_list)
                 # ret_data = sorted(ret_data, key=lambda x: x['create_datetime'], reverse=True)
                 response.code = 200
