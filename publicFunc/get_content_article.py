@@ -53,7 +53,8 @@ def convert_content(s, content):
                 file_dir = os.path.join('statics', 'img') + filename
                 with open(file_dir, 'wb') as file:
                     file.write(html.content)
-                sub_url = URL + file_dir
+                sub_url = update_qiniu(file_dir)
+                # sub_url = URL + file_dir
                 # sub_url = URL + '/statics/img' + filename
                 content = content.replace(pattern_url, sub_url)
         else:

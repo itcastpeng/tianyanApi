@@ -36,17 +36,13 @@ class weixin_pay_api(WeixinApiPublic):
             'notify_url': 'http://zhugeleida.zhugeyingxiao.com/tianyan/api/payback',
             'trade_type': 'JSAPI'                    # 支付方式  NATIVE--Native支付、APP--app支付，MWEB--H5支付
         }
-        print('result_data===========> ', result_data)
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
         result_data['sign'] = self.md5(string_sign_temp).upper()
         xml_data = self.toXml(result_data).encode('utf-8')
-        print('xml_data=-xml_data-----------xml_data---------------------------> ', xml_data)
         ret = requests.post(url, data=xml_data, headers={'Content-Type': 'text/xml'})
         ret.encoding = 'utf8'
-        print('ret.text---------------ret.text----------------ret.text------------------> ', ret.text)
         dom_tree = xmldom.parseString(ret.text)
         collection = dom_tree.documentElement
-        print('collection-------------> ', collection)
         data = ['return_code', 'return_msg']
         result_data = xmldom_parsing.xmldom(collection, data)
         data = ['prepay_id']
@@ -101,7 +97,6 @@ class weixin_pay_api(WeixinApiPublic):
             'act_name':'tianyanhuodong',                 # 活动名称
             'remark':'tianyan_beizhu!',                  # 备注
         }
-        print('result_data-=--------------> ', result_data)
         string_sign_temp = self.shengchengsign(result_data, self.SHANGHUKEY)
         result_data['sign'] = self.md5(string_sign_temp).upper()
         xml_data = self.toXml(result_data).encode('utf-8')
